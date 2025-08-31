@@ -1,3 +1,4 @@
+
 -- Migration: 20250831164140_sync_with_production_schema.sql
 -- Purpose: Sync local schema with production database
 -- Description: Create all tables and fields that exist in production, without RLS policies

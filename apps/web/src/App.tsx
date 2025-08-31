@@ -12,6 +12,9 @@ import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import About from "./pages/About";
 import Pricing from "./pages/Pricing";
+import Solutions from "./pages/Solutions";
+import Testimonials from "./pages/Testimonials";
+import FAQ from "./pages/FAQ";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +26,9 @@ const AppRoutes = () => {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/contact" element={<Contact />} />
+      <Route path="/solutions" element={<Solutions />} />
+      <Route path="/testimonials" element={<Testimonials />} />
+      <Route path="/faq" element={<FAQ />} />
       <Route path="/terms" element={<Terms />} />
       <Route path="/privacy" element={<Privacy />} />
       <Route path="/about" element={<About />} />

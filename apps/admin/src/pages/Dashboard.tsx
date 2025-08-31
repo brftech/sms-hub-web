@@ -4,7 +4,7 @@ import { useAdminStats } from '@sms-hub/supabase'
 
 export function Dashboard() {
   const { hubConfig, currentHub } = useHub()
-  const { data: stats } = useAdminStats(hubConfig.hubNumber)
+  const { data: stats } = useAdminStats(hubConfig.id)
 
   const overviewStats = [
     {

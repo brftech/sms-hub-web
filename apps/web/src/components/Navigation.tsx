@@ -77,6 +77,16 @@ const Navigation = () => {
             >
               About
             </button>
+            <button
+              onClick={() => navigate("/faq")}
+              className={`transition-colors text-sm font-medium ${
+                location.pathname === "/faq"
+                  ? `${hubColors.text} hub-text-primary`
+                  : "text-white hover:text-gray-300"
+              }`}
+            >
+              FAQ
+            </button>
           </div>
 
           {/* Mobile header with logo, contact button, and hamburger */}
@@ -181,6 +191,18 @@ const Navigation = () => {
                 }`}
               >
                 About
+              </button>
+              <button
+                onClick={() => handleNavClick("/faq")}
+                className={`block w-full text-left px-3 py-2 text-base font-medium text-white hover:${
+                  hubColors.textHover
+                } hover:${hubColors.bgLight} transition-colors ${
+                  location.pathname === "/faq"
+                    ? `${hubColors.text} ${hubColors.bgLight}`
+                    : ""
+                }`}
+              >
+                FAQ
               </button>
             </div>
           </div>

@@ -40,7 +40,7 @@ export function ActivationStep({ onComplete }: StepComponentProps) {
   }
 
   const handleContinue = () => {
-    navigate('/dashboard')
+    navigate('/')
   }
 
   return (

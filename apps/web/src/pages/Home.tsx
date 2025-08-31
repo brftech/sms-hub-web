@@ -108,7 +108,7 @@ const Home = () => {
       footer={<Footer />}
     >
       <div
-        className="min-h-screen bg-black relative cursor-pointer"
+        className="min-h-screen bg-black relative cursor-pointer pt-16"
         style={{
           backgroundImage: `url(${cigarImage})`,
           backgroundSize: "40%",
@@ -125,7 +125,7 @@ const Home = () => {
             hubType={currentHub}
             variant="text"
             size="xl"
-            className="!flex-none !items-start"
+            className="!flex-none !items-start h-24 w-auto"
           />
         </div>
 

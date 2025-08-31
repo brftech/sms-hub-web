@@ -97,18 +97,19 @@ serve(async (req) => {
         }
 
         // Create user in Supabase Auth
-        const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
-          email: tempSignup.email,
-          phone: tempSignup.mobile_phone_number,
-          password: Math.random().toString(36), // Temporary password
-          email_confirm: true,
-          phone_confirm: true,
-          user_metadata: {
-            temp_signup_id: tempSignup.id,
-            company_id: company.id,
-            hub_id: tempSignup.hub_id,
-          },
-        });
+        const { data: authData, error: authError } =
+          await supabaseAdmin.auth.admin.createUser({
+            email: tempSignup.email,
+            phone: tempSignup.mobile_phone_number,
+            password: Math.random().toString(36), // Temporary password
+            email_confirm: true,
+            phone_confirm: true,
+            user_metadata: {
+              temp_signup_id: tempSignup.id,
+              company_id: company.id,
+              hub_id: tempSignup.hub_id,
+            },
+          });
 
         if (authError || !authData.user) {
           console.error("❌ Error creating auth user:", authError);
@@ -116,10 +117,10 @@ serve(async (req) => {
         }
 
         // Generate account number
-        const { data: accountNumber, error: accountError } = await supabaseAdmin.rpc(
-          "generate_account_number",
-          { hub_name: getHubName(tempSignup.hub_id) }
-        );
+        const { data: accountNumber, error: accountError } =
+          await supabaseAdmin.rpc("generate_account_number", {
+            hub_name: getHubName(tempSignup.hub_id),
+          });
 
         if (accountError) {
           console.error("❌ Error generating account number:", accountError);
@@ -150,7 +151,10 @@ serve(async (req) => {
           throw new Error("Failed to create user profile");
         }
 
-        console.log("✅ Account creation successful for user:", authData.user.id);
+        console.log(
+          "✅ Account creation successful for user:",
+          authData.user.id
+        );
 
         // Return success response with account details
         return new Response(

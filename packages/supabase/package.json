@@ -8,7 +8,8 @@
     ".": "./src/index.ts",
     "./client": "./src/client.ts",
     "./auth": "./src/auth.ts",
-    "./queries": "./src/queries.ts"
+    "./queries": "./src/queries.ts",
+    "./react": "./src/react.ts"
   },
   "scripts": {
     "type-check": "tsc --noEmit",

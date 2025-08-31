@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useHub, Card, CardContent, CardDescription, CardHeader, CardTitle, Button, Input, Label, Textarea, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sms-hub/ui'
 import { Progress, Badge, Checkbox } from '@sms-hub/ui'
 import { ArrowRight, ArrowLeft, CheckCircle } from 'lucide-react'
-import { useUserProfile, useOnboardingSubmission, useCreateOnboardingSubmission, useUpdateOnboardingSubmission } from '@sms-hub/supabase'
+import { useUserProfile, useOnboardingSubmission, useCreateOnboardingSubmission, useUpdateOnboardingSubmission } from '@sms-hub/supabase/react'
 import { ONBOARDING_STEPS, type OnboardingStepName } from '@sms-hub/types'
 
 export function Onboarding() {

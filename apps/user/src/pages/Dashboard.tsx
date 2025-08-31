@@ -15,7 +15,7 @@ import {
   CheckCircle,
   Settings,
 } from "lucide-react";
-import { useUserProfile, useOnboardingSubmission } from "@sms-hub/supabase";
+import { useUserProfile, useOnboardingSubmission } from "@sms-hub/supabase/react";
 import { ONBOARDING_STEPS } from "@sms-hub/types";
 import { Link } from "react-router-dom";
 

@@ -170,30 +170,50 @@ const About = () => {
             {/* Why Choose Section */}
             <section className="bg-gradient-to-br from-gray-800/80 to-gray-900/80 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-8 shadow-2xl">
               <h2 className={`text-2xl font-bold ${hubColors.text} mb-4`}>
-                Why Choose {currentHub === "gnymble" ? "Gnymble" : currentHub === "percytech" ? "PercyTech" : currentHub === "percymd" ? "PercyMD" : currentHub === "percytext" ? "PercyText" : "Our Platform"}?
+                Why Choose{" "}
+                {currentHub === "gnymble"
+                  ? "Gnymble"
+                  : currentHub === "percytech"
+                    ? "PercyTech"
+                    : currentHub === "percymd"
+                      ? "PercyMD"
+                      : currentHub === "percytext"
+                        ? "PercyText"
+                        : "Our Platform"}
+                ?
               </h2>
               <div className="grid md:grid-cols-2 gap-4">
                 <ul className="space-y-3">
                   <li className="flex items-center text-gray-300 text-lg">
-                    <span className={`w-2 h-2 ${hubColors.bg} rounded-full mr-3`}></span>
+                    <span
+                      className={`w-2 h-2 ${hubColors.bg} rounded-full mr-3`}
+                    ></span>
                     Industry specialists who understand your sector
                   </li>
                   <li className="flex items-center text-gray-300 text-lg">
-                    <span className={`w-2 h-2 ${hubColors.bg} rounded-full mr-3`}></span>
+                    <span
+                      className={`w-2 h-2 ${hubColors.bg} rounded-full mr-3`}
+                    ></span>
                     Bespoke platforms built for sophistication
                   </li>
                   <li className="flex items-center text-gray-300 text-lg">
-                    <span className={`w-2 h-2 ${hubColors.bg} rounded-full mr-3`}></span>
+                    <span
+                      className={`w-2 h-2 ${hubColors.bg} rounded-full mr-3`}
+                    ></span>
                     Regulatory mastery with ongoing compliance
                   </li>
                 </ul>
                 <ul className="space-y-3">
                   <li className="flex items-center text-gray-300 text-lg">
-                    <span className={`w-2 h-2 ${hubColors.bg} rounded-full mr-3`}></span>
+                    <span
+                      className={`w-2 h-2 ${hubColors.bg} rounded-full mr-3`}
+                    ></span>
                     Exclusive focus on premium establishments
                   </li>
                   <li className="flex items-center text-gray-300 text-lg">
-                    <span className={`w-2 h-2 ${hubColors.bg} rounded-full mr-3`}></span>
+                    <span
+                      className={`w-2 h-2 ${hubColors.bg} rounded-full mr-3`}
+                    ></span>
                     Custom solutions others won't provide
                   </li>
                 </ul>

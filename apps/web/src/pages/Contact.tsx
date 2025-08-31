@@ -106,6 +106,17 @@ const Contact = () => {
       footer={<Footer />}
     >
       <div className="min-h-screen bg-black p-8 relative">
+        {/* Page Header */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
+            Contact Us
+          </h1>
+          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+            Ready to get started? We'd love to hear from you. Fill out the form
+            below and we'll be in touch within 24 hours.
+          </p>
+        </div>
+
         {/* Contact Form */}
         <div className="flex justify-center pt-4">
           <div className="bg-gradient-to-br from-gray-800/80 to-gray-900/80 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-6 shadow-2xl max-w-md w-full">

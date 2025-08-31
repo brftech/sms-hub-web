@@ -15,6 +15,17 @@ const Privacy = () => {
       footer={<Footer />}
     >
       <div className="min-h-screen bg-black p-8 relative">
+        {/* Page Header */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
+            Privacy Policy
+          </h1>
+          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+            Your privacy is important to us. Learn how we collect, use, and
+            protect your information.
+          </p>
+        </div>
+
         {/* Privacy Content Card */}
         <div className="flex justify-center pt-4">
           <div className="bg-gradient-to-br from-gray-800/80 to-gray-900/80 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-8 shadow-2xl max-w-md w-full max-h-[500px] overflow-y-auto scrollbar-thin ${hubColors.scrollbar}/50 scrollbar-track-gray-800/50">
@@ -182,9 +193,33 @@ const Privacy = () => {
                     practices, please contact us at:
                   </p>
                   <div className="text-gray-300 text-sm">
-                    <p>Email: privacy@gnymble.com</p>
+                    <p>
+                      Email: privacy@
+                      {currentHub === "gnymble"
+                        ? "gnymble"
+                        : currentHub === "percytech"
+                          ? "percytech"
+                          : currentHub === "percymd"
+                            ? "percymd"
+                            : currentHub === "percytext"
+                              ? "percytext"
+                              : "ourplatform"}
+                      .com
+                    </p>
                     <p>Phone: 757-295-8725</p>
-                    <p>Address: Gnymble Privacy Office</p>
+                    <p>
+                      Address:{" "}
+                      {currentHub === "gnymble"
+                        ? "Gnymble"
+                        : currentHub === "percytech"
+                          ? "PercyTech"
+                          : currentHub === "percymd"
+                            ? "PercyMD"
+                            : currentHub === "percytext"
+                              ? "PercyText"
+                              : "Our Platform"}{" "}
+                      Privacy Office
+                    </p>
                   </div>
                 </section>
               </div>

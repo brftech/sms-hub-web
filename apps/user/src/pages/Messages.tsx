@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useHub, Card, CardContent, CardDescription, CardHeader, CardTitle, Button, Input, Badge, DataTable } from '@sms-hub/ui'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sms-hub/ui'
 import { Search, Send, MessageSquare, Download } from 'lucide-react'
-import { useMessages } from '@sms-hub/supabase'
+import { useMessages } from '@sms-hub/supabase/react'
 import type { Message } from '@sms-hub/types'
 
 const messageColumns = [

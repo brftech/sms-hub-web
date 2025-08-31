@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useHub, Card, CardContent, CardDescription, CardHeader, CardTitle, Button, Input, Label, Switch } from '@sms-hub/ui'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Badge, Separator } from '@sms-hub/ui'
 import { User, Building, Phone, CreditCard, Bell, Shield, Key } from 'lucide-react'
-import { useUserProfile, useCompany, usePhoneNumbers } from '@sms-hub/supabase'
+import { useUserProfile, useCompany, usePhoneNumbers } from '@sms-hub/supabase/react'
 
 export function Settings() {
   useHub() // Initialize hub context

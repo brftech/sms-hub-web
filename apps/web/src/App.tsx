@@ -38,7 +38,7 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <SonnerToaster />
-        <HubProvider environment={webEnvironment} defaultHub="percytech">
+        <HubProvider environment={webEnvironment} defaultHub="gnymble">
           <BrowserRouter>
             <AppRoutes />
           </BrowserRouter>

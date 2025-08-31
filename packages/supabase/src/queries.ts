@@ -1,6 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from './client'
-import { authService } from './auth'
+import { createAuthService } from './auth'
+
+const authService = createAuthService(supabase)
 
 // Auth Queries
 export const useAuth = () => {

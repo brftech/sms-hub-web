@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useHub, Card, CardContent, CardDescription, CardHeader, CardTitle, Button, Input, Badge, DataTable } from '@sms-hub/ui'
 import { Search, Plus, Play, Pause, MoreHorizontal, TrendingUp } from 'lucide-react'
-import { useCampaigns } from '@sms-hub/supabase'
+import { useCampaigns } from '@sms-hub/supabase/react'
 import type { Campaign } from '@sms-hub/types'
 
 const campaignColumns = [

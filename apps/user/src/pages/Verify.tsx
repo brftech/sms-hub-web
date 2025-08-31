@@ -1,62 +1,78 @@
-import { useState, useEffect } from 'react'
-import { useSearchParams, useNavigate } from 'react-router-dom'
-import { useHub, HubLogo, Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sms-hub/ui'
-import { Input, Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@sms-hub/ui'
-import { useVerifyCode } from '@sms-hub/supabase'
-import { VerificationData } from '@sms-hub/types'
-import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
+import { useState, useEffect } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import {
+  useHub,
+  HubLogo,
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@sms-hub/ui";
+import {
+  Input,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@sms-hub/ui";
+import { useVerifyCode } from "../hooks/useAuth";
+import { VerificationData } from "@sms-hub/types";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 export function Verify() {
-  const { currentHub } = useHub()
-  const [searchParams] = useSearchParams()
-  const navigate = useNavigate()
-  const verifyCode = useVerifyCode()
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const tempSignupId = searchParams.get('id')
+  const { currentHub } = useHub();
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const verifyCode = useVerifyCode();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const tempSignupId = searchParams.get("id");
 
   const form = useForm<{ verification_code: string }>({
     defaultValues: {
-      verification_code: ''
-    }
-  })
+      verification_code: "",
+    },
+  });
 
   useEffect(() => {
     if (!tempSignupId) {
-      navigate('/signup')
+      navigate("/signup");
     }
-  }, [tempSignupId, navigate])
+  }, [tempSignupId, navigate]);
 
   const onSubmit = async (data: { verification_code: string }) => {
-    if (!tempSignupId) return
-    
-    setIsSubmitting(true)
-    
+    if (!tempSignupId) return;
+
+    setIsSubmitting(true);
+
     try {
       const verificationData: VerificationData = {
         temp_signup_id: tempSignupId,
-        verification_code: data.verification_code
-      }
+        verification_code: data.verification_code,
+      };
 
-      await verifyCode.mutateAsync(verificationData)
-      
-      toast.success('Account verified! Redirecting to onboarding...')
-      
+      await verifyCode.mutateAsync(verificationData);
+
+      toast.success("Account verified! Redirecting to onboarding...");
+
       // Navigate to onboarding
       setTimeout(() => {
-        navigate('/onboarding')
-      }, 1500)
-      
+        navigate("/onboarding");
+      }, 1500);
     } catch (error) {
-      console.error('Verification error:', error)
-      toast.error('Invalid verification code. Please try again.')
+      console.error("Verification error:", error);
+      toast.error("Invalid verification code. Please try again.");
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   if (!tempSignupId) {
-    return null
+    return null;
   }
 
   return (
@@ -66,7 +82,9 @@ export function Verify() {
           <div className="flex justify-center mb-4">
             <HubLogo hubType={currentHub} variant="full" size="lg" />
           </div>
-          <CardTitle className="hub-text-primary">Verify Your Account</CardTitle>
+          <CardTitle className="hub-text-primary">
+            Verify Your Account
+          </CardTitle>
           <CardDescription>
             Enter the verification code sent to your phone
           </CardDescription>
@@ -81,11 +99,11 @@ export function Verify() {
                   <FormItem>
                     <FormLabel>Verification Code</FormLabel>
                     <FormControl>
-                      <Input 
-                        placeholder="123456" 
+                      <Input
+                        placeholder="123456"
                         maxLength={6}
                         className="text-center text-lg font-mono tracking-widest"
-                        {...field} 
+                        {...field}
                       />
                     </FormControl>
                     <FormMessage />
@@ -93,20 +111,20 @@ export function Verify() {
                 )}
               />
 
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 className="w-full hub-bg-primary hover:hub-bg-primary/90"
                 disabled={isSubmitting}
               >
-                {isSubmitting ? 'Verifying...' : 'Verify Account'}
+                {isSubmitting ? "Verifying..." : "Verify Account"}
               </Button>
             </form>
           </Form>
 
           <div className="mt-6 text-center text-sm text-muted-foreground">
-            Didn't receive a code?{' '}
-            <button 
-              onClick={() => navigate('/signup')}
+            Didn't receive a code?{" "}
+            <button
+              onClick={() => navigate("/signup")}
               className="hub-text-primary hover:underline"
             >
               Try again
@@ -115,5 +133,5 @@ export function Verify() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

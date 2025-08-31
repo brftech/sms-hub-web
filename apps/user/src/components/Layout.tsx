@@ -2,7 +2,7 @@ import { Outlet, Link, useLocation } from 'react-router-dom'
 import { useHub, HubLogo, HubSwitcher, Button } from '@sms-hub/ui'
 import { Badge, Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger } from '@sms-hub/ui'
 import { Home, MessageSquare, Settings, Zap, LogOut } from 'lucide-react'
-import { useUserProfile } from '@sms-hub/supabase'
+import { useUserProfile } from '@sms-hub/supabase/react'
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: Home },

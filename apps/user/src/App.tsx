@@ -17,12 +17,13 @@ function App() {
         <Route path="/verify" element={<Verify />} />
         <Route path="/login" element={<Login />} />
         <Route path="/onboarding" element={<Onboarding />} />
-        <Route path="/" element={<Layout />}>
+        <Route path="/dashboard" element={<Layout />}>
           <Route index element={<Dashboard />} />
           <Route path="campaigns" element={<Campaigns />} />
           <Route path="messages" element={<Messages />} />
           <Route path="settings" element={<Settings />} />
         </Route>
+        <Route path="/" element={<Signup />} />
       </Routes>
     </div>
   );

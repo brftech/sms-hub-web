@@ -54,7 +54,6 @@ export * from "./components/hub-logo";
 export * from "./components/hub-switcher";
 
 // Shared UI components
-export * from "./components/footer";
 export * from "./components/error-boundary";
 export * from "./components/forms";
 export * from "./components/page-layout";

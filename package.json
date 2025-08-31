@@ -1,0 +1,48 @@
+{
+  "name": "sms-hub-monorepo",
+  "private": true,
+  "description": "Multi-hub SMS B2B SaaS platform with Gnymble, PercyMD, PercyTech, and PercyText",
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "type-check": "turbo run type-check",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,md,json}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,md,json}\"",
+    "clean": "turbo run clean && rm -rf node_modules",
+    "install:all": "pnpm install",
+    "db:generate-types": "supabase gen types typescript --project-id $SUPABASE_PROJECT_ID --schema public > packages/types/src/database.ts",
+    "db:reset": "supabase db reset",
+    "db:migrate": "supabase db push",
+    "supabase:start": "supabase start",
+    "supabase:stop": "supabase stop",
+    "storybook": "turbo run storybook",
+    "build-storybook": "turbo run build-storybook"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "pnpm": {
+    "overrides": {
+      "react": "^19.1.0",
+      "react-dom": "^19.1.0",
+      "@types/react": "^19.1.0",
+      "@types/react-dom": "^19.1.1"
+    }
+  },
+  "devDependencies": {
+    "@turbo/gen": "^2.5.6",
+    "turbo": "^2.5.6",
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.2",
+    "@types/node": "^22.15.3",
+    "supabase": "^1.200.3"
+  },
+  "packageManager": "pnpm@10.15.0",
+  "engines": {
+    "node": ">=18",
+    "pnpm": ">=8"
+  }
+}

@@ -1,0 +1,42 @@
+-- Remove all RLS policies for development
+-- Migration: 20241229000003_remove_rls_policies.sql
+
+-- Remove all RLS policies from public schema tables
+DROP POLICY IF EXISTS "hubs_read_policy" ON public.hubs;
+DROP POLICY IF EXISTS "hubs_admin_policy" ON public.hubs;
+DROP POLICY IF EXISTS "hub_configs_read_policy" ON public.hub_configs;
+DROP POLICY IF EXISTS "hub_configs_update_policy" ON public.hub_configs;
+DROP POLICY IF EXISTS "temp_signups_create_policy" ON public.temp_signups;
+DROP POLICY IF EXISTS "temp_signups_read_policy" ON public.temp_signups;
+DROP POLICY IF EXISTS "temp_signups_update_policy" ON public.temp_signups;
+DROP POLICY IF EXISTS "verification_attempts_policy" ON public.verification_attempts;
+DROP POLICY IF EXISTS "companies_read_policy" ON public.companies;
+DROP POLICY IF EXISTS "companies_full_policy" ON public.companies;
+DROP POLICY IF EXISTS "user_profiles_read_policy" ON public.user_profiles;
+DROP POLICY IF EXISTS "user_profiles_update_policy" ON public.user_profiles;
+DROP POLICY IF EXISTS "leads_create_policy" ON public.leads;
+DROP POLICY IF EXISTS "leads_read_policy" ON public.leads;
+DROP POLICY IF EXISTS "memberships_read_policy" ON public.memberships;
+DROP POLICY IF EXISTS "memberships_full_policy" ON public.memberships;
+DROP POLICY IF EXISTS "onboarding_steps_read_policy" ON public.onboarding_steps;
+DROP POLICY IF EXISTS "onboarding_steps_update_policy" ON public.onboarding_steps;
+DROP POLICY IF EXISTS "onboarding_submissions_read_policy" ON public.onboarding_submissions;
+DROP POLICY IF EXISTS "onboarding_submissions_full_policy" ON public.onboarding_submissions;
+DROP POLICY IF EXISTS "brands_read_policy" ON public.brands;
+DROP POLICY IF EXISTS "brands_full_policy" ON public.brands;
+DROP POLICY IF EXISTS "campaigns_read_policy" ON public.campaigns;
+DROP POLICY IF EXISTS "campaigns_full_policy" ON public.campaigns;
+DROP POLICY IF EXISTS "phone_numbers_read_policy" ON public.phone_numbers;
+DROP POLICY IF EXISTS "phone_numbers_full_policy" ON public.phone_numbers;
+DROP POLICY IF EXISTS "campaign_phone_assignments_read_policy" ON public.campaign_phone_assignments;
+DROP POLICY IF EXISTS "campaign_phone_assignments_full_policy" ON public.campaign_phone_assignments;
+DROP POLICY IF EXISTS "tcr_integrations_read_policy" ON public.tcr_integrations;
+DROP POLICY IF EXISTS "tcr_integrations_full_policy" ON public.tcr_integrations;
+DROP POLICY IF EXISTS "bandwidth_accounts_read_policy" ON public.bandwidth_accounts;
+DROP POLICY IF EXISTS "bandwidth_accounts_full_policy" ON public.bandwidth_accounts;
+DROP POLICY IF EXISTS "admin_audit_logs_read_policy" ON public.admin_audit_logs;
+DROP POLICY IF EXISTS "admin_audit_logs_create_policy" ON public.admin_audit_logs;
+DROP POLICY IF EXISTS "lead_activities_read_policy" ON public.lead_activities;
+DROP POLICY IF EXISTS "lead_activities_create_policy" ON public.lead_activities;
+DROP POLICY IF EXISTS "payment_history_read_policy" ON public.payment_history;
+DROP POLICY IF EXISTS "payment_history_create_policy" ON public.payment_history;

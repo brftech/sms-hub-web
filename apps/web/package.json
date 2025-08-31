@@ -1,0 +1,44 @@
+{
+  "name": "@sms-hub/web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3000",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf .next"
+  },
+  "dependencies": {
+    "next": "^15.0.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "@sms-hub/ui": "workspace:*",
+    "@sms-hub/types": "workspace:*",
+    "@sms-hub/utils": "workspace:*",
+    "@sms-hub/supabase": "workspace:*",
+    "@sms-hub/hub-logic": "workspace:*",
+    "@tanstack/react-query": "^5.59.0",
+    "@supabase/supabase-js": "^2.39.0",
+    "stripe": "^16.12.0",
+    "lucide-react": "^0.460.0",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^2.5.2",
+    "react-hook-form": "^7.48.2",
+    "sonner": "^1.5.0",
+    "styled-components": "^6.1.13"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.3",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.1",
+    "typescript": "^5.9.2",
+    "eslint": "^9.34.0",
+    "eslint-config-next": "^15.0.0",
+    "tailwindcss": "^3.4.11",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.47",
+    "@types/styled-components": "^5.1.34"
+  }
+}

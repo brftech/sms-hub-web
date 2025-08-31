@@ -14,7 +14,7 @@ interface CreateTempSignupRequest {
   last_name: string;
   mobile_phone_number: string;
   email: string;
-  auth_method?: 'sms' | 'email';
+  auth_method?: "sms" | "email";
 }
 
 serve(async (req) => {
@@ -26,7 +26,14 @@ serve(async (req) => {
     const signupData: CreateTempSignupRequest = await req.json();
 
     // Validate required fields
-    const requiredFields = ['hub_id', 'company_name', 'first_name', 'last_name', 'mobile_phone_number', 'email'];
+    const requiredFields = [
+      "hub_id",
+      "company_name",
+      "first_name",
+      "last_name",
+      "mobile_phone_number",
+      "email",
+    ];
     for (const field of requiredFields) {
       if (!signupData[field as keyof CreateTempSignupRequest]) {
         throw new Error(`${field} is required`);
@@ -50,7 +57,7 @@ serve(async (req) => {
       .from("temp_signups")
       .insert({
         ...signupData,
-        auth_method: signupData.auth_method || 'sms',
+        auth_method: signupData.auth_method || "sms",
         verification_code: verificationCode,
         verification_attempts: 0,
         max_attempts: 3,
@@ -65,19 +72,30 @@ serve(async (req) => {
     }
 
     // Send verification based on auth method
-    const authMethod = signupData.auth_method || 'sms';
+    const authMethod = signupData.auth_method || "sms";
     const hubName = getHubName(signupData.hub_id);
 
-    if (authMethod === 'sms') {
+    if (authMethod === "sms") {
       // Use our SMS platform via Zapier webhook
       const formattedPhone = signupData.mobile_phone_number.replace(/\D/g, "");
-      
-      console.log("📱 Sending SMS via our platform to:", formattedPhone);
-      await sendSMSViaZapier(formattedPhone, verificationCode, hubName, tempSignup.id, signupData.hub_id);
+      // Ensure phone number has +1 prefix for US numbers
+      const fullPhone =
+        formattedPhone.length === 10
+          ? `+1${formattedPhone}`
+          : `+${formattedPhone}`;
+
+      console.log("📱 Sending SMS via our platform to:", fullPhone);
+      await sendSMSViaZapier(
+        fullPhone,
+        verificationCode,
+        hubName,
+        tempSignup.id,
+        signupData.hub_id
+      );
     } else {
       // Send email verification
       const resendApiKey = Deno.env.get("RESEND_API_KEY");
-      
+
       if (resendApiKey) {
         try {
           const emailHtml = `
@@ -91,7 +109,7 @@ serve(async (req) => {
           const response = await fetch("https://api.resend.com/emails", {
             method: "POST",
             headers: {
-              "Authorization": `Bearer ${resendApiKey}`,
+              Authorization: `Bearer ${resendApiKey}`,
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
@@ -122,7 +140,8 @@ serve(async (req) => {
       JSON.stringify({
         success: true,
         id: tempSignup.id,
-        message: "Signup created successfully. Check your phone for verification code.",
+        message:
+          "Signup created successfully. Check your phone for verification code.",
       }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -132,10 +151,10 @@ serve(async (req) => {
   } catch (error: any) {
     console.error("Error in create-temp-signup:", error);
     return new Response(
-      JSON.stringify({ 
+      JSON.stringify({
         error: error.message || "Failed to create signup",
-        details: error.toString()
-      }), 
+        details: error.toString(),
+      }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 400,
@@ -164,9 +183,15 @@ function getHubDomain(hubId: number): string {
   return hubDomains[hubId] || "sms-hub.com";
 }
 
-async function sendSMSViaZapier(phone: string, code: string, hubName: string, signupId: string, hubId: number) {
+async function sendSMSViaZapier(
+  phone: string,
+  code: string,
+  hubName: string,
+  signupId: string,
+  hubId: number
+) {
   const zapierWebhookUrl = Deno.env.get("ZAPIER_SMS_WEBHOOK_URL");
-  
+
   const smsMessage = `Welcome to ${hubName}! 🚀
 
 Your verification code is: ${code}

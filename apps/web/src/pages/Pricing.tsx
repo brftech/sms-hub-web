@@ -1,4 +1,5 @@
-import { Button, PageLayout } from "@sms-hub/ui";
+import { Button, PageLayout, useHub } from "@sms-hub/ui";
+import { getHubColorClasses } from "@sms-hub/utils";
 import { useNavigate } from "react-router-dom";
 import { Check } from "lucide-react";
 import Navigation from "../components/Navigation";
@@ -6,6 +7,8 @@ import Footer from "../components/Footer";
 
 const Pricing = () => {
   const navigate = useNavigate();
+  const { currentHub } = useHub();
+  const hubColors = getHubColorClasses(currentHub);
 
   const onboardingPlan = {
     name: "Onboarding",
@@ -92,7 +95,7 @@ const Pricing = () => {
                 {onboardingPlan.name}
               </h2>
               <div className="flex items-baseline justify-center mb-4">
-                <span className="text-5xl font-bold text-orange-400">
+                <span className="text-5xl font-bold ${hubColors.text}">
                   {onboardingPlan.price}
                 </span>
                 <span className="text-xl text-gray-400 ml-3">
@@ -108,7 +111,7 @@ const Pricing = () => {
               <ul className="space-y-3">
                 {onboardingPlan.features.map((feature, index) => (
                   <li key={index} className="flex items-center text-lg">
-                    <Check className="w-5 h-5 text-orange-400 mr-3 flex-shrink-0" />
+                    <Check className="w-5 h-5 ${hubColors.text} mr-3 flex-shrink-0" />
                     <span className="text-white">{feature}</span>
                   </li>
                 ))}
@@ -118,7 +121,7 @@ const Pricing = () => {
                 <Button
                   size="lg"
                   onClick={() => navigate("/contact")}
-                  className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white text-lg px-8 py-3"
+                  className="bg-gradient-to-r from-${hubColors.bg} to-${hubColors.bgHover} hover:from-${hubColors.bgHover} hover:to-${hubColors.bg} text-white text-lg px-8 py-3"
                 >
                   Get Started
                 </Button>
@@ -137,13 +140,13 @@ const Pricing = () => {
                   key={index}
                   className={`bg-gradient-to-br from-gray-800/80 to-gray-900/80 backdrop-blur-sm rounded-2xl border p-8 shadow-2xl h-full ${
                     plan.popular
-                      ? "border-orange-500/50 bg-orange-500/10"
+                      ? "${hubColors.border}/50 ${hubColors.bg}/10"
                       : "border-gray-700/50"
                   }`}
                 >
                   {plan.popular && (
                     <div className="text-center mb-4">
-                      <span className="bg-orange-500 text-white text-sm px-4 py-2 rounded-full font-semibold">
+                      <span className="${hubColors.bg} text-white text-sm px-4 py-2 rounded-full font-semibold">
                         Most Popular
                       </span>
                     </div>
@@ -153,7 +156,7 @@ const Pricing = () => {
                       {plan.name}
                     </h3>
                     <div className="flex items-baseline justify-center mb-4">
-                      <span className="text-4xl font-bold text-orange-400">
+                      <span className="text-4xl font-bold ${hubColors.text}">
                         {plan.price}
                       </span>
                       <span className="text-lg text-gray-400 ml-2">
@@ -171,7 +174,7 @@ const Pricing = () => {
                         key={featureIndex}
                         className="flex items-center text-base"
                       >
-                        <Check className="w-5 h-5 text-orange-400 mr-3 flex-shrink-0" />
+                        <Check className="w-5 h-5 ${hubColors.text} mr-3 flex-shrink-0" />
                         <span className="text-white">{feature}</span>
                       </li>
                     ))}
@@ -197,8 +200,8 @@ const Pricing = () => {
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
               <div className="text-center">
-                <div className="w-16 h-16 bg-orange-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <Check className="w-8 h-8 text-orange-400" />
+                <div className="w-16 h-16 ${hubColors.bg}/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <Check className="w-8 h-8 ${hubColors.text}" />
                 </div>
                 <h3 className="text-lg font-semibold text-white mb-2">
                   Compliance
@@ -206,8 +209,8 @@ const Pricing = () => {
                 <p className="text-gray-400">Built-in regulatory compliance</p>
               </div>
               <div className="text-center">
-                <div className="w-16 h-16 bg-orange-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <Check className="w-8 h-8 text-orange-400" />
+                <div className="w-16 h-16 ${hubColors.bg}/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <Check className="w-8 h-8 ${hubColors.text}" />
                 </div>
                 <h3 className="text-lg font-semibold text-white mb-2">
                   Security
@@ -215,8 +218,8 @@ const Pricing = () => {
                 <p className="text-gray-400">Enterprise-grade encryption</p>
               </div>
               <div className="text-center">
-                <div className="w-16 h-16 bg-orange-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <Check className="w-8 h-8 text-orange-400" />
+                <div className="w-16 h-16 ${hubColors.bg}/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <Check className="w-8 h-8 ${hubColors.text}" />
                 </div>
                 <h3 className="text-lg font-semibold text-white mb-2">
                   Analytics
@@ -224,8 +227,8 @@ const Pricing = () => {
                 <p className="text-gray-400">Detailed reporting</p>
               </div>
               <div className="text-center">
-                <div className="w-16 h-16 bg-orange-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <Check className="w-8 h-8 text-orange-400" />
+                <div className="w-16 h-16 ${hubColors.bg}/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <Check className="w-8 h-8 ${hubColors.text}" />
                 </div>
                 <h3 className="text-lg font-semibold text-white mb-2">
                   Support

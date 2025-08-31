@@ -4,6 +4,7 @@ import path from "path";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
+  envDir: '../../', // Load .env from monorepo root
   server: {
     host: "localhost",
     port: 3000,

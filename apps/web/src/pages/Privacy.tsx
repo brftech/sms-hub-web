@@ -1,8 +1,12 @@
-import { PageLayout } from "@sms-hub/ui";
+import { PageLayout, useHub } from "@sms-hub/ui";
+import { getHubColorClasses } from "@sms-hub/utils";
 import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";
 
 const Privacy = () => {
+  const { currentHub } = useHub();
+  const hubColors = getHubColorClasses(currentHub);
+
   return (
     <PageLayout
       showNavigation={true}
@@ -13,7 +17,7 @@ const Privacy = () => {
       <div className="min-h-screen bg-black p-8 relative">
         {/* Privacy Content Card */}
         <div className="flex justify-center pt-4">
-          <div className="bg-gradient-to-br from-gray-800/80 to-gray-900/80 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-8 shadow-2xl max-w-md w-full max-h-[500px] overflow-y-auto scrollbar-thin scrollbar-thumb-orange-500/50 scrollbar-track-gray-800/50">
+          <div className="bg-gradient-to-br from-gray-800/80 to-gray-900/80 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-8 shadow-2xl max-w-md w-full max-h-[500px] overflow-y-auto scrollbar-thin ${hubColors.scrollbar}/50 scrollbar-track-gray-800/50">
             <div className="space-y-6">
               <div className="text-center space-y-2">
                 <h2 className="text-xl font-bold text-white">Privacy Policy</h2>
@@ -24,7 +28,7 @@ const Privacy = () => {
 
               <div className="space-y-6">
                 <section>
-                  <h3 className="text-lg font-bold text-orange-400 mb-2">
+                  <h3 className="text-lg font-bold ${hubColors.text} mb-2">
                     1. Information We Collect
                   </h3>
                   <p className="text-gray-300 text-sm leading-relaxed mb-2">
@@ -55,7 +59,7 @@ const Privacy = () => {
                 </section>
 
                 <section>
-                  <h3 className="text-lg font-bold text-orange-400 mb-2">
+                  <h3 className="text-lg font-bold ${hubColors.text} mb-2">
                     2. How We Use Your Information
                   </h3>
                   <p className="text-gray-300 text-sm leading-relaxed mb-2">
@@ -77,7 +81,7 @@ const Privacy = () => {
                 </section>
 
                 <section>
-                  <h3 className="text-lg font-bold text-orange-400 mb-2">
+                  <h3 className="text-lg font-bold ${hubColors.text} mb-2">
                     3. Information Sharing
                   </h3>
                   <p className="text-gray-300 text-sm leading-relaxed mb-2">
@@ -99,7 +103,7 @@ const Privacy = () => {
                 </section>
 
                 <section>
-                  <h3 className="text-lg font-bold text-orange-400 mb-2">
+                  <h3 className="text-lg font-bold ${hubColors.text} mb-2">
                     4. Data Security
                   </h3>
                   <p className="text-gray-300 text-sm leading-relaxed">
@@ -112,7 +116,7 @@ const Privacy = () => {
                 </section>
 
                 <section>
-                  <h3 className="text-lg font-bold text-orange-400 mb-2">
+                  <h3 className="text-lg font-bold ${hubColors.text} mb-2">
                     5. HIPAA Compliance
                   </h3>
                   <p className="text-gray-300 text-sm leading-relaxed">
@@ -125,7 +129,7 @@ const Privacy = () => {
                 </section>
 
                 <section>
-                  <h3 className="text-lg font-bold text-orange-400 mb-2">
+                  <h3 className="text-lg font-bold ${hubColors.text} mb-2">
                     6. Data Retention
                   </h3>
                   <p className="text-gray-300 text-sm leading-relaxed">
@@ -138,7 +142,7 @@ const Privacy = () => {
                 </section>
 
                 <section>
-                  <h3 className="text-lg font-bold text-orange-400 mb-2">
+                  <h3 className="text-lg font-bold ${hubColors.text} mb-2">
                     7. Your Rights
                   </h3>
                   <p className="text-gray-300 text-sm leading-relaxed mb-2">
@@ -159,7 +163,7 @@ const Privacy = () => {
                 </section>
 
                 <section>
-                  <h3 className="text-lg font-bold text-orange-400 mb-2">
+                  <h3 className="text-lg font-bold ${hubColors.text} mb-2">
                     8. Changes to This Policy
                   </h3>
                   <p className="text-gray-300 text-sm leading-relaxed">
@@ -170,7 +174,7 @@ const Privacy = () => {
                 </section>
 
                 <section>
-                  <h3 className="text-lg font-bold text-orange-400 mb-2">
+                  <h3 className="text-lg font-bold ${hubColors.text} mb-2">
                     9. Contact Information
                   </h3>
                   <p className="text-gray-300 text-sm leading-relaxed mb-2">

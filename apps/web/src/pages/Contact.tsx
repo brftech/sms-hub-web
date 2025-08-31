@@ -5,13 +5,16 @@ import {
   FormContainerComponent,
   FormFieldComponent,
   PageLayout,
+  useHub,
 } from "@sms-hub/ui";
 import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";
+import { contactService } from "../services/contactService";
 
 import { CheckCircle, Loader2 } from "lucide-react";
 
 const Contact = () => {
+  const { hubConfig } = useHub();
   const [formData, setFormData] = useState<{
     firstName: string;
     lastName: string;
@@ -60,8 +63,11 @@ const Contact = () => {
     setIsSubmitting(true);
 
     try {
-      // TODO: Implement contact submission
-      console.log("Contact form submitted:", formData);
+      // Submit to Edge Function
+      await contactService.submitContact({
+        ...formData,
+        hub_id: hubConfig.hubNumber,
+      });
 
       // Show success modal
       setShowSuccess(true);

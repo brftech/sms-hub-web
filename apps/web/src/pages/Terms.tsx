@@ -1,8 +1,12 @@
-import { PageLayout } from "@sms-hub/ui";
+import { PageLayout, useHub } from "@sms-hub/ui";
+import { getHubColorClasses } from "@sms-hub/utils";
 import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";
 
 const Terms = () => {
+  const { currentHub } = useHub();
+  const hubColors = getHubColorClasses(currentHub);
+
   return (
     <PageLayout
       showNavigation={true}
@@ -13,7 +17,7 @@ const Terms = () => {
       <div className="min-h-screen bg-black p-8 relative">
         {/* Terms Content Card */}
         <div className="flex justify-center pt-4">
-          <div className="bg-gradient-to-br from-gray-800/80 to-gray-900/80 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-8 shadow-2xl max-w-md w-full max-h-[500px] overflow-y-auto scrollbar-thin scrollbar-thumb-orange-500/50 scrollbar-track-gray-800/50">
+          <div className="bg-gradient-to-br from-gray-800/80 to-gray-900/80 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-8 shadow-2xl max-w-md w-full max-h-[500px] overflow-y-auto scrollbar-thin ${hubColors.scrollbar}/50 scrollbar-track-gray-800/50">
             <div className="space-y-6">
               <div className="text-center space-y-2">
                 <h2 className="text-xl font-bold text-white">
@@ -26,7 +30,7 @@ const Terms = () => {
 
               <div className="space-y-6">
                 <section>
-                  <h3 className="text-lg font-bold text-orange-400 mb-2">
+                  <h3 className="text-lg font-bold ${hubColors.text} mb-2">
                     1. Acceptance of Terms
                   </h3>
                   <p className="text-gray-300 text-sm leading-relaxed">
@@ -38,7 +42,7 @@ const Terms = () => {
                 </section>
 
                 <section>
-                  <h3 className="text-lg font-bold text-orange-400 mb-2">
+                  <h3 className="text-lg font-bold ${hubColors.text} mb-2">
                     2. Service Description
                   </h3>
                   <p className="text-gray-300 text-sm leading-relaxed">
@@ -51,7 +55,7 @@ const Terms = () => {
                 </section>
 
                 <section>
-                  <h3 className="text-lg font-bold text-orange-400 mb-2">
+                  <h3 className="text-lg font-bold ${hubColors.text} mb-2">
                     3. User Responsibilities
                   </h3>
                   <p className="text-gray-300 text-sm leading-relaxed mb-2">
@@ -71,7 +75,7 @@ const Terms = () => {
                 </section>
 
                 <section>
-                  <h3 className="text-lg font-bold text-orange-400 mb-2">
+                  <h3 className="text-lg font-bold ${hubColors.text} mb-2">
                     4. Compliance and Regulations
                   </h3>
                   <p className="text-gray-300 text-sm leading-relaxed">
@@ -84,7 +88,7 @@ const Terms = () => {
                 </section>
 
                 <section>
-                  <h3 className="text-lg font-bold text-orange-400 mb-2">
+                  <h3 className="text-lg font-bold ${hubColors.text} mb-2">
                     5. Payment Terms
                   </h3>
                   <p className="text-gray-300 text-sm leading-relaxed">
@@ -96,7 +100,7 @@ const Terms = () => {
                 </section>
 
                 <section>
-                  <h3 className="text-lg font-bold text-orange-400 mb-2">
+                  <h3 className="text-lg font-bold ${hubColors.text} mb-2">
                     6. Limitation of Liability
                   </h3>
                   <p className="text-gray-300 text-sm leading-relaxed">
@@ -109,7 +113,7 @@ const Terms = () => {
                 </section>
 
                 <section>
-                  <h3 className="text-lg font-bold text-orange-400 mb-2">
+                  <h3 className="text-lg font-bold ${hubColors.text} mb-2">
                     7. Termination
                   </h3>
                   <p className="text-gray-300 text-sm leading-relaxed">
@@ -121,7 +125,7 @@ const Terms = () => {
                 </section>
 
                 <section>
-                  <h3 className="text-lg font-bold text-orange-400 mb-2">
+                  <h3 className="text-lg font-bold ${hubColors.text} mb-2">
                     8. Contact Information
                   </h3>
                   <p className="text-gray-300 text-sm leading-relaxed mb-2">

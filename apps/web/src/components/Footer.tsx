@@ -1,19 +1,13 @@
 import { Link } from "react-router-dom";
-import { useHub } from "@/contexts/HubContext";
-import { useHubColors } from "@/utils/hubColors";
-import GnymbleLogo from "./GnymbleLogo";
-import PercyTechLogo from "./PercyTechLogo";
+import { useHub, HubLogo } from "@sms-hub/ui";
+import { getHubColorClasses } from "@sms-hub/utils";
 
 const Footer = () => {
   const { currentHub } = useHub();
-  const hubColors = useHubColors();
+  const hubColors = getHubColorClasses(currentHub);
 
   const getLogo = () => {
-    if (currentHub === "percytech") {
-      return <PercyTechLogo size="4xl" variant="text-logo" />;
-    } else {
-      return <GnymbleLogo size="4xl" variant="default" />;
-    }
+    return <HubLogo hubType={currentHub} variant="text" size="xl" />;
   };
 
   return (

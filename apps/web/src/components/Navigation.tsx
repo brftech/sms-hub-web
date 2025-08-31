@@ -1,26 +1,19 @@
 import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { useHub } from "@/contexts/HubContext";
+import { Button, useHub, HubLogo } from "@sms-hub/ui";
 import { Menu, X } from "lucide-react";
-import HubSelector from "./HubSelector";
-import GnymbleLogo from "./GnymbleLogo";
-import PercyTechLogo from "./PercyTechLogo";
-import { useHubColors } from "@/utils/hubColors";
+import { HubSwitcher } from "@sms-hub/ui";
+import { getHubColorClasses } from "@sms-hub/utils";
 
 const Navigation = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const hubColors = useHubColors();
   const { currentHub, hubConfig, switchHub, showHubSwitcher } = useHub();
+  const hubColors = getHubColorClasses(currentHub);
 
   const getLogo = () => {
-    if (currentHub === "percytech") {
-      return <PercyTechLogo size="lg" variant="icon-logo" />;
-    } else {
-      return <GnymbleLogo size="lg" variant="icon" />;
-    }
+    return <HubLogo hubType={currentHub} variant="icon" size="lg" />;
   };
 
   const isContactPage = location.pathname === "/contact";
@@ -96,7 +89,7 @@ const Navigation = () => {
             </button>
             <div className="flex items-center space-x-3">
               {/* Hub Selector - Only visible in development */}
-              {showHubSwitcher && <HubSelector />}
+              {showHubSwitcher && <HubSwitcher />}
 
               <Button
                 onClick={() => navigate("/contact")}
@@ -115,7 +108,7 @@ const Navigation = () => {
 
           {/* Right side - Navigation buttons (Desktop only) */}
           <div className="hidden md:flex items-center space-x-4">
-            <HubSelector />
+            <HubSwitcher />
             <Button
               variant="outline"
               size="sm"

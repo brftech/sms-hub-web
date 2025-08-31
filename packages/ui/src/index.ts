@@ -53,8 +53,19 @@ export * from "./components/hub-themed-button";
 export * from "./components/hub-logo";
 export * from "./components/hub-switcher";
 
-// Providers
-export * from "./providers";
+// Shared UI components
+export * from "./components/footer";
+export * from "./components/error-boundary";
+export * from "./components/forms";
+export * from "./components/page-layout";
+
+// Providers - HubProvider is exported from contexts/HubContext
+
+// Hooks
+export * from "./hooks/use-toast";
+
+// Contexts
+export * from "./contexts/HubContext";
 
 // Theme and styling exports
 export * from "./theme/styled-provider";

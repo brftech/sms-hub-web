@@ -1,17 +1,17 @@
 import { useState, useEffect } from "react";
-import { PageLayout } from "@/components/layout";
-import { DemoRequestButton } from "@/components";
-import { useHub } from "@/contexts/HubContext";
-import cigarImage from "@/assets/cigar.png";
-import gnymbleTextLogo from "@/assets/gnymble-text-logo.svg";
-import percytechTextLogo from "@/assets/percytech-text-logo.svg";
+import { PageLayout, useHub, HubLogo } from "@sms-hub/ui";
+import { getHubColorClasses } from "@sms-hub/utils";
+import Navigation from "../components/Navigation";
+import Footer from "../components/Footer";
+import cigarImage from "@sms-hub/ui/assets/cigar.png";
 
 const Home = () => {
   const [showText, setShowText] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showButtons, setShowButtons] = useState(false);
   const [showSmiley, setShowSmiley] = useState(false);
-  const { currentHub, hubConfig, switchHub, showHubSwitcher } = useHub();
+  const { currentHub, hubConfig } = useHub();
+  const hubColors = getHubColorClasses(currentHub);
 
   const textParts = ["Compliant texting for cigar retailers..."];
   const totalLength = textParts.join("").length;
@@ -76,9 +76,9 @@ const Home = () => {
         const visibleText = part.slice(0, visibleLength);
 
         if (i === 1) {
-          // The 's' part
+          // The 's' part - use dynamic hub colors
           result.push(
-            <span key={i} className="text-orange-400">
+            <span key={i} className={hubColors.text}>
               {visibleText}
             </span>
           );
@@ -101,7 +101,12 @@ const Home = () => {
   };
 
   return (
-    <PageLayout>
+    <PageLayout
+      showNavigation={true}
+      showFooter={true}
+      navigation={<Navigation />}
+      footer={<Footer />}
+    >
       <div
         className="min-h-screen bg-black relative cursor-pointer"
         style={{
@@ -114,39 +119,29 @@ const Home = () => {
       >
         {/* Background overlay for opacity - makes cigar image appear at 10% opacity */}
         <div className="absolute inset-0 bg-black opacity-75"></div>
-        {/* Logo - Fixed position higher up */}
-        <div className="absolute top-1/4 md:top-1/4 top-1/5 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-          <h1 className="text-6xl lg:text-8xl font-black tracking-tight animate-fade-in">
-            {currentHub === "percytech" ? (
-              <img
-                src={percytechTextLogo}
-                alt="PercyTech Logo"
-                className="w-[600px] h-auto"
-              />
-            ) : (
-              <img
-                src={gnymbleTextLogo}
-                alt="Gnymble Logo"
-                className="w-[600px] h-auto"
-              />
-            )}
-          </h1>
+        {/* Logo - Horizontally centered, positioned higher up */}
+        <div className="absolute top-1/4 left-0 right-0 flex justify-center">
+          <HubLogo
+            hubType={currentHub}
+            variant="text"
+            size="xl"
+            className="!flex-none !items-start"
+          />
         </div>
 
         {/* Typewriter text - Positioned below logo */}
         {showText && (
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
             <div className="text-2xl lg:text-4xl font-bold text-white text-center animate-fade-in">
-              {currentHub === "percytech"
-                ? hubConfig.content.heroSubtitle
-                : renderText()}
+              {currentHub === "gnymble"
+                ? renderText()
+                : hubConfig.content.heroSubtitle}
             </div>
           </div>
         )}
 
-        {/* Demo Access Button and Scroll Down Arrow - Centered Together */}
+        {/* Scroll Down Arrow */}
         <div className="absolute bottom-32 left-1/2 transform -translate-x-1/2 flex flex-col items-center space-y-6">
-          <DemoRequestButton />
           <div className="animate-bounce">
             <div className="w-6 h-6 border-b-2 border-r-2 border-white rotate-45 transform origin-center"></div>
           </div>

@@ -1,7 +1,8 @@
-import { Button } from "@/components/ui/button";
+import { Button, PageLayout } from "@sms-hub/ui";
 import { useNavigate } from "react-router-dom";
 import { Check } from "lucide-react";
-import { PageLayout } from "@/components/layout";
+import Navigation from "../components/Navigation";
+import Footer from "../components/Footer";
 
 const Pricing = () => {
   const navigate = useNavigate();
@@ -66,7 +67,12 @@ const Pricing = () => {
   ];
 
   return (
-    <PageLayout>
+    <PageLayout
+      showNavigation={true}
+      showFooter={true}
+      navigation={<Navigation />}
+      footer={<Footer />}
+    >
       <div className="min-h-screen bg-black py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
           {/* Header */}

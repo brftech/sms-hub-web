@@ -1,16 +1,25 @@
 import { useState, useRef, useEffect } from "react";
-import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
-import { contactService } from "@/services";
-import { ContactData } from "@/types";
-import { FormContainer, FormField } from "@/components/forms";
-import { PageLayout } from "@/components/layout";
-import { useHub } from "@/contexts/HubContext";
+import {
+  useToast,
+  FormContainerComponent,
+  FormFieldComponent,
+  PageLayout,
+} from "@sms-hub/ui";
+import Navigation from "../components/Navigation";
+import Footer from "../components/Footer";
 
 import { CheckCircle, Loader2 } from "lucide-react";
 
 const Contact = () => {
-  const [formData, setFormData] = useState<ContactData>({
+  const [formData, setFormData] = useState<{
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+    company: string;
+    message: string;
+  }>({
     firstName: "",
     lastName: "",
     email: "",
@@ -22,7 +31,6 @@ const Contact = () => {
   const [showSuccess, setShowSuccess] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { hubConfig } = useHub();
   const firstNameRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -52,7 +60,8 @@ const Contact = () => {
     setIsSubmitting(true);
 
     try {
-      await contactService.submitContact(formData, hubConfig.hubNumber);
+      // TODO: Implement contact submission
+      console.log("Contact form submitted:", formData);
 
       // Show success modal
       setShowSuccess(true);
@@ -83,88 +92,93 @@ const Contact = () => {
     }
   };
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
   return (
-    <PageLayout>
+    <PageLayout
+      showNavigation={true}
+      showFooter={true}
+      navigation={<Navigation />}
+      footer={<Footer />}
+    >
       <div className="min-h-screen bg-black p-8 relative">
         {/* Contact Form */}
         <div className="flex justify-center pt-4">
           <div className="bg-gradient-to-br from-gray-800/80 to-gray-900/80 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-6 shadow-2xl max-w-md w-full">
-            <FormContainer
-              title="Get in Touch"
+            <FormContainerComponent
               onSubmit={handleSubmit}
               submitText="Submit"
-              isSubmitting={isSubmitting}
+              submitLoading={isSubmitting}
+              submitDisabled={isSubmitting}
             >
               <div className="grid grid-cols-2 gap-4">
-                <FormField
+                <FormFieldComponent
                   label="First Name"
                   name="firstName"
                   type="text"
                   placeholder="John"
                   required
                   value={formData.firstName}
-                  onChange={handleChange}
-                  autoComplete="given-name"
+                  onChange={(value) =>
+                    setFormData((prev) => ({ ...prev, firstName: value }))
+                  }
                 />
-                <FormField
+                <FormFieldComponent
                   label="Last Name"
                   name="lastName"
                   type="text"
                   placeholder="Doe"
                   required
                   value={formData.lastName}
-                  onChange={handleChange}
-                  autoComplete="family-name"
+                  onChange={(value) =>
+                    setFormData((prev) => ({ ...prev, lastName: value }))
+                  }
                 />
               </div>
 
-              <FormField
+              <FormFieldComponent
                 label="Email"
                 name="email"
                 type="email"
                 placeholder="john@speakeasy.com"
                 required
                 value={formData.email}
-                onChange={handleChange}
-                autoComplete="email"
+                onChange={(value) =>
+                  setFormData((prev) => ({ ...prev, email: value }))
+                }
               />
 
-              <FormField
+              <FormFieldComponent
                 label="Phone (Optional)"
                 name="phone"
                 type="tel"
                 placeholder="(555) 123-4567"
                 value={formData.phone}
-                onChange={handleChange}
-                autoComplete="tel"
+                onChange={(value) =>
+                  setFormData((prev) => ({ ...prev, phone: value }))
+                }
               />
 
-              <FormField
+              <FormFieldComponent
                 label="Company (Optional)"
                 name="company"
                 type="text"
                 placeholder="Company Name"
                 value={formData.company}
-                onChange={handleChange}
-                autoComplete="organization"
+                onChange={(value) =>
+                  setFormData((prev) => ({ ...prev, company: value }))
+                }
               />
 
-              <FormField
+              <FormFieldComponent
                 label="Message (Optional)"
                 name="message"
                 type="textarea"
                 placeholder="Tell us about your venue or interest..."
                 value={formData.message}
-                onChange={handleChange}
+                onChange={(value) =>
+                  setFormData((prev) => ({ ...prev, message: value }))
+                }
               />
-            </FormContainer>
+            </FormContainerComponent>
           </div>
         </div>
       </div>

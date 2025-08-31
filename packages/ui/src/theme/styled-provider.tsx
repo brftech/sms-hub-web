@@ -1,76 +1,76 @@
-import React from 'react'
-import { ThemeProvider, createGlobalStyle } from 'styled-components'
-import { HubType } from '@sms-hub/types'
-import { useHub } from '../providers/hub-provider'
+import React from "react";
+import { ThemeProvider, createGlobalStyle } from "styled-components";
+import { HubType } from "@sms-hub/types";
+import { useHub } from "../contexts/HubContext";
 
 // Hub color configurations
 const hubColors = {
   percytech: {
-    primary: '#1F2937',
-    secondary: '#6B7280', 
-    accent: '#3B82F6',
-    primaryRgb: '31, 41, 55',
-    secondaryRgb: '107, 114, 128',
-    accentRgb: '59, 130, 246'
+    primary: "#1F2937",
+    secondary: "#6B7280",
+    accent: "#3B82F6",
+    primaryRgb: "31, 41, 55",
+    secondaryRgb: "107, 114, 128",
+    accentRgb: "59, 130, 246",
   },
   gnymble: {
-    primary: '#059669',
-    secondary: '#10B981',
-    accent: '#34D399', 
-    primaryRgb: '5, 150, 105',
-    secondaryRgb: '16, 185, 129',
-    accentRgb: '52, 211, 153'
+    primary: "#059669",
+    secondary: "#10B981",
+    accent: "#34D399",
+    primaryRgb: "5, 150, 105",
+    secondaryRgb: "16, 185, 129",
+    accentRgb: "52, 211, 153",
   },
   percymd: {
-    primary: '#DC2626',
-    secondary: '#EF4444',
-    accent: '#F87171',
-    primaryRgb: '220, 38, 38', 
-    secondaryRgb: '239, 68, 68',
-    accentRgb: '248, 113, 113'
+    primary: "#DC2626",
+    secondary: "#EF4444",
+    accent: "#F87171",
+    primaryRgb: "220, 38, 38",
+    secondaryRgb: "239, 68, 68",
+    accentRgb: "248, 113, 113",
   },
   percytext: {
-    primary: '#7C3AED',
-    secondary: '#8B5CF6',
-    accent: '#A78BFA',
-    primaryRgb: '124, 58, 237',
-    secondaryRgb: '139, 92, 246', 
-    accentRgb: '167, 139, 250'
-  }
-}
+    primary: "#7C3AED",
+    secondary: "#8B5CF6",
+    accent: "#A78BFA",
+    primaryRgb: "124, 58, 237",
+    secondaryRgb: "139, 92, 246",
+    accentRgb: "167, 139, 250",
+  },
+};
 
 // Base design tokens
 const baseTheme = {
   colors: {
-    background: 'hsl(0, 0%, 100%)',
-    foreground: 'hsl(0, 0%, 3.9%)',
-    card: 'hsl(0, 0%, 100%)',
-    cardForeground: 'hsl(0, 0%, 3.9%)',
-    popover: 'hsl(0, 0%, 100%)',
-    popoverForeground: 'hsl(0, 0%, 3.9%)',
-    primary: 'hsl(0, 0%, 9%)',
-    primaryForeground: 'hsl(0, 0%, 98%)',
-    secondary: 'hsl(0, 0%, 96.1%)',
-    secondaryForeground: 'hsl(0, 0%, 9%)',
-    muted: 'hsl(0, 0%, 96.1%)',
-    mutedForeground: 'hsl(0, 0%, 45.1%)',
-    accent: 'hsl(0, 0%, 96.1%)',
-    accentForeground: 'hsl(0, 0%, 9%)',
-    destructive: 'hsl(0, 84.2%, 60.2%)',
-    destructiveForeground: 'hsl(0, 0%, 98%)',
-    border: 'hsl(0, 0%, 89.8%)',
-    input: 'hsl(0, 0%, 89.8%)',
-    ring: 'hsl(0, 0%, 3.9%)',
+    background: "hsl(0, 0%, 100%)",
+    foreground: "hsl(0, 0%, 3.9%)",
+    card: "hsl(0, 0%, 100%)",
+    cardForeground: "hsl(0, 0%, 3.9%)",
+    popover: "hsl(0, 0%, 100%)",
+    popoverForeground: "hsl(0, 0%, 3.9%)",
+    primary: "hsl(0, 0%, 9%)",
+    primaryForeground: "hsl(0, 0%, 98%)",
+    secondary: "hsl(0, 0%, 96.1%)",
+    secondaryForeground: "hsl(0, 0%, 9%)",
+    muted: "hsl(0, 0%, 96.1%)",
+    mutedForeground: "hsl(0, 0%, 45.1%)",
+    accent: "hsl(0, 0%, 96.1%)",
+    accentForeground: "hsl(0, 0%, 9%)",
+    destructive: "hsl(0, 84.2%, 60.2%)",
+    destructiveForeground: "hsl(0, 0%, 98%)",
+    border: "hsl(0, 0%, 89.8%)",
+    input: "hsl(0, 0%, 89.8%)",
+    ring: "hsl(0, 0%, 3.9%)",
   },
-  radius: '0.5rem',
+  radius: "0.5rem",
   spacing: {
-    xs: '0.25rem',
-    sm: '0.5rem', 
-    md: '1rem',
-    lg: '1.5rem',
-    xl: '2rem'
-  }
-}
+    xs: "0.25rem",
+    sm: "0.5rem",
+    md: "1rem",
+    lg: "1.5rem",
+    xl: "2rem",
+  },
+};
 
 // Global styles that work with Tailwind
 const GlobalStyle = createGlobalStyle<{ hub: HubType }>`
@@ -102,12 +102,12 @@ const GlobalStyle = createGlobalStyle<{ hub: HubType }>`
     --chart-5: 27 87% 67%;
     
     /* Hub colors */
-    --hub-primary: ${props => hubColors[props.hub].primary};
-    --hub-secondary: ${props => hubColors[props.hub].secondary};
-    --hub-accent: ${props => hubColors[props.hub].accent};
-    --hub-primary-rgb: ${props => hubColors[props.hub].primaryRgb};
-    --hub-secondary-rgb: ${props => hubColors[props.hub].secondaryRgb};
-    --hub-accent-rgb: ${props => hubColors[props.hub].accentRgb};
+    --hub-primary: ${(props) => hubColors[props.hub].primary};
+    --hub-secondary: ${(props) => hubColors[props.hub].secondary};
+    --hub-accent: ${(props) => hubColors[props.hub].accent};
+    --hub-primary-rgb: ${(props) => hubColors[props.hub].primaryRgb};
+    --hub-secondary-rgb: ${(props) => hubColors[props.hub].secondaryRgb};
+    --hub-accent-rgb: ${(props) => hubColors[props.hub].accentRgb};
   }
 
   .dark {
@@ -145,41 +145,49 @@ const GlobalStyle = createGlobalStyle<{ hub: HubType }>`
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
   }
-`
+`;
 
 // Styled theme provider component that integrates with HubProvider
 export interface StyledHubProviderProps {
-  children: React.ReactNode
+  children: React.ReactNode;
 }
 
-export const StyledHubProvider: React.FC<StyledHubProviderProps> = ({ children }) => {
-  const { currentHub } = useHub()
-  
+export const StyledHubProvider: React.FC<StyledHubProviderProps> = ({
+  children,
+}) => {
+  const { currentHub } = useHub();
+
   const theme = {
     ...baseTheme,
-    hub: hubColors[currentHub]
-  }
+    hub: hubColors[currentHub],
+  };
 
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyle hub={currentHub} />
       {children}
     </ThemeProvider>
-  )
-}
+  );
+};
 
 // Utility functions for styled components
-export const getHubColor = (hub: HubType, colorType: 'primary' | 'secondary' | 'accent') => {
-  return hubColors[hub][colorType]
-}
+export const getHubColor = (
+  hub: HubType,
+  colorType: "primary" | "secondary" | "accent"
+) => {
+  return hubColors[hub][colorType];
+};
 
 export const createHubStyles = (hub: HubType) => ({
   colors: hubColors[hub],
   utils: {
-    hubText: (colorType: 'primary' | 'secondary' | 'accent') => `color: ${hubColors[hub][colorType]};`,
-    hubBg: (colorType: 'primary' | 'secondary' | 'accent') => `background-color: ${hubColors[hub][colorType]};`,
-    hubBorder: (colorType: 'primary' | 'secondary' | 'accent') => `border-color: ${hubColors[hub][colorType]};`
-  }
-})
+    hubText: (colorType: "primary" | "secondary" | "accent") =>
+      `color: ${hubColors[hub][colorType]};`,
+    hubBg: (colorType: "primary" | "secondary" | "accent") =>
+      `background-color: ${hubColors[hub][colorType]};`,
+    hubBorder: (colorType: "primary" | "secondary" | "accent") =>
+      `border-color: ${hubColors[hub][colorType]};`,
+  },
+});
 
-export { hubColors, baseTheme }
+export { hubColors, baseTheme };

@@ -1,14 +1,16 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@sms-hub/ui";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
-import { useHubColors } from "@/utils/hubColors";
+import { getHubColorClasses } from "@sms-hub/utils";
+import { useHub } from "@sms-hub/ui";
 
 const MobileMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const hubColors = useHubColors();
+  const { currentHub } = useHub();
+  const hubColors = getHubColorClasses(currentHub);
 
   const handleNavClick = (path: string) => {
     setIsOpen(false);

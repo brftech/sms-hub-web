@@ -1,11 +1,15 @@
-import { useNavigate } from "react-router-dom";
-import { PageLayout } from "@/components/layout";
+import { PageLayout } from "@sms-hub/ui";
+import Navigation from "../components/Navigation";
+import Footer from "../components/Footer";
 
 const Privacy = () => {
-  const navigate = useNavigate();
-
   return (
-    <PageLayout>
+    <PageLayout
+      showNavigation={true}
+      showFooter={true}
+      navigation={<Navigation />}
+      footer={<Footer />}
+    >
       <div className="min-h-screen bg-black p-8 relative">
         {/* Privacy Content Card */}
         <div className="flex justify-center pt-4">

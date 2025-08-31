@@ -1,1 +1,1 @@
-export * from './hub-provider'
+// HubProvider is now exported from contexts/HubContext

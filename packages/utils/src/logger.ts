@@ -149,7 +149,7 @@ class Logger {
       timestamp: new Date().toISOString(),
       context: {
         ...context,
-        requestId: this.requestId,
+        requestId: this.requestId || undefined,
       },
       data,
     };

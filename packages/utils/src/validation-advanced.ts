@@ -196,7 +196,7 @@ export const validatePartial = <T>(
   context?: Record<string, unknown>
 ): Partial<T> => {
   try {
-    return schema.partial().parse(data);
+    return (schema as any).partial().parse(data);
   } catch (error) {
     if (error instanceof z.ZodError) {
       const validationError = createValidationError(

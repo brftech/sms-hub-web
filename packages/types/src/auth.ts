@@ -22,7 +22,7 @@ export interface SignupData {
   last_name: string
   mobile_phone_number: string
   email: string
-  auth_method?: string
+  auth_method?: 'sms' | 'email'
 }
 
 export interface VerificationData {

@@ -1,3 +1,72 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Temporary Gnymble CSS for testing */
+[data-hub="gnymble"] {
+  /* Pure black background like Resend */
+  --background: 0 0% 0%;
+  --foreground: 0 0% 100%;
+
+  /* Card and surface colors - subtle dark grays */
+  --card: 0 0% 3%;
+  --card-foreground: 0 0% 100%;
+
+  /* Primary - burnt orange */
+  --primary: 25 100% 40%;
+  --primary-foreground: 0 0% 100%;
+  --primary-glow: 25 100% 50%;
+
+  /* Secondary - subtle gray */
+  --secondary: 0 0% 8%;
+  --secondary-foreground: 0 0% 100%;
+
+  /* Muted tones */
+  --muted: 0 0% 5%;
+  --muted-foreground: 0 0% 65%;
+
+  /* Borders and inputs */
+  --border: 0 0% 12%;
+  --input: 0 0% 8%;
+  --ring: 0 0% 100%;
+
+  /* Hub-specific colors */
+  --hub-primary: #f97316; /* orange-500 */
+  --hub-secondary: #dc2626; /* red-600 */
+  --hub-accent: #ea580c; /* orange-600 */
+}
+
+/* Test styles to see if CSS is working */
+body[data-hub="gnymble"] {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+}
+
+/* Make it very obvious when Gnymble is detected */
+[data-hub="gnymble"] h1 {
+  color: #f97316 !important;
+  font-size: 3rem !important;
+  text-shadow: 0 0 20px #f97316 !important;
+}
+
+[data-hub="gnymble"] .hub-text-primary {
+  color: #f97316 !important;
+  font-weight: bold !important;
+}
+
+[data-hub="gnymble"] .hub-bg-primary {
+  background-color: #f97316 !important;
+}
+
+/* Debug: Show what hub is detected */
+body::before {
+  content: "Hub: " attr(data-hub);
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  background: red;
+  color: white;
+  padding: 5px;
+  z-index: 9999;
+  font-family: monospace;
+}

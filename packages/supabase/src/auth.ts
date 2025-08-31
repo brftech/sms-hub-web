@@ -3,11 +3,12 @@ import { SignupData, VerificationData, UserProfile } from '@sms-hub/types'
 
 export const authService = {
   async createTempSignup(data: SignupData) {
-    const { data: result, error } = await supabase
-      .from('temp_signups')
-      .insert([data])
-      .select()
-      .single()
+    const { data: result, error } = await supabase.functions.invoke(
+      'create-temp-signup',
+      {
+        body: data
+      }
+    )
 
     if (error) throw error
     return result

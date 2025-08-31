@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useHub, HubLogo, Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sms-hub/ui'
-import { Input, Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@sms-hub/ui'
+import { Input, Form, FormControl, FormField, FormItem, FormLabel, FormMessage, RadioGroup, RadioGroupItem } from '@sms-hub/ui'
 import { useCreateTempSignup } from '@sms-hub/supabase'
 import { SignupData } from '@sms-hub/types'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import { Phone, Mail } from 'lucide-react'
 
 export function Signup() {
   const { hubConfig, currentHub } = useHub()
@@ -128,6 +129,39 @@ export function Signup() {
                     <FormLabel>Phone Number</FormLabel>
                     <FormControl>
                       <Input type="tel" placeholder="(555) 123-4567" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="auth_method"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Verification Method</FormLabel>
+                    <FormControl>
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        className="flex flex-col space-y-2"
+                      >
+                        <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-muted/50 cursor-pointer">
+                          <RadioGroupItem value="sms" id="sms" />
+                          <label htmlFor="sms" className="flex items-center space-x-2 cursor-pointer flex-1">
+                            <Phone className="h-4 w-4" />
+                            <span>Send code via SMS</span>
+                          </label>
+                        </div>
+                        <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-muted/50 cursor-pointer">
+                          <RadioGroupItem value="email" id="email" />
+                          <label htmlFor="email" className="flex items-center space-x-2 cursor-pointer flex-1">
+                            <Mail className="h-4 w-4" />
+                            <span>Send code via Email</span>
+                          </label>
+                        </div>
+                      </RadioGroup>
                     </FormControl>
                     <FormMessage />
                   </FormItem>

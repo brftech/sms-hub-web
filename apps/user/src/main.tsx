@@ -2,17 +2,16 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { HubProvider, StyledHubProvider } from "@sms-hub/ui";
-import { Toaster } from "sonner";
+import { HubProvider } from "@sms-hub/ui";
 import App from "./App.tsx";
 
-// Import shared UI styles
-import "@sms-hub/ui/styles/globals.css";
+// Import local CSS for testing
+import "./index.css";
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 5 * 60 * 1000,
+      retry: 1,
       refetchOnWindowFocus: false,
     },
   },
@@ -22,12 +21,9 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <HubProvider defaultHub="gnymble" enableHubSwitcher={true}>
-        <StyledHubProvider>
-          <BrowserRouter>
-            <App />
-            <Toaster position="top-right" />
-          </BrowserRouter>
-        </StyledHubProvider>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
       </HubProvider>
     </QueryClientProvider>
   </StrictMode>

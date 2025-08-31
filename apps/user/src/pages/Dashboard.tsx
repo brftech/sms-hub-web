@@ -1,23 +1,48 @@
-import { useHub, Card, CardContent, CardDescription, CardHeader, CardTitle, Button } from '@sms-hub/ui'
-import { Badge, Progress } from '@sms-hub/ui'
-import { MessageSquare, Users, TrendingUp, CheckCircle, Settings } from 'lucide-react'
-import { useUserProfile, useOnboardingSubmission } from '@sms-hub/supabase'
-import { ONBOARDING_STEPS } from '@sms-hub/types'
-import { Link } from 'react-router-dom'
+import {
+  useHub,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  Button,
+} from "@sms-hub/ui";
+import { Badge, Progress } from "@sms-hub/ui";
+import {
+  MessageSquare,
+  Users,
+  TrendingUp,
+  CheckCircle,
+  Settings,
+} from "lucide-react";
+import { useUserProfile, useOnboardingSubmission } from "@sms-hub/supabase";
+import { ONBOARDING_STEPS } from "@sms-hub/types";
+import { Link } from "react-router-dom";
 
 export function Dashboard() {
-  const { hubConfig } = useHub()
-  const { data: userProfile } = useUserProfile()
+  const { hubConfig, currentHub } = useHub();
+  const { data: userProfile } = useUserProfile();
   const { data: onboardingSubmission } = useOnboardingSubmission(
-    userProfile?.company_id || '',
+    userProfile?.company_id || "",
     hubConfig.hubNumber
-  )
+  );
 
-  const onboardingProgress = onboardingSubmission 
-    ? Object.values(ONBOARDING_STEPS).findIndex(step => step.stepName === onboardingSubmission.current_step) + 1
-    : 0
+  // Debug: Log hub information
+  console.log("Current Hub:", currentHub);
+  console.log("Hub Config:", hubConfig);
+  console.log(
+    "Document data-hub:",
+    document.documentElement.getAttribute("data-hub")
+  );
+  console.log("Body data-hub:", document.body.getAttribute("data-hub"));
 
-  const totalSteps = Object.keys(ONBOARDING_STEPS).length
+  const onboardingProgress = onboardingSubmission
+    ? Object.values(ONBOARDING_STEPS).findIndex(
+        (step) => step.stepName === onboardingSubmission.current_step
+      ) + 1
+    : 0;
+
+  const totalSteps = Object.keys(ONBOARDING_STEPS).length;
 
   return (
     <div className="space-y-6">
@@ -29,7 +54,7 @@ export function Dashboard() {
       </div>
 
       {/* Onboarding Progress */}
-      {userProfile?.onboarding_step !== 'completed' && (
+      {userProfile?.onboarding_step !== "completed" && (
         <Card className="hub-border-primary/20">
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
@@ -44,7 +69,10 @@ export function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <Progress value={(onboardingProgress / totalSteps) * 100} className="w-full" />
+              <Progress
+                value={(onboardingProgress / totalSteps) * 100}
+                className="w-full"
+              />
               <Button asChild className="hub-bg-primary">
                 <Link to="/onboarding">Continue Setup</Link>
               </Button>
@@ -70,7 +98,9 @@ export function Dashboard() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Campaigns</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Active Campaigns
+            </CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -101,9 +131,7 @@ export function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">--</div>
-            <p className="text-xs text-muted-foreground">
-              No data yet
-            </p>
+            <p className="text-xs text-muted-foreground">No data yet</p>
           </CardContent>
         </Card>
       </div>
@@ -113,9 +141,7 @@ export function Dashboard() {
         <Card>
           <CardHeader>
             <CardTitle>Quick Actions</CardTitle>
-            <CardDescription>
-              Get started with common tasks
-            </CardDescription>
+            <CardDescription>Get started with common tasks</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
             <Button asChild variant="outline" className="w-full justify-start">
@@ -142,9 +168,7 @@ export function Dashboard() {
         <Card>
           <CardHeader>
             <CardTitle>Recent Activity</CardTitle>
-            <CardDescription>
-              Your latest account activity
-            </CardDescription>
+            <CardDescription>Your latest account activity</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="text-center py-8 text-muted-foreground">
@@ -154,5 +178,5 @@ export function Dashboard() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

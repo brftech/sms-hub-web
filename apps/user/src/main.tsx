@@ -1,10 +1,13 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import { BrowserRouter } from 'react-router-dom'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { HubProvider, StyledHubProvider } from '@sms-hub/ui'
-import { Toaster } from 'sonner'
-import App from './App.tsx'
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import { BrowserRouter } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { HubProvider, StyledHubProvider } from "@sms-hub/ui";
+import { Toaster } from "sonner";
+import App from "./App.tsx";
+
+// Import shared UI styles
+import "@sms-hub/ui/styles/globals.css";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -13,12 +16,12 @@ const queryClient = new QueryClient({
       refetchOnWindowFocus: false,
     },
   },
-})
+});
 
-createRoot(document.getElementById('root')!).render(
+createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <HubProvider enableHubSwitcher={true}>
+      <HubProvider defaultHub="gnymble" enableHubSwitcher={true}>
         <StyledHubProvider>
           <BrowserRouter>
             <App />
@@ -27,5 +30,5 @@ createRoot(document.getElementById('root')!).render(
         </StyledHubProvider>
       </HubProvider>
     </QueryClientProvider>
-  </StrictMode>,
-)
+  </StrictMode>
+);

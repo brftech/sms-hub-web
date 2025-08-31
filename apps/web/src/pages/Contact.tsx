@@ -52,7 +52,7 @@ const Contact = () => {
     setIsSubmitting(true);
 
     try {
-      await contactService.submitContact(formData, hubConfig.id);
+      await contactService.submitContact(formData, hubConfig.hubNumber);
 
       // Show success modal
       setShowSuccess(true);

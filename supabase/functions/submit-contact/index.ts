@@ -35,6 +35,7 @@ Deno.serve(async (req) => {
       email,
       company,
       platform_interest,
+      hub_id,
     });
 
     // Parse name into first_name and last_name
@@ -64,7 +65,7 @@ Deno.serve(async (req) => {
       const { data: newLeadData, error: insertError } = await supabase
         .from("leads")
         .insert({
-          hub_id: hub_id || 2, // Default to Gnymble (hub_id: 2) if not provided
+          hub_id: hub_id || 1, // Default to Gnymble (hub_id: 1) if not provided
           first_name: firstName,
           last_name: lastName,
           email,
@@ -155,9 +156,17 @@ Deno.serve(async (req) => {
           platform_interest || "General inquiry"
         }. Message: ${message}. Lead ID: ${leadData.id}`;
 
+    console.log(
+      "About to insert into lead_activities with hub_id:",
+      hub_id,
+      "fallback:",
+      hub_id || 1
+    );
+
     const { error: activityError } = await supabase
       .from("lead_activities")
       .insert({
+        hub_id: hub_id || 1, // Default to Gnymble (hub_id: 1) if not provided
         lead_id: leadData.id,
         activity_type: "note",
         description: activityDescription,

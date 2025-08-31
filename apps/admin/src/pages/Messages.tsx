@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { useHub, Card, CardContent, CardDescription, CardHeader, CardTitle, Button, Input, Badge, DataTable } from '@sms-hub/ui'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sms-hub/ui'
-import { Search, MessageSquare, Filter, Download, AlertTriangle, DollarSign } from 'lucide-react'
+import { Search, MessageSquare, Filter, Download, AlertTriangle, DollarSign, CheckCircle, Clock } from 'lucide-react'
 import { useAdminMessages } from '@sms-hub/supabase'
 import type { Message } from '@sms-hub/types'
+import styled from 'styled-components'
 
 const messageColumns = [
   {
@@ -83,6 +84,208 @@ const messageColumns = [
   },
 ]
 
+const PageContainer = styled.div`
+  background: #f8f9fa;
+  min-height: 100vh;
+  padding: 2rem;
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
+`
+
+const Header = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: start;
+    gap: 1rem;
+  }
+`
+
+const HeaderInfo = styled.div``
+
+const Title = styled.h1`
+  font-size: 1.875rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+  margin-bottom: 0.5rem;
+`
+
+const Subtitle = styled.p`
+  font-size: 1rem;
+  color: #6b7280;
+  margin: 0;
+`
+
+const ActionGroup = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+`
+
+const ActionButton = styled(Button)`
+  background: white;
+  color: #374151;
+  border: 1px solid #d1d5db;
+  padding: 0.5rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  transition: all 0.2s;
+
+  &:hover {
+    background: #f9fafb;
+    border-color: #9ca3af;
+  }
+`
+
+const StatsGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+`
+
+const StatCard = styled(Card)`
+  background: white;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  transition: all 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  }
+`
+
+const StatContent = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`
+
+const StatInfo = styled.div`
+  flex: 1;
+`
+
+const StatLabel = styled.p`
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #6b7280;
+  margin: 0;
+  margin-bottom: 0.5rem;
+`
+
+const StatValue = styled.div`
+  font-size: 1.875rem;
+  font-weight: 600;
+  line-height: 1.2;
+  margin-bottom: 0.25rem;
+`
+
+const StatMeta = styled.p`
+  font-size: 0.75rem;
+  color: #9ca3af;
+  margin: 0;
+`
+
+const IconContainer = styled.div<{ $bgColor: string }>`
+  width: 48px;
+  height: 48px;
+  background: ${props => props.$bgColor};
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+`
+
+const MainCard = styled(Card)`
+  background: white;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+`
+
+const FiltersContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+`
+
+const SearchContainer = styled.div`
+  position: relative;
+  flex: 1;
+  max-width: 400px;
+`
+
+const SearchIcon = styled(Search)`
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  color: #9ca3af;
+`
+
+const FilterGroup = styled.div`
+  display: flex;
+  gap: 0.5rem;
+`
+
+const LoadingContainer = styled.div`
+  text-align: center;
+  padding: 3rem;
+`
+
+const Spinner = styled.div`
+  width: 32px;
+  height: 32px;
+  margin: 0 auto;
+  border: 3px solid #e5e7eb;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+`
+
+const LoadingText = styled.p`
+  margin-top: 1rem;
+  color: #6b7280;
+  font-size: 0.875rem;
+`
+
+const EmptyState = styled.div`
+  text-align: center;
+  padding: 3rem;
+  color: #6b7280;
+  
+  svg {
+    color: #9ca3af;
+    margin-bottom: 1rem;
+  }
+`
+
+const StyledInput = styled(Input)`
+  padding-left: 2.5rem;
+`
+
 export function Messages() {
   const { hubConfig } = useHub()
   const [searchTerm, setSearchTerm] = useState('')
@@ -113,84 +316,102 @@ export function Messages() {
   const deliveryRate = stats.total > 0 ? Math.round((stats.delivered / stats.total) * 100) : 0
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold hub-text-primary">Messages</h1>
-          <p className="text-muted-foreground">
+    <PageContainer>
+      <Header>
+        <HeaderInfo>
+          <Title>Messages</Title>
+          <Subtitle>
             Monitor all SMS messages across {hubConfig.displayName}
-          </p>
-        </div>
-        <div className="flex items-center space-x-2">
-          <Button variant="outline">
-            <Download className="h-4 w-4 mr-2" />
+          </Subtitle>
+        </HeaderInfo>
+        <ActionGroup>
+          <ActionButton>
+            <Download size={16} />
             Export
-          </Button>
-          <Button variant="outline">
-            <Filter className="h-4 w-4 mr-2" />
+          </ActionButton>
+          <ActionButton>
+            <Filter size={16} />
             Advanced Filters
-          </Button>
-        </div>
-      </div>
+          </ActionButton>
+        </ActionGroup>
+      </Header>
 
-      {/* Message Stats */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Messages</CardTitle>
-            <MessageSquare className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
+      <StatsGrid>
+        <StatCard>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.total.toLocaleString()}</div>
+            <StatContent>
+              <StatInfo>
+                <StatLabel>Total Messages</StatLabel>
+                <StatValue style={{ color: '#1f2937' }}>{stats.total.toLocaleString()}</StatValue>
+              </StatInfo>
+              <IconContainer $bgColor="#eff6ff">
+                <MessageSquare size={24} color="#3b82f6" />
+              </IconContainer>
+            </StatContent>
           </CardContent>
-        </Card>
+        </StatCard>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Delivered</CardTitle>
-            <div className="h-2 w-2 rounded-full bg-green-600"></div>
-          </CardHeader>
+        <StatCard>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">{stats.delivered.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">
-              {deliveryRate}% delivery rate
-            </p>
+            <StatContent>
+              <StatInfo>
+                <StatLabel>Delivered</StatLabel>
+                <StatValue style={{ color: '#10b981' }}>{stats.delivered.toLocaleString()}</StatValue>
+                <StatMeta>
+                  {deliveryRate}% delivery rate
+                </StatMeta>
+              </StatInfo>
+              <IconContainer $bgColor="#f0fdf4">
+                <CheckCircle size={24} color="#10b981" />
+              </IconContainer>
+            </StatContent>
           </CardContent>
-        </Card>
+        </StatCard>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Failed</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-red-600" />
-          </CardHeader>
+        <StatCard>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">{stats.failed.toLocaleString()}</div>
+            <StatContent>
+              <StatInfo>
+                <StatLabel>Failed</StatLabel>
+                <StatValue style={{ color: '#ef4444' }}>{stats.failed.toLocaleString()}</StatValue>
+              </StatInfo>
+              <IconContainer $bgColor="#fef2f2">
+                <AlertTriangle size={24} color="#ef4444" />
+              </IconContainer>
+            </StatContent>
           </CardContent>
-        </Card>
+        </StatCard>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pending</CardTitle>
-            <div className="h-2 w-2 rounded-full bg-yellow-600"></div>
-          </CardHeader>
+        <StatCard>
           <CardContent>
-            <div className="text-2xl font-bold text-yellow-600">{stats.pending.toLocaleString()}</div>
+            <StatContent>
+              <StatInfo>
+                <StatLabel>Pending</StatLabel>
+                <StatValue style={{ color: '#f59e0b' }}>{stats.pending.toLocaleString()}</StatValue>
+              </StatInfo>
+              <IconContainer $bgColor="#fffbeb">
+                <Clock size={24} color="#f59e0b" />
+              </IconContainer>
+            </StatContent>
           </CardContent>
-        </Card>
+        </StatCard>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Cost</CardTitle>
-            <DollarSign className="h-4 w-4 text-green-600" />
-          </CardHeader>
+        <StatCard>
           <CardContent>
-            <div className="text-2xl font-bold">${stats.totalCost.toFixed(2)}</div>
+            <StatContent>
+              <StatInfo>
+                <StatLabel>Total Cost</StatLabel>
+                <StatValue style={{ color: '#10b981' }}>${stats.totalCost.toFixed(2)}</StatValue>
+              </StatInfo>
+              <IconContainer $bgColor="#f0fdf4">
+                <DollarSign size={24} color="#10b981" />
+              </IconContainer>
+            </StatContent>
           </CardContent>
-        </Card>
-      </div>
+        </StatCard>
+      </StatsGrid>
 
-      {/* Filters and Search */}
-      <Card>
+      <MainCard>
         <CardHeader>
           <CardTitle>Message Log</CardTitle>
           <CardDescription>
@@ -198,18 +419,17 @@ export function Messages() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-between mb-4 space-x-4">
-            <div className="relative flex-1 max-w-sm">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
+          <FiltersContainer>
+            <SearchContainer>
+              <SearchIcon />
+              <StyledInput
                 placeholder="Search messages..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
               />
-            </div>
+            </SearchContainer>
             
-            <div className="flex items-center space-x-2">
+            <FilterGroup>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className="w-40">
                   <SelectValue placeholder="Filter by status" />
@@ -235,29 +455,29 @@ export function Messages() {
                   <SelectItem value="90d">Last 90 days</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
-          </div>
+            </FilterGroup>
+          </FiltersContainer>
 
           {isLoading ? (
-            <div className="text-center py-8">
-              <div className="animate-spin h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
-              <p className="mt-2 text-muted-foreground">Loading messages...</p>
-            </div>
+            <LoadingContainer>
+              <Spinner />
+              <LoadingText>Loading messages...</LoadingText>
+            </LoadingContainer>
           ) : filteredMessages.length > 0 ? (
             <DataTable
               columns={messageColumns}
               data={filteredMessages}
             />
           ) : (
-            <div className="text-center py-8">
-              <MessageSquare className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground">
+            <EmptyState>
+              <MessageSquare size={48} />
+              <p>
                 No messages match your criteria
               </p>
-            </div>
+            </EmptyState>
           )}
         </CardContent>
-      </Card>
-    </div>
+      </MainCard>
+    </PageContainer>
   )
 }

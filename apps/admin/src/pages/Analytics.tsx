@@ -1,8 +1,210 @@
 import { useState } from 'react'
-import { useHub, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sms-hub/ui'
+import { useHub, Card, CardContent, CardDescription, CardHeader, CardTitle, Button } from '@sms-hub/ui'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sms-hub/ui'
-import { BarChart3, TrendingUp, MessageSquare, Users, DollarSign, Activity } from 'lucide-react'
+import { BarChart3, TrendingUp, MessageSquare, Users, DollarSign, Activity, Clock } from 'lucide-react'
 import { useAdminAnalytics } from '@sms-hub/supabase'
+import styled from 'styled-components'
+
+const PageContainer = styled.div`
+  background: #f8f9fa;
+  min-height: 100vh;
+  padding: 2rem;
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
+`
+
+const Header = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: start;
+    gap: 1rem;
+  }
+`
+
+const HeaderInfo = styled.div``
+
+const Title = styled.h1`
+  font-size: 1.875rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+  margin-bottom: 0.5rem;
+`
+
+const Subtitle = styled.p`
+  font-size: 1rem;
+  color: #6b7280;
+  margin: 0;
+`
+
+const StatsGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+`
+
+const StatCard = styled(Card)`
+  background: white;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  transition: all 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  }
+`
+
+const StatContent = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+`
+
+const StatInfo = styled.div`
+  flex: 1;
+`
+
+const StatLabel = styled.p`
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #6b7280;
+  margin: 0;
+  margin-bottom: 0.5rem;
+`
+
+const StatValue = styled.div`
+  font-size: 1.875rem;
+  font-weight: 600;
+  color: #1f2937;
+  line-height: 1.2;
+  margin-bottom: 0.5rem;
+`
+
+const StatChange = styled.p<{ $positive: boolean }>`
+  font-size: 0.75rem;
+  color: ${props => props.$positive ? '#059669' : '#dc2626'};
+  margin: 0;
+`
+
+const IconContainer = styled.div<{ $bgColor: string }>`
+  width: 48px;
+  height: 48px;
+  background: ${props => props.$bgColor};
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+`
+
+const ContentGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+`
+
+const MainCard = styled(Card)`
+  background: white;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+`
+
+const ChartPlaceholder = styled.div`
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9ca3af;
+  text-align: center;
+`
+
+const ChartContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+`
+
+const ChartIcon = styled.div`
+  color: #9ca3af;
+`
+
+const ChartText = styled.p`
+  margin: 0;
+  font-size: 0.875rem;
+  
+  &.small {
+    font-size: 0.75rem;
+  }
+`
+
+const DataList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+`
+
+const DataItem = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #f3f4f6;
+
+  &:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+`
+
+const CompanyInfo = styled.div`
+  flex: 1;
+`
+
+const CompanyName = styled.div`
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #1f2937;
+`
+
+const CompanyAccount = styled.div`
+  font-size: 0.75rem;
+  color: #6b7280;
+  font-family: monospace;
+  margin-top: 0.125rem;
+`
+
+const MetricValue = styled.div`
+  text-align: right;
+`
+
+const MetricNumber = styled.div`
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #1f2937;
+`
+
+const MetricLabel = styled.div`
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-top: 0.125rem;
+`
+
+const EmptyState = styled.div`
+  text-align: center;
+  padding: 2rem;
+  color: #9ca3af;
+  font-size: 0.875rem;
+`
 
 export function Analytics() {
   const { hubConfig } = useHub()
@@ -15,44 +217,44 @@ export function Analytics() {
       value: (analytics?.totalMessages || 0).toLocaleString(),
       change: analytics?.messageGrowth || 0,
       icon: MessageSquare,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-100',
+      color: '#3b82f6',
+      bgColor: '#eff6ff',
     },
     {
       title: 'Delivery Rate',
       value: `${analytics?.deliveryRate || 0}%`,
       change: analytics?.deliveryRateChange || 0,
       icon: TrendingUp,
-      color: 'text-green-600',
-      bgColor: 'bg-green-100',
+      color: '#10b981',
+      bgColor: '#f0fdf4',
     },
     {
       title: 'Active Users',
       value: (analytics?.activeUsers || 0).toLocaleString(),
       change: analytics?.userGrowth || 0,
       icon: Users,
-      color: 'text-purple-600',
-      bgColor: 'bg-purple-100',
+      color: '#8b5cf6',
+      bgColor: '#f5f3ff',
     },
     {
       title: 'Revenue',
       value: `$${(analytics?.revenue || 0).toLocaleString()}`,
       change: analytics?.revenueGrowth || 0,
       icon: DollarSign,
-      color: 'text-green-600',
-      bgColor: 'bg-green-100',
+      color: '#10b981',
+      bgColor: '#f0fdf4',
     },
   ]
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold hub-text-primary">Analytics</h1>
-          <p className="text-muted-foreground">
+    <PageContainer>
+      <Header>
+        <HeaderInfo>
+          <Title>Analytics</Title>
+          <Subtitle>
             {hubConfig.displayName} platform performance and insights
-          </p>
-        </div>
+          </Subtitle>
+        </HeaderInfo>
         <Select value={timeRange} onValueChange={setTimeRange}>
           <SelectTrigger className="w-40">
             <SelectValue />
@@ -64,31 +266,31 @@ export function Analytics() {
             <SelectItem value="1y">Last year</SelectItem>
           </SelectContent>
         </Select>
-      </div>
+      </Header>
 
-      {/* KPI Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <StatsGrid>
         {kpiCards.map((kpi) => (
-          <Card key={kpi.title}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{kpi.title}</CardTitle>
-              <div className={`p-2 rounded-full ${kpi.bgColor}`}>
-                <kpi.icon className={`h-4 w-4 ${kpi.color}`} />
-              </div>
-            </CardHeader>
+          <StatCard key={kpi.title}>
             <CardContent>
-              <div className="text-2xl font-bold">{kpi.value}</div>
-              <p className={`text-xs ${kpi.change >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {kpi.change >= 0 ? '+' : ''}{kpi.change.toFixed(1)}% from last period
-              </p>
+              <StatContent>
+                <StatInfo>
+                  <StatLabel>{kpi.title}</StatLabel>
+                  <StatValue>{kpi.value}</StatValue>
+                  <StatChange $positive={kpi.change >= 0}>
+                    {kpi.change >= 0 ? '+' : ''}{kpi.change.toFixed(1)}% from last period
+                  </StatChange>
+                </StatInfo>
+                <IconContainer $bgColor={kpi.bgColor}>
+                  <kpi.icon size={24} color={kpi.color} />
+                </IconContainer>
+              </StatContent>
             </CardContent>
-          </Card>
+          </StatCard>
         ))}
-      </div>
+      </StatsGrid>
 
-      {/* Charts Section */}
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card>
+      <ContentGrid>
+        <MainCard>
           <CardHeader>
             <CardTitle>Message Volume Trend</CardTitle>
             <CardDescription>
@@ -96,17 +298,19 @@ export function Analytics() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-              <div className="text-center">
-                <BarChart3 className="h-12 w-12 mx-auto mb-4" />
-                <p>Chart visualization would be rendered here</p>
-                <p className="text-sm">(Integration with charting library needed)</p>
-              </div>
-            </div>
+            <ChartPlaceholder>
+              <ChartContent>
+                <ChartIcon>
+                  <BarChart3 size={48} />
+                </ChartIcon>
+                <ChartText>Chart visualization would be rendered here</ChartText>
+                <ChartText className="small">(Integration with charting library needed)</ChartText>
+              </ChartContent>
+            </ChartPlaceholder>
           </CardContent>
-        </Card>
+        </MainCard>
 
-        <Card>
+        <MainCard>
           <CardHeader>
             <CardTitle>Delivery Performance</CardTitle>
             <CardDescription>
@@ -114,20 +318,21 @@ export function Analytics() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-              <div className="text-center">
-                <Activity className="h-12 w-12 mx-auto mb-4" />
-                <p>Delivery rate chart would be rendered here</p>
-                <p className="text-sm">(Integration with charting library needed)</p>
-              </div>
-            </div>
+            <ChartPlaceholder>
+              <ChartContent>
+                <ChartIcon>
+                  <Activity size={48} />
+                </ChartIcon>
+                <ChartText>Delivery rate chart would be rendered here</ChartText>
+                <ChartText className="small">(Integration with charting library needed)</ChartText>
+              </ChartContent>
+            </ChartPlaceholder>
           </CardContent>
-        </Card>
-      </div>
+        </MainCard>
+      </ContentGrid>
 
-      {/* Top Performers */}
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card>
+      <ContentGrid>
+        <MainCard>
           <CardHeader>
             <CardTitle>Top Companies by Volume</CardTitle>
             <CardDescription>
@@ -135,30 +340,28 @@ export function Analytics() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
+            <DataList>
               {analytics?.topCompanies?.map((company, i) => (
-                <div key={i} className="flex items-center justify-between">
-                  <div>
-                    <div className="font-medium">{company.name}</div>
-                    <div className="text-sm text-muted-foreground font-mono">
-                      {company.account_number}
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="font-medium">{company.message_count.toLocaleString()}</div>
-                    <div className="text-sm text-muted-foreground">messages</div>
-                  </div>
-                </div>
+                <DataItem key={i}>
+                  <CompanyInfo>
+                    <CompanyName>{company.name}</CompanyName>
+                    <CompanyAccount>{company.account_number}</CompanyAccount>
+                  </CompanyInfo>
+                  <MetricValue>
+                    <MetricNumber>{company.message_count.toLocaleString()}</MetricNumber>
+                    <MetricLabel>messages</MetricLabel>
+                  </MetricValue>
+                </DataItem>
               )) || (
-                <div className="text-center py-4 text-muted-foreground">
+                <EmptyState>
                   No data available
-                </div>
+                </EmptyState>
               )}
-            </div>
+            </DataList>
           </CardContent>
-        </Card>
+        </MainCard>
 
-        <Card>
+        <MainCard>
           <CardHeader>
             <CardTitle>Failed Message Analysis</CardTitle>
             <CardDescription>
@@ -166,26 +369,28 @@ export function Analytics() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
+            <DataList>
               {analytics?.failureReasons?.map((reason, i) => (
-                <div key={i} className="flex items-center justify-between">
-                  <div className="text-sm">{reason.reason}</div>
-                  <div className="flex items-center space-x-2">
-                    <div className="text-sm font-medium">{reason.count}</div>
-                    <div className="text-xs text-muted-foreground">
-                      ({((reason.count / stats.failed) * 100).toFixed(1)}%)
-                    </div>
-                  </div>
-                </div>
+                <DataItem key={i}>
+                  <CompanyInfo>
+                    <CompanyName>{reason.reason}</CompanyName>
+                  </CompanyInfo>
+                  <MetricValue>
+                    <MetricNumber>{reason.count}</MetricNumber>
+                    <MetricLabel>
+                      ({((reason.count / (analytics?.totalFailures || 1)) * 100).toFixed(1)}%)
+                    </MetricLabel>
+                  </MetricValue>
+                </DataItem>
               )) || (
-                <div className="text-center py-4 text-muted-foreground">
+                <EmptyState>
                   No failure data available
-                </div>
+                </EmptyState>
               )}
-            </div>
+            </DataList>
           </CardContent>
-        </Card>
-      </div>
-    </div>
+        </MainCard>
+      </ContentGrid>
+    </PageContainer>
   )
 }

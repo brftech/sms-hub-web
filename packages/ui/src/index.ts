@@ -53,6 +53,11 @@ export * from "./components/hub-themed-button";
 export * from "./components/hub-logo";
 export * from "./components/hub-switcher";
 
+// Phone Interactive components
+export { default as PhoneInteractive } from "./components/PhoneInteractive";
+export { default as SMSAuthModal } from "./components/SMSAuthModal";
+export { default as PlatformDemo } from "./components/PlatformDemo";
+
 // Shared UI components
 export * from "./components/error-boundary";
 export * from "./components/forms";
@@ -65,6 +70,7 @@ export * from "./hooks/use-toast";
 
 // Contexts
 export * from "./contexts/HubContext";
+export * from "./contexts/LiveMessagingContext";
 
 // Theme and styling exports
 export * from "./theme/styled-provider";

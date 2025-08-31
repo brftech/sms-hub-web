@@ -1,6 +1,167 @@
 import { useHub, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sms-hub/ui'
-import { MessageSquare, Users, Building, TrendingUp, AlertTriangle, DollarSign } from 'lucide-react'
+import { MessageSquare, Users, Building, TrendingUp, AlertTriangle, DollarSign, Activity, Clock, CheckCircle, XCircle } from 'lucide-react'
 import { useAdminStats } from '@sms-hub/supabase'
+import styled from 'styled-components'
+
+const DashboardContainer = styled.div`
+  background: #f8f9fa;
+  min-height: 100vh;
+  padding: 2rem;
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
+`
+
+const Header = styled.div`
+  margin-bottom: 2rem;
+`
+
+const Title = styled.h1`
+  font-size: 1.875rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+  margin-bottom: 0.5rem;
+`
+
+const Subtitle = styled.p`
+  font-size: 1rem;
+  color: #6b7280;
+  margin: 0;
+`
+
+const StatsGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+`
+
+const StatCard = styled(Card)`
+  background: white;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  transition: all 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  }
+`
+
+const AlertCard = styled(StatCard)`
+  border-left: 4px solid #ef4444;
+`
+
+const StatContent = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+`
+
+const StatInfo = styled.div`
+  flex: 1;
+`
+
+const StatLabel = styled.p`
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #6b7280;
+  margin: 0;
+  margin-bottom: 0.5rem;
+`
+
+const StatValue = styled.div`
+  font-size: 1.875rem;
+  font-weight: 600;
+  color: #1f2937;
+  line-height: 1.2;
+`
+
+const IconContainer = styled.div<{ $bgColor: string }>`
+  width: 48px;
+  height: 48px;
+  background: ${props => props.$bgColor};
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+`
+
+const ContentGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 1.5rem;
+`
+
+const ActivityCard = styled(Card)`
+  background: white;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+`
+
+const ActivityList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+`
+
+const ActivityItem = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #f3f4f6;
+
+  &:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+`
+
+const UserInfo = styled.div`
+  flex: 1;
+`
+
+const UserName = styled.div`
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #1f2937;
+`
+
+const UserEmail = styled.div`
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-top: 0.125rem;
+`
+
+const TimeStamp = styled.div`
+  font-size: 0.75rem;
+  color: #9ca3af;
+`
+
+const StatusIndicator = styled.div<{ $status: 'success' | 'warning' | 'error' }>`
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.75rem;
+  color: ${props => props.$status === 'success' ? '#059669' : props.$status === 'warning' ? '#d97706' : '#dc2626'};
+`
+
+const StatusDot = styled.div<{ $status: 'success' | 'warning' | 'error' }>`
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: ${props => props.$status === 'success' ? '#10b981' : props.$status === 'warning' ? '#f59e0b' : '#ef4444'};
+`
+
+const EmptyState = styled.div`
+  text-align: center;
+  padding: 2rem;
+  color: #9ca3af;
+  font-size: 0.875rem;
+`
 
 export function Dashboard() {
   const { hubConfig, currentHub } = useHub()
@@ -11,29 +172,29 @@ export function Dashboard() {
       title: 'Total Users',
       value: stats?.totalUsers || 0,
       icon: Users,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-100',
+      color: '#3b82f6',
+      bgColor: '#eff6ff',
     },
     {
       title: 'Active Companies',
       value: stats?.activeCompanies || 0,
       icon: Building,
-      color: 'text-green-600',
-      bgColor: 'bg-green-100',
+      color: '#10b981',
+      bgColor: '#f0fdf4',
     },
     {
       title: 'Messages Today',
       value: stats?.messagesToday || 0,
       icon: MessageSquare,
-      color: 'text-purple-600',
-      bgColor: 'bg-purple-100',
+      color: '#8b5cf6',
+      bgColor: '#f5f3ff',
     },
     {
       title: 'Revenue (MTD)',
       value: `$${(stats?.revenueThisMonth || 0).toLocaleString()}`,
       icon: DollarSign,
-      color: 'text-green-600',
-      bgColor: 'bg-green-100',
+      color: '#10b981',
+      bgColor: '#f0fdf4',
     },
   ]
 
@@ -41,129 +202,136 @@ export function Dashboard() {
     {
       title: 'Failed Messages',
       value: stats?.failedMessages || 0,
-      icon: AlertTriangle,
-      color: 'text-red-600',
-      bgColor: 'bg-red-100',
+      icon: XCircle,
+      color: '#ef4444',
+      bgColor: '#fef2f2',
     },
     {
       title: 'Pending Reviews',
       value: stats?.pendingReviews || 0,
-      icon: TrendingUp,
-      color: 'text-yellow-600',
-      bgColor: 'bg-yellow-100',
+      icon: Clock,
+      color: '#f59e0b',
+      bgColor: '#fffbeb',
     },
   ]
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold hub-text-primary">Admin Dashboard</h1>
-        <p className="text-muted-foreground">
-          {hubConfig.displayName} platform overview and management
-        </p>
-      </div>
+    <DashboardContainer>
+      <Header>
+        <Title>Admin Dashboard</Title>
+        <Subtitle>{hubConfig.displayName} platform overview and management</Subtitle>
+      </Header>
 
-      {/* Overview Stats */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <StatsGrid>
         {overviewStats.map((stat) => (
-          <Card key={stat.title}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
-              <div className={`p-2 rounded-full ${stat.bgColor}`}>
-                <stat.icon className={`h-4 w-4 ${stat.color}`} />
-              </div>
-            </CardHeader>
+          <StatCard key={stat.title}>
             <CardContent>
-              <div className="text-2xl font-bold">{stat.value}</div>
+              <StatContent>
+                <StatInfo>
+                  <StatLabel>{stat.title}</StatLabel>
+                  <StatValue>{stat.value}</StatValue>
+                </StatInfo>
+                <IconContainer $bgColor={stat.bgColor}>
+                  <stat.icon size={24} color={stat.color} />
+                </IconContainer>
+              </StatContent>
             </CardContent>
-          </Card>
+          </StatCard>
         ))}
-      </div>
+      </StatsGrid>
 
-      {/* Alerts Section */}
-      <div className="grid gap-4 md:grid-cols-2">
+      <StatsGrid>
         {alertsStats.map((stat) => (
-          <Card key={stat.title} className="border-red-200">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
-              <div className={`p-2 rounded-full ${stat.bgColor}`}>
-                <stat.icon className={`h-4 w-4 ${stat.color}`} />
-              </div>
-            </CardHeader>
+          <AlertCard key={stat.title}>
             <CardContent>
-              <div className="text-2xl font-bold">{stat.value}</div>
+              <StatContent>
+                <StatInfo>
+                  <StatLabel>{stat.title}</StatLabel>
+                  <StatValue>{stat.value}</StatValue>
+                </StatInfo>
+                <IconContainer $bgColor={stat.bgColor}>
+                  <stat.icon size={24} color={stat.color} />
+                </IconContainer>
+              </StatContent>
             </CardContent>
-          </Card>
+          </AlertCard>
         ))}
-      </div>
+      </StatsGrid>
 
-      {/* Recent Activity */}
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card>
+      <ContentGrid>
+        <ActivityCard>
           <CardHeader>
             <CardTitle>Recent Signups</CardTitle>
             <CardDescription>New user registrations today</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
-              {stats?.recentSignups?.map((signup, i) => (
-                <div key={i} className="flex items-center justify-between">
-                  <div>
-                    <div className="font-medium">{signup.name}</div>
-                    <div className="text-sm text-muted-foreground">{signup.email}</div>
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    {new Date(signup.created_at).toLocaleTimeString()}
-                  </div>
-                </div>
-              )) || (
-                <div className="text-center py-4 text-muted-foreground">
-                  No recent signups
-                </div>
+            <ActivityList>
+              {stats?.recentSignups?.length ? (
+                stats.recentSignups.map((signup, i) => (
+                  <ActivityItem key={i}>
+                    <UserInfo>
+                      <UserName>{signup.name}</UserName>
+                      <UserEmail>{signup.email}</UserEmail>
+                    </UserInfo>
+                    <TimeStamp>
+                      {new Date(signup.created_at).toLocaleTimeString()}
+                    </TimeStamp>
+                  </ActivityItem>
+                ))
+              ) : (
+                <EmptyState>No recent signups</EmptyState>
               )}
-            </div>
+            </ActivityList>
           </CardContent>
-        </Card>
+        </ActivityCard>
 
-        <Card>
+        <ActivityCard>
           <CardHeader>
             <CardTitle>System Health</CardTitle>
             <CardDescription>Platform status and performance</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-sm">API Status</span>
-                <div className="flex items-center space-x-2">
-                  <div className="h-2 w-2 rounded-full bg-green-600"></div>
-                  <span className="text-sm text-green-600">Operational</span>
-                </div>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm">Message Queue</span>
-                <div className="flex items-center space-x-2">
-                  <div className="h-2 w-2 rounded-full bg-green-600"></div>
-                  <span className="text-sm text-green-600">Healthy</span>
-                </div>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm">Database</span>
-                <div className="flex items-center space-x-2">
-                  <div className="h-2 w-2 rounded-full bg-green-600"></div>
-                  <span className="text-sm text-green-600">Connected</span>
-                </div>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm">SMS Gateway</span>
-                <div className="flex items-center space-x-2">
-                  <div className="h-2 w-2 rounded-full bg-yellow-600"></div>
-                  <span className="text-sm text-yellow-600">Degraded</span>
-                </div>
-              </div>
-            </div>
+            <ActivityList>
+              <ActivityItem>
+                <UserInfo>
+                  <UserName>API Status</UserName>
+                </UserInfo>
+                <StatusIndicator $status="success">
+                  <StatusDot $status="success" />
+                  Operational
+                </StatusIndicator>
+              </ActivityItem>
+              <ActivityItem>
+                <UserInfo>
+                  <UserName>Message Queue</UserName>
+                </UserInfo>
+                <StatusIndicator $status="success">
+                  <StatusDot $status="success" />
+                  Healthy
+                </StatusIndicator>
+              </ActivityItem>
+              <ActivityItem>
+                <UserInfo>
+                  <UserName>Database</UserName>
+                </UserInfo>
+                <StatusIndicator $status="success">
+                  <StatusDot $status="success" />
+                  Connected
+                </StatusIndicator>
+              </ActivityItem>
+              <ActivityItem>
+                <UserInfo>
+                  <UserName>SMS Gateway</UserName>
+                </UserInfo>
+                <StatusIndicator $status="warning">
+                  <StatusDot $status="warning" />
+                  Degraded
+                </StatusIndicator>
+              </ActivityItem>
+            </ActivityList>
           </CardContent>
-        </Card>
-      </div>
-    </div>
+        </ActivityCard>
+      </ContentGrid>
+    </DashboardContainer>
   )
 }

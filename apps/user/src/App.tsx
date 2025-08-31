@@ -2,8 +2,8 @@ import { Routes, Route } from "react-router-dom";
 import { Dashboard } from "./pages/Dashboard";
 import { Onboarding } from "./pages/onboarding/Onboarding";
 import { Login } from "./pages/Login";
-import { Signup } from "./pages/Signup";
-import { Verify } from "./pages/Verify";
+import { SignupEnhanced } from "./pages/SignupEnhanced";
+import { VerifyCode } from "./pages/VerifyCode";
 import { Campaigns } from "./pages/Campaigns";
 import { Messages } from "./pages/Messages";
 import { Settings } from "./pages/Settings";
@@ -13,8 +13,8 @@ function App() {
   return (
     <div className="min-h-screen bg-background">
       <Routes>
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/verify" element={<Verify />} />
+        <Route path="/signup" element={<SignupEnhanced />} />
+        <Route path="/verify" element={<VerifyCode />} />
         <Route path="/login" element={<Login />} />
         <Route path="/onboarding" element={<Onboarding />} />
         <Route path="/" element={<Layout />}>

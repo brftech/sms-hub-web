@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation } from 'react-router-dom'
-import { useHub, HubLogo, HubSwitcher, Button } from '@sms-hub/ui'
+import { useHub, HubLogo, Button } from '@sms-hub/ui'
 import { Badge, Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger } from '@sms-hub/ui'
 import { Home, MessageSquare, Settings, Zap, LogOut } from 'lucide-react'
 import { useUserProfile } from '@sms-hub/supabase'
@@ -23,7 +23,8 @@ export function Layout() {
           <SidebarContent>
             <div className="p-4 border-b">
               <HubLogo hubType={currentHub} variant="full" size="md" />
-              <HubSwitcher className="mt-2" />
+              {/* HubSwitcher hidden for now */}
+              {/* <HubSwitcher className="mt-2" /> */}
             </div>
             
             <SidebarGroup>

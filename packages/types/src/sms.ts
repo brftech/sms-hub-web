@@ -26,6 +26,25 @@ export interface SMSMessage {
 // Alias for Message type
 export type Message = SMSMessage
 
+// Chat Message interface for PhoneInteractive component
+export interface ChatMessage {
+  id: string
+  text: string
+  sender: 'user' | 'business'
+  timestamp: string
+  businessName?: string
+  metadata?: Record<string, any>
+}
+
+// Conversation context for chat sessions
+export interface ConversationContext {
+  sessionId: string
+  userId?: string
+  businessId?: string
+  campaignId?: string
+  metadata?: Record<string, any>
+}
+
 export interface TCRBrandRegistration {
   companyName: string
   legalName: string

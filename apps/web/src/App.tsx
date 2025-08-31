@@ -2,7 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster, SonnerToaster, TooltipProvider } from "@sms-hub/ui";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import { HubProvider, useHub } from "@sms-hub/ui";
+import { HubProvider } from "@sms-hub/ui";
 import { ErrorBoundary } from "@sms-hub/ui";
 import { webEnvironment } from "./config/webEnvironment";
 
@@ -15,12 +15,18 @@ import Pricing from "./pages/Pricing";
 import Solutions from "./pages/Solutions";
 import Testimonials from "./pages/Testimonials";
 import FAQ from "./pages/FAQ";
+import PhoneDemo from "./pages/PhoneDemo";
+import PlatformDemo from "./pages/PlatformDemo";
+import Admin from "./pages/Admin";
+import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
+import { useScrollToTop } from "./hooks/useScrollToTop";
 
 const queryClient = new QueryClient();
 
-// AppRoutes component that uses the hub context
+// AppRoutes component that uses the hub context and scroll-to-top
 const AppRoutes = () => {
-  const { currentHub } = useHub();
+  // Apply scroll-to-top on route changes
+  useScrollToTop();
 
   return (
     <Routes>
@@ -33,6 +39,16 @@ const AppRoutes = () => {
       <Route path="/privacy" element={<Privacy />} />
       <Route path="/about" element={<About />} />
       <Route path="/pricing" element={<Pricing />} />
+      <Route path="/phone-demo" element={<PhoneDemo />} />
+      <Route path="/platform-demo" element={<PlatformDemo />} />
+      <Route 
+        path="/admin" 
+        element={
+          <ProtectedAdminRoute>
+            <Admin />
+          </ProtectedAdminRoute>
+        } 
+      />
       <Route path="*" element={<Home />} />
     </Routes>
   );

@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { useHub, Card, CardContent, CardDescription, CardHeader, CardTitle, Button, Input, Badge, DataTable } from '@sms-hub/ui'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sms-hub/ui'
-import { Search, Building, MoreHorizontal, DollarSign } from 'lucide-react'
+import { Search, Building, MoreHorizontal, DollarSign, Users, AlertTriangle } from 'lucide-react'
 import { useAdminCompanies } from '@sms-hub/supabase'
 import type { Company } from '@sms-hub/types'
+import styled from 'styled-components'
 
 const companyColumns = [
   {
@@ -90,6 +91,187 @@ const companyColumns = [
   },
 ]
 
+const PageContainer = styled.div`
+  background: #f8f9fa;
+  min-height: 100vh;
+  padding: 2rem;
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
+`
+
+const Header = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: start;
+    gap: 1rem;
+  }
+`
+
+const HeaderInfo = styled.div``
+
+const Title = styled.h1`
+  font-size: 1.875rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+  margin-bottom: 0.5rem;
+`
+
+const Subtitle = styled.p`
+  font-size: 1rem;
+  color: #6b7280;
+  margin: 0;
+`
+
+const StatsGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+`
+
+const StatCard = styled(Card)`
+  background: white;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  transition: all 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  }
+`
+
+const StatContent = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`
+
+const StatInfo = styled.div``
+
+const StatLabel = styled.p`
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #6b7280;
+  margin: 0;
+  margin-bottom: 0.5rem;
+`
+
+const StatValue = styled.div`
+  font-size: 1.875rem;
+  font-weight: 600;
+  line-height: 1.2;
+`
+
+const IconContainer = styled.div<{ $bgColor: string }>`
+  width: 48px;
+  height: 48px;
+  background: ${props => props.$bgColor};
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+`
+
+const MainCard = styled(Card)`
+  background: white;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+`
+
+const FiltersContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+`
+
+const SearchContainer = styled.div`
+  position: relative;
+  flex: 1;
+  max-width: 400px;
+`
+
+const SearchIcon = styled(Search)`
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  color: #9ca3af;
+`
+
+const FilterGroup = styled.div`
+  display: flex;
+  gap: 0.5rem;
+`
+
+const ActionButton = styled(Button)`
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  transition: background 0.2s;
+
+  &:hover {
+    background: #2563eb;
+  }
+`
+
+const LoadingContainer = styled.div`
+  text-align: center;
+  padding: 3rem;
+`
+
+const Spinner = styled.div`
+  width: 32px;
+  height: 32px;
+  margin: 0 auto;
+  border: 3px solid #e5e7eb;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+`
+
+const LoadingText = styled.p`
+  margin-top: 1rem;
+  color: #6b7280;
+  font-size: 0.875rem;
+`
+
+const EmptyState = styled.div`
+  text-align: center;
+  padding: 3rem;
+  color: #6b7280;
+`
+
+const StyledInput = styled(Input)`
+  padding-left: 2.5rem;
+`
+
 export function Companies() {
   const { hubConfig } = useHub()
   const [searchTerm, setSearchTerm] = useState('')
@@ -115,68 +297,82 @@ export function Companies() {
     totalRevenue: companies.reduce((sum: number, c: any) => sum + (c.monthly_spend || 0), 0),
   }
 
+  const totalUsers = companies.reduce((sum: number, c: any) => sum + (c.total_users || 0), 0)
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold hub-text-primary">Companies</h1>
-          <p className="text-muted-foreground">
-            Manage {hubConfig.displayName} customer accounts
-          </p>
-        </div>
-        <Button className="hub-bg-primary">
-          <Building className="h-4 w-4 mr-2" />
+    <PageContainer>
+      <Header>
+        <HeaderInfo>
+          <Title>Companies</Title>
+          <Subtitle>Manage {hubConfig.displayName} customer accounts</Subtitle>
+        </HeaderInfo>
+        <ActionButton>
+          <Building size={20} />
           Add Company
-        </Button>
-      </div>
+        </ActionButton>
+      </Header>
 
-      {/* Company Stats */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Companies</CardTitle>
-            <Building className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
+      <StatsGrid>
+        <StatCard>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.total}</div>
+            <StatContent>
+              <StatInfo>
+                <StatLabel>Total Companies</StatLabel>
+                <StatValue style={{ color: '#1f2937' }}>{stats.total}</StatValue>
+              </StatInfo>
+              <IconContainer $bgColor="#eff6ff">
+                <Building size={24} color="#3b82f6" />
+              </IconContainer>
+            </StatContent>
           </CardContent>
-        </Card>
+        </StatCard>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active</CardTitle>
-            <div className="h-2 w-2 rounded-full bg-green-600"></div>
-          </CardHeader>
+        <StatCard>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">{stats.active}</div>
+            <StatContent>
+              <StatInfo>
+                <StatLabel>Active</StatLabel>
+                <StatValue style={{ color: '#10b981' }}>{stats.active}</StatValue>
+              </StatInfo>
+              <IconContainer $bgColor="#f0fdf4">
+                <Building size={24} color="#10b981" />
+              </IconContainer>
+            </StatContent>
           </CardContent>
-        </Card>
+        </StatCard>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Suspended</CardTitle>
-            <div className="h-2 w-2 rounded-full bg-red-600"></div>
-          </CardHeader>
+        <StatCard>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">{stats.suspended}</div>
+            <StatContent>
+              <StatInfo>
+                <StatLabel>Suspended</StatLabel>
+                <StatValue style={{ color: '#ef4444' }}>{stats.suspended}</StatValue>
+              </StatInfo>
+              <IconContainer $bgColor="#fef2f2">
+                <AlertTriangle size={24} color="#ef4444" />
+              </IconContainer>
+            </StatContent>
           </CardContent>
-        </Card>
+        </StatCard>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Monthly Revenue</CardTitle>
-            <DollarSign className="h-4 w-4 text-green-600" />
-          </CardHeader>
+        <StatCard>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">
-              ${stats.totalRevenue.toLocaleString()}
-            </div>
+            <StatContent>
+              <StatInfo>
+                <StatLabel>Monthly Revenue</StatLabel>
+                <StatValue style={{ color: '#10b981' }}>
+                  ${stats.totalRevenue.toLocaleString()}
+                </StatValue>
+              </StatInfo>
+              <IconContainer $bgColor="#f0fdf4">
+                <DollarSign size={24} color="#10b981" />
+              </IconContainer>
+            </StatContent>
           </CardContent>
-        </Card>
-      </div>
+        </StatCard>
+      </StatsGrid>
 
-      {/* Filters and Search */}
-      <Card>
+      <MainCard>
         <CardHeader>
           <CardTitle>All Companies</CardTitle>
           <CardDescription>
@@ -184,18 +380,17 @@ export function Companies() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-between mb-4 space-x-4">
-            <div className="relative flex-1 max-w-sm">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
+          <FiltersContainer>
+            <SearchContainer>
+              <SearchIcon />
+              <StyledInput
                 placeholder="Search companies..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
               />
-            </div>
+            </SearchContainer>
             
-            <div className="flex items-center space-x-2">
+            <FilterGroup>
               <Select value={industryFilter} onValueChange={setIndustryFilter}>
                 <SelectTrigger className="w-40">
                   <SelectValue placeholder="Industry" />
@@ -222,28 +417,26 @@ export function Companies() {
                   <SelectItem value="pending">Pending</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
-          </div>
+            </FilterGroup>
+          </FiltersContainer>
 
           {isLoading ? (
-            <div className="text-center py-8">
-              <div className="animate-spin h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
-              <p className="mt-2 text-muted-foreground">Loading companies...</p>
-            </div>
+            <LoadingContainer>
+              <Spinner />
+              <LoadingText>Loading companies...</LoadingText>
+            </LoadingContainer>
           ) : filteredCompanies.length > 0 ? (
             <DataTable
               columns={companyColumns}
               data={filteredCompanies}
             />
           ) : (
-            <div className="text-center py-8">
-              <p className="text-muted-foreground">
-                No companies match your search criteria
-              </p>
-            </div>
+            <EmptyState>
+              No companies match your search criteria
+            </EmptyState>
           )}
         </CardContent>
-      </Card>
-    </div>
+      </MainCard>
+    </PageContainer>
   )
 }

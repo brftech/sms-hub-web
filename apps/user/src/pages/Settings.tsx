@@ -1,14 +1,197 @@
 import { useState } from 'react'
 import { useHub, Card, CardContent, CardDescription, CardHeader, CardTitle, Button, Input, Label, Switch } from '@sms-hub/ui'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Badge, Separator } from '@sms-hub/ui'
-import { User, Building, Phone, CreditCard, Bell, Shield, Key } from 'lucide-react'
-import { useUserProfile, useCompany, usePhoneNumbers } from '@sms-hub/supabase/react'
+import { User, Building, Phone, CreditCard, Bell, Shield, Key, ChevronRight } from 'lucide-react'
+import { useUserProfile, useCurrentUserCompany, useCurrentUserPhoneNumbers, useBrands, useCurrentUserCampaigns } from '@sms-hub/supabase/react'
+import styled from 'styled-components'
+
+const PageContainer = styled.div`
+  padding: 2rem;
+  background: #f8f9fa;
+  min-height: 100vh;
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
+`;
+
+const Header = styled.div`
+  margin-bottom: 2rem;
+`;
+
+const Title = styled.h1`
+  font-size: 1.875rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+  margin-bottom: 0.25rem;
+`;
+
+const Subtitle = styled.p`
+  font-size: 1rem;
+  color: #6b7280;
+  margin: 0;
+`;
+
+const ContentWrapper = styled.div`
+  display: flex;
+  gap: 1.5rem;
+
+  @media (max-width: 1024px) {
+    flex-direction: column;
+  }
+`;
+
+const SidebarCard = styled(Card)`
+  background: white;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  height: fit-content;
+  min-width: 260px;
+
+  @media (max-width: 1024px) {
+    width: 100%;
+  }
+`;
+
+const MainCard = styled(Card)`
+  background: white;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  flex: 1;
+`;
+
+const NavMenu = styled.nav`
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+`;
+
+const NavItem = styled.button<{ $active?: boolean }>`
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.625rem 0.75rem;
+  border: none;
+  background: ${props => props.$active ? '#3b82f6' : 'transparent'};
+  color: ${props => props.$active ? 'white' : '#4b5563'};
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: left;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: ${props => props.$active ? '#3b82f6' : '#f3f4f6'};
+  }
+
+  svg {
+    width: 1rem;
+    height: 1rem;
+  }
+`;
+
+const FormSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+`;
+
+const FormGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+`;
+
+const FormRow = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+`;
+
+const SwitchRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+`;
+
+const SwitchInfo = styled.div`
+  flex: 1;
+`;
+
+const SwitchLabel = styled.div`
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #1f2937;
+  margin-bottom: 0.125rem;
+`;
+
+const SwitchDescription = styled.div`
+  font-size: 0.75rem;
+  color: #6b7280;
+`;
+
+const InfoCard = styled.div`
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+`;
+
+const InfoRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  background: white;
+  margin-bottom: 0.75rem;
+`;
+
+const InfoLabel = styled.div`
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #1f2937;
+`;
+
+const InfoValue = styled.div`
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-family: monospace;
+`;
+
+const ActionButtons = styled.div`
+  display: flex;
+  gap: 0.5rem;
+`;
+
+const ProgressBar = styled.div`
+  width: 100%;
+  height: 0.5rem;
+  background: #e5e7eb;
+  border-radius: 0.25rem;
+  overflow: hidden;
+  margin: 0.75rem 0;
+`;
+
+const ProgressFill = styled.div<{ $percent: number }>`
+  height: 100%;
+  width: ${props => props.$percent}%;
+  background: #3b82f6;
+  transition: width 0.3s ease;
+`;
 
 export function Settings() {
   useHub() // Initialize hub context
   const { data: userProfile } = useUserProfile()
-  const { data: company } = useCompany()
-  const { data: phoneNumbers = [] } = usePhoneNumbers()
+  const { data: company } = useCurrentUserCompany()
+  const { data: phoneNumbers = [] } = useCurrentUserPhoneNumbers()
+  const { data: brands = [] } = useBrands(company?.id || '')
+  const { data: campaigns = [] } = useCurrentUserCampaigns()
   const [activeTab, setActiveTab] = useState('profile')
 
   const tabs = [
@@ -25,26 +208,27 @@ export function Settings() {
     switch (activeTab) {
       case 'profile':
         return (
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
+          <FormSection>
+            <FormRow>
+              <FormGroup>
                 <Label htmlFor="first-name">First Name</Label>
                 <Input
                   id="first-name"
                   defaultValue={userProfile?.first_name || ''}
                   placeholder="Enter first name"
                 />
-              </div>
-              <div>
+              </FormGroup>
+              <FormGroup>
                 <Label htmlFor="last-name">Last Name</Label>
                 <Input
                   id="last-name"
                   defaultValue={userProfile?.last_name || ''}
                   placeholder="Enter last name"
                 />
-              </div>
-            </div>
-            <div>
+              </FormGroup>
+            </FormRow>
+            
+            <FormGroup>
               <Label htmlFor="email">Email Address</Label>
               <Input
                 id="email"
@@ -52,8 +236,9 @@ export function Settings() {
                 defaultValue={userProfile?.email || ''}
                 placeholder="Enter email"
               />
-            </div>
-            <div>
+            </FormGroup>
+            
+            <FormGroup>
               <Label htmlFor="phone">Phone Number</Label>
               <Input
                 id="phone"
@@ -61,41 +246,52 @@ export function Settings() {
                 defaultValue={userProfile?.mobile_phone_number || ''}
                 placeholder="Enter phone number"
               />
-            </div>
-            <div>
-              <Label>Role</Label>
-              <Badge variant="secondary" className="ml-2">
-                {userProfile?.role}
-              </Badge>
-            </div>
-            <Button className="hub-bg-primary">
+            </FormGroup>
+            
+            <FormGroup>
+              <Label>Account Details</Label>
+              <InfoCard>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                  <span style={{ fontSize: '0.875rem', color: '#6b7280' }}>Account Number:</span>
+                  <Badge variant="secondary">{userProfile?.account_number || 'Not assigned'}</Badge>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <span style={{ fontSize: '0.875rem', color: '#6b7280' }}>Role:</span>
+                  <Badge variant="secondary">{userProfile?.role || 'Member'}</Badge>
+                </div>
+              </InfoCard>
+            </FormGroup>
+            
+            <Button style={{ background: '#3b82f6', color: 'white', width: 'fit-content' }}>
               Save Changes
             </Button>
-          </div>
+          </FormSection>
         )
 
       case 'company':
         return (
-          <div className="space-y-6">
-            <div>
+          <FormSection>
+            <FormGroup>
               <Label htmlFor="company-name">Company Name</Label>
               <Input
                 id="company-name"
                 defaultValue={company?.public_name || ''}
                 placeholder="Enter company name"
               />
-            </div>
-            <div>
-              <Label htmlFor="account-number">Account Number</Label>
+            </FormGroup>
+            
+            <FormGroup>
+              <Label htmlFor="account-number">Company Account Number</Label>
               <Input
                 id="account-number"
                 value={company?.company_account_number || ''}
                 disabled
-                className="bg-gray-50"
+                style={{ background: '#f9fafb', cursor: 'not-allowed' }}
               />
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
+            </FormGroup>
+            
+            <FormRow>
+              <FormGroup>
                 <Label htmlFor="industry">Industry</Label>
                 <Select defaultValue={company?.industry || ''}>
                   <SelectTrigger>
@@ -110,8 +306,9 @@ export function Settings() {
                     <SelectItem value="other">Other</SelectItem>
                   </SelectContent>
                 </Select>
-              </div>
-              <div>
+              </FormGroup>
+              
+              <FormGroup>
                 <Label htmlFor="company-size">Company Size</Label>
                 <Select defaultValue={company?.size || ''}>
                   <SelectTrigger>
@@ -125,50 +322,66 @@ export function Settings() {
                     <SelectItem value="1000+">1000+ employees</SelectItem>
                   </SelectContent>
                 </Select>
-              </div>
-            </div>
-            <Button className="hub-bg-primary">
+              </FormGroup>
+            </FormRow>
+            
+            <FormGroup>
+              <Label htmlFor="website">Website</Label>
+              <Input
+                id="website"
+                type="url"
+                defaultValue={company?.website || ''}
+                placeholder="https://example.com"
+              />
+            </FormGroup>
+            
+            <Button style={{ background: '#3b82f6', color: 'white', width: 'fit-content' }}>
               Save Changes
             </Button>
-          </div>
+          </FormSection>
         )
 
       case 'phone':
         return (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
+          <FormSection>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
               <div>
-                <h3 className="text-lg font-semibold">Phone Numbers</h3>
-                <p className="text-muted-foreground">Manage your SMS sending numbers</p>
+                <h3 style={{ fontSize: '1.125rem', fontWeight: 600, color: '#1f2937', marginBottom: '0.25rem' }}>
+                  Phone Numbers
+                </h3>
+                <p style={{ fontSize: '0.875rem', color: '#6b7280' }}>
+                  Manage your SMS sending numbers
+                </p>
               </div>
-              <Button className="hub-bg-primary">
+              <Button style={{ background: '#3b82f6', color: 'white' }}>
                 <Phone className="h-4 w-4 mr-2" />
                 Add Number
               </Button>
             </div>
 
             {phoneNumbers.length > 0 ? (
-              <div className="space-y-4">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 {phoneNumbers.map((phone) => (
-                  <Card key={phone.id}>
+                  <Card key={phone.id} style={{ border: '1px solid #e5e7eb' }}>
                     <CardContent className="p-4">
-                      <div className="flex items-center justify-between">
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <div>
-                          <div className="font-mono text-lg">{phone.phone_number}</div>
-                          <div className="text-sm text-muted-foreground">
-                            {phone.assigned_to_campaign ? 'Assigned to campaign' : 'Available'}
+                          <div style={{ fontFamily: 'monospace', fontSize: '1.125rem', fontWeight: 500, color: '#1f2937', marginBottom: '0.25rem' }}>
+                            {phone.phone_number}
+                          </div>
+                          <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>
+                            {phone.assigned_to_campaign ? `Assigned to campaign` : 'Available for use'}
                           </div>
                         </div>
-                        <div className="flex items-center space-x-2">
-                          <Badge
-                            variant={phone.is_active ? 'default' : 'secondary'}
-                            className={phone.is_active ? 'hub-bg-primary' : ''}
-                          >
-                            {phone.is_active ? 'ACTIVE' : 'INACTIVE'}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                          <Badge style={{
+                            background: phone.is_active ? '#dcfce7' : '#f3f4f6',
+                            color: phone.is_active ? '#166534' : '#6b7280',
+                            border: 'none'
+                          }}>
+                            {phone.is_active ? 'Active' : 'Inactive'}
                           </Badge>
-                          <Button variant="outline" size="sm">
-                            Configure
-                          </Button>
+                          <Button variant="outline" size="sm">Configure</Button>
                         </div>
                       </div>
                     </CardContent>
@@ -176,41 +389,38 @@ export function Settings() {
                 ))}
               </div>
             ) : (
-              <Card>
+              <Card style={{ border: '1px solid #e5e7eb' }}>
                 <CardContent className="text-center py-8">
-                  <Phone className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">No phone numbers</h3>
-                  <p className="text-muted-foreground mb-4">
+                  <Phone className="h-12 w-12 text-muted-foreground mx-auto mb-4" style={{ color: '#9ca3af' }} />
+                  <h3 style={{ fontSize: '1.125rem', fontWeight: 600, color: '#1f2937', marginBottom: '0.5rem' }}>
+                    No phone numbers
+                  </h3>
+                  <p style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '1.5rem' }}>
                     Add a phone number to start sending SMS messages
                   </p>
-                  <Button className="hub-bg-primary">
+                  <Button style={{ background: '#3b82f6', color: 'white' }}>
                     <Phone className="h-4 w-4 mr-2" />
                     Get Your First Number
                   </Button>
                 </CardContent>
               </Card>
             )}
-          </div>
+          </FormSection>
         )
 
       case 'billing':
         return (
-          <div className="space-y-6">
-            <div>
-              <h3 className="text-lg font-semibold">Billing Information</h3>
-              <p className="text-muted-foreground">Manage your payment methods and billing</p>
-            </div>
-
-            <Card>
+          <FormSection>
+            <Card style={{ border: '1px solid #e5e7eb', marginBottom: '1rem' }}>
               <CardHeader>
                 <CardTitle>Current Plan</CardTitle>
                 <CardDescription>Your subscription details</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="flex items-center justify-between">
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div>
-                    <div className="font-semibold">Starter Plan</div>
-                    <div className="text-sm text-muted-foreground">
+                    <div style={{ fontWeight: 600, color: '#1f2937', marginBottom: '0.25rem' }}>Starter Plan</div>
+                    <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>
                       1,000 messages/month • $0.01 per additional message
                     </div>
                   </div>
@@ -219,281 +429,267 @@ export function Settings() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card style={{ border: '1px solid #e5e7eb' }}>
               <CardHeader>
                 <CardTitle>Usage This Month</CardTitle>
                 <CardDescription>Your current usage and remaining credits</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  <div className="flex justify-between">
-                    <span>Messages sent</span>
-                    <span className="font-medium">247 / 1,000</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div className="hub-bg-primary h-2 rounded-full" style={{ width: '24.7%' }}></div>
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    753 messages remaining in your plan
-                  </div>
-                </div>
+                {(() => {
+                  const messagesUsed = campaigns.reduce((acc, c) => acc + (c.metadata?.message_count || 0), 0);
+                  const messageLimit = 1000;
+                  const percentage = Math.min((messagesUsed / messageLimit) * 100, 100);
+                  const remaining = Math.max(messageLimit - messagesUsed, 0);
+                  
+                  return (
+                    <>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                        <span style={{ fontSize: '0.875rem', color: '#6b7280' }}>Messages sent</span>
+                        <span style={{ fontWeight: 600, color: '#1f2937' }}>
+                          {messagesUsed.toLocaleString()} / {messageLimit.toLocaleString()}
+                        </span>
+                      </div>
+                      <ProgressBar>
+                        <ProgressFill $percent={percentage} />
+                      </ProgressBar>
+                      <div style={{ fontSize: '0.875rem', color: '#6b7280', marginTop: '0.5rem' }}>
+                        {remaining.toLocaleString()} messages remaining in your plan
+                      </div>
+                    </>
+                  );
+                })()}
               </CardContent>
             </Card>
-          </div>
+          </FormSection>
         )
 
       case 'notifications':
         return (
-          <div className="space-y-6">
-            <div>
-              <h3 className="text-lg font-semibold">Notification Preferences</h3>
-              <p className="text-muted-foreground">Choose what notifications you want to receive</p>
-            </div>
-
-            <Card>
+          <FormSection>
+            <Card style={{ border: '1px solid #e5e7eb' }}>
               <CardHeader>
                 <CardTitle>Email Notifications</CardTitle>
                 <CardDescription>Receive updates via email</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label htmlFor="campaign-updates">Campaign Updates</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Get notified when campaigns complete
-                    </p>
-                  </div>
-                  <Switch id="campaign-updates" defaultChecked />
-                </div>
+              <CardContent>
+                <SwitchRow>
+                  <SwitchInfo>
+                    <SwitchLabel>Campaign Updates</SwitchLabel>
+                    <SwitchDescription>Get notified when campaigns complete</SwitchDescription>
+                  </SwitchInfo>
+                  <Switch defaultChecked />
+                </SwitchRow>
+                
                 <Separator />
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label htmlFor="delivery-reports">Delivery Reports</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Daily summary of message delivery
-                    </p>
-                  </div>
-                  <Switch id="delivery-reports" defaultChecked />
-                </div>
+                
+                <SwitchRow>
+                  <SwitchInfo>
+                    <SwitchLabel>Delivery Reports</SwitchLabel>
+                    <SwitchDescription>Daily summary of message delivery</SwitchDescription>
+                  </SwitchInfo>
+                  <Switch defaultChecked />
+                </SwitchRow>
+                
                 <Separator />
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label htmlFor="billing-alerts">Billing Alerts</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Notifications about usage and billing
-                    </p>
-                  </div>
-                  <Switch id="billing-alerts" defaultChecked />
-                </div>
+                
+                <SwitchRow>
+                  <SwitchInfo>
+                    <SwitchLabel>Billing Alerts</SwitchLabel>
+                    <SwitchDescription>Notifications about usage and billing</SwitchDescription>
+                  </SwitchInfo>
+                  <Switch defaultChecked />
+                </SwitchRow>
+                
+                <Separator />
+                
+                <SwitchRow>
+                  <SwitchInfo>
+                    <SwitchLabel>Product Updates</SwitchLabel>
+                    <SwitchDescription>New features and improvements</SwitchDescription>
+                  </SwitchInfo>
+                  <Switch />
+                </SwitchRow>
               </CardContent>
             </Card>
-
-            <Button className="hub-bg-primary">
+            
+            <Button style={{ background: '#3b82f6', color: 'white', width: 'fit-content' }}>
               Save Preferences
             </Button>
-          </div>
+          </FormSection>
         )
 
       case 'security':
         return (
-          <div className="space-y-6">
-            <div>
-              <h3 className="text-lg font-semibold">Security Settings</h3>
-              <p className="text-muted-foreground">Manage your account security</p>
-            </div>
-
-            <Card>
+          <FormSection>
+            <Card style={{ border: '1px solid #e5e7eb', marginBottom: '1rem' }}>
               <CardHeader>
                 <CardTitle>Password</CardTitle>
                 <CardDescription>Update your account password</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <Label htmlFor="current-password">Current Password</Label>
-                  <Input
-                    id="current-password"
-                    type="password"
-                    placeholder="Enter current password"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="new-password">New Password</Label>
-                  <Input
-                    id="new-password"
-                    type="password"
-                    placeholder="Enter new password"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="confirm-password">Confirm New Password</Label>
-                  <Input
-                    id="confirm-password"
-                    type="password"
-                    placeholder="Confirm new password"
-                  />
-                </div>
-                <Button className="hub-bg-primary">
-                  Update Password
-                </Button>
+              <CardContent>
+                <FormSection>
+                  <FormGroup>
+                    <Label htmlFor="current-password">Current Password</Label>
+                    <Input
+                      id="current-password"
+                      type="password"
+                      placeholder="Enter current password"
+                    />
+                  </FormGroup>
+                  <FormGroup>
+                    <Label htmlFor="new-password">New Password</Label>
+                    <Input
+                      id="new-password"
+                      type="password"
+                      placeholder="Enter new password"
+                    />
+                  </FormGroup>
+                  <FormGroup>
+                    <Label htmlFor="confirm-password">Confirm New Password</Label>
+                    <Input
+                      id="confirm-password"
+                      type="password"
+                      placeholder="Confirm new password"
+                    />
+                  </FormGroup>
+                  <Button style={{ background: '#3b82f6', color: 'white', width: 'fit-content' }}>
+                    Update Password
+                  </Button>
+                </FormSection>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card style={{ border: '1px solid #e5e7eb' }}>
               <CardHeader>
                 <CardTitle>Two-Factor Authentication</CardTitle>
                 <CardDescription>Add an extra layer of security to your account</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="flex items-center justify-between">
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div>
-                    <div className="font-medium">SMS Authentication</div>
-                    <div className="text-sm text-muted-foreground">
+                    <div style={{ fontWeight: 500, color: '#1f2937', marginBottom: '0.25rem' }}>
+                      SMS Authentication
+                    </div>
+                    <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>
                       Receive verification codes via SMS
                     </div>
                   </div>
-                  <Button variant="outline">
-                    Enable 2FA
-                  </Button>
+                  <Button variant="outline">Enable 2FA</Button>
                 </div>
               </CardContent>
             </Card>
-          </div>
+          </FormSection>
         )
 
       case 'api':
         return (
-          <div className="space-y-6">
-            <div>
-              <h3 className="text-lg font-semibold">API Keys</h3>
-              <p className="text-muted-foreground">Manage API keys for programmatic access</p>
-            </div>
-
-            <Card>
+          <FormSection>
+            <Card style={{ border: '1px solid #e5e7eb', marginBottom: '1rem' }}>
               <CardHeader>
                 <CardTitle>API Access</CardTitle>
-                <CardDescription>
-                  Generate and manage API keys for integration
-                </CardDescription>
+                <CardDescription>Generate and manage API keys for integration</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between p-3 border rounded-lg">
-                    <div>
-                      <div className="font-medium">Production Key</div>
-                      <div className="text-sm text-muted-foreground font-mono">
-                        sk_prod_••••••••••••••••
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Badge variant="secondary">Active</Badge>
-                      <Button variant="outline" size="sm">
-                        Regenerate
-                      </Button>
-                    </div>
+                <InfoRow>
+                  <div>
+                    <InfoLabel>Production Key</InfoLabel>
+                    <InfoValue>sk_prod_••••••••••••••••</InfoValue>
                   </div>
-                  
-                  <Button className="hub-bg-primary">
-                    <Key className="h-4 w-4 mr-2" />
-                    Generate New Key
-                  </Button>
-                </div>
+                  <ActionButtons>
+                    <Badge variant="secondary">Active</Badge>
+                    <Button variant="outline" size="sm">Regenerate</Button>
+                  </ActionButtons>
+                </InfoRow>
+                
+                <Button style={{ background: '#3b82f6', color: 'white', marginTop: '1rem' }}>
+                  <Key className="h-4 w-4 mr-2" />
+                  Generate New Key
+                </Button>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card style={{ border: '1px solid #e5e7eb' }}>
               <CardHeader>
                 <CardTitle>Webhooks</CardTitle>
-                <CardDescription>
-                  Configure webhooks for real-time events
-                </CardDescription>
+                <CardDescription>Configure webhooks for real-time events</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  <div>
+                <FormSection>
+                  <FormGroup>
                     <Label htmlFor="webhook-url">Webhook URL</Label>
                     <Input
                       id="webhook-url"
                       placeholder="https://your-app.com/webhooks"
                     />
-                  </div>
-                  <div className="space-y-2">
+                  </FormGroup>
+                  
+                  <FormGroup>
                     <Label>Events</Label>
-                    <div className="space-y-2">
-                      <div className="flex items-center space-x-2">
-                        <input type="checkbox" id="message-delivered" />
-                        <Label htmlFor="message-delivered">Message Delivered</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <input type="checkbox" id="message-failed" />
-                        <Label htmlFor="message-failed">Message Failed</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <input type="checkbox" id="campaign-completed" />
-                        <Label htmlFor="campaign-completed">Campaign Completed</Label>
-                      </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem' }}>
+                        <input type="checkbox" />
+                        Message Delivered
+                      </label>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem' }}>
+                        <input type="checkbox" />
+                        Message Failed
+                      </label>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem' }}>
+                        <input type="checkbox" />
+                        Campaign Completed
+                      </label>
                     </div>
-                  </div>
-                  <Button variant="outline">
+                  </FormGroup>
+                  
+                  <Button variant="outline" style={{ width: 'fit-content' }}>
                     Save Webhook
                   </Button>
-                </div>
+                </FormSection>
               </CardContent>
             </Card>
-          </div>
+          </FormSection>
         )
 
       default:
         return (
-          <div className="text-center py-8">
-            <p className="text-muted-foreground">
-              This section is coming soon
-            </p>
+          <div style={{ textAlign: 'center', padding: '3rem 2rem' }}>
+            <p style={{ color: '#6b7280' }}>This section is coming soon</p>
           </div>
         )
     }
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold hub-text-primary">Settings</h1>
-        <p className="text-muted-foreground">
-          Manage your account preferences and configuration
-        </p>
-      </div>
+    <PageContainer>
+      <Header>
+        <Title>Settings</Title>
+        <Subtitle>Manage your account preferences and configuration</Subtitle>
+      </Header>
 
-      <div className="flex flex-col lg:flex-row gap-6">
-        {/* Sidebar Navigation */}
-        <Card className="lg:w-64">
+      <ContentWrapper>
+        <SidebarCard>
           <CardContent className="p-4">
-            <nav className="space-y-1">
+            <NavMenu>
               {tabs.map((tab) => (
-                <button
+                <NavItem
                   key={tab.id}
+                  $active={activeTab === tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`w-full flex items-center px-3 py-2 text-sm rounded-md transition-colors ${
-                    activeTab === tab.id
-                      ? 'hub-bg-primary text-white'
-                      : 'text-gray-600 hover:bg-gray-100'
-                  }`}
                 >
-                  <tab.icon className="h-4 w-4 mr-3" />
+                  <tab.icon />
                   {tab.label}
-                </button>
+                </NavItem>
               ))}
-            </nav>
+            </NavMenu>
           </CardContent>
-        </Card>
+        </SidebarCard>
 
-        {/* Main Content */}
-        <div className="flex-1">
-          <Card>
-            <CardContent className="p-6">
-              {renderTabContent()}
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    </div>
+        <MainCard>
+          <CardContent className="p-6">
+            {renderTabContent()}
+          </CardContent>
+        </MainCard>
+      </ContentWrapper>
+    </PageContainer>
   )
 }

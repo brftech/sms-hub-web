@@ -1,15 +1,16 @@
-import React, { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Button, useHub, HubLogo } from "@sms-hub/ui";
-import { Menu, X } from "lucide-react";
-import { HubSwitcher } from "@sms-hub/ui";
+import { Menu, X, Shield } from "lucide-react";
+// import { HubSwitcher } from "@sms-hub/ui";
 import { getHubColorClasses } from "@sms-hub/utils";
+import { isAdminAccessible } from "../utils/environment";
 
 const Navigation = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const { currentHub, hubConfig, switchHub, showHubSwitcher } = useHub();
+  const { currentHub } = useHub();
   const hubColors = getHubColorClasses(currentHub);
 
   const getLogo = () => {
@@ -17,12 +18,22 @@ const Navigation = () => {
   };
 
   const isContactPage = location.pathname === "/contact";
-  const isSignUpPage = location.pathname === "/signup";
-  const isLoginPage = location.pathname === "/login";
+  const showAdminLink = isAdminAccessible();
+
+  // Scroll to top function
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const handleNavClick = (path: string) => {
     setIsMobileMenuOpen(false);
     navigate(path);
+    scrollToTop();
+  };
+
+  const handleDesktopNavClick = (path: string) => {
+    navigate(path);
+    scrollToTop();
   };
 
   return (
@@ -32,13 +43,13 @@ const Navigation = () => {
           {/* Left side - Text links (Desktop only) */}
           <div className="hidden md:flex items-center space-x-6">
             <button
-              onClick={() => navigate("/")}
+              onClick={() => handleDesktopNavClick("/")}
               className="hover:opacity-80 transition-opacity duration-300"
             >
               {getLogo()}
             </button>
             <button
-              onClick={() => navigate("/solutions")}
+              onClick={() => handleDesktopNavClick("/solutions")}
               className={`transition-colors text-sm font-medium ${
                 location.pathname === "/solutions"
                   ? `${hubColors.text} hub-text-primary`
@@ -48,7 +59,7 @@ const Navigation = () => {
               Solutions
             </button>
             <button
-              onClick={() => navigate("/pricing")}
+              onClick={() => handleDesktopNavClick("/pricing")}
               className={`transition-colors text-sm font-medium ${
                 location.pathname === "/pricing"
                   ? `${hubColors.text} hub-text-primary`
@@ -58,7 +69,7 @@ const Navigation = () => {
               Pricing
             </button>
             <button
-              onClick={() => navigate("/testimonials")}
+              onClick={() => handleDesktopNavClick("/testimonials")}
               className={`transition-colors text-sm font-medium ${
                 location.pathname === "/testimonials"
                   ? `${hubColors.text} hub-text-primary`
@@ -68,7 +79,7 @@ const Navigation = () => {
               Testimonials
             </button>
             <button
-              onClick={() => navigate("/about")}
+              onClick={() => handleDesktopNavClick("/about")}
               className={`transition-colors text-sm font-medium ${
                 location.pathname === "/about"
                   ? `${hubColors.text} hub-text-primary`
@@ -78,7 +89,7 @@ const Navigation = () => {
               About
             </button>
             <button
-              onClick={() => navigate("/faq")}
+              onClick={() => handleDesktopNavClick("/faq")}
               className={`transition-colors text-sm font-medium ${
                 location.pathname === "/faq"
                   ? `${hubColors.text} hub-text-primary`
@@ -87,22 +98,55 @@ const Navigation = () => {
             >
               FAQ
             </button>
+            <button
+              onClick={() => handleDesktopNavClick("/phone-demo")}
+              className={`transition-colors text-sm font-medium ${
+                location.pathname === "/phone-demo"
+                  ? `${hubColors.text} hub-text-primary`
+                  : "text-white hover:text-gray-300"
+              }`}
+            >
+              Phone Demo
+            </button>
+            <button
+              onClick={() => handleDesktopNavClick("/platform-demo")}
+              className={`transition-colors text-sm font-medium ${
+                location.pathname === "/platform-demo"
+                  ? `${hubColors.text} hub-text-primary`
+                  : "text-white hover:text-gray-300"
+              }`}
+            >
+              Platform Demo
+            </button>
+            {showAdminLink && (
+              <button
+                onClick={() => handleDesktopNavClick("/admin")}
+                className={`transition-colors text-sm font-medium ${
+                  location.pathname === "/admin"
+                    ? `${hubColors.text} hub-text-primary`
+                    : "text-white hover:text-gray-300"
+                }`}
+              >
+                <Shield className="w-4 h-4 inline mr-1" />
+                Admin
+              </button>
+            )}
           </div>
 
           {/* Mobile header with logo, contact button, and hamburger */}
           <div className="md:hidden flex items-center justify-between w-full">
             <button
-              onClick={() => navigate("/")}
+              onClick={() => handleDesktopNavClick("/")}
               className="hover:opacity-80 transition-opacity duration-300"
             >
               {getLogo()}
             </button>
             <div className="flex items-center space-x-3">
-              {/* Hub Selector - Only visible in development */}
-              {showHubSwitcher && <HubSwitcher />}
+              {/* Hub Selector - Hidden for now */}
+              {/* {showHubSwitcher && <HubSwitcher />} */}
 
               <Button
-                onClick={() => navigate("/contact")}
+                onClick={() => handleDesktopNavClick("/contact")}
                 className={`px-4 py-2 transition-all duration-300 ${hubColors.contactButton}`}
               >
                 Contact Us
@@ -118,11 +162,12 @@ const Navigation = () => {
 
           {/* Right side - Navigation buttons (Desktop only) */}
           <div className="hidden md:flex items-center space-x-4">
-            <HubSwitcher />
+            {/* Hub Selector - Hidden for now */}
+            {/* <HubSwitcher /> */}
             <Button
               variant="outline"
               size="sm"
-              onClick={() => navigate("/contact")}
+              onClick={() => handleDesktopNavClick("/contact")}
               className={`transition-all duration-300 backdrop-blur-sm px-4 text-xs w-24 ${
                 isContactPage
                   ? `${hubColors.bgLight} ${hubColors.text} ${hubColors.border}`
@@ -204,6 +249,45 @@ const Navigation = () => {
               >
                 FAQ
               </button>
+              <button
+                onClick={() => handleNavClick("/phone-demo")}
+                className={`block w-full text-left px-3 py-2 text-base font-medium text-white hover:${
+                  hubColors.textHover
+                } hover:${hubColors.bgLight} transition-colors ${
+                  location.pathname === "/phone-demo"
+                    ? `${hubColors.text} ${hubColors.bgLight}`
+                    : ""
+                }`}
+              >
+                Phone Demo
+              </button>
+              <button
+                onClick={() => handleNavClick("/platform-demo")}
+                className={`block w-full text-left px-3 py-2 text-base font-medium text-white hover:${
+                  hubColors.textHover
+                } hover:${hubColors.bgLight} transition-colors ${
+                  location.pathname === "/platform-demo"
+                    ? `${hubColors.text} ${hubColors.bgLight}`
+                    : ""
+                }`}
+              >
+                Platform Demo
+              </button>
+              {showAdminLink && (
+                <button
+                  onClick={() => handleNavClick("/admin")}
+                  className={`block w-full text-left px-3 py-2 text-base font-medium text-white hover:${
+                    hubColors.textHover
+                  } hover:${hubColors.bgLight} transition-colors ${
+                    location.pathname === "/admin"
+                      ? `${hubColors.text} ${hubColors.bgLight}`
+                      : ""
+                  }`}
+                >
+                  <Shield className="w-4 h-4 inline mr-2" />
+                  Admin
+                </button>
+              )}
             </div>
           </div>
         )}

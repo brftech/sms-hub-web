@@ -2,71 +2,149 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Temporary Gnymble CSS for testing */
-[data-hub="gnymble"] {
-  /* Pure black background like Resend */
-  --background: 0 0% 0%;
-  --foreground: 0 0% 100%;
+/* User Dashboard Design System - Clean, modern, professional */
 
-  /* Card and surface colors - subtle dark grays */
-  --card: 0 0% 3%;
-  --card-foreground: 0 0% 100%;
+@layer base {
+  :root {
+    /* Bright, clean background */
+    --background: 0 0% 98%;
+    --foreground: 0 0% 9%;
 
-  /* Primary - burnt orange */
-  --primary: 25 100% 40%;
-  --primary-foreground: 0 0% 100%;
-  --primary-glow: 25 100% 50%;
+    /* Card and surface colors - clean whites */
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 9%;
 
-  /* Secondary - subtle gray */
-  --secondary: 0 0% 8%;
-  --secondary-foreground: 0 0% 100%;
+    /* Popover colors */
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 9%;
 
-  /* Muted tones */
-  --muted: 0 0% 5%;
-  --muted-foreground: 0 0% 65%;
+    /* Primary - professional blue */
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
 
-  /* Borders and inputs */
-  --border: 0 0% 12%;
-  --input: 0 0% 8%;
-  --ring: 0 0% 100%;
+    /* Secondary - subtle gray */
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 9%;
 
-  /* Hub-specific colors */
-  --hub-primary: #f97316; /* orange-500 */
-  --hub-secondary: #dc2626; /* red-600 */
-  --hub-accent: #ea580c; /* orange-600 */
+    /* Muted tones */
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
+
+    /* Accent colors for hub-specific branding */
+    --accent: 217 91% 60%;
+    --accent-foreground: 0 0% 100%;
+
+    /* Destructive */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Borders and inputs */
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 217 91% 60%;
+
+    --radius: 0.5rem;
+
+    /* Professional shadows */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+
+    /* Sidebar colors */
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 0 0% 20%;
+    --sidebar-primary: 217 91% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 96%;
+    --sidebar-accent-foreground: 0 0% 9%;
+    --sidebar-border: 0 0% 90%;
+    --sidebar-ring: 217 91% 60%;
+  }
+
+  /* Hub-specific color overrides */
+  [data-hub="percytech"] {
+    --primary: 217 91% 60%;
+    --accent: 217 91% 60%;
+    --hub-primary: #3b82f6;
+    --hub-secondary: #2563eb;
+    --hub-accent: #1d4ed8;
+  }
+
+  [data-hub="gnymble"] {
+    --primary: 25 95% 53%;
+    --accent: 25 95% 53%;
+    --hub-primary: #f97316;
+    --hub-secondary: #ea580c;
+    --hub-accent: #dc2626;
+  }
+
+  [data-hub="percymd"] {
+    --primary: 262 83% 58%;
+    --accent: 262 83% 58%;
+    --hub-primary: #9333ea;
+    --hub-secondary: #7e22ce;
+    --hub-accent: #6b21a8;
+  }
+
+  [data-hub="percytext"] {
+    --primary: 142 76% 36%;
+    --accent: 142 76% 36%;
+    --hub-primary: #22c55e;
+    --hub-secondary: #16a34a;
+    --hub-accent: #15803d;
+  }
 }
 
-/* Test styles to see if CSS is working */
-body[data-hub="gnymble"] {
-  background-color: #000000 !important;
-  color: #ffffff !important;
+@layer components {
+  /* Clean card styles */
+  .card-clean {
+    @apply bg-white rounded-lg border border-gray-200 shadow-sm;
+  }
+
+  .card-hover {
+    @apply transition-all duration-200 hover:shadow-md hover:border-gray-300;
+  }
+
+  /* Professional button styles */
+  .btn-primary {
+    @apply bg-primary text-white rounded-md px-4 py-2 font-medium transition-colors hover:opacity-90;
+  }
+
+  .btn-secondary {
+    @apply bg-gray-100 text-gray-700 rounded-md px-4 py-2 font-medium transition-colors hover:bg-gray-200;
+  }
+
+  /* Clean text styles */
+  .text-primary-accent {
+    color: hsl(var(--primary));
+  }
+
+  .text-secondary-accent {
+    @apply text-gray-600;
+  }
+
+  /* Professional stat card */
+  .stat-card {
+    @apply bg-white p-6 rounded-lg border border-gray-200 transition-all duration-200 hover:shadow-md;
+  }
+
+  /* Clean input styles */
+  .input-clean {
+    @apply w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary transition-colors;
+  }
 }
 
-/* Make it very obvious when Gnymble is detected */
-[data-hub="gnymble"] h1 {
-  color: #f97316 !important;
-  font-size: 3rem !important;
-  text-shadow: 0 0 20px #f97316 !important;
-}
+@layer base {
+  * {
+    @apply border-border;
+  }
 
-[data-hub="gnymble"] .hub-text-primary {
-  color: #f97316 !important;
-  font-weight: bold !important;
-}
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  }
 
-[data-hub="gnymble"] .hub-bg-primary {
-  background-color: #f97316 !important;
-}
-
-/* Debug: Show what hub is detected */
-body::before {
-  content: "Hub: " attr(data-hub);
-  position: fixed;
-  top: 10px;
-  right: 10px;
-  background: red;
-  color: white;
-  padding: 5px;
-  z-index: 9999;
-  font-family: monospace;
+  h1, h2, h3, h4, h5, h6 {
+    @apply tracking-tight;
+  }
 }

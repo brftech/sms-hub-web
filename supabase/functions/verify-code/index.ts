@@ -32,28 +32,62 @@ serve(async (req) => {
       { auth: { persistSession: false } }
     );
 
-    console.log("🔍 Verifying code for signup:", temp_signup_id);
+    console.log("🔍 Verifying code for signup:", temp_signup_id, "with code:", verification_code);
 
-    // Find the temp signup
-    const { data: tempSignup, error: fetchError } = await supabaseAdmin
+    // First, find the temp signup by ID only to check if it exists
+    const { data: tempSignupCheck, error: checkError } = await supabaseAdmin
       .from("temp_signups")
       .select("*")
       .eq("id", temp_signup_id)
-      .eq("verification_code", verification_code)
       .single();
 
-    if (fetchError || !tempSignup) {
-      console.error("❌ Error fetching temp signup:", fetchError);
-      throw new Error("Invalid verification code or signup ID");
+    if (checkError || !tempSignupCheck) {
+      console.error("❌ Temp signup not found:", temp_signup_id, checkError);
+      throw new Error("Signup request not found. Please sign up again.");
+    }
+
+    console.log("📋 Found temp signup:", {
+      id: tempSignupCheck.id,
+      email: tempSignupCheck.email,
+      verification_code: tempSignupCheck.verification_code,
+      is_verified: tempSignupCheck.is_verified,
+      expires_at: tempSignupCheck.expires_at,
+      verification_attempts: tempSignupCheck.verification_attempts,
+    });
+
+    // Now check if the verification code matches
+    if (tempSignupCheck.verification_code !== verification_code) {
+      console.error("❌ Invalid code. Expected:", tempSignupCheck.verification_code, "Got:", verification_code);
+      
+      // Increment attempts
+      await supabaseAdmin
+        .from("temp_signups")
+        .update({ 
+          verification_attempts: (tempSignupCheck.verification_attempts || 0) + 1 
+        })
+        .eq("id", temp_signup_id);
+      
+      throw new Error("Invalid verification code");
+    }
+
+    const tempSignup = tempSignupCheck;
+
+    // Check if already verified
+    if (tempSignup.is_verified) {
+      console.log("⚠️ Temp signup already verified");
+      throw new Error("This signup has already been verified. Please login instead.");
     }
 
     // Check if code has expired
     if (new Date(tempSignup.expires_at) < new Date()) {
+      console.error("❌ Code expired. Expires at:", tempSignup.expires_at);
       throw new Error("Verification code has expired");
     }
 
     // Check if max attempts exceeded
-    if (tempSignup.verification_attempts >= tempSignup.max_attempts) {
+    const maxAttempts = tempSignup.max_attempts || 5;
+    if (tempSignup.verification_attempts >= maxAttempts) {
+      console.error("❌ Max attempts exceeded:", tempSignup.verification_attempts, ">=", maxAttempts);
       throw new Error("Maximum verification attempts exceeded");
     }
 
@@ -78,23 +112,57 @@ serve(async (req) => {
           .eq("id", temp_signup_id);
 
         console.log("✅ Verification successful for signup:", temp_signup_id);
+        console.log("📊 Temp signup data:", {
+          hub_id: tempSignup.hub_id,
+          company_name: tempSignup.company_name,
+          email: tempSignup.email,
+          phone: tempSignup.mobile_phone_number,
+        });
+
+        // Generate company account number first
+        const hubName = getHubName(tempSignup.hub_id).toLowerCase();
+        console.log("🏢 Generating company account for hub:", hubName);
+        
+        const { data: companyAccountNumber, error: companyAccountError } =
+          await supabaseAdmin.rpc("generate_company_account_number", {
+            hub_name: hubName,
+          });
+
+        if (companyAccountError) {
+          console.error("❌ Error generating company account number:", companyAccountError);
+          console.error("Hub name used:", hubName);
+          throw new Error("Failed to generate company account number");
+        }
+        
+        console.log("✅ Generated company account number:", companyAccountNumber);
 
         // Create company record
+        const companyData = {
+          hub_id: tempSignup.hub_id,
+          company_account_number: companyAccountNumber,
+          public_name: tempSignup.company_name,
+          legal_name: tempSignup.company_name,
+          point_of_contact_email: tempSignup.email,
+          company_phone_number: tempSignup.mobile_phone_number,
+          is_active: true,
+          created_at: new Date().toISOString(),
+        };
+        
+        console.log("🏢 Creating company with data:", companyData);
+        
         const { data: company, error: companyError } = await supabaseAdmin
           .from("companies")
-          .insert({
-            name: tempSignup.company_name,
-            hub_id: tempSignup.hub_id,
-            is_active: true,
-            created_at: new Date().toISOString(),
-          })
+          .insert(companyData)
           .select()
           .single();
 
         if (companyError) {
           console.error("❌ Error creating company:", companyError);
+          console.error("Company data attempted:", companyData);
           throw new Error("Failed to create company");
         }
+        
+        console.log("✅ Company created:", company.id);
 
         // Create user in Supabase Auth
         const { data: authData, error: authError } =
@@ -132,7 +200,6 @@ serve(async (req) => {
           .from("user_profiles")
           .insert({
             id: authData.user.id,
-            company_id: company.id,
             hub_id: tempSignup.hub_id,
             account_number: accountNumber,
             first_name: tempSignup.first_name,
@@ -141,6 +208,7 @@ serve(async (req) => {
             email: tempSignup.email,
             role: "OWNER",
             onboarding_step: "payment",
+            is_active: true,
             created_at: new Date().toISOString(),
           })
           .select()
@@ -149,6 +217,22 @@ serve(async (req) => {
         if (profileError) {
           console.error("❌ Error creating user profile:", profileError);
           throw new Error("Failed to create user profile");
+        }
+
+        // Create membership to link user to company
+        const { error: membershipError } = await supabaseAdmin
+          .from("memberships")
+          .insert({
+            user_id: authData.user.id,
+            company_id: company.id,
+            hub_id: tempSignup.hub_id,
+            role: "OWNER",
+            status: "active",
+          });
+
+        if (membershipError) {
+          console.error("❌ Error creating membership:", membershipError);
+          // Don't fail the whole signup if membership fails
         }
 
         console.log(

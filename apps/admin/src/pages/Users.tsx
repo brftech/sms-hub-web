@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { useHub, Card, CardContent, CardDescription, CardHeader, CardTitle, Button, Input, Badge, DataTable } from '@sms-hub/ui'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sms-hub/ui'
-import { Search, UserPlus, MoreHorizontal, Filter } from 'lucide-react'
+import { Search, UserPlus, MoreHorizontal, Filter, Users as UsersIcon, CheckCircle, Clock, Shield } from 'lucide-react'
 import { useAdminUsers } from '@sms-hub/supabase'
 import type { UserProfile } from '@sms-hub/types'
+import styled from 'styled-components'
 
 const userColumns = [
   {
@@ -88,6 +89,187 @@ const userColumns = [
   },
 ]
 
+const PageContainer = styled.div`
+  background: #f8f9fa;
+  min-height: 100vh;
+  padding: 2rem;
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
+`
+
+const Header = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: start;
+    gap: 1rem;
+  }
+`
+
+const HeaderInfo = styled.div``
+
+const Title = styled.h1`
+  font-size: 1.875rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+  margin-bottom: 0.5rem;
+`
+
+const Subtitle = styled.p`
+  font-size: 1rem;
+  color: #6b7280;
+  margin: 0;
+`
+
+const StatsGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+`
+
+const StatCard = styled(Card)`
+  background: white;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  transition: all 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  }
+`
+
+const StatContent = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`
+
+const StatInfo = styled.div``
+
+const StatLabel = styled.p`
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #6b7280;
+  margin: 0;
+  margin-bottom: 0.5rem;
+`
+
+const StatValue = styled.div`
+  font-size: 1.875rem;
+  font-weight: 600;
+  line-height: 1.2;
+`
+
+const IconContainer = styled.div<{ $bgColor: string }>`
+  width: 48px;
+  height: 48px;
+  background: ${props => props.$bgColor};
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+`
+
+const MainCard = styled(Card)`
+  background: white;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+`
+
+const FiltersContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+`
+
+const SearchContainer = styled.div`
+  position: relative;
+  flex: 1;
+  max-width: 400px;
+`
+
+const SearchIcon = styled(Search)`
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  color: #9ca3af;
+`
+
+const FilterGroup = styled.div`
+  display: flex;
+  gap: 0.5rem;
+`
+
+const ActionButton = styled(Button)`
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  transition: background 0.2s;
+
+  &:hover {
+    background: #2563eb;
+  }
+`
+
+const LoadingContainer = styled.div`
+  text-align: center;
+  padding: 3rem;
+`
+
+const Spinner = styled.div`
+  width: 32px;
+  height: 32px;
+  margin: 0 auto;
+  border: 3px solid #e5e7eb;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+`
+
+const LoadingText = styled.p`
+  margin-top: 1rem;
+  color: #6b7280;
+  font-size: 0.875rem;
+`
+
+const EmptyState = styled.div`
+  text-align: center;
+  padding: 3rem;
+  color: #6b7280;
+`
+
+const StyledInput = styled(Input)`
+  padding-left: 2.5rem;
+`
+
 export function Users() {
   const { hubConfig } = useHub()
   const [searchTerm, setSearchTerm] = useState('')
@@ -118,61 +300,77 @@ export function Users() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold hub-text-primary">Users</h1>
-          <p className="text-muted-foreground">
-            Manage {hubConfig.displayName} platform users
-          </p>
-        </div>
-        <Button className="hub-bg-primary">
-          <UserPlus className="h-4 w-4 mr-2" />
+    <PageContainer>
+      <Header>
+        <HeaderInfo>
+          <Title>Users</Title>
+          <Subtitle>Manage {hubConfig.displayName} platform users</Subtitle>
+        </HeaderInfo>
+        <ActionButton>
+          <UserPlus size={20} />
           Invite User
-        </Button>
-      </div>
+        </ActionButton>
+      </Header>
 
-      {/* User Stats */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Users</CardTitle>
-          </CardHeader>
+      <StatsGrid>
+        <StatCard>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.total}</div>
+            <StatContent>
+              <StatInfo>
+                <StatLabel>Total Users</StatLabel>
+                <StatValue style={{ color: '#1f2937' }}>{stats.total}</StatValue>
+              </StatInfo>
+              <IconContainer $bgColor="#eff6ff">
+                <UsersIcon size={24} color="#3b82f6" />
+              </IconContainer>
+            </StatContent>
           </CardContent>
-        </Card>
+        </StatCard>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active</CardTitle>
-          </CardHeader>
+        <StatCard>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">{stats.active}</div>
+            <StatContent>
+              <StatInfo>
+                <StatLabel>Active</StatLabel>
+                <StatValue style={{ color: '#10b981' }}>{stats.active}</StatValue>
+              </StatInfo>
+              <IconContainer $bgColor="#f0fdf4">
+                <CheckCircle size={24} color="#10b981" />
+              </IconContainer>
+            </StatContent>
           </CardContent>
-        </Card>
+        </StatCard>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Onboarding</CardTitle>
-          </CardHeader>
+        <StatCard>
           <CardContent>
-            <div className="text-2xl font-bold text-yellow-600">{stats.onboarding}</div>
+            <StatContent>
+              <StatInfo>
+                <StatLabel>Onboarding</StatLabel>
+                <StatValue style={{ color: '#f59e0b' }}>{stats.onboarding}</StatValue>
+              </StatInfo>
+              <IconContainer $bgColor="#fffbeb">
+                <Clock size={24} color="#f59e0b" />
+              </IconContainer>
+            </StatContent>
           </CardContent>
-        </Card>
+        </StatCard>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Administrators</CardTitle>
-          </CardHeader>
+        <StatCard>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">{stats.admins}</div>
+            <StatContent>
+              <StatInfo>
+                <StatLabel>Administrators</StatLabel>
+                <StatValue style={{ color: '#3b82f6' }}>{stats.admins}</StatValue>
+              </StatInfo>
+              <IconContainer $bgColor="#eff6ff">
+                <Shield size={24} color="#3b82f6" />
+              </IconContainer>
+            </StatContent>
           </CardContent>
-        </Card>
-      </div>
+        </StatCard>
+      </StatsGrid>
 
-      {/* Filters and Search */}
-      <Card>
+      <MainCard>
         <CardHeader>
           <CardTitle>All Users</CardTitle>
           <CardDescription>
@@ -180,18 +378,17 @@ export function Users() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-between mb-4 space-x-4">
-            <div className="relative flex-1 max-w-sm">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
+          <FiltersContainer>
+            <SearchContainer>
+              <SearchIcon />
+              <StyledInput
                 placeholder="Search users..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
               />
-            </div>
+            </SearchContainer>
             
-            <div className="flex items-center space-x-2">
+            <FilterGroup>
               <Select value={roleFilter} onValueChange={setRoleFilter}>
                 <SelectTrigger className="w-40">
                   <SelectValue placeholder="Filter by role" />
@@ -217,28 +414,26 @@ export function Users() {
                   <SelectItem value="onboarding">Onboarding</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
-          </div>
+            </FilterGroup>
+          </FiltersContainer>
 
           {isLoading ? (
-            <div className="text-center py-8">
-              <div className="animate-spin h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
-              <p className="mt-2 text-muted-foreground">Loading users...</p>
-            </div>
+            <LoadingContainer>
+              <Spinner />
+              <LoadingText>Loading users...</LoadingText>
+            </LoadingContainer>
           ) : filteredUsers.length > 0 ? (
             <DataTable
               columns={userColumns}
               data={filteredUsers}
             />
           ) : (
-            <div className="text-center py-8">
-              <p className="text-muted-foreground">
-                No users match your search criteria
-              </p>
-            </div>
+            <EmptyState>
+              No users match your search criteria
+            </EmptyState>
           )}
         </CardContent>
-      </Card>
-    </div>
+      </MainCard>
+    </PageContainer>
   )
 }

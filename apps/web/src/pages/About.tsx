@@ -37,18 +37,18 @@ const About = () => {
             <h1 className="text-5xl md:text-7xl font-bold text-white mb-8 leading-tight">
               <span className="block">About</span>
               <span className={`${hubColors.text} bg-gradient-to-r from-orange-400 to-purple-500 bg-clip-text text-transparent`}>
-                {currentHub === "gnymble"
-                  ? "Gnymble"
-                  : currentHub === "percytech"
-                    ? "PercyTech"
-                    : currentHub === "percymd"
-                      ? "PercyMD"
-                      : currentHub === "percytext"
-                        ? "PercyText"
-                        : "Our Platform"}
+              {currentHub === "gnymble"
+                ? "Gnymble"
+                : currentHub === "percytech"
+                  ? "PercyTech"
+                  : currentHub === "percymd"
+                    ? "PercyMD"
+                    : currentHub === "percytext"
+                      ? "PercyText"
+                      : "Our Platform"}
               </span>
             </h1>
-            
+
             <p className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto leading-relaxed mb-12">
               Premium venues deserve premium solutions. We're the platform that understands 
               sophisticated establishments and delivers the regulatory expertise they require.
@@ -60,7 +60,7 @@ const About = () => {
                 <div className="relative">
                   <img
                     src={bryanProfileImage}
-                    alt="Bryan - Creator of Our Platform"
+                alt="Bryan - Creator of Our Platform"
                     className="w-32 h-32 rounded-full object-cover border-4 border-orange-500/30 shadow-2xl"
                   />
                   <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center">
@@ -120,7 +120,7 @@ const About = () => {
             </div>
           </div>
 
-          {/* Industry Focus Section */}
+            {/* Industry Focus Section */}
           <div className="mb-20">
             <div className="text-center mb-12">
               <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
@@ -174,7 +174,7 @@ const About = () => {
             </div>
           </div>
 
-          {/* Key Solutions Section */}
+            {/* Key Solutions Section */}
           <div className="mb-20">
             <div className="text-center mb-12">
               <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
@@ -224,23 +224,23 @@ const About = () => {
             </div>
           </div>
 
-          {/* Why Choose Section */}
+            {/* Why Choose Section */}
           <div className="mb-20">
             <div className="bg-gradient-to-r from-orange-500/10 to-purple-500/10 border border-orange-500/20 rounded-3xl p-12 backdrop-blur-sm">
               <div className="text-center mb-12">
                 <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-                  Why Choose{" "}
-                  {currentHub === "gnymble"
-                    ? "Gnymble"
-                    : currentHub === "percytech"
-                      ? "PercyTech"
-                      : currentHub === "percymd"
-                        ? "PercyMD"
-                        : currentHub === "percytext"
-                          ? "PercyText"
-                          : "Our Platform"}
-                  ?
-                </h2>
+                Why Choose{" "}
+                {currentHub === "gnymble"
+                  ? "Gnymble"
+                  : currentHub === "percytech"
+                    ? "PercyTech"
+                    : currentHub === "percymd"
+                      ? "PercyMD"
+                      : currentHub === "percytext"
+                        ? "PercyText"
+                        : "Our Platform"}
+                ?
+              </h2>
                 <p className="text-xl text-gray-300 max-w-3xl mx-auto">
                   We're not just another SMS platform. We're the platform that understands premium venues.
                 </p>

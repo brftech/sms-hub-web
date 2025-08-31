@@ -1,19 +1,34 @@
 import { createClient } from '@supabase/supabase-js'
 import { Database } from '@sms-hub/types'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.VITE_SUPABASE_URL || ''
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY || ''
-
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables')
+// For Vite apps, environment variables need to be injected at build time
+// We'll export a function that creates the client with provided config
+export const createSupabaseClient = (url: string, anonKey: string) => {
+  if (!url || !anonKey) {
+    console.error('Missing Supabase environment variables')
+  }
+  
+  return createClient<Database>(url, anonKey, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true
+    }
+  })
 }
 
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-    detectSessionInUrl: true
+// For server-side usage (Nest.js)
+let supabase: ReturnType<typeof createSupabaseClient> | null = null
+
+if (typeof process !== 'undefined' && process.env) {
+  const url = process.env.SUPABASE_URL || ''
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || ''
+  
+  if (url && key) {
+    supabase = createSupabaseClient(url, key)
   }
-})
+}
+
+export { supabase }
 
 export type SupabaseClient = typeof supabase

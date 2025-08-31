@@ -55,14 +55,29 @@ export function Verify() {
         verification_code: data.verification_code,
       };
 
-      await verifyCode.mutateAsync(verificationData);
+      const result = await verifyCode.mutateAsync(verificationData);
 
-      toast.success("Account verified! Redirecting to onboarding...");
+      if (result.success && result.account) {
+        toast.success("Account verified! Redirecting to payment...");
 
-      // Navigate to onboarding
-      setTimeout(() => {
-        navigate("/onboarding");
-      }, 1500);
+        // Store account info in localStorage for payment flow
+        localStorage.setItem("newAccount", JSON.stringify(result.account));
+
+        // Navigate to payment/onboarding with account details
+        setTimeout(() => {
+          navigate("/onboarding", {
+            state: {
+              account: result.account,
+              fromVerification: true,
+            },
+          });
+        }, 1500);
+      } else {
+        toast.success("Account verified! Redirecting to onboarding...");
+        setTimeout(() => {
+          navigate("/onboarding");
+        }, 1500);
+      }
     } catch (error) {
       console.error("Verification error:", error);
       toast.error("Invalid verification code. Please try again.");

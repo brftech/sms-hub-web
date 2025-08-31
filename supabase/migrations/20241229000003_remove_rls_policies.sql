@@ -1,4 +1,4 @@
--- Remove all RLS policies for development
+-- Remove all RLS policies and disable RLS for development
 -- Migration: 20241229000003_remove_rls_policies.sql
 
 -- Remove all RLS policies from public schema tables
@@ -40,3 +40,24 @@ DROP POLICY IF EXISTS "lead_activities_read_policy" ON public.lead_activities;
 DROP POLICY IF EXISTS "lead_activities_create_policy" ON public.lead_activities;
 DROP POLICY IF EXISTS "payment_history_read_policy" ON public.payment_history;
 DROP POLICY IF EXISTS "payment_history_create_policy" ON public.payment_history;
+
+-- Disable RLS on all tables
+ALTER TABLE public.hubs DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.hub_configs DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.temp_signups DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.verification_attempts DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.companies DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.user_profiles DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.leads DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.memberships DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.onboarding_steps DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.onboarding_submissions DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.brands DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.campaigns DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.phone_numbers DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.campaign_phone_assignments DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.tcr_integrations DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.bandwidth_accounts DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.admin_audit_logs DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.lead_activities DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.payment_history DISABLE ROW LEVEL SECURITY;

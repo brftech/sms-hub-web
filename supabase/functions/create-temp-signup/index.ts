@@ -69,30 +69,11 @@ serve(async (req) => {
     const hubName = getHubName(signupData.hub_id);
 
     if (authMethod === 'sms') {
-      // Use Supabase Auth for SMS
+      // Use our SMS platform via Zapier webhook
       const formattedPhone = signupData.mobile_phone_number.replace(/\D/g, "");
-      const fullPhone = formattedPhone.length === 10 ? `+1${formattedPhone}` : `+${formattedPhone}`;
-
-      // First, try to create/update user in Supabase Auth
-      const { data: authData, error: authError } = await supabaseAdmin.auth.signInWithOtp({
-        phone: fullPhone,
-        options: {
-          shouldCreateUser: true,
-          data: {
-            temp_signup_id: tempSignup.id,
-            hub_id: signupData.hub_id,
-            verification_code: verificationCode
-          }
-        }
-      });
-
-      if (authError) {
-        console.error("Error with Supabase Auth SMS:", authError);
-        // Fall back to Zapier webhook
-        await sendSMSViaZapier(formattedPhone, verificationCode, hubName, tempSignup.id, signupData.hub_id);
-      } else {
-        console.log("✅ SMS OTP sent via Supabase Auth to:", fullPhone);
-      }
+      
+      console.log("📱 Sending SMS via our platform to:", formattedPhone);
+      await sendSMSViaZapier(formattedPhone, verificationCode, hubName, tempSignup.id, signupData.hub_id);
     } else {
       // Send email verification
       const resendApiKey = Deno.env.get("RESEND_API_KEY");

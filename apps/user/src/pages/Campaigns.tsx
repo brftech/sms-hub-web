@@ -36,12 +36,12 @@ export function Campaigns() {
   // Calculate stats
   const stats = {
     total: campaigns.length,
-    active: campaigns.filter(c => c.status === 'active').length,
-    paused: campaigns.filter(c => c.status === 'paused').length,
-    completed: campaigns.filter(c => c.status === 'completed').length,
-    totalMessages: campaigns.reduce((acc, c) => acc + ((c as any).metadata?.message_count || 0), 0),
+    active: campaigns.filter((c: Campaign) => c.status === 'active').length,
+    paused: campaigns.filter((c: Campaign) => c.status === 'paused').length,
+    completed: campaigns.filter((c: Campaign) => c.status === 'completed').length,
+    totalMessages: campaigns.reduce((acc: number, c: Campaign) => acc + ((c as any).metadata?.message_count || 0), 0),
     deliveryRate: campaigns.length > 0 ? 
-      campaigns.reduce((acc, c) => acc + ((c as any).metadata?.delivery_rate || 0), 0) / campaigns.length : 0
+      campaigns.reduce((acc: number, c: Campaign) => acc + ((c as any).metadata?.delivery_rate || 0), 0) / campaigns.length : 0
   }
 
   const getStatusColor = (status: string) => {
@@ -202,7 +202,7 @@ export function Campaigns() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredCampaigns.map((campaign) => (
+              {filteredCampaigns.map((campaign: Campaign) => (
                 <tr key={campaign.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>

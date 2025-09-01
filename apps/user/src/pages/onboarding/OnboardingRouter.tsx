@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useHub } from '@sms-hub/ui'
 import { useCurrentUserCompany, useBrands, useCurrentUserCampaigns, useUserProfile, useOnboardingSubmission } from '@sms-hub/supabase/react'
+import { Brand, Campaign } from '@sms-hub/types'
 import { BrandStep } from './steps/BrandStep'
 import { PrivacyStep } from './steps/PrivacyStep'
 import { CampaignStep } from './steps/CampaignStep'
@@ -95,13 +96,13 @@ export function OnboardingRouter() {
     // Check which steps are already completed based on data
     const completed = new Set<OnboardingStep>()
     
-    if (brands?.some(b => b.status === 'approved')) {
+    if (brands?.some((b: Brand) => b.status === 'approved')) {
       completed.add('brand')
     }
     if (company?.privacy_policy_accepted_at) {
       completed.add('privacy')
     }
-    if (campaigns?.some(c => c.status === 'approved')) {
+    if (campaigns?.some((c: Campaign) => c.status === 'approved')) {
       completed.add('campaign')
     }
     if (company?.phone_number_provisioned) {

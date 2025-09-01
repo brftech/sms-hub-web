@@ -5,7 +5,6 @@ import { PaymentCallback } from "./pages/onboarding/PaymentCallback";
 import { BusinessInfoStep } from "./pages/onboarding/steps/BusinessInfoStep";
 import { Login } from "./pages/Login";
 import { Signup } from "./pages/Signup";
-import { Verify } from "./pages/Verify";
 import { VerifyOtp } from "./pages/VerifyOtp";
 import { VerifyCode } from "./pages/VerifyCode";
 import { AccountDetails } from "./pages/AccountDetails";

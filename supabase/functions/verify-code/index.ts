@@ -28,7 +28,15 @@ serve(async (req) => {
     const identifierField =
       auth_method === "sms" ? "mobile_phone_number" : "email";
 
-    const { data: verificationRequest, error: findError } = await supabaseAdmin
+    console.log("🔍 Verification attempt:", {
+      verification_id,
+      verification_code,
+      identifier,
+      identifierField,
+      auth_method,
+    });
+
+    const { data: verificationExists, error: findError } = await supabaseAdmin
       .from("verifications")
       .select("*")
       .eq("id", verification_id)
@@ -38,10 +46,19 @@ serve(async (req) => {
       .gte("expires_at", new Date().toISOString())
       .single();
 
-    if (findError || !verificationRequest) {
-      console.error("Verification failed:", findError);
+    if (findError || !verificationExists) {
+      console.error("❌ Verification failed:", findError);
+      console.error("❌ Query conditions:", {
+        id: verification_id,
+        [identifierField]: identifier,
+        verification_code,
+        is_verified: false,
+        expires_at: new Date().toISOString(),
+      });
       throw new Error("Invalid or expired verification code");
     }
+
+    console.log("✅ Verification record found:", verificationExists);
 
     // Update verification request as verified
     const { error: updateError } = await supabaseAdmin
@@ -59,8 +76,9 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({
         success: true,
-        verification_id: verificationRequest.id,
-        verification_data: verificationRequest.step_data,
+        verification_id: verificationExists.id,
+        signup_id: verificationExists.id, // For backward compatibility
+        verification_data: verificationExists.step_data,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );

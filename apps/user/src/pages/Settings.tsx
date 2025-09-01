@@ -14,6 +14,7 @@ import {
   EyeOff
 } from 'lucide-react'
 import { useUserProfile, useCurrentUserCompany, useCurrentUserPhoneNumbers, useBrands, useCurrentUserCampaigns } from '@sms-hub/supabase/react'
+import { PhoneNumber } from '@sms-hub/types'
 
 type SettingsTab = 'profile' | 'company' | 'billing' | 'notifications' | 'security' | 'phone-numbers'
 
@@ -344,7 +345,7 @@ export function Settings() {
         
         <div className="divide-y divide-gray-200">
           {phoneNumbers.length > 0 ? (
-            phoneNumbers.map((phone) => (
+            phoneNumbers.map((phone: PhoneNumber) => (
               <div key={phone.id} className="px-6 py-4">
                 <div className="flex items-center justify-between">
                   <div>

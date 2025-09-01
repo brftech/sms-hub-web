@@ -23,6 +23,7 @@ import {
   useBrands,
   useCurrentUserPhoneNumbers
 } from "@sms-hub/supabase/react";
+import { Campaign, Brand } from "@sms-hub/types";
 import { Link } from "react-router-dom";
 import { OnboardingTracker } from "../components/OnboardingTracker";
 import { InfoGatheringModal } from "../components/InfoGatheringModal";
@@ -61,9 +62,9 @@ export function Dashboard() {
     customer?.stripe_subscription_id && customer?.subscription_status === 'active' && // Payment
     isProfileComplete && // Personal Info
     company?.legal_name && company?.ein && // Business Info
-    brands?.some(b => b.status === 'approved') && // Brand
+    brands?.some((b: Brand) => b.status === 'approved') && // Brand
     company?.privacy_policy_accepted_at && // Privacy
-    campaigns?.some(c => c.status === 'approved') && // Campaign
+    campaigns?.some((c: Campaign) => c.status === 'approved') && // Campaign
     company?.phone_number_provisioned && // gPhone
     company?.account_setup_completed_at && // Account Setup
     company?.platform_access_granted // Platform Access
@@ -74,7 +75,7 @@ export function Dashboard() {
     totalMessages: 15420,
     messagesThisMonth: 2340,
     totalCampaigns: campaigns?.length || 0,
-    activeCampaigns: campaigns?.filter(c => c.status === 'active').length || 0,
+    activeCampaigns: campaigns?.filter((c: Campaign) => c.status === 'active').length || 0,
     totalContacts: 1247,
     activeContacts: 1189,
     deliveryRate: 98.5,

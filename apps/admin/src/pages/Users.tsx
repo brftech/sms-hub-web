@@ -1,34 +1,39 @@
-import { useState, useEffect } from 'react'
-import { useHub } from '@sms-hub/ui'
-import { 
-  Search, 
-  UserPlus, 
-  MoreHorizontal, 
-  Users as UsersIcon, 
-  CheckCircle, 
-  Clock, 
-  Shield, 
+import { useState, useEffect } from "react";
+import { useHub } from "@sms-hub/ui";
+import {
+  Search,
+  UserPlus,
+  MoreHorizontal,
+  Users as UsersIcon,
+  CheckCircle,
+  Clock,
+  Shield,
   RefreshCw,
   Eye,
-  AlertTriangle
-} from 'lucide-react'
-import { usersService, UserProfile, UserStats } from '../services/usersService'
+  AlertTriangle,
+} from "lucide-react";
+import { usersService, UserProfile, UserStats } from "../services/usersService";
 
 const Users = () => {
-  const { currentHub } = useHub()
-  const [users, setUsers] = useState<UserProfile[]>([])
-  const [filteredUsers, setFilteredUsers] = useState<UserProfile[]>([])
-  const [stats, setStats] = useState<UserStats | null>(null)
-  const [searchQuery, setSearchQuery] = useState("")
-  const [roleFilter, setRoleFilter] = useState<string>("all")
-  const [paymentStatusFilter, setPaymentStatusFilter] = useState<string>("all")
-  const [onboardingStepFilter, setOnboardingStepFilter] = useState<string>("all")
-  const [isLoading, setIsLoading] = useState(true)
-  const [isRefreshing, setIsRefreshing] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [availableRoles, setAvailableRoles] = useState<string[]>([])
-  const [availablePaymentStatuses, setAvailablePaymentStatuses] = useState<string[]>([])
-  const [availableOnboardingSteps, setAvailableOnboardingSteps] = useState<string[]>([])
+  const { currentHub } = useHub();
+  const [users, setUsers] = useState<UserProfile[]>([]);
+  const [filteredUsers, setFilteredUsers] = useState<UserProfile[]>([]);
+  const [stats, setStats] = useState<UserStats | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [roleFilter, setRoleFilter] = useState<string>("all");
+  const [paymentStatusFilter, setPaymentStatusFilter] = useState<string>("all");
+  const [onboardingStepFilter, setOnboardingStepFilter] =
+    useState<string>("all");
+  const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [availableRoles, setAvailableRoles] = useState<string[]>([]);
+  const [availablePaymentStatuses, setAvailablePaymentStatuses] = useState<
+    string[]
+  >([]);
+  const [availableOnboardingSteps, setAvailableOnboardingSteps] = useState<
+    string[]
+  >([]);
 
   // Fetch users and stats from database
   const fetchData = async () => {
@@ -37,38 +42,44 @@ const Users = () => {
       setError(null);
 
       // Get hub ID based on current hub
-      const hubId = currentHub === 'gnymble' ? 1 : 
-                   currentHub === 'percymd' ? 2 :
-                   currentHub === 'percytext' ? 3 :
-                   currentHub === 'percytech' ? 0 : 1; // Default to gnymble (1)
-      
-      console.log('Users: Current hub:', currentHub);
-      console.log('Users: Using hub_id:', hubId);
+      const hubId =
+        currentHub === "gnymble"
+          ? 1
+          : currentHub === "percymd"
+            ? 2
+            : currentHub === "percytext"
+              ? 3
+              : currentHub === "percytech"
+                ? 0
+                : 1; // Default to gnymble (1)
+
+      console.log("Users: Current hub:", currentHub);
+      console.log("Users: Using hub_id:", hubId);
 
       // Build filter options
       const filterOptions: any = {
         hub_id: hubId,
         search: searchQuery || undefined,
-        limit: 1000
+        limit: 1000,
       };
 
-      if (roleFilter !== 'all') {
+      if (roleFilter !== "all") {
         filterOptions.role = roleFilter;
       }
 
-      if (paymentStatusFilter !== 'all') {
+      if (paymentStatusFilter !== "all") {
         filterOptions.payment_status = paymentStatusFilter;
       }
 
-      if (onboardingStepFilter !== 'all') {
+      if (onboardingStepFilter !== "all") {
         filterOptions.onboarding_step = onboardingStepFilter;
       }
 
       // Fetch users with filters
       const fetchedUsers = await usersService.getUsers(filterOptions);
 
-      console.log('Users: Fetched users:', fetchedUsers);
-      console.log('Users: Count:', fetchedUsers.length);
+      console.log("Users: Fetched users:", fetchedUsers);
+      console.log("Users: Count:", fetchedUsers.length);
 
       // Fetch stats
       const fetchedStats = await usersService.getUserStats(hubId);
@@ -85,8 +96,8 @@ const Users = () => {
       setAvailablePaymentStatuses(paymentStatuses);
       setAvailableOnboardingSteps(onboardingSteps);
     } catch (err) {
-      console.error('Error fetching data:', err);
-      setError(err instanceof Error ? err.message : 'Failed to fetch data');
+      console.error("Error fetching data:", err);
+      setError(err instanceof Error ? err.message : "Failed to fetch data");
     } finally {
       setIsLoading(false);
     }
@@ -127,7 +138,9 @@ const Users = () => {
           <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
             <Shield className="h-6 w-6 text-red-600" />
           </div>
-          <h3 className="mt-4 text-lg font-medium text-gray-900">Error Loading Data</h3>
+          <h3 className="mt-4 text-lg font-medium text-gray-900">
+            Error Loading Data
+          </h3>
           <p className="mt-2 text-sm text-gray-500">{error}</p>
           <div className="mt-6">
             <button
@@ -158,64 +171,92 @@ const Users = () => {
             <UserPlus className="w-4 h-4 mr-2" />
             Invite User
           </button>
-          <button 
+          <button
             onClick={handleRefresh}
             disabled={isRefreshing}
             className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <RefreshCw className={`w-4 h-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
-            {isRefreshing ? 'Refreshing...' : 'Refresh'}
+            <RefreshCw
+              className={`w-4 h-4 mr-2 ${isRefreshing ? "animate-spin" : ""}`}
+            />
+            {isRefreshing ? "Refreshing..." : "Refresh"}
           </button>
         </div>
       </div>
 
       {/* Statistics Cards */}
       {stats && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 hover:shadow-md hover:scale-105 transition-all duration-200 cursor-pointer group">
             <div className="flex items-center">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <UsersIcon className="w-6 h-6 text-blue-600" />
+              <div className="p-2 sm:p-3 bg-blue-100 rounded-lg group-hover:bg-blue-200 transition-colors duration-200">
+                <UsersIcon className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
               </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Total Users</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+              <div className="ml-3 sm:ml-4 min-w-0 flex-1">
+                <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">
+                  Total Users
+                </p>
+                <p className="text-xl sm:text-2xl font-bold text-gray-900">
+                  {stats.total}
+                </p>
+                <p className="text-xs text-blue-600 mt-1 truncate">All users</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 hover:shadow-md hover:scale-105 transition-all duration-200 cursor-pointer group">
             <div className="flex items-center">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <CheckCircle className="w-6 h-6 text-green-600" />
+              <div className="p-2 sm:p-3 bg-green-100 rounded-lg group-hover:bg-green-200 transition-colors duration-200">
+                <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
               </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Active Users</p>
-                <p className="text-2xl font-bold text-green-600">{stats.active}</p>
+              <div className="ml-3 sm:ml-4 min-w-0 flex-1">
+                <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">
+                  Active Users
+                </p>
+                <p className="text-xl sm:text-2xl font-bold text-green-600">
+                  {stats.active}
+                </p>
+                <p className="text-xs text-green-600 mt-1 truncate">
+                  Currently active
+                </p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 hover:shadow-md hover:scale-105 transition-all duration-200 cursor-pointer group">
             <div className="flex items-center">
-              <div className="p-2 bg-red-100 rounded-lg">
-                <Clock className="w-6 h-6 text-red-600" />
+              <div className="p-2 sm:p-3 bg-red-100 rounded-lg group-hover:bg-red-200 transition-colors duration-200">
+                <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-red-600" />
               </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Inactive Users</p>
-                <p className="text-2xl font-bold text-red-600">{stats.inactive}</p>
+              <div className="ml-3 sm:ml-4 min-w-0 flex-1">
+                <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">
+                  Inactive Users
+                </p>
+                <p className="text-xl sm:text-2xl font-bold text-red-600">
+                  {stats.inactive}
+                </p>
+                <p className="text-xs text-red-600 mt-1 truncate">
+                  Needs attention
+                </p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 hover:shadow-md hover:scale-105 transition-all duration-200 cursor-pointer group">
             <div className="flex items-center">
-              <div className="p-2 bg-yellow-100 rounded-lg">
-                <Shield className="w-6 h-6 text-yellow-600" />
+              <div className="p-2 sm:p-3 bg-yellow-100 rounded-lg group-hover:bg-yellow-200 transition-colors duration-200">
+                <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-600" />
               </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Roles</p>
-                <p className="text-2xl font-bold text-yellow-600">{Object.keys(stats.byRole).length}</p>
+              <div className="ml-3 sm:ml-4 min-w-0 flex-1">
+                <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">
+                  Roles
+                </p>
+                <p className="text-xl sm:text-2xl font-bold text-yellow-600">
+                  {Object.keys(stats.byRole).length}
+                </p>
+                <p className="text-xs text-yellow-600 mt-1 truncate">
+                  User roles
+                </p>
               </div>
             </div>
           </div>
@@ -245,8 +286,10 @@ const Users = () => {
               className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="all">All Roles</option>
-              {availableRoles.map(role => (
-                <option key={role} value={role}>{role}</option>
+              {availableRoles.map((role) => (
+                <option key={role} value={role}>
+                  {role}
+                </option>
               ))}
             </select>
 
@@ -256,8 +299,10 @@ const Users = () => {
               className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="all">All Payment Status</option>
-              {availablePaymentStatuses.map(status => (
-                <option key={status} value={status}>{status}</option>
+              {availablePaymentStatuses.map((status) => (
+                <option key={status} value={status}>
+                  {status}
+                </option>
               ))}
             </select>
 
@@ -267,8 +312,10 @@ const Users = () => {
               className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="all">All Onboarding Steps</option>
-              {availableOnboardingSteps.map(step => (
-                <option key={step} value={step}>{step}</option>
+              {availableOnboardingSteps.map((step) => (
+                <option key={step} value={step}>
+                  {step}
+                </option>
               ))}
             </select>
           </div>
@@ -322,31 +369,41 @@ const Users = () => {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="font-mono text-sm">{user.account_number}</div>
+                    <div className="font-mono text-sm">
+                      {user.account_number}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      user.role === 'admin' ? 'bg-red-100 text-red-800' :
-                      user.role === 'manager' ? 'bg-purple-100 text-purple-800' :
-                      'bg-blue-100 text-blue-800'
-                    }`}>
-                      {user.role || 'user'}
+                    <span
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        user.role === "admin"
+                          ? "bg-red-100 text-red-800"
+                          : user.role === "manager"
+                            ? "bg-purple-100 text-purple-800"
+                            : "bg-blue-100 text-blue-800"
+                      }`}
+                    >
+                      {user.role || "user"}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      user.is_active 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-gray-100 text-gray-800'
-                    }`}>
-                      {user.is_active ? 'Active' : 'Inactive'}
+                    <span
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        user.is_active
+                          ? "bg-green-100 text-green-800"
+                          : "bg-gray-100 text-gray-800"
+                      }`}
+                    >
+                      {user.is_active ? "Active" : "Inactive"}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {user.payment_status || 'Not specified'}
+                    {user.payment_status || "Not specified"}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {user.created_at ? new Date(user.created_at).toLocaleDateString() : 'Unknown'}
+                    {user.created_at
+                      ? new Date(user.created_at).toLocaleDateString()
+                      : "Unknown"}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex items-center space-x-2">
@@ -367,11 +424,16 @@ const Users = () => {
         {filteredUsers.length === 0 && (
           <div className="text-center py-12">
             <UsersIcon className="mx-auto h-12 w-12 text-gray-400" />
-            <h3 className="mt-2 text-sm font-medium text-gray-900">No users found</h3>
+            <h3 className="mt-2 text-sm font-medium text-gray-900">
+              No users found
+            </h3>
             <p className="mt-1 text-sm text-gray-500">
-              {searchQuery || roleFilter !== 'all' || paymentStatusFilter !== 'all' || onboardingStepFilter !== 'all'
-                ? 'Try adjusting your search or filter criteria.'
-                : 'No users have been created yet.'}
+              {searchQuery ||
+              roleFilter !== "all" ||
+              paymentStatusFilter !== "all" ||
+              onboardingStepFilter !== "all"
+                ? "Try adjusting your search or filter criteria."
+                : "No users have been created yet."}
             </p>
           </div>
         )}

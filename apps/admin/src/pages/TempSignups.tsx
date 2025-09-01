@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { useHub } from "@sms-hub/ui";
-import { 
-  Users, 
-  Clock, 
-  CheckCircle, 
-  XCircle, 
-  Search, 
-  Eye, 
+import { useGlobalView } from "../contexts/GlobalViewContext";
+import {
+  Users,
+  Clock,
+  CheckCircle,
+  XCircle,
+  Search,
+  Eye,
   Trash2,
   Phone,
   Mail,
@@ -14,14 +15,21 @@ import {
   RefreshCw,
   AlertTriangle,
   Calendar,
-  Shield
+  Shield,
 } from "lucide-react";
-import { tempSignupsService, TempSignup, TempSignupStats } from "../services/tempSignupsService";
+import {
+  tempSignupsService,
+  TempSignup,
+  TempSignupStats,
+} from "../services/tempSignupsService";
 
 const TempSignups = () => {
   const { currentHub } = useHub();
+  const { isGlobalView } = useGlobalView();
   const [tempSignups, setTempSignups] = useState<TempSignup[]>([]);
-  const [filteredTempSignups, setFilteredTempSignups] = useState<TempSignup[]>([]);
+  const [filteredTempSignups, setFilteredTempSignups] = useState<TempSignup[]>(
+    []
+  );
   const [stats, setStats] = useState<TempSignupStats | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [authMethodFilter, setAuthMethodFilter] = useState<string>("all");
@@ -30,7 +38,9 @@ const TempSignups = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [availableAuthMethods, setAvailableAuthMethods] = useState<string[]>([]);
+  const [availableAuthMethods, setAvailableAuthMethods] = useState<string[]>(
+    []
+  );
 
   // Fetch temp signups and stats from database
   const fetchData = async () => {
@@ -38,57 +48,76 @@ const TempSignups = () => {
       setIsLoading(true);
       setError(null);
 
-      // Get hub ID based on current hub
-      const hubId = currentHub === 'gnymble' ? 1 : 
-                   currentHub === 'percymd' ? 2 :
-                   currentHub === 'percytext' ? 3 :
-                   currentHub === 'percytech' ? 0 : 1; // Default to gnymble (1)
-      
-      console.log('TempSignups: Current hub:', currentHub);
-      console.log('TempSignups: Using hub_id:', hubId);
+      // Get hub ID based on current hub (only used for non-global view)
+      const hubId =
+        currentHub === "gnymble"
+          ? 1
+          : currentHub === "percymd"
+            ? 2
+            : currentHub === "percytext"
+              ? 3
+              : currentHub === "percytech"
+                ? 0
+                : 1; // Default to gnymble (1)
+
+      console.log("TempSignups: Current hub:", currentHub);
+      console.log("TempSignups: Global view:", isGlobalView);
+      console.log(
+        "TempSignups: Using hub_id:",
+        isGlobalView ? "ALL HUBS" : hubId
+      );
 
       // Build filter options
       const filterOptions: any = {
-        hub_id: hubId,
         search: searchQuery || undefined,
-        limit: 1000
+        limit: 1000,
       };
 
-      if (authMethodFilter !== 'all') {
+      // Only filter by hub_id if not in global view
+      if (!isGlobalView) {
+        filterOptions.hub_id = hubId;
+      }
+
+      if (authMethodFilter !== "all") {
         filterOptions.auth_method = authMethodFilter;
       }
 
-      if (verificationFilter === 'verified') {
+      if (verificationFilter === "verified") {
         filterOptions.is_verified = true;
-      } else if (verificationFilter === 'unverified') {
+      } else if (verificationFilter === "unverified") {
         filterOptions.is_verified = false;
       }
 
-      if (expiryFilter === 'expired') {
+      if (expiryFilter === "expired") {
         filterOptions.is_expired = true;
-      } else if (expiryFilter === 'active') {
+      } else if (expiryFilter === "active") {
         filterOptions.is_expired = false;
       }
 
       // Fetch temp signups with filters
-      const fetchedTempSignups = await tempSignupsService.getTempSignups(filterOptions);
+      const fetchedTempSignups =
+        await tempSignupsService.getTempSignups(filterOptions);
 
-      console.log('TempSignups: Fetched temp signups:', fetchedTempSignups);
-      console.log('TempSignups: Count:', fetchedTempSignups.length);
+      console.log("TempSignups: Fetched temp signups:", fetchedTempSignups);
+      console.log("TempSignups: Count:", fetchedTempSignups.length);
 
-      // Fetch stats
-      const fetchedStats = await tempSignupsService.getTempSignupStats(hubId);
+      // Fetch stats (global or hub-specific)
+      const fetchedStats = isGlobalView
+        ? await tempSignupsService.getGlobalTempSignupStats()
+        : await tempSignupsService.getTempSignupStats(hubId);
 
-      // Fetch available auth methods for filter dropdown
-      const authMethods = await tempSignupsService.getUniqueAuthMethods();
+      // Fetch available auth methods for filter dropdown (global or hub-specific)
+      const authMethods = isGlobalView
+        ? await tempSignupsService.getGlobalUniqueAuthMethods()
+        : await tempSignupsService.getUniqueAuthMethods();
 
       setTempSignups(fetchedTempSignups);
       setFilteredTempSignups(fetchedTempSignups);
       setStats(fetchedStats);
       setAvailableAuthMethods(authMethods);
     } catch (err) {
-      console.error('Error fetching data:', err);
-      setError(err instanceof Error ? err.message : 'Failed to fetch data');
+      console.error("Error fetching data:", err);
+      setError(err instanceof Error ? err.message : "Failed to fetch data");
     } finally {
       setIsLoading(false);
     }
@@ -103,27 +132,33 @@ const TempSignups = () => {
 
   // Delete temp signup
   const handleDeleteTempSignup = async (id: string) => {
-    if (window.confirm('Are you sure you want to delete this temporary signup?')) {
+    if (
+      window.confirm("Are you sure you want to delete this temporary signup?")
+    ) {
       try {
         await tempSignupsService.deleteTempSignup(id);
         await fetchData(); // Refresh data
       } catch (err) {
-        console.error('Error deleting temp signup:', err);
-        setError('Failed to delete temporary signup');
+        console.error("Error deleting temp signup:", err);
+        setError("Failed to delete temporary signup");
       }
     }
   };
 
   // Cleanup expired signups
   const handleCleanupExpired = async () => {
-    if (window.confirm('Are you sure you want to cleanup all expired temporary signups?')) {
+    if (
+      window.confirm(
+        "Are you sure you want to cleanup all expired temporary signups?"
+      )
+    ) {
       try {
         const deletedCount = await tempSignupsService.cleanupExpiredSignups();
         alert(`Cleaned up ${deletedCount} expired temporary signups`);
         await fetchData(); // Refresh data
       } catch (err) {
-        console.error('Error cleaning up expired signups:', err);
-        setError('Failed to cleanup expired signups');
+        console.error("Error cleaning up expired signups:", err);
+        setError("Failed to cleanup expired signups");
       }
     }
   };
@@ -133,20 +168,26 @@ const TempSignups = () => {
     fetchData();
   }, []);
 
-  // Filter temp signups when filters change
+  // Filter temp signups when filters change or global view changes
   useEffect(() => {
     fetchData();
-  }, [authMethodFilter, verificationFilter, expiryFilter, searchQuery]);
+  }, [
+    authMethodFilter,
+    verificationFilter,
+    expiryFilter,
+    searchQuery,
+    isGlobalView,
+  ]);
 
   // Format date
   const formatDate = (dateString: string | null) => {
-    if (!dateString) return 'Unknown';
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
+    if (!dateString) return "Unknown";
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
@@ -158,12 +199,24 @@ const TempSignups = () => {
   // Get verification status
   const getVerificationStatus = (signup: TempSignup) => {
     if (signup.is_verified) {
-      return { status: 'verified', color: 'bg-green-100 text-green-800', icon: <CheckCircle className="w-4 h-4" /> };
+      return {
+        status: "verified",
+        color: "bg-green-100 text-green-800",
+        icon: <CheckCircle className="w-4 h-4" />,
+      };
     }
     if (isExpired(signup.expires_at)) {
-      return { status: 'expired', color: 'bg-red-100 text-red-800', icon: <XCircle className="w-4 h-4" /> };
+      return {
+        status: "expired",
+        color: "bg-red-100 text-red-800",
+        icon: <XCircle className="w-4 h-4" />,
+      };
     }
-    return { status: 'pending', color: 'bg-yellow-100 text-yellow-800', icon: <Clock className="w-4 h-4" /> };
+    return {
+      status: "pending",
+      color: "bg-yellow-100 text-yellow-800",
+      icon: <Clock className="w-4 h-4" />,
+    };
   };
 
   if (isLoading) {
@@ -171,7 +224,9 @@ const TempSignups = () => {
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading temporary signups from database...</p>
+          <p className="mt-4 text-gray-600">
+            Loading temporary signups from database...
+          </p>
         </div>
       </div>
     );
@@ -184,7 +239,9 @@ const TempSignups = () => {
           <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
             <AlertTriangle className="h-6 w-6 text-red-600" />
           </div>
-          <h3 className="mt-4 text-lg font-medium text-gray-900">Error Loading Data</h3>
+          <h3 className="mt-4 text-lg font-medium text-gray-900">
+            Error Loading Data
+          </h3>
           <p className="mt-2 text-sm text-gray-500">{error}</p>
           <div className="mt-6">
             <button
@@ -205,9 +262,13 @@ const TempSignups = () => {
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Temporary Signups</h1>
+          <h1 className="text-2xl font-bold text-gray-900">
+            {isGlobalView ? "Global Temporary Signups" : "Temporary Signups"}
+          </h1>
           <p className="mt-1 text-sm text-gray-500">
-            Manage temporary signups from {currentHub} hub
+            {isGlobalView
+              ? "Manage temporary signups from all hubs"
+              : `Manage temporary signups from ${currentHub} hub`}
           </p>
         </div>
         <div className="flex items-center space-x-3">
@@ -223,71 +284,108 @@ const TempSignups = () => {
             disabled={isRefreshing}
             className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <RefreshCw className={`w-4 h-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
-            {isRefreshing ? 'Refreshing...' : 'Refresh'}
+            <RefreshCw
+              className={`w-4 h-4 mr-2 ${isRefreshing ? "animate-spin" : ""}`}
+            />
+            {isRefreshing ? "Refreshing..." : "Refresh"}
           </button>
         </div>
       </div>
 
       {/* Statistics Cards */}
       {stats && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-          <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-6">
+          <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 hover:shadow-md hover:scale-105 transition-all duration-200 cursor-pointer group">
             <div className="flex items-center">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Users className="w-6 h-6 text-blue-600" />
+              <div className="p-2 sm:p-3 bg-blue-100 rounded-lg group-hover:bg-blue-200 transition-colors duration-200">
+                <Users className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
               </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Total Signups</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+              <div className="ml-3 sm:ml-4 min-w-0 flex-1">
+                <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">
+                  Total Signups
+                </p>
+                <p className="text-xl sm:text-2xl font-bold text-gray-900">
+                  {stats.total}
+                </p>
+                <p className="text-xs text-blue-600 mt-1 truncate">
+                  All signups
+                </p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 hover:shadow-md hover:scale-105 transition-all duration-200 cursor-pointer group">
             <div className="flex items-center">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <CheckCircle className="w-6 h-6 text-green-600" />
+              <div className="p-2 sm:p-3 bg-green-100 rounded-lg group-hover:bg-green-200 transition-colors duration-200">
+                <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
               </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Verified</p>
-                <p className="text-2xl font-bold text-green-600">{stats.verified}</p>
+              <div className="ml-3 sm:ml-4 min-w-0 flex-1">
+                <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">
+                  Verified
+                </p>
+                <p className="text-xl sm:text-2xl font-bold text-green-600">
+                  {stats.verified}
+                </p>
+                <p className="text-xs text-green-600 mt-1 truncate">
+                  Successfully verified
+                </p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 hover:shadow-md hover:scale-105 transition-all duration-200 cursor-pointer group">
             <div className="flex items-center">
-              <div className="p-2 bg-yellow-100 rounded-lg">
-                <Clock className="w-6 h-6 text-yellow-600" />
+              <div className="p-2 sm:p-3 bg-yellow-100 rounded-lg group-hover:bg-yellow-200 transition-colors duration-200">
+                <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-600" />
               </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Unverified</p>
-                <p className="text-2xl font-bold text-yellow-600">{stats.unverified}</p>
+              <div className="ml-3 sm:ml-4 min-w-0 flex-1">
+                <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">
+                  Unverified
+                </p>
+                <p className="text-2xl font-bold text-yellow-600">
+                  {stats.unverified}
+                </p>
+                <p className="text-xs text-yellow-600 mt-1 truncate">
+                  Pending verification
+                </p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 hover:shadow-md hover:scale-105 transition-all duration-200 cursor-pointer group">
             <div className="flex items-center">
-              <div className="p-2 bg-red-100 rounded-lg">
-                <XCircle className="w-6 h-6 text-red-600" />
+              <div className="p-2 sm:p-3 bg-red-100 rounded-lg group-hover:bg-red-200 transition-colors duration-200">
+                <XCircle className="w-5 h-5 sm:w-6 sm:h-6 text-red-600" />
               </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Expired</p>
-                <p className="text-2xl font-bold text-red-600">{stats.expired}</p>
+              <div className="ml-3 sm:ml-4 min-w-0 flex-1">
+                <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">
+                  Expired
+                </p>
+                <p className="text-xl sm:text-2xl font-bold text-red-600">
+                  {stats.expired}
+                </p>
+                <p className="text-xs text-red-600 mt-1 truncate">
+                  Time expired
+                </p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 hover:shadow-md hover:scale-105 transition-all duration-200 cursor-pointer group">
             <div className="flex items-center">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <Shield className="w-6 h-6 text-purple-600" />
+              <div className="p-2 sm:p-3 bg-purple-100 rounded-lg group-hover:bg-purple-200 transition-colors duration-200">
+                <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" />
               </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Auth Methods</p>
-                <p className="text-2xl font-bold text-purple-600">{Object.keys(stats.byAuthMethod).length}</p>
+              <div className="ml-3 sm:ml-4 min-w-0 flex-1">
+                <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">
+                  Auth Methods
+                </p>
+                <p className="text-2xl font-bold text-purple-600">
+                  {Object.keys(stats.byAuthMethod).length}
+                </p>
+                <p className="text-xs text-purple-600 mt-1 truncate">
+                  Available methods
+                </p>
               </div>
             </div>
           </div>
@@ -317,8 +415,10 @@ const TempSignups = () => {
               className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="all">All Auth Methods</option>
-              {availableAuthMethods.map(method => (
-                <option key={method} value={method}>{method}</option>
+              {availableAuthMethods.map((method) => (
+                <option key={method} value={method}>
+                  {method}
+                </option>
               ))}
             </select>
 
@@ -363,6 +463,11 @@ const TempSignups = () => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Company
                 </th>
+                {isGlobalView && (
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Hub
+                  </th>
+                )}
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Contact
                 </th>
@@ -388,19 +493,39 @@ const TempSignups = () => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold">
-                          {signup.first_name.charAt(0).toUpperCase()}{signup.last_name.charAt(0).toUpperCase()}
+                          {signup.first_name.charAt(0).toUpperCase()}
+                          {signup.last_name.charAt(0).toUpperCase()}
                         </div>
                         <div className="ml-4">
                           <div className="text-sm font-medium text-gray-900">
                             {signup.first_name} {signup.last_name}
                           </div>
-                          <div className="text-sm text-gray-500">{signup.email}</div>
+                          <div className="text-sm text-gray-500">
+                            {signup.email}
+                          </div>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{signup.company_name}</div>
+                      <div className="text-sm text-gray-900">
+                        {signup.company_name}
+                      </div>
                     </td>
+                    {isGlobalView && (
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                          {signup.hub_id === 0
+                            ? "PercyTech"
+                            : signup.hub_id === 1
+                              ? "Gnymble"
+                              : signup.hub_id === 2
+                                ? "PercyMD"
+                                : signup.hub_id === 3
+                                  ? "PercyText"
+                                  : "Unknown"}
+                        </span>
+                      </td>
+                    )}
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900 flex items-center">
                         <Phone className="w-3 h-3 mr-1" />
@@ -412,7 +537,9 @@ const TempSignups = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{signup.auth_method}</div>
+                      <div className="text-sm text-gray-900">
+                        {signup.auth_method}
+                      </div>
                       {signup.verification_attempts !== null && (
                         <div className="text-xs text-gray-500">
                           {signup.verification_attempts} attempts
@@ -420,13 +547,19 @@ const TempSignups = () => {
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${verificationStatus.color}`}>
+                      <div
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${verificationStatus.color}`}
+                      >
                         {verificationStatus.icon}
-                        <span className="ml-1">{verificationStatus.status}</span>
+                        <span className="ml-1">
+                          {verificationStatus.status}
+                        </span>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{formatDate(signup.expires_at)}</div>
+                      <div className="text-sm text-gray-900">
+                        {formatDate(signup.expires_at)}
+                      </div>
                       {isExpired(signup.expires_at) && (
                         <div className="text-xs text-red-500">Expired</div>
                       )}
@@ -436,7 +569,7 @@ const TempSignups = () => {
                         <button className="text-blue-600 hover:text-blue-900">
                           <Eye className="w-4 h-4" />
                         </button>
-                        <button 
+                        <button
                           onClick={() => handleDeleteTempSignup(signup.id)}
                           className="text-red-600 hover:text-red-900"
                         >
@@ -454,11 +587,16 @@ const TempSignups = () => {
         {filteredTempSignups.length === 0 && (
           <div className="text-center py-12">
             <Users className="mx-auto h-12 w-12 text-gray-400" />
-            <h3 className="mt-2 text-sm font-medium text-gray-900">No temporary signups found</h3>
+            <h3 className="mt-2 text-sm font-medium text-gray-900">
+              No temporary signups found
+            </h3>
             <p className="mt-1 text-sm text-gray-500">
-              {searchQuery || authMethodFilter !== 'all' || verificationFilter !== 'all' || expiryFilter !== 'all'
-                ? 'Try adjusting your search or filter criteria.'
-                : 'No temporary signups have been created yet.'}
+              {searchQuery ||
+              authMethodFilter !== "all" ||
+              verificationFilter !== "all" ||
+              expiryFilter !== "all"
+                ? "Try adjusting your search or filter criteria."
+                : "No temporary signups have been created yet."}
             </p>
           </div>
         )}

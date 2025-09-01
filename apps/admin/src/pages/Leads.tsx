@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 import { useHub } from "@sms-hub/ui";
-import { 
-  Users, 
-  MessageSquare, 
-  TrendingUp, 
-  Search, 
-  Download, 
-  Eye, 
-  Edit, 
+import {
+  Users,
+  MessageSquare,
+  TrendingUp,
+  Search,
+  Download,
+  Eye,
+  Edit,
   Trash2,
   Phone,
   Clock,
@@ -15,7 +15,7 @@ import {
   AlertCircle,
   XCircle,
   RefreshCw,
-  UserPlus
+  UserPlus,
 } from "lucide-react";
 import { leadsService, Lead, LeadStats } from "../services/leadsService";
 
@@ -40,26 +40,32 @@ const Leads = () => {
       setError(null);
 
       // Get hub ID based on current hub
-      const hubId = currentHub === 'gnymble' ? 1 : 
-                   currentHub === 'percymd' ? 2 :
-                   currentHub === 'percytext' ? 3 :
-                   currentHub === 'percytech' ? 0 : 1; // Default to gnymble (1)
-      
-      console.log('Leads: Current hub:', currentHub);
-      console.log('Leads: Using hub_id:', hubId);
+      const hubId =
+        currentHub === "gnymble"
+          ? 1
+          : currentHub === "percymd"
+            ? 2
+            : currentHub === "percytext"
+              ? 3
+              : currentHub === "percytech"
+                ? 0
+                : 1; // Default to gnymble (1)
+
+      console.log("Leads: Current hub:", currentHub);
+      console.log("Leads: Using hub_id:", hubId);
 
       // Fetch leads with filters
       const fetchedLeads = await leadsService.getLeads({
         hub_id: hubId,
-        status: statusFilter !== 'all' ? statusFilter : undefined,
-        priority: priorityFilter !== 'all' ? priorityFilter : undefined,
-        source: sourceFilter !== 'all' ? sourceFilter : undefined,
+        status: statusFilter !== "all" ? statusFilter : undefined,
+        priority: priorityFilter !== "all" ? priorityFilter : undefined,
+        source: sourceFilter !== "all" ? sourceFilter : undefined,
         search: searchQuery || undefined,
-        limit: 1000
+        limit: 1000,
       });
 
-      console.log('Leads: Fetched leads:', fetchedLeads);
-      console.log('Leads: Lead count:', fetchedLeads.length);
+      console.log("Leads: Fetched leads:", fetchedLeads);
+      console.log("Leads: Lead count:", fetchedLeads.length);
 
       // Fetch stats
       const fetchedStats = await leadsService.getLeadStats(hubId);
@@ -72,8 +78,8 @@ const Leads = () => {
       setStats(fetchedStats);
       setAvailableSources(sources);
     } catch (err) {
-      console.error('Error fetching data:', err);
-      setError(err instanceof Error ? err.message : 'Failed to fetch data');
+      console.error("Error fetching data:", err);
+      setError(err instanceof Error ? err.message : "Failed to fetch data");
     } finally {
       setIsLoading(false);
     }
@@ -90,13 +96,17 @@ const Leads = () => {
   const handleStatusUpdate = async (leadId: string, newStatus: string) => {
     try {
       await leadsService.updateLeadStatus(leadId, newStatus);
-      await leadsService.addLeadActivity(leadId, 'status_change', `Status changed to ${newStatus}`);
-      
+      await leadsService.addLeadActivity(
+        leadId,
+        "status_change",
+        `Status changed to ${newStatus}`
+      );
+
       // Refresh data to show updated status
       await fetchData();
     } catch (err) {
-      console.error('Error updating status:', err);
-      setError('Failed to update lead status');
+      console.error("Error updating status:", err);
+      setError("Failed to update lead status");
     }
   };
 
@@ -104,13 +114,17 @@ const Leads = () => {
   const handlePriorityUpdate = async (leadId: string, newPriority: string) => {
     try {
       await leadsService.updateLeadPriority(leadId, newPriority);
-      await leadsService.addLeadActivity(leadId, 'priority_change', `Priority changed to ${newPriority}`);
-      
+      await leadsService.addLeadActivity(
+        leadId,
+        "priority_change",
+        `Priority changed to ${newPriority}`
+      );
+
       // Refresh data to show updated priority
       await fetchData();
     } catch (err) {
-      console.error('Error updating priority:', err);
-      setError('Failed to update lead priority');
+      console.error("Error updating priority:", err);
+      setError("Failed to update lead priority");
     }
   };
 
@@ -127,46 +141,64 @@ const Leads = () => {
   // Get status color and icon
   const getStatusInfo = (status: string) => {
     switch (status) {
-      case 'new':
-        return { color: 'bg-blue-100 text-blue-800', icon: <Clock className="w-4 h-4" /> };
-      case 'contacted':
-        return { color: 'bg-yellow-100 text-yellow-800', icon: <MessageSquare className="w-4 h-4" /> };
-      case 'qualified':
-        return { color: 'bg-purple-100 text-purple-800', icon: <CheckCircle className="w-4 h-4" /> };
-      case 'converted':
-        return { color: 'bg-green-100 text-green-800', icon: <TrendingUp className="w-4 h-4" /> };
-      case 'lost':
-        return { color: 'bg-red-100 text-red-800', icon: <XCircle className="w-4 h-4" /> };
+      case "new":
+        return {
+          color: "bg-blue-100 text-blue-800",
+          icon: <Clock className="w-4 h-4" />,
+        };
+      case "contacted":
+        return {
+          color: "bg-yellow-100 text-yellow-800",
+          icon: <MessageSquare className="w-4 h-4" />,
+        };
+      case "qualified":
+        return {
+          color: "bg-purple-100 text-purple-800",
+          icon: <CheckCircle className="w-4 h-4" />,
+        };
+      case "converted":
+        return {
+          color: "bg-green-100 text-green-800",
+          icon: <TrendingUp className="w-4 h-4" />,
+        };
+      case "lost":
+        return {
+          color: "bg-red-100 text-red-800",
+          icon: <XCircle className="w-4 h-4" />,
+        };
       default:
-        return { color: 'bg-gray-100 text-gray-800', icon: <AlertCircle className="w-4 h-4" /> };
+        return {
+          color: "bg-gray-100 text-gray-800",
+          icon: <AlertCircle className="w-4 h-4" />,
+        };
     }
   };
 
   // Get priority color
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'high':
-        return 'bg-red-100 text-red-800';
-      case 'medium':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'low':
-        return 'bg-green-100 text-green-800';
-      case 'urgent':
-        return 'bg-purple-100 text-purple-800';
+      case "high":
+        return "bg-red-100 text-red-800";
+      case "medium":
+        return "bg-yellow-100 text-yellow-800";
+      case "low":
+        return "bg-green-100 text-green-800";
+      case "urgent":
+        return "bg-purple-100 text-purple-800";
       default:
-        return 'bg-gray-100 text-gray-800';
+        return "bg-gray-100 text-gray-800";
     }
   };
 
   // Format date
   const formatDate = (dateString: string | null) => {
-    if (!dateString) return 'Unknown';
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
+    if (!dateString) return "Unknown";
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
@@ -178,12 +210,12 @@ const Leads = () => {
     if (lead.name) {
       return lead.name;
     }
-    return 'Unknown';
+    return "Unknown";
   };
 
   // Get display phone for lead
   const getLeadDisplayPhone = (lead: Lead) => {
-    return lead.phone || lead.lead_phone_number || 'No phone';
+    return lead.phone || lead.lead_phone_number || "No phone";
   };
 
   if (isLoading) {
@@ -204,7 +236,9 @@ const Leads = () => {
           <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
             <AlertCircle className="h-6 w-6 text-red-600" />
           </div>
-          <h3 className="mt-4 text-lg font-medium text-gray-900">Error Loading Data</h3>
+          <h3 className="mt-4 text-lg font-medium text-gray-900">
+            Error Loading Data
+          </h3>
           <p className="mt-2 text-sm text-gray-500">{error}</p>
           <div className="mt-6">
             <button
@@ -236,8 +270,10 @@ const Leads = () => {
             disabled={isRefreshing}
             className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <RefreshCw className={`w-4 h-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
-            {isRefreshing ? 'Refreshing...' : 'Refresh'}
+            <RefreshCw
+              className={`w-4 h-4 mr-2 ${isRefreshing ? "animate-spin" : ""}`}
+            />
+            {isRefreshing ? "Refreshing..." : "Refresh"}
           </button>
           <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
             <UserPlus className="w-4 h-4 mr-2" />
@@ -248,75 +284,111 @@ const Leads = () => {
 
       {/* Statistics Cards */}
       {stats && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6">
-          <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 sm:gap-6">
+          <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 hover:shadow-md hover:scale-105 transition-all duration-200 cursor-pointer group">
             <div className="flex items-center">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Users className="w-6 h-6 text-blue-600" />
+              <div className="p-2 sm:p-3 bg-blue-100 rounded-lg group-hover:bg-blue-200 transition-colors duration-200">
+                <Users className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
               </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Total Leads</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+              <div className="ml-3 sm:ml-4 min-w-0 flex-1">
+                <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">
+                  Total Leads
+                </p>
+                <p className="text-xl sm:text-2xl font-bold text-gray-900">
+                  {stats.total}
+                </p>
+                <p className="text-xs text-blue-600 mt-1 truncate">All time</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 hover:shadow-md hover:scale-105 transition-all duration-200 cursor-pointer group">
             <div className="flex items-center">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Clock className="w-6 h-6 text-blue-600" />
+              <div className="p-2 sm:p-3 bg-blue-100 rounded-lg group-hover:bg-blue-200 transition-colors duration-200">
+                <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
               </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">New</p>
-                <p className="text-2xl font-bold text-blue-600">{stats.new}</p>
+              <div className="ml-3 sm:ml-4 min-w-0 flex-1">
+                <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">
+                  New
+                </p>
+                <p className="text-xl sm:text-2xl font-bold text-blue-600">
+                  {stats.new}
+                </p>
+                <p className="text-xs text-blue-600 mt-1 truncate">Recent</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 hover:shadow-md hover:scale-105 transition-all duration-200 cursor-pointer group">
             <div className="flex items-center">
-              <div className="p-2 bg-yellow-100 rounded-lg">
-                <MessageSquare className="w-6 h-6 text-yellow-600" />
+              <div className="p-2 sm:p-3 bg-yellow-100 rounded-lg group-hover:bg-yellow-200 transition-colors duration-200">
+                <MessageSquare className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-600" />
               </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Contacted</p>
-                <p className="text-2xl font-bold text-yellow-600">{stats.contacted}</p>
+              <div className="ml-3 sm:ml-4 min-w-0 flex-1">
+                <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">
+                  Contacted
+                </p>
+                <p className="text-xl sm:text-2xl font-bold text-yellow-600">
+                  {stats.contacted}
+                </p>
+                <p className="text-xs text-yellow-600 mt-1 truncate">
+                  In progress
+                </p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 hover:shadow-md hover:scale-105 transition-all duration-200 cursor-pointer group">
             <div className="flex items-center">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <CheckCircle className="w-6 h-6 text-purple-600" />
+              <div className="p-2 sm:p-3 bg-purple-100 rounded-lg group-hover:bg-purple-200 transition-colors duration-200">
+                <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" />
               </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Qualified</p>
-                <p className="text-2xl font-bold text-purple-600">{stats.qualified}</p>
+              <div className="ml-3 sm:ml-4 min-w-0 flex-1">
+                <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">
+                  Qualified
+                </p>
+                <p className="text-xl sm:text-2xl font-bold text-purple-600">
+                  {stats.qualified}
+                </p>
+                <p className="text-xs text-purple-600 mt-1 truncate">
+                  Ready to convert
+                </p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 hover:shadow-md hover:scale-105 transition-all duration-200 cursor-pointer group">
             <div className="flex items-center">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <TrendingUp className="w-6 h-6 text-green-600" />
+              <div className="p-2 sm:p-3 bg-green-100 rounded-lg group-hover:bg-green-200 transition-colors duration-200">
+                <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
               </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Converted</p>
-                <p className="text-2xl font-bold text-green-600">{stats.converted}</p>
+              <div className="ml-3 sm:ml-4 min-w-0 flex-1">
+                <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">
+                  Converted
+                </p>
+                <p className="text-xl sm:text-2xl font-bold text-green-600">
+                  {stats.converted}
+                </p>
+                <p className="text-xs text-green-600 mt-1 truncate">Success!</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 hover:shadow-md hover:scale-105 transition-all duration-200 cursor-pointer group">
             <div className="flex items-center">
-              <div className="p-2 bg-red-100 rounded-lg">
-                <XCircle className="w-6 h-6 text-red-600" />
+              <div className="p-2 sm:p-3 bg-red-100 rounded-lg group-hover:bg-red-200 transition-colors duration-200">
+                <XCircle className="w-5 h-5 sm:w-6 sm:h-6 text-red-600" />
               </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Lost</p>
-                <p className="text-2xl font-bold text-red-600">{stats.lost}</p>
+              <div className="ml-3 sm:ml-4 min-w-0 flex-1">
+                <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">
+                  Lost
+                </p>
+                <p className="text-xl sm:text-2xl font-bold text-red-600">
+                  {stats.lost}
+                </p>
+                <p className="text-xs text-red-600 mt-1 truncate">
+                  Need follow-up
+                </p>
               </div>
             </div>
           </div>
@@ -371,8 +443,10 @@ const Leads = () => {
               className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="all">All Sources</option>
-              {availableSources.map(source => (
-                <option key={source} value={source}>{source}</option>
+              {availableSources.map((source) => (
+                <option key={source} value={source}>
+                  {source}
+                </option>
               ))}
             </select>
           </div>
@@ -426,7 +500,9 @@ const Leads = () => {
                         <div className="text-sm font-medium text-gray-900">
                           {getLeadDisplayName(lead)}
                         </div>
-                        <div className="text-sm text-gray-500">{lead.email}</div>
+                        <div className="text-sm text-gray-500">
+                          {lead.email}
+                        </div>
                         <div className="text-sm text-gray-500 flex items-center mt-1">
                           <Phone className="w-3 h-3 mr-1" />
                           {getLeadDisplayPhone(lead)}
@@ -435,15 +511,21 @@ const Leads = () => {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{lead.company_name || 'N/A'}</div>
+                    <div className="text-sm text-gray-900">
+                      {lead.company_name || "N/A"}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{lead.source || 'Unknown'}</div>
+                    <div className="text-sm text-gray-900">
+                      {lead.source || "Unknown"}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <select
                       value={lead.status}
-                      onChange={(e) => handleStatusUpdate(lead.id, e.target.value)}
+                      onChange={(e) =>
+                        handleStatusUpdate(lead.id, e.target.value)
+                      }
                       className={`text-xs font-medium rounded-full px-2.5 py-0.5 border-0 ${getStatusInfo(lead.status).color}`}
                     >
                       <option value="new">New</option>
@@ -455,9 +537,11 @@ const Leads = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <select
-                      value={lead.priority || 'medium'}
-                      onChange={(e) => handlePriorityUpdate(lead.id, e.target.value)}
-                      className={`text-xs font-medium rounded-full px-2.5 py-0.5 border-0 ${getPriorityColor(lead.priority || 'medium')}`}
+                      value={lead.priority || "medium"}
+                      onChange={(e) =>
+                        handlePriorityUpdate(lead.id, e.target.value)
+                      }
+                      className={`text-xs font-medium rounded-full px-2.5 py-0.5 border-0 ${getPriorityColor(lead.priority || "medium")}`}
                     >
                       <option value="low">Low</option>
                       <option value="medium">Medium</option>
@@ -466,7 +550,9 @@ const Leads = () => {
                     </select>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{formatDate(lead.created_at)}</div>
+                    <div className="text-sm text-gray-900">
+                      {formatDate(lead.created_at)}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex items-center space-x-2">
@@ -490,11 +576,16 @@ const Leads = () => {
         {filteredLeads.length === 0 && (
           <div className="text-center py-12">
             <Users className="mx-auto h-12 w-12 text-gray-400" />
-            <h3 className="mt-2 text-sm font-medium text-gray-900">No leads found</h3>
+            <h3 className="mt-2 text-sm font-medium text-gray-900">
+              No leads found
+            </h3>
             <p className="mt-1 text-sm text-gray-500">
-              {searchQuery || statusFilter !== 'all' || priorityFilter !== 'all' || sourceFilter !== 'all'
-                ? 'Try adjusting your search or filter criteria.'
-                : 'No leads have been submitted yet.'}
+              {searchQuery ||
+              statusFilter !== "all" ||
+              priorityFilter !== "all" ||
+              sourceFilter !== "all"
+                ? "Try adjusting your search or filter criteria."
+                : "No leads have been submitted yet."}
             </p>
           </div>
         )}

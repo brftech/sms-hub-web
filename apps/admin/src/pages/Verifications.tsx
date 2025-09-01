@@ -20,16 +20,16 @@ import {
   MoreHorizontal,
 } from "lucide-react";
 import { useGlobalView } from "../contexts/GlobalViewContext";
-import { useCurrentHub } from "../hooks/useCurrentHub";
+import { useHub } from "@sms-hub/ui";
 import {
-  VerificationsService,
+  verificationsService,
   Verification,
   VerificationStats,
 } from "../services/verificationsService";
 
 const Verifications = () => {
   const navigate = useNavigate();
-  const { currentHub } = useCurrentHub();
+  const { currentHub } = useHub();
   const { isGlobalView } = useGlobalView();
   const [verifications, setVerifications] = useState<Verification[]>([]);
   const [filteredVerifications, setFilteredVerifications] = useState<
@@ -52,13 +52,30 @@ const Verifications = () => {
   const [bulkAction, setBulkAction] = useState("");
   const [showBulkActions, setShowBulkActions] = useState(false);
 
-  const verificationsService = new VerificationsService();
-
   // Fetch verifications and stats from database
   const fetchData = async () => {
     try {
       setLoading(true);
       setError(null);
+
+      // Get hub ID based on current hub (only used for non-global view)
+      const hubId =
+        currentHub === "gnymble"
+          ? 1
+          : currentHub === "percymd"
+            ? 2
+            : currentHub === "percytext"
+              ? 3
+              : currentHub === "percytech"
+                ? 0
+                : 1; // Default to gnymble (1)
+
+      console.log("Verifications: Current hub:", currentHub);
+      console.log("Verifications: Global view:", isGlobalView);
+      console.log(
+        "Verifications: Using hub_id:",
+        isGlobalView ? "ALL HUBS" : hubId
+      );
 
       let fetchedVerifications: Verification[] = [];
       let fetchedStats: VerificationStats | null = null;
@@ -69,16 +86,10 @@ const Verifications = () => {
         fetchedStats = await verificationsService.getGlobalVerificationStats();
       } else {
         // Fetch hub-specific data
-        if (currentHub) {
-          console.log("Verifications: Current hub:", currentHub);
-          console.log("Verifications: Global view:", isGlobalView);
-          const hubId = currentHub.id;
-          console.log("Verifications: Using hub_id:", hubId);
-
-          fetchedVerifications =
-            await verificationsService.getVerifications(hubId);
-          fetchedStats = await verificationsService.getVerificationStats(hubId);
-        }
+        fetchedVerifications = await verificationsService.getVerifications({
+          hub_id: hubId,
+        });
+        fetchedStats = await verificationsService.getVerificationStats(hubId);
       }
 
       setVerifications(fetchedVerifications);
@@ -132,9 +143,20 @@ const Verifications = () => {
     }
 
     if (filters.status) {
-      filtered = filtered.filter(
-        (verification) => verification.status === filters.status
-      );
+      if (filters.status === 'verified') {
+        filtered = filtered.filter(verification => verification.is_verified === true);
+      } else if (filters.status === 'unverified') {
+        filtered = filtered.filter(verification => verification.is_verified !== true);
+      } else if (filters.status === 'expired') {
+        filtered = filtered.filter(verification => 
+          verification.expires_at && new Date(verification.expires_at) < new Date()
+        );
+      } else if (filters.status === 'max_attempts') {
+        filtered = filtered.filter(verification => 
+          verification.verification_attempts && verification.max_attempts && 
+          verification.verification_attempts >= parseInt(verification.max_attempts)
+        );
+      }
     }
 
     if (filters.hubId && !isGlobalView) {
@@ -160,7 +182,7 @@ const Verifications = () => {
       }
 
       filtered = filtered.filter(
-        (verification) => new Date(verification.created_at) >= cutoff
+        (verification) => new Date(verification.created_at || "") >= cutoff
       );
     }
 
@@ -251,7 +273,11 @@ const Verifications = () => {
         bg: "bg-green-100",
       };
     }
-    if (verification.verification_attempts >= verification.max_attempts) {
+    if (
+      verification.verification_attempts &&
+      verification.max_attempts &&
+      verification.verification_attempts >= parseInt(verification.max_attempts)
+    ) {
       return {
         status: "max_attempts",
         color: "text-red-600",
@@ -335,7 +361,7 @@ const Verifications = () => {
           <p className="text-gray-600">
             {isGlobalView
               ? "Manage verifications from all hubs"
-              : `Manage verifications for ${currentHub?.name || "current hub"}`}
+              : `Manage verifications for ${currentHub} hub`}
           </p>
         </div>
 
@@ -399,9 +425,9 @@ const Verifications = () => {
                 <Clock className="w-5 h-5 text-yellow-600" />
               </div>
               <div className="ml-3">
-                <p className="text-sm font-medium text-gray-600">Pending</p>
+                <p className="text-sm font-medium text-gray-600">Unverified</p>
                 <p className="text-2xl font-semibold text-gray-900">
-                  {stats.pending}
+                  {stats.unverified}
                 </p>
               </div>
             </div>
@@ -413,9 +439,9 @@ const Verifications = () => {
                 <XCircle className="w-5 h-5 text-red-600" />
               </div>
               <div className="ml-3">
-                <p className="text-sm font-medium text-gray-600">Failed</p>
+                <p className="text-sm font-medium text-gray-600">Expired</p>
                 <p className="text-2xl font-semibold text-gray-900">
-                  {stats.failed}
+                  {stats.expired}
                 </p>
               </div>
             </div>
@@ -658,7 +684,9 @@ const Verifications = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {new Date(verification.created_at).toLocaleDateString()}
+                      {verification.created_at
+                        ? new Date(verification.created_at).toLocaleDateString()
+                        : "Unknown"}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex items-center space-x-2">

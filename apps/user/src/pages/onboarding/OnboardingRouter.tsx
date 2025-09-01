@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useHub } from '@sms-hub/ui'
-import { useCurrentUserCompany, useBrands, useCurrentUserCampaigns } from '@sms-hub/supabase/react'
+import { useCurrentUserCompany, useBrands, useCurrentUserCampaigns, useUserProfile, useOnboardingSubmission } from '@sms-hub/supabase/react'
 import { BrandStep } from './steps/BrandStep'
 import { PrivacyStep } from './steps/PrivacyStep'
 import { CampaignStep } from './steps/CampaignStep'
@@ -83,6 +83,8 @@ export function OnboardingRouter() {
   const { data: company } = useCurrentUserCompany()
   const { data: brands } = useBrands(company?.id || '')
   const { data: campaigns } = useCurrentUserCampaigns()
+  const { data: userProfile } = useUserProfile()
+  const { data: onboardingSubmission } = useOnboardingSubmission(company?.id || '', hubConfig.hubNumber)
   
   const [completedSteps, setCompletedSteps] = useState<Set<OnboardingStep>>(new Set())
   

@@ -15,6 +15,7 @@ import {
   RefreshCw
 } from 'lucide-react'
 import { useCurrentUserCampaigns, useCurrentUserCompany, useBrands } from '@sms-hub/supabase/react'
+import { Campaign } from '@sms-hub/types'
 
 export function Campaigns() {
   const { currentHub } = useHub()
@@ -25,7 +26,7 @@ export function Campaigns() {
   const [statusFilter, setStatusFilter] = useState("all")
 
   // Filter campaigns based on search and status
-  const filteredCampaigns = campaigns.filter(campaign => {
+  const filteredCampaigns = campaigns.filter((campaign: Campaign) => {
     const matchesSearch = campaign.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          campaign.description?.toLowerCase().includes(searchQuery.toLowerCase())
     const matchesStatus = statusFilter === "all" || campaign.status === statusFilter

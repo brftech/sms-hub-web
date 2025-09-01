@@ -8,8 +8,13 @@ serve(async (req) => {
   }
 
   try {
-    const { signup_id, code, email, mobile_phone_number, auth_method } =
-      await req.json();
+    const {
+      verification_id,
+      verification_code,
+      email,
+      mobile_phone_number,
+      auth_method,
+    } = await req.json();
 
     // Create Supabase admin client
     const supabaseAdmin = createClient(
@@ -26,9 +31,9 @@ serve(async (req) => {
     const { data: verificationRequest, error: findError } = await supabaseAdmin
       .from("verifications")
       .select("*")
-      .eq("id", signup_id)
+      .eq("id", verification_id)
       .eq(identifierField, identifier)
-      .eq("verification_code", code)
+      .eq("verification_code", verification_code)
       .eq("is_verified", false)
       .gte("expires_at", new Date().toISOString())
       .single();
@@ -44,10 +49,10 @@ serve(async (req) => {
       .update({
         is_verified: true,
       })
-      .eq("id", signup_id);
+      .eq("id", verification_id);
 
     if (updateError) {
-      console.error("Failed to update signup request:", updateError);
+      console.error("Failed to update verification request:", updateError);
       throw new Error("Failed to verify code");
     }
 

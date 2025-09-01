@@ -64,6 +64,7 @@ export const useCustomerByUser = (userId: string | null) => {
     queryFn: async () => {
       if (!userId) return null
       
+      const supabase = getSupabaseClient()
       
       // First check if user has direct customer relationship
       const { data: userProfile } = await supabase
@@ -96,6 +97,7 @@ export const useCustomerByCompany = (companyId: string | null) => {
     queryFn: async () => {
       if (!companyId) return null
       
+      const supabase = getSupabaseClient()
       
       // First get company's customer_id
       const { data: company } = await supabase

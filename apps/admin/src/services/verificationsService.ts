@@ -322,6 +322,31 @@ class VerificationsService {
         .filter((method): method is string => method !== null) || [];
     return [...new Set(methods)]; // Remove duplicates
   }
+
+  async verifyCode(verificationData: {
+    verification_id: string;
+    verification_code: string;
+    email: string;
+    mobile_phone_number: string;
+    auth_method: string;
+  }): Promise<any> {
+    try {
+      const { data, error } = await this.supabase.functions.invoke(
+        "verify-code",
+        { body: verificationData }
+      );
+
+      if (error) {
+        console.error("Error verifying code:", error);
+        throw new Error("Failed to verify code");
+      }
+
+      return data;
+    } catch (error) {
+      console.error("Error in verifyCode:", error);
+      throw error;
+    }
+  }
 }
 
 export const verificationsService = new VerificationsService();

@@ -113,7 +113,7 @@ export function CampaignStep({ onComplete }: StepComponentProps) {
       subscriber_help: 'HELP',
       opt_in_message: 'Reply YES to receive messages from ' + hubConfig.displayName + '. Msg & data rates may apply. Reply STOP to unsubscribe.',
       opt_out_message: 'You have been unsubscribed from ' + hubConfig.displayName + '. Reply START to resubscribe.',
-      help_message: 'For help with ' + hubConfig.displayName + ' SMS, visit ' + hubConfig.domain + '/help or call support.',
+      help_message: 'For help with ' + hubConfig.displayName + ' SMS, visit ' + hubConfig.deploymentUrls.production + '/help or call support.',
       age_gated: false,
       direct_lending: false,
       embedded_link: false,

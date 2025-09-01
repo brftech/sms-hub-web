@@ -1,6 +1,14 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { useHub, Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from "@sms-hub/ui";
+import {
+  useHub,
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@sms-hub/ui";
 import { Input, Label, Alert, AlertDescription } from "@sms-hub/ui";
 import { CheckCircle, ArrowLeft } from "lucide-react";
 import styled from "styled-components";
@@ -46,7 +54,13 @@ const StyledLabel = styled(Label)`
   margin-bottom: 0.5rem;
   font-weight: 500;
   color: #374151;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family:
+    "Inter",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
 `;
 
 const StyledInput = styled(Input)`
@@ -75,7 +89,7 @@ const BackButton = styled.button`
   align-items: center;
   margin-bottom: 0.75rem;
   transition: color 0.2s ease;
-  
+
   &:hover {
     color: #374151;
   }
@@ -97,9 +111,9 @@ export function Verify() {
       navigate("/signup");
       return;
     }
-    
+
     // Load signup data from session storage
-    const storedData = sessionStorage.getItem('signup_data');
+    const storedData = sessionStorage.getItem("signup_data");
     if (storedData) {
       setSignupData(JSON.parse(storedData));
     }
@@ -107,7 +121,7 @@ export function Verify() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!verificationId || !verificationCode) {
       setError("Please enter the verification code");
       return;
@@ -117,61 +131,69 @@ export function Verify() {
     setError("");
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/submit-verify`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-        },
-        body: JSON.stringify({
-          action: "verify",
-          verification_id: verificationId,
-          verification_code: verificationCode,
-        }),
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/verify-code`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({
+            verification_id: verificationId,
+            verification_code: verificationCode,
+            email: signupData?.email,
+            mobile_phone_number:
+              signupData?.mobile_phone_number || signupData?.phone,
+            auth_method: signupData?.authMethod,
+          }),
+        }
+      );
 
       const result = await response.json();
-      console.log('► Verification response:', result);
+      console.log("► Verification response:", result);
 
       if (!response.ok) {
         throw new Error(result.error || "Failed to verify code");
       }
 
       setSuccess(true);
-      
+
       // Handle session if provided
       if (result.session || result.session_url) {
         const supabase = createSupabaseClient(
           import.meta.env.VITE_SUPABASE_URL,
           import.meta.env.VITE_SUPABASE_ANON_KEY
         );
-        
+
         // For login flow, we might get a session URL
         if (result.session_url) {
           window.location.href = result.session_url;
           return;
         }
-        
+
         // For signup flow, set the session
         if (result.session) {
-          const { error: sessionError } = await supabase.auth.setSession(result.session);
+          const { error: sessionError } = await supabase.auth.setSession(
+            result.session
+          );
           if (sessionError) {
             console.error("Session error:", sessionError);
           }
         }
       }
-      
+
       // Clear session storage
-      sessionStorage.removeItem('signup_data');
-      
+      sessionStorage.removeItem("signup_data");
+
       // Redirect based on flow type
       const isLogin = signupData?.isLogin || false;
-      const redirectPath = result.redirect || (isLogin ? "/dashboard" : "/onboarding");
-      
+      const redirectPath =
+        result.redirect || (isLogin ? "/dashboard" : "/onboarding");
+
       setTimeout(() => {
         navigate(redirectPath);
       }, 2000);
-
     } catch (err: any) {
       console.error("Verification error:", err);
       setError(err.message || "Failed to verify code");
@@ -185,32 +207,31 @@ export function Verify() {
       setError("Unable to resend code. Please try signing up again.");
       return;
     }
-    
+
     setIsSubmitting(true);
     setError("");
-    
+
     try {
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/submit-verify`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-        },
-        body: JSON.stringify({
-          action: "send",
-          verification_id: verificationId,
-          email: signupData.email,
-          mobile_phone_number: signupData.mobile_phone_number || signupData.phone,
-          auth_method: signupData.authMethod,
-          is_login: signupData.isLogin || false,
-        }),
-      });
-      
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/resend-verification`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({
+            verification_id: verificationId,
+            auth_method: signupData.authMethod,
+          }),
+        }
+      );
+
       const result = await response.json();
       if (!response.ok) {
         throw new Error(result.error || "Failed to resend code");
       }
-      
+
       setError("");
       alert("A new verification code has been sent!");
     } catch (err: any) {
@@ -227,14 +248,18 @@ export function Verify() {
         <VerifyCard>
           <CardContent className="text-center py-12">
             <CheckCircle className="w-16 h-16 text-green-600 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold mb-2">{signupData?.isLogin ? "Login Successful!" : "Account Verified!"}</h2>
+            <h2 className="text-2xl font-bold mb-2">
+              {signupData?.isLogin ? "Login Successful!" : "Account Verified!"}
+            </h2>
             <p className="text-gray-600 mb-4">
-              {signupData?.isLogin 
-                ? "You have been successfully logged in." 
+              {signupData?.isLogin
+                ? "You have been successfully logged in."
                 : "Your account has been successfully created and verified."}
             </p>
             <p className="text-sm text-gray-500">
-              {signupData?.isLogin ? "Redirecting to dashboard..." : "Redirecting to complete setup..."}
+              {signupData?.isLogin
+                ? "Redirecting to dashboard..."
+                : "Redirecting to complete setup..."}
             </p>
           </CardContent>
         </VerifyCard>
@@ -254,17 +279,18 @@ export function Verify() {
             <LogoImage src={logoIcon} alt="Logo" />
             <CardTitle className="text-xl">Verify Your Account</CardTitle>
             <CardDescription className="text-sm">
-              Enter the 6-digit verification code sent to your {signupData?.authMethod === "sms" ? "phone" : "email"}
+              Enter the 6-digit verification code sent to your{" "}
+              {signupData?.authMethod === "sms" ? "phone" : "email"}
             </CardDescription>
           </LogoSection>
         </CardHeader>
-        
+
         <CardContent>
           <BackButton onClick={() => navigate("/signup")}>
             <ArrowLeft className="w-3 h-3 mr-1" />
             Back to Signup
           </BackButton>
-          
+
           <FormSection onSubmit={handleSubmit}>
             <FormGroup>
               <StyledLabel htmlFor="verification_code">
@@ -276,23 +302,25 @@ export function Verify() {
                 placeholder="123456"
                 maxLength={6}
                 value={verificationCode}
-                onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, ''))}
+                onChange={(e) =>
+                  setVerificationCode(e.target.value.replace(/\D/g, ""))
+                }
                 disabled={isSubmitting}
                 autoFocus
               />
             </FormGroup>
-            
+
             {error && (
               <Alert variant="destructive" className="mb-4">
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
-            
+
             <SubmitButton type="submit" disabled={isSubmitting}>
-              {isSubmitting ? 'Verifying...' : 'Verify Code'}
+              {isSubmitting ? "Verifying..." : "Verify Code"}
             </SubmitButton>
           </FormSection>
-          
+
           <div className="text-center mt-4">
             <p className="text-sm text-gray-600 mb-2">
               Didn't receive the code?

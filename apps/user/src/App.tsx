@@ -3,7 +3,7 @@ import { Dashboard } from "./pages/Dashboard";
 import { Onboarding } from "./pages/onboarding/Onboarding";
 import { Login } from "./pages/Login";
 import { Signup } from "./pages/Signup";
-import { VerifyCode } from "./pages/VerifyCode";
+import { Verify } from "./pages/Verify";
 import { VerifyOtp } from "./pages/VerifyOtp";
 import { Campaigns } from "./pages/Campaigns";
 import { Messages } from "./pages/Messages";
@@ -18,7 +18,7 @@ function App() {
     <div className="min-h-screen bg-background">
       <Routes>
         <Route path="/signup" element={<Signup />} />
-        <Route path="/verify" element={<VerifyCode />} />
+        <Route path="/verify" element={<Verify />} />
         <Route path="/verify-otp" element={<VerifyOtp />} />
         <Route path="/login" element={<Login />} />
         <Route path="/payment-required" element={<PaymentRequired />} />

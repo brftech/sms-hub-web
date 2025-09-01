@@ -67,9 +67,19 @@ interface CampaignFormData {
   use_case: string
   sample_messages: string[]
   content_type: string
+  call_to_action: string
+  subscriber_optin: string
+  subscriber_optout: string
+  subscriber_help: string
   opt_in_message: string
   opt_out_message: string
   help_message: string
+  age_gated: boolean
+  direct_lending: boolean
+  embedded_link: boolean
+  embedded_phone: boolean
+  affiliate_marketing: boolean
+  monthly_volume: number
 }
 
 const USE_CASES = [
@@ -97,9 +107,19 @@ export function CampaignStep({ onComplete }: StepComponentProps) {
       use_case: '',
       sample_messages: [],
       content_type: 'promotional',
+      call_to_action: '',
+      subscriber_optin: 'WEB_FORM',
+      subscriber_optout: 'STOP',
+      subscriber_help: 'HELP',
       opt_in_message: 'Reply YES to receive messages from ' + hubConfig.displayName + '. Msg & data rates may apply. Reply STOP to unsubscribe.',
       opt_out_message: 'You have been unsubscribed from ' + hubConfig.displayName + '. Reply START to resubscribe.',
-      help_message: 'For help with ' + hubConfig.displayName + ' SMS, visit ' + hubConfig.domain + '/help or call support.'
+      help_message: 'For help with ' + hubConfig.displayName + ' SMS, visit ' + hubConfig.domain + '/help or call support.',
+      age_gated: false,
+      direct_lending: false,
+      embedded_link: false,
+      embedded_phone: false,
+      affiliate_marketing: false,
+      monthly_volume: 10000
     },
     mode: 'onChange'
   })
@@ -112,14 +132,50 @@ export function CampaignStep({ onComplete }: StepComponentProps) {
       const campaignData = {
         ...data,
         sample_messages: sampleMessages.filter(msg => msg.trim() !== ''),
-        hub_id: hubConfig.hubNumber,
-        tcr_status: 'pending'
+        hub_id: hubConfig.hubNumber
       }
       
-      // Submit to TCR API via backend
-      await onComplete(campaignData)
+      // Call TCR campaign registration Edge Function
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/tcr-register-campaign`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
+          },
+          body: JSON.stringify({
+            company_id: localStorage.getItem('company_id'), // Get from auth context
+            brand_id: localStorage.getItem('brand_id'), // Get from previous step
+            campaign_data: campaignData
+          })
+        }
+      )
+      
+      const result = await response.json()
+      
+      if (!response.ok) {
+        throw new Error(result.error || 'Campaign registration failed')
+      }
+      
+      // Store campaign ID for next steps
+      if (result.campaignId) {
+        localStorage.setItem('tcr_campaign_id', result.campaignId)
+        localStorage.setItem('campaign_id', result.campaign?.id)
+      }
+      
+      // Continue to next step
+      await onComplete({
+        ...campaignData,
+        tcr_campaign_id: result.campaignId,
+        campaign_id: result.campaign?.id
+      })
     } catch (error) {
       console.error('Campaign registration error:', error)
+      // In development, continue anyway
+      if (import.meta.env.DEV) {
+        await onComplete(data)
+      }
     } finally {
       setIsSubmitting(false)
     }
@@ -262,6 +318,74 @@ export function CampaignStep({ onComplete }: StepComponentProps) {
                 </FormItem>
               )}
             />
+
+            <FormField
+              control={form.control}
+              name="call_to_action"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Call to Action (Min. 40 characters)</FormLabel>
+                  <FormControl>
+                    <Textarea 
+                      placeholder="Describe in detail how subscribers will opt-in to receive messages. Example: Customers opt-in by visiting our website and entering their phone number in the SMS updates form..."
+                      rows={2}
+                      {...field} 
+                    />
+                  </FormControl>
+                  <p className="text-xs text-gray-500 mt-1">
+                    TCR requires a detailed description of your opt-in process (minimum 40 characters)
+                  </p>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="subscriber_optin"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Subscriber Opt-In Method</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select opt-in method" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="WEB_FORM">Web Form</SelectItem>
+                        <SelectItem value="VIA_SMS">Via SMS/Keyword</SelectItem>
+                        <SelectItem value="MOBILE_QR_CODE">QR Code</SelectItem>
+                        <SelectItem value="VERBAL">Verbal/Phone</SelectItem>
+                        <SelectItem value="PAPER">Paper Form</SelectItem>
+                        <SelectItem value="KEYWORD">SMS Keyword</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="monthly_volume"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Expected Monthly Volume</FormLabel>
+                    <FormControl>
+                      <Input 
+                        type="number" 
+                        placeholder="10000" 
+                        {...field}
+                        onChange={e => field.onChange(parseInt(e.target.value) || 0)}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             <div>
               <FormLabel>Sample Messages</FormLabel>

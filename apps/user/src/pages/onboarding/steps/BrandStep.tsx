@@ -13,10 +13,19 @@ interface BrandFormData {
   industry: string
   vertical_type: string
   legal_form: string
+  brand_relationship: string
+  address_street: string
+  address_city: string
+  address_state: string
+  address_postal_code: string
+  address_country: string
   contact_first_name: string
   contact_last_name: string
   contact_email: string
   contact_phone: string
+  stock_symbol?: string
+  alternate_business_id?: string
+  alternate_business_id_type?: string
 }
 
 export function BrandStep({ onComplete }: StepComponentProps) {
@@ -31,10 +40,19 @@ export function BrandStep({ onComplete }: StepComponentProps) {
       industry: '',
       vertical_type: '',
       legal_form: '',
+      brand_relationship: 'BASIC_ACCOUNT',
+      address_street: '',
+      address_city: '',
+      address_state: '',
+      address_postal_code: '',
+      address_country: 'US',
       contact_first_name: '',
       contact_last_name: '',
       contact_email: '',
-      contact_phone: ''
+      contact_phone: '',
+      stock_symbol: '',
+      alternate_business_id: '',
+      alternate_business_id_type: ''
     },
     mode: 'onChange'
   })
@@ -110,6 +128,69 @@ export function BrandStep({ onComplete }: StepComponentProps) {
               )}
             />
 
+            <div className="border-t pt-4">
+              <h3 className="font-semibold mb-4">Company Address</h3>
+              <div className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="address_street"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Street Address</FormLabel>
+                      <FormControl>
+                        <Input placeholder="123 Main Street, Suite 100" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="address_city"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>City</FormLabel>
+                        <FormControl>
+                          <Input placeholder="San Francisco" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="address_state"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>State</FormLabel>
+                        <FormControl>
+                          <Input placeholder="CA" maxLength={2} {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="address_postal_code"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>ZIP Code</FormLabel>
+                        <FormControl>
+                          <Input placeholder="94105" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
@@ -129,7 +210,43 @@ export function BrandStep({ onComplete }: StepComponentProps) {
                         <SelectItem value="finance">Finance</SelectItem>
                         <SelectItem value="retail">Retail</SelectItem>
                         <SelectItem value="education">Education</SelectItem>
+                        <SelectItem value="real_estate">Real Estate</SelectItem>
+                        <SelectItem value="insurance">Insurance</SelectItem>
+                        <SelectItem value="legal">Legal</SelectItem>
+                        <SelectItem value="non_profit">Non-Profit</SelectItem>
                         <SelectItem value="other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="vertical_type"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Vertical Type</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select vertical" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="PROFESSIONAL">Professional Services</SelectItem>
+                        <SelectItem value="REAL_ESTATE">Real Estate</SelectItem>
+                        <SelectItem value="HEALTHCARE">Healthcare</SelectItem>
+                        <SelectItem value="RETAIL">Retail/E-commerce</SelectItem>
+                        <SelectItem value="EDUCATION">Education</SelectItem>
+                        <SelectItem value="INSURANCE">Insurance</SelectItem>
+                        <SelectItem value="FINANCIAL_SERVICES">Financial Services</SelectItem>
+                        <SelectItem value="ENERGY">Energy/Utilities</SelectItem>
+                        <SelectItem value="ENTERTAINMENT">Entertainment</SelectItem>
+                        <SelectItem value="NON_PROFIT">Non-Profit</SelectItem>
+                        <SelectItem value="GOVERNMENT">Government</SelectItem>
+                        <SelectItem value="OTHER">Other</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />

@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import { useNavigate, Link, useLocation } from 'react-router-dom'
-import { useHub, Button, Card, CardContent, CardDescription, CardHeader, CardTitle, HubLogo } from '@sms-hub/ui'
+import { useHub, Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sms-hub/ui'
 import { Input, Label, Alert, AlertDescription } from '@sms-hub/ui'
 import { Mail, ArrowRight, Shield, CheckCircle } from 'lucide-react'
 import { createSupabaseClient } from '@sms-hub/supabase'
 import styled from 'styled-components'
+import logoIcon from "@sms-hub/ui/assets/gnymble-icon-logo.svg"
 
 const LoginContainer = styled.div`
   min-height: 100vh;
@@ -25,6 +26,13 @@ const LogoSection = styled.div`
   margin-bottom: 2rem;
 `
 
+const LogoImage = styled.img`
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 1rem;
+  display: block;
+`
+
 const FormSection = styled.form`
   space-y: 4;
 `
@@ -38,6 +46,7 @@ const StyledLabel = styled(Label)`
   margin-bottom: 0.5rem;
   font-weight: 500;
   color: #374151;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 `
 
 const StyledInput = styled(Input)`
@@ -146,9 +155,7 @@ export function Login() {
       <LoginCard>
         <CardHeader>
           <LogoSection>
-            <div className="mx-auto mb-4">
-              <HubLogo hubType={hubConfig.id} className="w-12 h-12" />
-            </div>
+            <LogoImage src={logoIcon} alt="Logo" />
             <CardTitle className="text-2xl">Welcome Back</CardTitle>
             <CardDescription>
               Sign in to your {hubConfig.displayName} account

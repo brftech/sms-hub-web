@@ -142,6 +142,7 @@ serve(async (req) => {
           company_account_number: companyAccountNumber,
           public_name: tempSignup.company_name,
           legal_name: tempSignup.company_name,
+          billing_email: tempSignup.email, // Required field
           point_of_contact_email: tempSignup.email,
           company_phone_number: tempSignup.mobile_phone_number,
           is_active: true,
@@ -185,14 +186,28 @@ serve(async (req) => {
         }
 
         // Generate account number
-        const { data: accountNumber, error: accountError } =
-          await supabaseAdmin.rpc("generate_account_number", {
-            hub_name: getHubName(tempSignup.hub_id),
-          });
+        console.log("🔍 Generating account number for hub:", getHubName(tempSignup.hub_id));
+        
+        let accountNumber: string;
+        try {
+          const { data: accountNumberData, error: accountError } =
+            await supabaseAdmin.rpc("generate_account_number", {
+              hub_name: getHubName(tempSignup.hub_id),
+            });
 
-        if (accountError) {
-          console.error("❌ Error generating account number:", accountError);
-          throw new Error("Failed to generate account number");
+          console.log("🔍 Account RPC Response - data:", accountNumberData);
+          console.log("🔍 Account RPC Response - error:", accountError);
+
+          if (accountError) {
+            console.error("❌ Error generating account number:", accountError);
+            throw new Error(`Failed to generate account number: ${accountError.message}`);
+          }
+
+          accountNumber = accountNumberData;
+          console.log("✅ Generated account number:", accountNumber);
+        } catch (rpcError) {
+          console.error("❌ Account RPC call failed:", rpcError);
+          throw new Error(`Account RPC call failed: ${rpcError.message}`);
         }
 
         // Create user profile
@@ -240,11 +255,26 @@ serve(async (req) => {
           authData.user.id
         );
 
-        // Return success response with account details
+        // Sign the user in and get a session
+        const { data: sessionData, error: sessionError } = await supabaseAdmin.auth.admin.generateLink({
+          type: 'signup',
+          email: tempSignup.email,
+          options: {
+            redirectTo: `${Deno.env.get('SUPABASE_URL')}/auth/callback`
+          }
+        });
+
+        if (sessionError) {
+          console.error("❌ Error generating sign in link:", sessionError);
+          // Continue without session, user can sign in manually
+        }
+
+        // Return success response with account details and session
         return new Response(
           JSON.stringify({
             success: true,
             message: "Verification successful! Your account is now active.",
+            session: sessionData,
             account: {
               userId: authData.user.id,
               companyId: company.id,

@@ -1,15 +1,14 @@
 import { useState, useEffect } from "react";
-import { PageLayout, useHub, HubLogo } from "@sms-hub/ui";
+import { useHub, HubLogo } from "@sms-hub/ui";
 import { getHubColorClasses } from "@sms-hub/utils";
-import Navigation from "../components/Navigation";
-import Footer from "../components/Footer";
+import AppLayout from "../components/AppLayout";
+import SEO from "../components/SEO";
 import cigarImage from "@sms-hub/ui/assets/cigar.png";
 
 const Home = () => {
   const [showText, setShowText] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [showButtons, setShowButtons] = useState(false);
-  const [showSmiley, setShowSmiley] = useState(false);
+
   const { currentHub, hubConfig } = useHub();
   const hubColors = getHubColorClasses(currentHub);
 
@@ -38,27 +37,13 @@ const Home = () => {
   useEffect(() => {
     if (!showText) return;
 
-    // Show buttons immediately when text starts showing
-    setShowButtons(true);
-
     if (currentIndex < totalLength) {
       const typeTimer = setTimeout(() => {
         setCurrentIndex((prev) => prev + 1);
       }, 100);
       return () => clearTimeout(typeTimer);
-    } else {
-      // Text is complete, wait 2 seconds then show smiley
-      const smileyTimer = setTimeout(() => {
-        setShowSmiley(true);
-      }, 2000);
-      return () => clearTimeout(smileyTimer);
     }
   }, [showText, currentIndex, totalLength]);
-
-  useEffect(() => {
-    // Show buttons immediately on page load without delay
-    setShowButtons(true);
-  }, []);
 
   const renderText = () => {
     let displayedLength = 0;
@@ -96,17 +81,15 @@ const Home = () => {
   const handleClick = () => {
     setShowText(true);
     setCurrentIndex(totalLength);
-    setShowSmiley(true);
-    setShowButtons(true);
   };
 
   return (
-    <PageLayout
-      showNavigation={true}
-      showFooter={true}
-      navigation={<Navigation />}
-      footer={<Footer />}
-    >
+    <AppLayout>
+      <SEO 
+        title="SMS Hub - Compliant Texting for Cigar Retailers"
+        description="Professional SMS platform for cigar retailers. Compliant texting, customer engagement, and business growth tools."
+        keywords="SMS, texting, cigar retailers, business communication, customer engagement"
+      />
       <div
         className="min-h-screen bg-black relative cursor-pointer pt-16"
         style={{
@@ -147,7 +130,7 @@ const Home = () => {
           </div>
         </div>
       </div>
-    </PageLayout>
+    </AppLayout>
   );
 };
 

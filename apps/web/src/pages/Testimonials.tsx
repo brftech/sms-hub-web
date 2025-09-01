@@ -5,7 +5,7 @@ import { getHubColorClasses } from "@sms-hub/utils";
 import { Star, Quote, Users, Building, Shield, Zap, CheckCircle, ArrowRight } from "lucide-react";
 
 const Testimonials = () => {
-  const { currentHub, hubConfig } = useHub();
+  const { currentHub } = useHub();
   const hubColors = getHubColorClasses(currentHub);
 
   const testimonials = [

@@ -207,6 +207,7 @@ const Contact = () => {
                           First Name *
                         </label>
                         <FormFieldComponent
+                          label="First Name"
                           name="firstName"
                           type="text"
                           placeholder="John"
@@ -223,6 +224,7 @@ const Contact = () => {
                           Last Name *
                         </label>
                         <FormFieldComponent
+                          label="Last Name"
                           name="lastName"
                           type="text"
                           placeholder="Doe"
@@ -241,6 +243,7 @@ const Contact = () => {
                           Email *
                         </label>
                         <FormFieldComponent
+                          label="Email"
                           name="email"
                           type="email"
                           placeholder="john@speakeasy.com"
@@ -257,6 +260,7 @@ const Contact = () => {
                           Phone (Optional)
                         </label>
                         <FormFieldComponent
+                          label="Phone"
                           name="phone"
                           type="tel"
                           placeholder="(555) 123-4567"
@@ -275,6 +279,7 @@ const Contact = () => {
                           Company (Optional)
                         </label>
                         <FormFieldComponent
+                          label="Company"
                           name="company"
                           type="text"
                           placeholder="Company Name"
@@ -293,6 +298,7 @@ const Contact = () => {
                           Message (Optional)
                         </label>
                         <FormFieldComponent
+                          label="Message"
                           name="message"
                           type="textarea"
                           placeholder="Tell us about your venue, your needs, and how we can help elevate your customer communication..."

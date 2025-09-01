@@ -1,0 +1,19 @@
+-- Migration: Sync Remote Schema
+-- Date: 2025-01-01
+-- Description: Schema pulled from remote Supabase database to ensure local types are up-to-date
+-- 
+-- This migration documents the current state of the database schema after pulling
+-- types from the remote Supabase instance. The schema includes:
+-- - companies table with business and billing information
+-- - user_profiles table with user data and onboarding
+-- - temp_signups table for unverified signups
+-- - leads table for lead management
+-- - admin_audit_logs for admin activity tracking
+-- - bandwidth_accounts for SMS integration
+-- - memberships for user-company relationships
+--
+-- All tables include proper foreign key relationships to hubs table
+-- and appropriate indexes for performance.
+
+-- No schema changes needed - this is a documentation migration
+-- The actual schema is reflected in packages/types/src/database-generated.ts

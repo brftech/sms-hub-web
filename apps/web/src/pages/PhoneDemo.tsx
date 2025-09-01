@@ -1,4 +1,4 @@
-import React from "react";
+
 import { PhoneInteractive, LiveMessagingProvider, PageLayout } from "@sms-hub/ui";
 import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";

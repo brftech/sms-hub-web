@@ -1,224 +1,454 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import {
-  useHub,
-  Button,
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-  Input,
-  Label,
-} from "@sms-hub/ui";
-import { useCreateTempSignup } from "../hooks/useAuth";
-import { SignupData } from "@sms-hub/types";
-import { toast } from "sonner";
-import { Phone, Mail, ArrowLeft } from "lucide-react";
+import { useHub, Button, Card, CardContent, CardDescription, CardHeader, CardTitle, HubLogo } from "@sms-hub/ui";
+import { Input, Label, Alert, AlertDescription } from "@sms-hub/ui";
+import { Shield, CheckCircle, Mail, ArrowLeft, ArrowRight, User, Building, Phone } from "lucide-react";
+import styled from "styled-components";
+
+const SignupContainer = styled.div`
+  min-height: 100vh;
+  background: linear-gradient(135deg, #2d1b1b 0%, #4a2c2c 50%, #3d2424 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+`;
+
+const SignupCard = styled(Card)`
+  width: 100%;
+  max-width: 400px;
+`;
+
+const LogoSection = styled.div`
+  text-align: center;
+  margin-bottom: 1.5rem;
+`;
+
+const FormSection = styled.form`
+  space-y: 4;
+`;
+
+const FormGroup = styled.div`
+  margin-bottom: 1rem;
+`;
+
+const NameRow = styled.div`
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+`;
+
+const NameField = styled.div`
+  flex: 1;
+`;
+
+const StyledLabel = styled(Label)`
+  display: block;
+  margin-bottom: 0.25rem;
+  font-weight: 500;
+  color: #374151;
+  font-size: 0.875rem;
+`;
+
+const StyledInput = styled(Input)`
+  width: 100%;
+  height: 36px;
+  font-size: 0.875rem;
+`;
+
+const SubmitButton = styled(Button)`
+  width: 100%;
+  height: 48px;
+  font-size: 1rem;
+  font-weight: 600;
+`;
+
+const Footer = styled.div`
+  text-align: center;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+`;
+
+const StepIndicator = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-bottom: 0.75rem;
+`;
+
+const Step = styled.div<{ active: boolean; completed: boolean }>`
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+  margin: 0 0.25rem;
+  background: ${props => props.completed ? '#10b981' : props.active ? '#3b82f6' : '#e5e7eb'};
+  color: ${props => props.completed || props.active ? 'white' : '#6b7280'};
+  transition: all 0.2s ease;
+`;
+
+const BackButton = styled.button`
+  background: none;
+  border: none;
+  color: #6b7280;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  transition: color 0.2s ease;
+  
+  &:hover {
+    color: #374151;
+  }
+`;
+
+const VerificationMethod = styled.div`
+  margin-bottom: 0.75rem;
+`;
+
+const MethodOptions = styled.div`
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+`;
+
+const MethodOption = styled.label`
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  cursor: pointer;
+  font-size: 0.75rem;
+`;
+
+// Helper function to get hub ID for database
+const getHubIdForDatabase = (hubType: string) => {
+  const hubMap: { [key: string]: string } = {
+    gnymble: "gnymble",
+    percymd: "percymd",
+    percytext: "percytext",
+  };
+  return hubMap[hubType] || "gnymble";
+};
 
 export function Signup() {
   const { hubConfig } = useHub();
-  const createTempSignup = useCreateTempSignup();
   const navigate = useNavigate();
+  const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
+  const [authMethod, setAuthMethod] = useState<"sms" | "email">("sms");
   
-  // Form state
-  const [formData, setFormData] = useState<SignupData>({
-    hub_id: hubConfig.hubNumber,
+  const [formData, setFormData] = useState({
     company_name: "",
     first_name: "",
     last_name: "",
-    mobile_phone_number: "",
     email: "",
-    auth_method: "sms",
+    phone: "",
   });
+
+  const formatPhoneNumber = (value: string) => {
+    const cleaned = value.replace(/\D/g, "");
+    const match = cleaned.match(/^(\d{0,3})(\d{0,3})(\d{0,4})$/);
+    if (match) {
+      const parts = [match[1], match[2], match[3]].filter(Boolean);
+      return parts.length > 0 ? `(${parts.join(") ")})` : "";
+    }
+    return value;
+  };
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatPhoneNumber(e.target.value);
+    setFormData({ ...formData, phone: formatted });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (currentStep === 1) {
+      if (!formData.company_name || !formData.first_name || !formData.last_name) {
+        setError("Please fill in all required fields");
+        return;
+      }
+      setError("");
+      setCurrentStep(2);
+      return;
+    }
+
+    if (!formData.email || !formData.phone) {
+      setError("Please fill in all required fields");
+      return;
+    }
+
     setIsSubmitting(true);
+    setError("");
 
     try {
-      const result = await createTempSignup.mutateAsync({
-        ...formData,
-        hub_id: hubConfig.hubNumber,
+      const hubId = getHubIdForDatabase(hubConfig.id);
+      
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-temp-signup`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({
+          company_name: formData.company_name,
+          first_name: formData.first_name,
+          last_name: formData.last_name,
+          email: formData.email,
+          phone: formData.phone,
+          auth_method: authMethod,
+          hub_id: hubId,
+        }),
       });
 
-      toast.success("Verification code sent! Check your phone.");
+      const result = await response.json();
 
-      // Navigate to verification page
-      navigate(`/verify?id=${result.id}`);
-    } catch (error: any) {
-      console.error("Signup error:", error);
-      toast.error("Failed to create account. Please try again.");
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to create account");
+      }
+
+      setSuccess(true);
+      
+      // Store data for verification page
+      sessionStorage.setItem('signup_data', JSON.stringify({
+        ...formData,
+        authMethod,
+        hubId
+      }));
+      
+      // Redirect to verification page
+      setTimeout(() => {
+        navigate('/verify-signup');
+      }, 2000);
+
+    } catch (err: any) {
+      console.error("Signup error:", err);
+      setError(err.message || "Failed to create account");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const updateFormData = (field: keyof SignupData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+  const prevStep = () => {
+    setError("");
+    setCurrentStep(1);
   };
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        {/* Back to Home Link */}
-        <div className="text-center">
-          <Link
-            to="/"
-            className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 transition-colors"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Home
-          </Link>
-        </div>
-
-        <div className="text-center">
-          <h2 className="text-3xl font-extrabold hub-text-primary">
-            Join {hubConfig.displayName}
-          </h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Create your account to start your SMS journey
-          </p>
-        </div>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Create your account</CardTitle>
-            <CardDescription>
-              Enter your details to get started with SMS campaigns
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="company_name">Company Name</Label>
-                <Input
-                  id="company_name"
-                  type="text"
-                  value={formData.company_name}
-                  onChange={(e) => updateFormData("company_name", e.target.value)}
-                  placeholder="Your Company"
-                  required
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="first_name">First Name</Label>
-                  <Input
-                    id="first_name"
-                    type="text"
-                    value={formData.first_name}
-                    onChange={(e) => updateFormData("first_name", e.target.value)}
-                    placeholder="John"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="last_name">Last Name</Label>
-                  <Input
-                    id="last_name"
-                    type="text"
-                    value={formData.last_name}
-                    onChange={(e) => updateFormData("last_name", e.target.value)}
-                    placeholder="Doe"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="email">Email Address</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => updateFormData("email", e.target.value)}
-                  placeholder="john@company.com"
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="mobile_phone_number">Phone Number</Label>
-                <Input
-                  id="mobile_phone_number"
-                  type="tel"
-                  value={formData.mobile_phone_number}
-                  onChange={(e) => updateFormData("mobile_phone_number", e.target.value)}
-                  placeholder="(555) 123-4567"
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label>Verification Method</Label>
-                <div className="space-y-2">
-                  <div 
-                    className={`flex items-center space-x-2 p-3 border rounded-lg cursor-pointer transition-colors ${
-                      formData.auth_method === 'sms' 
-                        ? 'border-blue-500 bg-blue-50' 
-                        : 'border-gray-200 hover:bg-gray-50'
-                    }`}
-                    onClick={() => updateFormData("auth_method", "sms")}
-                  >
-                    <input
-                      type="radio"
-                      name="auth_method"
-                      value="sms"
-                      checked={formData.auth_method === 'sms'}
-                      onChange={() => updateFormData("auth_method", "sms")}
-                      className="text-blue-600"
-                    />
-                    <Phone className="h-4 w-4 text-gray-600" />
-                    <span className="text-sm">Send code via SMS</span>
-                  </div>
-                  <div 
-                    className={`flex items-center space-x-2 p-3 border rounded-lg cursor-pointer transition-colors ${
-                      formData.auth_method === 'email' 
-                        ? 'border-blue-500 bg-blue-50' 
-                        : 'border-gray-200 hover:bg-gray-50'
-                    }`}
-                    onClick={() => updateFormData("auth_method", "email")}
-                  >
-                    <input
-                      type="radio"
-                      name="auth_method"
-                      value="email"
-                      checked={formData.auth_method === 'email'}
-                      onChange={() => updateFormData("auth_method", "email")}
-                      className="text-blue-600"
-                    />
-                    <Mail className="h-4 w-4 text-gray-600" />
-                    <span className="text-sm">Send code via Email</span>
-                  </div>
-                </div>
-              </div>
-
-              <Button
-                type="submit"
-                className="w-full hub-bg-primary"
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? "Creating Account..." : "Create Account"}
-              </Button>
-            </form>
-
-            <div className="mt-6 text-center">
-              <p className="text-sm text-gray-600">
-                Already have an account?{" "}
-                <Link
-                  to="/login"
-                  className="font-medium hub-text-primary hover:opacity-80"
-                >
-                  Sign in
-                </Link>
-              </p>
-            </div>
+  if (success) {
+    return (
+      <SignupContainer>
+        <SignupCard>
+          <CardContent className="text-center py-12">
+            <CheckCircle className="w-16 h-16 text-green-600 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold mb-2">Account Created!</h2>
+            <p className="text-gray-600 mb-4">
+              We've sent a verification code to your {authMethod === "sms" ? "phone" : "email"}
+            </p>
+            <p className="text-sm text-gray-500">
+              Please check your {authMethod === "sms" ? "phone" : "email"} and enter the code to complete your registration.
+            </p>
           </CardContent>
-        </Card>
-      </div>
-    </div>
+        </SignupCard>
+      </SignupContainer>
+    );
+  }
+
+  return (
+    <SignupContainer>
+      <SignupCard>
+        <CardHeader>
+          <LogoSection>
+            <div className="mx-auto mb-3">
+              <HubLogo hubType={hubConfig.id} className="w-12 h-12" />
+            </div>
+            <CardTitle className="text-xl">
+              {currentStep === 1 ? "Create Account" : "Contact Info"}
+            </CardTitle>
+            <CardDescription className="text-sm">
+              {currentStep === 1 
+                ? "" 
+                : "How should we contact you?"
+              }
+            </CardDescription>
+          </LogoSection>
+          
+          <StepIndicator>
+            <Step active={currentStep === 1} completed={currentStep > 1}>1</Step>
+            <Step active={currentStep === 2} completed={false}>2</Step>
+          </StepIndicator>
+        </CardHeader>
+        
+        <CardContent>
+          {currentStep > 1 && (
+            <BackButton onClick={prevStep}>
+              <ArrowLeft className="w-3 h-3 mr-1" />
+              Back
+            </BackButton>
+          )}
+          
+          <FormSection onSubmit={handleSubmit}>
+            {currentStep === 1 ? (
+              <>
+                <FormGroup>
+                  <StyledLabel htmlFor="company_name">
+                    <Building className="w-3 h-3 inline mr-1" />
+                    Company Name *
+                  </StyledLabel>
+                  <StyledInput
+                    id="company_name"
+                    type="text"
+                    placeholder="Your company"
+                    value={formData.company_name}
+                    onChange={(e) => setFormData({ ...formData, company_name: e.target.value })}
+                    disabled={isSubmitting}
+                    autoFocus
+                  />
+                </FormGroup>
+
+                <NameRow>
+                  <NameField>
+                    <StyledLabel htmlFor="first_name">
+                      <User className="w-3 h-3 inline mr-1" />
+                      First Name *
+                    </StyledLabel>
+                    <StyledInput
+                      id="first_name"
+                      type="text"
+                      placeholder="John"
+                      value={formData.first_name}
+                      onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
+                      disabled={isSubmitting}
+                    />
+                  </NameField>
+                  
+                  <NameField>
+                    <StyledLabel htmlFor="last_name">
+                      <User className="w-3 h-3 inline mr-1" />
+                      Last Name *
+                    </StyledLabel>
+                    <StyledInput
+                      id="last_name"
+                      type="text"
+                      placeholder="Doe"
+                      value={formData.last_name}
+                      onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
+                      disabled={isSubmitting}
+                    />
+                  </NameField>
+                </NameRow>
+              </>
+            ) : (
+              <>
+                <FormGroup>
+                  <StyledLabel htmlFor="phone">
+                    <Phone className="w-3 h-3 inline mr-1" />
+                    Phone Number *
+                  </StyledLabel>
+                  <StyledInput
+                    id="phone"
+                    type="tel"
+                    placeholder="(555) 123-4567"
+                    value={formData.phone}
+                    onChange={handlePhoneChange}
+                    disabled={isSubmitting}
+                    autoFocus
+                  />
+                  {authMethod === "sms" && (
+                    <p className="text-xs text-blue-600 mt-1 font-medium">
+                      We'll send a verification code to this number
+                    </p>
+                  )}
+                </FormGroup>
+
+                <FormGroup>
+                  <StyledLabel htmlFor="email">
+                    <Mail className="w-3 h-3 inline mr-1" />
+                    Email Address *
+                  </StyledLabel>
+                  <StyledInput
+                    id="email"
+                    type="email"
+                    placeholder="john@company.com"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    disabled={isSubmitting}
+                  />
+                  {authMethod === "email" && (
+                    <p className="text-xs text-blue-600 mt-1 font-medium">
+                      We'll send a verification code to this email
+                    </p>
+                  )}
+                </FormGroup>
+
+                <VerificationMethod>
+                  <StyledLabel>Verification Method</StyledLabel>
+                  <MethodOptions>
+                    <MethodOption>
+                      <input
+                        type="radio"
+                        name="auth_method"
+                        value="sms"
+                        checked={authMethod === "sms"}
+                        onChange={() => setAuthMethod("sms")}
+                        className="w-3 h-3 text-blue-600"
+                      />
+                      <span>SMS</span>
+                      <span className="px-1 py-0.5 text-xs font-semibold bg-blue-100 text-blue-800 rounded-full">BEST</span>
+                    </MethodOption>
+                    
+                    <MethodOption>
+                      <input
+                        type="radio"
+                        name="auth_method"
+                        value="email"
+                        checked={authMethod === "email"}
+                        onChange={() => setAuthMethod("email")}
+                        className="w-3 h-3 text-blue-600"
+                      />
+                      <span>Email</span>
+                    </MethodOption>
+                  </MethodOptions>
+                </VerificationMethod>
+              </>
+            )}
+            
+            {error && (
+              <Alert variant="destructive" className="mb-3">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+            
+            <SubmitButton type="submit" disabled={isSubmitting}>
+              {isSubmitting ? (
+                'Creating Account...'
+              ) : currentStep === 1 ? (
+                <>
+                  Next Step
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </>
+              ) : (
+                'Create Account'
+              )}
+            </SubmitButton>
+          </FormSection>
+          
+          <Footer>
+            <p className="text-sm text-gray-600">
+              Already have an account?{" "}
+              <Link to="/login" className="text-blue-600 hover:text-blue-700 font-medium">
+                Log in
+              </Link>
+            </p>
+          </Footer>
+        </CardContent>
+      </SignupCard>
+    </SignupContainer>
   );
 }

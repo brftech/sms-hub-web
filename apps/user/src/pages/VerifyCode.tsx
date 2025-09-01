@@ -40,6 +40,7 @@ export function VerifyCode() {
   
   const tempSignupId = searchParams.get("id");
   const authMethod = searchParams.get("method") || "sms";
+  const isExistingUser = searchParams.get("existing") === "true";
   
   const [code, setCode] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
@@ -112,7 +113,16 @@ export function VerifyCode() {
 
       setSuccess(true);
       
-      // Now create the actual account
+      // Check if this is an existing user - if so, redirect to login
+      if (isExistingUser) {
+        console.log("Existing user verified, redirecting to login...");
+        setTimeout(() => {
+          navigate("/login");
+        }, 2000);
+        return;
+      }
+      
+      // Now create the actual account for new users
       if (data.tempSignup) {
         console.log("Creating account for verified signup...");
         
@@ -237,12 +247,20 @@ export function VerifyCode() {
         <Card className="w-full max-w-md">
           <CardContent className="text-center py-12">
             <CheckCircle2 className="w-16 h-16 text-green-600 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold mb-2">Account Verified!</h2>
+            <h2 className="text-2xl font-bold mb-2">
+              {isExistingUser ? "Identity Verified!" : "Account Verified!"}
+            </h2>
             <p className="text-gray-600 mb-4">
-              Your {hubConfig.displayName} account has been created successfully.
+              {isExistingUser 
+                ? `Welcome back to ${hubConfig.displayName}!`
+                : `Your ${hubConfig.displayName} account has been created successfully.`
+              }
             </p>
             <p className="text-sm text-gray-500">
-              Redirecting to complete payment setup...
+              {isExistingUser 
+                ? "Redirecting to login..."
+                : "Redirecting to complete payment setup..."
+              }
             </p>
           </CardContent>
         </Card>
@@ -258,11 +276,13 @@ export function VerifyCode() {
             <Shield className="w-12 h-12 text-blue-600" />
           </div>
           <CardTitle className="text-2xl text-center">
-            Verify Your {authMethod === "sms" ? "Phone" : "Email"}
+            {isExistingUser ? "Welcome Back!" : `Verify Your ${authMethod === "sms" ? "Phone" : "Email"}`}
           </CardTitle>
           <CardDescription className="text-center">
-            We sent a 6-digit verification code to your {authMethod === "sms" ? "phone" : "email"}.
-            Please enter it below.
+            {isExistingUser 
+              ? `We've sent a new verification code to your ${authMethod === "sms" ? "phone" : "email"}. Please enter it below to access your account.`
+              : `We sent a 6-digit verification code to your ${authMethod === "sms" ? "phone" : "email"}. Please enter it below.`
+            }
           </CardDescription>
         </CardHeader>
         

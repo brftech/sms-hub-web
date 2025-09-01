@@ -117,6 +117,8 @@ const Navigation = () => {
               Platform Demo
             </button>
 
+
+
           </div>
 
           {/* Mobile header with logo, contact button, and hamburger */}

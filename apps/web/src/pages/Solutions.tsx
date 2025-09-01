@@ -2,10 +2,10 @@ import { PageLayout, useHub } from "@sms-hub/ui";
 import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";
 import { getHubColorClasses } from "@sms-hub/utils";
-import { Shield, MessageSquare, Zap, Users, Building, CheckCircle } from "lucide-react";
+import { Shield, MessageSquare, Zap, Users, CheckCircle } from "lucide-react";
 
 const Solutions = () => {
-  const { currentHub, hubConfig } = useHub();
+  const { currentHub } = useHub();
   const hubColors = getHubColorClasses(currentHub);
 
   const solutions = [

@@ -29,6 +29,7 @@ import {
   useCurrentUserPhoneNumbers
 } from "@sms-hub/supabase/react";
 import { Link } from "react-router-dom";
+import { OnboardingTracker } from "../components/OnboardingTracker";
 
 export function Dashboard() {
   const { hubConfig, currentHub } = useHub()
@@ -38,6 +39,16 @@ export function Dashboard() {
   const { data: campaigns } = useCurrentUserCampaigns()
   const { data: brands } = useBrands(company?.id || "")
   const { data: phoneNumbers } = useCurrentUserPhoneNumbers()
+  
+  // Check if onboarding is complete
+  const isOnboardingComplete = !!(
+    company?.stripe_subscription_id &&
+    brands?.some(b => b.status === 'approved') &&
+    company?.privacy_policy_accepted_at &&
+    campaigns?.some(c => c.status === 'approved') &&
+    company?.phone_number_provisioned &&
+    company?.platform_access_granted
+  )
 
   // Mock data for demonstration
   const stats = {
@@ -116,13 +127,28 @@ export function Dashboard() {
     <div className="space-y-6 p-6">
       {/* Page Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+        <h1 className="text-2xl font-bold text-gray-900">
+          {isOnboardingComplete ? 'Dashboard' : 'Welcome to ' + currentHub + '!'}
+        </h1>
         <p className="mt-1 text-sm text-gray-500">
-          Welcome back, {userProfile?.first_name}! Here's what's happening with your {currentHub} account.
+          {isOnboardingComplete 
+            ? `Welcome back, ${userProfile?.first_name}! Here's what's happening with your ${currentHub} account.`
+            : `Hi ${userProfile?.first_name}, let's get your account set up and ready to send messages.`
+          }
         </p>
       </div>
 
-      {/* Statistics Cards */}
+      {/* Onboarding Tracker - Show prominently if not complete */}
+      {!isOnboardingComplete && (
+        <OnboardingTracker 
+          userProfile={userProfile}
+          company={company}
+          campaigns={campaigns}
+          brands={brands}
+        />
+      )}
+
+      {/* Statistics Cards - Show if onboarding is complete or partially complete */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div className="bg-white rounded-lg shadow-sm p-6">
           <div className="flex items-center">
@@ -277,7 +303,7 @@ export function Dashboard() {
       </div>
 
       {/* Company Info */}
-      {company && (
+      {company && isOnboardingComplete && (
         <div className="bg-white rounded-lg shadow-sm p-6">
           <h3 className="text-lg font-medium text-gray-900 mb-4">Company Information</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -302,6 +328,22 @@ export function Dashboard() {
               }`}>
                 {company.is_active ? 'Active' : 'Inactive'}
               </span>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Show compact onboarding tracker at bottom if complete */}
+      {isOnboardingComplete && (
+        <div className="bg-green-50 border-l-4 border-green-400 p-4">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <CheckCircle className="h-5 w-5 text-green-400" />
+            </div>
+            <div className="ml-3">
+              <p className="text-sm text-green-700">
+                Onboarding complete! You have full access to all platform features.
+              </p>
             </div>
           </div>
         </div>

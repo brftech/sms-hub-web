@@ -47,6 +47,66 @@ serve(async (req) => {
       { auth: { persistSession: false } }
     );
 
+    // First, check if this phone/email is already registered
+    const { data: existingUser } = await supabaseAdmin
+      .from("user_profiles")
+      .select("id, email, mobile_phone_number")
+      .or(`email.eq.${signupData.email},mobile_phone_number.eq.${signupData.mobile_phone_number}`)
+      .single();
+
+    if (existingUser) {
+      console.log("User already exists, sending new verification code");
+      // User already exists - just send them a new verification code
+      // Check for recent temp signup
+      const { data: recentSignup } = await supabaseAdmin
+        .from("temp_signups")
+        .select("*")
+        .or(`email.eq.${signupData.email},mobile_phone_number.eq.${signupData.mobile_phone_number}`)
+        .gte("expires_at", new Date().toISOString())
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .single();
+
+      if (recentSignup) {
+        // Update existing temp signup with new verification code
+        const newVerificationCode = Math.floor(
+          100000 + Math.random() * 900000
+        ).toString();
+
+        const { data: updatedSignup, error: updateError } = await supabaseAdmin
+          .from("temp_signups")
+          .update({
+            verification_code: newVerificationCode,
+            verification_attempts: 0,
+            expires_at: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
+          })
+          .eq("id", recentSignup.id)
+          .select()
+          .single();
+
+        if (updateError) {
+          console.error("Error updating temp signup:", updateError);
+          throw new Error("Failed to update verification request");
+        }
+
+        // Send new verification code
+        await sendVerification(signupData, newVerificationCode, updatedSignup.id);
+
+        return new Response(
+          JSON.stringify({
+            success: true,
+            id: updatedSignup.id,
+            message: "A new verification code has been sent. Please check your phone or email.",
+            existing: true,
+          }),
+          {
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+            status: 200,
+          }
+        );
+      }
+    }
+
     // Generate a 6-digit verification code
     const verificationCode = Math.floor(
       100000 + Math.random() * 900000
@@ -68,72 +128,53 @@ serve(async (req) => {
 
     if (insertError) {
       console.error("Error creating temp signup:", insertError);
+      // Check if it's a unique constraint violation
+      if (insertError.code === "23505") {
+        // Duplicate entry - find existing and update it
+        const { data: existingSignup } = await supabaseAdmin
+          .from("temp_signups")
+          .select("*")
+          .or(`email.eq.${signupData.email},mobile_phone_number.eq.${signupData.mobile_phone_number}`)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .single();
+
+        if (existingSignup) {
+          // Update with new verification code
+          const newCode = Math.floor(100000 + Math.random() * 900000).toString();
+          const { data: updated } = await supabaseAdmin
+            .from("temp_signups")
+            .update({
+              verification_code: newCode,
+              verification_attempts: 0,
+              expires_at: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
+            })
+            .eq("id", existingSignup.id)
+            .select()
+            .single();
+
+          if (updated) {
+            await sendVerification(signupData, newCode, updated.id);
+            return new Response(
+              JSON.stringify({
+                success: true,
+                id: updated.id,
+                message: "A new verification code has been sent.",
+                existing: true,
+              }),
+              {
+                headers: { ...corsHeaders, "Content-Type": "application/json" },
+                status: 200,
+              }
+            );
+          }
+        }
+      }
       throw new Error("Failed to create signup request");
     }
 
-    // Send verification based on auth method
-    const authMethod = signupData.auth_method || "sms";
-    const hubName = getHubName(signupData.hub_id);
-
-    if (authMethod === "sms") {
-      // Use our SMS platform via Zapier webhook
-      const formattedPhone = signupData.mobile_phone_number.replace(/\D/g, "");
-      // Ensure phone number has +1 prefix for US numbers
-      const fullPhone =
-        formattedPhone.length === 10
-          ? `+1${formattedPhone}`
-          : `+${formattedPhone}`;
-
-      console.log("📱 Sending SMS via our platform to:", fullPhone);
-      await sendSMSViaZapier(
-        fullPhone,
-        verificationCode,
-        hubName,
-        tempSignup.id,
-        signupData.hub_id
-      );
-    } else {
-      // Send email verification
-      const resendApiKey = Deno.env.get("RESEND_API_KEY");
-
-      if (resendApiKey) {
-        try {
-          const emailHtml = `
-            <h2>Welcome to ${hubName}!</h2>
-            <p>Your verification code is:</p>
-            <h1 style="font-size: 32px; letter-spacing: 5px; color: #CC5500;">${verificationCode}</h1>
-            <p>This code expires in 15 minutes.</p>
-            <p>Questions? We're here to help.</p>
-          `;
-
-          const response = await fetch("https://api.resend.com/emails", {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${resendApiKey}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              from: `${hubName} <noreply@${getHubDomain(signupData.hub_id)}>`,
-              to: [signupData.email],
-              subject: `Your ${hubName} Verification Code`,
-              html: emailHtml,
-            }),
-          });
-
-          if (response.ok) {
-            console.log("✅ Email sent successfully to:", signupData.email);
-          } else {
-            console.error("❌ Resend API failed:", await response.text());
-          }
-        } catch (emailError) {
-          console.error("❌ Error sending email:", emailError);
-        }
-      } else {
-        console.log("⚠️ RESEND_API_KEY not configured");
-        console.log("📧 Email would be sent to:", signupData.email);
-        console.log("🔑 Verification code:", verificationCode);
-      }
-    }
+    // Send verification
+    await sendVerification(signupData, verificationCode, tempSignup.id);
 
     // Return success response
     return new Response(
@@ -162,6 +203,75 @@ serve(async (req) => {
     );
   }
 });
+
+async function sendVerification(
+  signupData: CreateTempSignupRequest,
+  verificationCode: string,
+  signupId: string
+) {
+  const authMethod = signupData.auth_method || "sms";
+  const hubName = getHubName(signupData.hub_id);
+
+  if (authMethod === "sms") {
+    // Use our SMS platform via Zapier webhook
+    const formattedPhone = signupData.mobile_phone_number.replace(/\D/g, "");
+    // Ensure phone number has +1 prefix for US numbers
+    const fullPhone =
+      formattedPhone.length === 10
+        ? `+1${formattedPhone}`
+        : `+${formattedPhone}`;
+
+    console.log("📱 Sending SMS via our platform to:", fullPhone);
+    await sendSMSViaZapier(
+      fullPhone,
+      verificationCode,
+      hubName,
+      signupId,
+      signupData.hub_id
+    );
+  } else {
+    // Send email verification
+    const resendApiKey = Deno.env.get("RESEND_API_KEY");
+
+    if (resendApiKey) {
+      try {
+        const emailHtml = `
+          <h2>Welcome to ${hubName}!</h2>
+          <p>Your verification code is:</p>
+          <h1 style="font-size: 32px; letter-spacing: 5px; color: #CC5500;">${verificationCode}</h1>
+          <p>This code expires in 15 minutes.</p>
+          <p>Questions? We're here to help.</p>
+        `;
+
+        const response = await fetch("https://api.resend.com/emails", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${resendApiKey}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            from: `${hubName} <noreply@${getHubDomain(signupData.hub_id)}>`,
+            to: [signupData.email],
+            subject: `Your ${hubName} Verification Code`,
+            html: emailHtml,
+          }),
+        });
+
+        if (response.ok) {
+          console.log("✅ Email sent successfully to:", signupData.email);
+        } else {
+          console.error("❌ Resend API failed:", await response.text());
+        }
+      } catch (emailError) {
+        console.error("❌ Error sending email:", emailError);
+      }
+    } else {
+      console.log("⚠️ RESEND_API_KEY not configured");
+      console.log("📧 Email would be sent to:", signupData.email);
+      console.log("🔑 Verification code:", verificationCode);
+    }
+  }
+}
 
 function getHubName(hubId: number): string {
   const hubNames: Record<number, string> = {

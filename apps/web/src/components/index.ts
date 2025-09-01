@@ -2,8 +2,10 @@
 
 // Shared components - imported from @sms-hub/ui
 export {
-  Footer,
   ErrorBoundary,
   FormFieldComponent,
   FormContainerComponent,
 } from "@sms-hub/ui";
+
+// Local components
+export { default as Footer } from "./Footer";

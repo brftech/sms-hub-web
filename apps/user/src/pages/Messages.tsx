@@ -10,20 +10,18 @@ import {
   Clock,
   Eye,
   RefreshCw,
-  Filter
 } from 'lucide-react'
 import { useMessages } from '@sms-hub/supabase/react'
-import type { Message } from '@sms-hub/types'
 
 export function Messages() {
-  const { hubConfig, currentHub } = useHub()
+  const { currentHub } = useHub()
   const { data: messages = [] } = useMessages()
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
   const [typeFilter, setTypeFilter] = useState("all")
 
   // Filter messages based on search and filters
-  const filteredMessages = messages.filter(message => {
+  const filteredMessages = messages.filter((message: any) => {
     const matchesSearch = message.content?.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          message.recipient_phone_number?.includes(searchQuery)
     const matchesStatus = statusFilter === "all" || message.status === statusFilter
@@ -34,12 +32,12 @@ export function Messages() {
   // Calculate stats
   const stats = {
     total: messages.length,
-    sent: messages.filter(m => m.status === 'sent').length,
-    delivered: messages.filter(m => m.status === 'delivered').length,
-    failed: messages.filter(m => m.status === 'failed').length,
-    pending: messages.filter(m => m.status === 'pending').length,
-    sms: messages.filter(m => m.message_type === 'sms').length,
-    mms: messages.filter(m => m.message_type === 'mms').length
+    sent: messages.filter((m: any) => m.status === 'sent').length,
+    delivered: messages.filter((m: any) => m.status === 'delivered').length,
+    failed: messages.filter((m: any) => m.status === 'failed').length,
+    pending: messages.filter((m: any) => m.status === 'pending').length,
+    sms: messages.filter((m: any) => m.message_type === 'sms').length,
+    mms: messages.filter((m: any) => m.message_type === 'mms').length
   }
 
   const getStatusColor = (status: string) => {
@@ -251,7 +249,7 @@ export function Messages() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredMessages.map((message) => (
+              {filteredMessages.map((message: any) => (
                 <tr key={message.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4">
                     <div className="max-w-xs">

@@ -1,6 +1,8 @@
 import { Routes, Route } from "react-router-dom";
 import { Dashboard } from "./pages/Dashboard";
 import { Onboarding } from "./pages/onboarding/Onboarding";
+import { PaymentCallback } from "./pages/onboarding/PaymentCallback";
+import { BusinessInfoStep } from "./pages/onboarding/steps/BusinessInfoStep";
 import { Login } from "./pages/Login";
 import { Signup } from "./pages/Signup";
 import { Verify } from "./pages/Verify";
@@ -23,7 +25,9 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/payment-required" element={<PaymentRequired />} />
         <Route path="/payment-success" element={<PaymentSuccess />} />
+        <Route path="/payment-callback" element={<PaymentCallback />} />
         <Route path="/onboarding" element={<Onboarding />} />
+        <Route path="/onboarding/business" element={<BusinessInfoStep />} />
         <Route path="/" element={
           <ProtectedRoute>
             <Layout />

@@ -120,6 +120,9 @@ export type Database = {
       }
       brands: {
         Row: {
+          alternate_business_id: string | null
+          alternate_business_id_type: string | null
+          brand_relationship: string | null
           company_id: string
           created_at: string | null
           dba_brand_name: string | null
@@ -127,10 +130,18 @@ export type Database = {
           id: string
           name: string
           status: string | null
+          stock_symbol: string | null
+          tcr_approval_date: string | null
           tcr_brand_id: string | null
+          tcr_rejection_reason: string | null
+          tcr_submission_date: string | null
           updated_at: string | null
+          vertical_type: string | null
         }
         Insert: {
+          alternate_business_id?: string | null
+          alternate_business_id_type?: string | null
+          brand_relationship?: string | null
           company_id: string
           created_at?: string | null
           dba_brand_name?: string | null
@@ -138,10 +149,18 @@ export type Database = {
           id?: string
           name: string
           status?: string | null
+          stock_symbol?: string | null
+          tcr_approval_date?: string | null
           tcr_brand_id?: string | null
+          tcr_rejection_reason?: string | null
+          tcr_submission_date?: string | null
           updated_at?: string | null
+          vertical_type?: string | null
         }
         Update: {
+          alternate_business_id?: string | null
+          alternate_business_id_type?: string | null
+          brand_relationship?: string | null
           company_id?: string
           created_at?: string | null
           dba_brand_name?: string | null
@@ -149,8 +168,13 @@ export type Database = {
           id?: string
           name?: string
           status?: string | null
+          stock_symbol?: string | null
+          tcr_approval_date?: string | null
           tcr_brand_id?: string | null
+          tcr_rejection_reason?: string | null
+          tcr_submission_date?: string | null
           updated_at?: string | null
+          vertical_type?: string | null
         }
         Relationships: [
           {
@@ -207,34 +231,121 @@ export type Database = {
       }
       campaigns: {
         Row: {
+          affiliate_marketing: boolean | null
+          age_gated: boolean | null
           brand_id: string
+          call_to_action: string | null
+          content_type: string | null
           created_at: string | null
+          description: string | null
+          direct_lending: boolean | null
+          embedded_link: boolean | null
+          embedded_phone: boolean | null
+          help_message: string | null
           hub_id: number
           id: string
+          message_flow: string | null
+          message_samples: Json | null
+          monthly_volume: number | null
           name: string
+          number_pool: boolean | null
+          opt_in_message: string | null
+          opt_out_message: string | null
+          sample_1: string | null
+          sample_2: string | null
+          sample_3: string | null
+          sample_4: string | null
+          sample_5: string | null
           status: string | null
+          sub_use_cases: Json | null
+          subscriber_count: number | null
+          subscriber_help: string | null
+          subscriber_optin: string | null
+          subscriber_optout: string | null
+          tcr_approval_date: string | null
           tcr_campaign_id: string | null
+          tcr_rejection_reason: string | null
+          tcr_submission_date: string | null
           updated_at: string | null
+          use_case: string | null
         }
         Insert: {
+          affiliate_marketing?: boolean | null
+          age_gated?: boolean | null
           brand_id: string
+          call_to_action?: string | null
+          content_type?: string | null
           created_at?: string | null
+          description?: string | null
+          direct_lending?: boolean | null
+          embedded_link?: boolean | null
+          embedded_phone?: boolean | null
+          help_message?: string | null
           hub_id: number
           id?: string
+          message_flow?: string | null
+          message_samples?: Json | null
+          monthly_volume?: number | null
           name: string
+          number_pool?: boolean | null
+          opt_in_message?: string | null
+          opt_out_message?: string | null
+          sample_1?: string | null
+          sample_2?: string | null
+          sample_3?: string | null
+          sample_4?: string | null
+          sample_5?: string | null
           status?: string | null
+          sub_use_cases?: Json | null
+          subscriber_count?: number | null
+          subscriber_help?: string | null
+          subscriber_optin?: string | null
+          subscriber_optout?: string | null
+          tcr_approval_date?: string | null
           tcr_campaign_id?: string | null
+          tcr_rejection_reason?: string | null
+          tcr_submission_date?: string | null
           updated_at?: string | null
+          use_case?: string | null
         }
         Update: {
+          affiliate_marketing?: boolean | null
+          age_gated?: boolean | null
           brand_id?: string
+          call_to_action?: string | null
+          content_type?: string | null
           created_at?: string | null
+          description?: string | null
+          direct_lending?: boolean | null
+          embedded_link?: boolean | null
+          embedded_phone?: boolean | null
+          help_message?: string | null
           hub_id?: number
           id?: string
+          message_flow?: string | null
+          message_samples?: Json | null
+          monthly_volume?: number | null
           name?: string
+          number_pool?: boolean | null
+          opt_in_message?: string | null
+          opt_out_message?: string | null
+          sample_1?: string | null
+          sample_2?: string | null
+          sample_3?: string | null
+          sample_4?: string | null
+          sample_5?: string | null
           status?: string | null
+          sub_use_cases?: Json | null
+          subscriber_count?: number | null
+          subscriber_help?: string | null
+          subscriber_optin?: string | null
+          subscriber_optout?: string | null
+          tcr_approval_date?: string | null
           tcr_campaign_id?: string | null
+          tcr_rejection_reason?: string | null
+          tcr_submission_date?: string | null
           updated_at?: string | null
+          use_case?: string | null
         }
         Relationships: [
           {
@@ -255,6 +366,8 @@ export type Database = {
       }
       companies: {
         Row: {
+          account_onboarding_step: string | null
+          account_setup_completed_at: string | null
           address: string | null
           address_street: string | null
           billing_address: Json | null
@@ -265,28 +378,49 @@ export type Database = {
           country_of_registration: string | null
           created_at: string | null
           created_by_profile_id: string | null
+          created_by_user_id: string | null
+          customer_id: string | null
           ein: string | null
+          first_admin_user_id: string | null
+          gphone_procured_at: string | null
           hub_id: number
           id: string
           industry: string | null
           is_active: boolean | null
           legal_form: string | null
           legal_name: string | null
+          phone_number_provisioned: boolean | null
+          phone_number_provisioned_at: string | null
+          platform_access_granted: boolean | null
+          platform_access_granted_at: string | null
           point_of_contact_email: string | null
           postal_code: string | null
+          privacy_policies_verified: boolean | null
+          privacy_policies_verified_at: string | null
+          privacy_policy_accepted_at: string | null
+          privacy_policy_version: string | null
           public_name: string
+          signup_type: string | null
           size: string | null
           state_region: string | null
-          stripe_customer_id: string | null
-          stripe_subscription_id: string | null
-          subscription_status: string | null
-          subscription_tier: string | null
           tax_issuing_country: string | null
+          tcr_brand_approved_at: string | null
+          tcr_brand_rejected_at: string | null
+          tcr_brand_rejection_reason: string | null
+          tcr_brand_submitted_at: string | null
+          tcr_campaign_approved_at: string | null
+          tcr_campaign_rejected_at: string | null
+          tcr_campaign_rejection_reason: string | null
+          tcr_campaign_submitted_at: string | null
           updated_at: string | null
+          verification_setup_completed: boolean | null
+          verification_setup_completed_at: string | null
           vertical_type: string | null
           website: string | null
         }
         Insert: {
+          account_onboarding_step?: string | null
+          account_setup_completed_at?: string | null
           address?: string | null
           address_street?: string | null
           billing_address?: Json | null
@@ -297,28 +431,49 @@ export type Database = {
           country_of_registration?: string | null
           created_at?: string | null
           created_by_profile_id?: string | null
+          created_by_user_id?: string | null
+          customer_id?: string | null
           ein?: string | null
+          first_admin_user_id?: string | null
+          gphone_procured_at?: string | null
           hub_id: number
           id?: string
           industry?: string | null
           is_active?: boolean | null
           legal_form?: string | null
           legal_name?: string | null
+          phone_number_provisioned?: boolean | null
+          phone_number_provisioned_at?: string | null
+          platform_access_granted?: boolean | null
+          platform_access_granted_at?: string | null
           point_of_contact_email?: string | null
           postal_code?: string | null
+          privacy_policies_verified?: boolean | null
+          privacy_policies_verified_at?: string | null
+          privacy_policy_accepted_at?: string | null
+          privacy_policy_version?: string | null
           public_name: string
+          signup_type?: string | null
           size?: string | null
           state_region?: string | null
-          stripe_customer_id?: string | null
-          stripe_subscription_id?: string | null
-          subscription_status?: string | null
-          subscription_tier?: string | null
           tax_issuing_country?: string | null
+          tcr_brand_approved_at?: string | null
+          tcr_brand_rejected_at?: string | null
+          tcr_brand_rejection_reason?: string | null
+          tcr_brand_submitted_at?: string | null
+          tcr_campaign_approved_at?: string | null
+          tcr_campaign_rejected_at?: string | null
+          tcr_campaign_rejection_reason?: string | null
+          tcr_campaign_submitted_at?: string | null
           updated_at?: string | null
+          verification_setup_completed?: boolean | null
+          verification_setup_completed_at?: string | null
           vertical_type?: string | null
           website?: string | null
         }
         Update: {
+          account_onboarding_step?: string | null
+          account_setup_completed_at?: string | null
           address?: string | null
           address_street?: string | null
           billing_address?: Json | null
@@ -329,28 +484,68 @@ export type Database = {
           country_of_registration?: string | null
           created_at?: string | null
           created_by_profile_id?: string | null
+          created_by_user_id?: string | null
+          customer_id?: string | null
           ein?: string | null
+          first_admin_user_id?: string | null
+          gphone_procured_at?: string | null
           hub_id?: number
           id?: string
           industry?: string | null
           is_active?: boolean | null
           legal_form?: string | null
           legal_name?: string | null
+          phone_number_provisioned?: boolean | null
+          phone_number_provisioned_at?: string | null
+          platform_access_granted?: boolean | null
+          platform_access_granted_at?: string | null
           point_of_contact_email?: string | null
           postal_code?: string | null
+          privacy_policies_verified?: boolean | null
+          privacy_policies_verified_at?: string | null
+          privacy_policy_accepted_at?: string | null
+          privacy_policy_version?: string | null
           public_name?: string
+          signup_type?: string | null
           size?: string | null
           state_region?: string | null
-          stripe_customer_id?: string | null
-          stripe_subscription_id?: string | null
-          subscription_status?: string | null
-          subscription_tier?: string | null
           tax_issuing_country?: string | null
+          tcr_brand_approved_at?: string | null
+          tcr_brand_rejected_at?: string | null
+          tcr_brand_rejection_reason?: string | null
+          tcr_brand_submitted_at?: string | null
+          tcr_campaign_approved_at?: string | null
+          tcr_campaign_rejected_at?: string | null
+          tcr_campaign_rejection_reason?: string | null
+          tcr_campaign_submitted_at?: string | null
           updated_at?: string | null
+          verification_setup_completed?: boolean | null
+          verification_setup_completed_at?: string | null
           vertical_type?: string | null
           website?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "companies_created_by_user_id_fkey"
+            columns: ["created_by_user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "companies_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "companies_first_admin_user_id_fkey"
+            columns: ["first_admin_user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "companies_hub_id_fkey"
             columns: ["hub_id"]
@@ -416,6 +611,83 @@ export type Database = {
           },
           {
             foreignKeyName: "contacts_hub_id_fkey"
+            columns: ["hub_id"]
+            isOneToOne: false
+            referencedRelation: "hubs"
+            referencedColumns: ["hub_number"]
+          },
+        ]
+      }
+      customers: {
+        Row: {
+          billing_address: Json | null
+          billing_email: string
+          created_at: string | null
+          customer_type: string
+          hub_id: number
+          id: string
+          is_active: boolean | null
+          last_payment_amount: number | null
+          last_payment_at: string | null
+          metadata: Json | null
+          payment_method_brand: string | null
+          payment_method_last4: string | null
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          subscription_ends_at: string | null
+          subscription_status: string | null
+          subscription_tier: string | null
+          total_spent: number | null
+          trial_ends_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          billing_address?: Json | null
+          billing_email: string
+          created_at?: string | null
+          customer_type: string
+          hub_id: number
+          id?: string
+          is_active?: boolean | null
+          last_payment_amount?: number | null
+          last_payment_at?: string | null
+          metadata?: Json | null
+          payment_method_brand?: string | null
+          payment_method_last4?: string | null
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          subscription_ends_at?: string | null
+          subscription_status?: string | null
+          subscription_tier?: string | null
+          total_spent?: number | null
+          trial_ends_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          billing_address?: Json | null
+          billing_email?: string
+          created_at?: string | null
+          customer_type?: string
+          hub_id?: number
+          id?: string
+          is_active?: boolean | null
+          last_payment_amount?: number | null
+          last_payment_at?: string | null
+          metadata?: Json | null
+          payment_method_brand?: string | null
+          payment_method_last4?: string | null
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          subscription_ends_at?: string | null
+          subscription_status?: string | null
+          subscription_tier?: string | null
+          total_spent?: number | null
+          trial_ends_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customers_hub_id_fkey"
             columns: ["hub_id"]
             isOneToOne: false
             referencedRelation: "hubs"
@@ -505,6 +777,82 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      inboxes: {
+        Row: {
+          auto_reply_enabled: boolean | null
+          auto_reply_message: string | null
+          business_hours_enabled: boolean | null
+          business_hours_end: string | null
+          business_hours_start: string | null
+          company_id: string
+          created_at: string | null
+          hub_id: number
+          id: string
+          inbox_name: string
+          is_active: boolean | null
+          notification_preferences: Json | null
+          phone_number_id: string
+          timezone: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          auto_reply_enabled?: boolean | null
+          auto_reply_message?: string | null
+          business_hours_enabled?: boolean | null
+          business_hours_end?: string | null
+          business_hours_start?: string | null
+          company_id: string
+          created_at?: string | null
+          hub_id: number
+          id?: string
+          inbox_name: string
+          is_active?: boolean | null
+          notification_preferences?: Json | null
+          phone_number_id: string
+          timezone?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          auto_reply_enabled?: boolean | null
+          auto_reply_message?: string | null
+          business_hours_enabled?: boolean | null
+          business_hours_end?: string | null
+          business_hours_start?: string | null
+          company_id?: string
+          created_at?: string | null
+          hub_id?: number
+          id?: string
+          inbox_name?: string
+          is_active?: boolean | null
+          notification_preferences?: Json | null
+          phone_number_id?: string
+          timezone?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inboxes_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inboxes_hub_id_fkey"
+            columns: ["hub_id"]
+            isOneToOne: false
+            referencedRelation: "hubs"
+            referencedColumns: ["hub_number"]
+          },
+          {
+            foreignKeyName: "inboxes_phone_number_id_fkey"
+            columns: ["phone_number_id"]
+            isOneToOne: false
+            referencedRelation: "phone_numbers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       lead_activities: {
         Row: {
@@ -959,6 +1307,7 @@ export type Database = {
         Row: {
           assigned_to_campaign: string | null
           bandwidth_account_id: string | null
+          company_id: string | null
           created_at: string | null
           hub_id: number
           id: string
@@ -969,6 +1318,7 @@ export type Database = {
         Insert: {
           assigned_to_campaign?: string | null
           bandwidth_account_id?: string | null
+          company_id?: string | null
           created_at?: string | null
           hub_id: number
           id?: string
@@ -979,6 +1329,7 @@ export type Database = {
         Update: {
           assigned_to_campaign?: string | null
           bandwidth_account_id?: string | null
+          company_id?: string | null
           created_at?: string | null
           hub_id?: number
           id?: string
@@ -992,6 +1343,13 @@ export type Database = {
             columns: ["assigned_to_campaign"]
             isOneToOne: false
             referencedRelation: "campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "phone_numbers_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
             referencedColumns: ["id"]
           },
           {
@@ -1060,17 +1418,29 @@ export type Database = {
           company_name: string
           created_at: string | null
           email: string
+          existing_user_id: string | null
           expires_at: string
           first_name: string
           hub_id: number
           id: string
+          is_existing_user: boolean | null
           is_verified: boolean | null
           last_name: string
+          last_verification_attempt_at: string | null
+          marketing_consent: boolean | null
           max_attempts: number | null
           mobile_phone_number: string
+          onboarding_step: string | null
+          preferred_verification_method: string | null
+          privacy_policy_accepted_at: string | null
+          step_data: Json | null
           stripe_customer_id: string | null
+          terms_accepted_at: string | null
+          user_created_at: string | null
           verification_attempts: number | null
           verification_code: string | null
+          verification_completed_at: string | null
+          verification_sent_at: string | null
           verified_at: string | null
         }
         Insert: {
@@ -1078,17 +1448,29 @@ export type Database = {
           company_name: string
           created_at?: string | null
           email: string
+          existing_user_id?: string | null
           expires_at?: string
           first_name: string
           hub_id: number
           id?: string
+          is_existing_user?: boolean | null
           is_verified?: boolean | null
           last_name: string
+          last_verification_attempt_at?: string | null
+          marketing_consent?: boolean | null
           max_attempts?: number | null
           mobile_phone_number: string
+          onboarding_step?: string | null
+          preferred_verification_method?: string | null
+          privacy_policy_accepted_at?: string | null
+          step_data?: Json | null
           stripe_customer_id?: string | null
+          terms_accepted_at?: string | null
+          user_created_at?: string | null
           verification_attempts?: number | null
           verification_code?: string | null
+          verification_completed_at?: string | null
+          verification_sent_at?: string | null
           verified_at?: string | null
         }
         Update: {
@@ -1096,20 +1478,39 @@ export type Database = {
           company_name?: string
           created_at?: string | null
           email?: string
+          existing_user_id?: string | null
           expires_at?: string
           first_name?: string
           hub_id?: number
           id?: string
+          is_existing_user?: boolean | null
           is_verified?: boolean | null
           last_name?: string
+          last_verification_attempt_at?: string | null
+          marketing_consent?: boolean | null
           max_attempts?: number | null
           mobile_phone_number?: string
+          onboarding_step?: string | null
+          preferred_verification_method?: string | null
+          privacy_policy_accepted_at?: string | null
+          step_data?: Json | null
           stripe_customer_id?: string | null
+          terms_accepted_at?: string | null
+          user_created_at?: string | null
           verification_attempts?: number | null
           verification_code?: string | null
+          verification_completed_at?: string | null
+          verification_sent_at?: string | null
           verified_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "temp_signups_existing_user_id_fkey"
+            columns: ["existing_user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "temp_signups_hub_id_fkey"
             columns: ["hub_id"]
@@ -1119,66 +1520,316 @@ export type Database = {
           },
         ]
       }
-      user_profiles: {
+      user_inbox_assignments: {
         Row: {
-          account_number: string
-          company_id: string | null
+          assigned_at: string | null
+          assigned_by_user_id: string | null
+          company_id: string
+          created_at: string | null
+          hub_id: number
+          id: string
+          inbox_id: string
+          is_active: boolean | null
+          permissions: Json | null
+          role: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          assigned_at?: string | null
+          assigned_by_user_id?: string | null
+          company_id: string
+          created_at?: string | null
+          hub_id: number
+          id?: string
+          inbox_id: string
+          is_active?: boolean | null
+          permissions?: Json | null
+          role?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          assigned_at?: string | null
+          assigned_by_user_id?: string | null
+          company_id?: string
+          created_at?: string | null
+          hub_id?: number
+          id?: string
+          inbox_id?: string
+          is_active?: boolean | null
+          permissions?: Json | null
+          role?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_inbox_assignments_assigned_by_user_id_fkey"
+            columns: ["assigned_by_user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_inbox_assignments_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_inbox_assignments_hub_id_fkey"
+            columns: ["hub_id"]
+            isOneToOne: false
+            referencedRelation: "hubs"
+            referencedColumns: ["hub_number"]
+          },
+          {
+            foreignKeyName: "user_inbox_assignments_inbox_id_fkey"
+            columns: ["inbox_id"]
+            isOneToOne: false
+            referencedRelation: "inboxes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_inbox_assignments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_invitations: {
+        Row: {
+          accepted_at: string | null
+          company_id: string
           created_at: string | null
           email: string
+          expires_at: string
           first_name: string | null
           hub_id: number
           id: string
-          is_active: boolean | null
+          invitation_token: string
+          invited_by_user_id: string
           last_name: string | null
-          lead_id: string | null
-          mobile_phone_number: string | null
-          onboarding_data: Json | null
-          onboarding_step: string | null
-          payment_date: string | null
-          payment_status: string | null
-          role: Database["public"]["Enums"]["user_role"] | null
-          stripe_session_id: string | null
+          permissions: Json | null
+          role: string | null
+          status: string | null
           updated_at: string | null
         }
         Insert: {
-          account_number: string
-          company_id?: string | null
+          accepted_at?: string | null
+          company_id: string
           created_at?: string | null
           email: string
+          expires_at?: string
           first_name?: string | null
           hub_id: number
-          id: string
-          is_active?: boolean | null
+          id?: string
+          invitation_token: string
+          invited_by_user_id: string
           last_name?: string | null
-          lead_id?: string | null
-          mobile_phone_number?: string | null
-          onboarding_data?: Json | null
-          onboarding_step?: string | null
-          payment_date?: string | null
-          payment_status?: string | null
-          role?: Database["public"]["Enums"]["user_role"] | null
-          stripe_session_id?: string | null
+          permissions?: Json | null
+          role?: string | null
+          status?: string | null
           updated_at?: string | null
         }
         Update: {
-          account_number?: string
-          company_id?: string | null
+          accepted_at?: string | null
+          company_id?: string
           created_at?: string | null
           email?: string
+          expires_at?: string
           first_name?: string | null
           hub_id?: number
           id?: string
-          is_active?: boolean | null
+          invitation_token?: string
+          invited_by_user_id?: string
           last_name?: string | null
+          permissions?: Json | null
+          role?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_invitations_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_invitations_hub_id_fkey"
+            columns: ["hub_id"]
+            isOneToOne: false
+            referencedRelation: "hubs"
+            referencedColumns: ["hub_number"]
+          },
+          {
+            foreignKeyName: "user_invitations_invited_by_user_id_fkey"
+            columns: ["invited_by_user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_profiles: {
+        Row: {
+          account_number: string
+          account_onboarding_step: string | null
+          account_setup_completed_at: string | null
+          company_admin: boolean | null
+          company_admin_since: string | null
+          company_id: string | null
+          company_name: string | null
+          created_at: string | null
+          customer_id: string | null
+          email: string
+          first_name: string | null
+          gphone_procured_at: string | null
+          hub_id: number
+          id: string
+          invitation_accepted_at: string | null
+          invited_by_user_id: string | null
+          is_active: boolean | null
+          is_individual_customer: boolean | null
+          last_login_method: string | null
+          last_name: string | null
+          last_payment_attempt_at: string | null
+          lead_id: string | null
+          mobile_phone_number: string | null
+          onboarding_completed_at: string | null
+          onboarding_data: Json | null
+          onboarding_step: string | null
+          payment_date: string | null
+          payment_failure_reason: string | null
+          payment_status: string | null
+          platform_onboarding_started_at: string | null
+          platform_onboarding_step: string | null
+          pre_onboarding_completed: boolean | null
+          pre_onboarding_completed_at: string | null
+          role: Database["public"]["Enums"]["user_role"] | null
+          signup_type: string | null
+          stripe_session_id: string | null
+          tcr_brand_approved_at: string | null
+          tcr_brand_rejected_at: string | null
+          tcr_brand_rejection_reason: string | null
+          tcr_brand_submitted_at: string | null
+          tcr_campaign_approved_at: string | null
+          tcr_campaign_rejected_at: string | null
+          tcr_campaign_rejection_reason: string | null
+          tcr_campaign_submitted_at: string | null
+          updated_at: string | null
+          verification_recommendation_shown: boolean | null
+          verification_recommendation_shown_at: string | null
+          verification_setup_completed: boolean | null
+          verification_setup_completed_at: string | null
+        }
+        Insert: {
+          account_number: string
+          account_onboarding_step?: string | null
+          account_setup_completed_at?: string | null
+          company_admin?: boolean | null
+          company_admin_since?: string | null
+          company_id?: string | null
+          company_name?: string | null
+          created_at?: string | null
+          customer_id?: string | null
+          email: string
+          first_name?: string | null
+          gphone_procured_at?: string | null
+          hub_id: number
+          id: string
+          invitation_accepted_at?: string | null
+          invited_by_user_id?: string | null
+          is_active?: boolean | null
+          is_individual_customer?: boolean | null
+          last_login_method?: string | null
+          last_name?: string | null
+          last_payment_attempt_at?: string | null
           lead_id?: string | null
           mobile_phone_number?: string | null
+          onboarding_completed_at?: string | null
           onboarding_data?: Json | null
           onboarding_step?: string | null
           payment_date?: string | null
+          payment_failure_reason?: string | null
           payment_status?: string | null
+          platform_onboarding_started_at?: string | null
+          platform_onboarding_step?: string | null
+          pre_onboarding_completed?: boolean | null
+          pre_onboarding_completed_at?: string | null
           role?: Database["public"]["Enums"]["user_role"] | null
+          signup_type?: string | null
           stripe_session_id?: string | null
+          tcr_brand_approved_at?: string | null
+          tcr_brand_rejected_at?: string | null
+          tcr_brand_rejection_reason?: string | null
+          tcr_brand_submitted_at?: string | null
+          tcr_campaign_approved_at?: string | null
+          tcr_campaign_rejected_at?: string | null
+          tcr_campaign_rejection_reason?: string | null
+          tcr_campaign_submitted_at?: string | null
           updated_at?: string | null
+          verification_recommendation_shown?: boolean | null
+          verification_recommendation_shown_at?: string | null
+          verification_setup_completed?: boolean | null
+          verification_setup_completed_at?: string | null
+        }
+        Update: {
+          account_number?: string
+          account_onboarding_step?: string | null
+          account_setup_completed_at?: string | null
+          company_admin?: boolean | null
+          company_admin_since?: string | null
+          company_id?: string | null
+          company_name?: string | null
+          created_at?: string | null
+          customer_id?: string | null
+          email?: string
+          first_name?: string | null
+          gphone_procured_at?: string | null
+          hub_id?: number
+          id?: string
+          invitation_accepted_at?: string | null
+          invited_by_user_id?: string | null
+          is_active?: boolean | null
+          is_individual_customer?: boolean | null
+          last_login_method?: string | null
+          last_name?: string | null
+          last_payment_attempt_at?: string | null
+          lead_id?: string | null
+          mobile_phone_number?: string | null
+          onboarding_completed_at?: string | null
+          onboarding_data?: Json | null
+          onboarding_step?: string | null
+          payment_date?: string | null
+          payment_failure_reason?: string | null
+          payment_status?: string | null
+          platform_onboarding_started_at?: string | null
+          platform_onboarding_step?: string | null
+          pre_onboarding_completed?: boolean | null
+          pre_onboarding_completed_at?: string | null
+          role?: Database["public"]["Enums"]["user_role"] | null
+          signup_type?: string | null
+          stripe_session_id?: string | null
+          tcr_brand_approved_at?: string | null
+          tcr_brand_rejected_at?: string | null
+          tcr_brand_rejection_reason?: string | null
+          tcr_brand_submitted_at?: string | null
+          tcr_campaign_approved_at?: string | null
+          tcr_campaign_rejected_at?: string | null
+          tcr_campaign_rejection_reason?: string | null
+          tcr_campaign_submitted_at?: string | null
+          updated_at?: string | null
+          verification_recommendation_shown?: boolean | null
+          verification_recommendation_shown_at?: string | null
+          verification_setup_completed?: boolean | null
+          verification_setup_completed_at?: string | null
         }
         Relationships: [
           {
@@ -1189,11 +1840,25 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "user_profiles_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "user_profiles_hub_id_fkey"
             columns: ["hub_id"]
             isOneToOne: false
             referencedRelation: "hubs"
             referencedColumns: ["hub_number"]
+          },
+          {
+            foreignKeyName: "user_profiles_invited_by_user_id_fkey"
+            columns: ["invited_by_user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "user_profiles_lead_id_fkey"

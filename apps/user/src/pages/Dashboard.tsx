@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { useHub } from "@sms-hub/ui";
 import {
   MessageSquare,
@@ -6,18 +7,12 @@ import {
   CheckCircle,
   Settings,
   Send,
-  Activity,
   Phone,
-  Mail,
   Building,
   ArrowRight,
   BarChart3,
-  FileText,
   Plus,
   Upload,
-  Clock,
-  Eye,
-  RefreshCw,
   Zap
 } from "lucide-react";
 import { 
@@ -30,24 +25,48 @@ import {
 } from "@sms-hub/supabase/react";
 import { Link } from "react-router-dom";
 import { OnboardingTracker } from "../components/OnboardingTracker";
+import { InfoGatheringModal } from "../components/InfoGatheringModal";
+import { VerificationRecommendation, VerificationRecommendationCompact } from "../components/VerificationRecommendation";
+import { SubscriptionStatus } from "../components/SubscriptionStatus";
+import { useCustomerByCompany } from "@sms-hub/supabase";
 
 export function Dashboard() {
   const { hubConfig, currentHub } = useHub()
-  const { data: userProfile } = useUserProfile()
-  const { data: company } = useCurrentUserCompany()
+  const { data: userProfile, refetch: refetchProfile } = useUserProfile()
+  const { data: company, refetch: refetchCompany } = useCurrentUserCompany()
+  const { data: customer } = useCustomerByCompany(company?.id || null)
   const { data: onboardingSubmission } = useOnboardingSubmission(company?.id || "", hubConfig.hubNumber)
   const { data: campaigns } = useCurrentUserCampaigns()
   const { data: brands } = useBrands(company?.id || "")
   const { data: phoneNumbers } = useCurrentUserPhoneNumbers()
+  const [showInfoGathering, setShowInfoGathering] = useState(false)
   
-  // Check if onboarding is complete
+  // Check if profile is complete (has name and company)
+  const isProfileComplete = !!(
+    userProfile?.first_name &&
+    userProfile?.last_name &&
+    userProfile?.company_id
+  )
+  
+  // Show info gathering modal if profile is incomplete
+  useEffect(() => {
+    if (userProfile && !isProfileComplete) {
+      setShowInfoGathering(true)
+    }
+  }, [userProfile, isProfileComplete])
+  
+  // Check if onboarding is complete (all 10 steps)
   const isOnboardingComplete = !!(
-    company?.stripe_subscription_id &&
-    brands?.some(b => b.status === 'approved') &&
-    company?.privacy_policy_accepted_at &&
-    campaigns?.some(c => c.status === 'approved') &&
-    company?.phone_number_provisioned &&
-    company?.platform_access_granted
+    userProfile?.id && // Auth
+    customer?.stripe_subscription_id && customer?.subscription_status === 'active' && // Payment
+    isProfileComplete && // Personal Info
+    company?.legal_name && company?.ein && // Business Info
+    brands?.some(b => b.status === 'approved') && // Brand
+    company?.privacy_policy_accepted_at && // Privacy
+    campaigns?.some(c => c.status === 'approved') && // Campaign
+    company?.phone_number_provisioned && // gPhone
+    company?.account_setup_completed_at && // Account Setup
+    company?.platform_access_granted // Platform Access
   )
 
   // Mock data for demonstration
@@ -123,8 +142,24 @@ export function Dashboard() {
     }
   ]
 
+  const handleInfoGatheringComplete = () => {
+    setShowInfoGathering(false)
+    // Refetch profile and company data
+    refetchProfile()
+    refetchCompany()
+  }
+  
   return (
     <div className="space-y-6 p-6">
+      {/* Info Gathering Modal */}
+      {userProfile && (
+        <InfoGatheringModal
+          isOpen={showInfoGathering}
+          onComplete={handleInfoGatheringComplete}
+          userProfile={userProfile}
+          signupType={(userProfile?.signup_type as 'new_company' | 'invited_user') || 'new_company'}
+        />
+      )}
       {/* Page Header */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900">
@@ -132,11 +167,19 @@ export function Dashboard() {
         </h1>
         <p className="mt-1 text-sm text-gray-500">
           {isOnboardingComplete 
-            ? `Welcome back, ${userProfile?.first_name}! Here's what's happening with your ${currentHub} account.`
-            : `Hi ${userProfile?.first_name}, let's get your account set up and ready to send messages.`
+            ? `Welcome back${userProfile?.first_name ? ', ' + userProfile.first_name : ''}! Here's what's happening with your ${currentHub} account.`
+            : `Hi${userProfile?.first_name ? ' ' + userProfile.first_name : ''}, let's get your account set up and ready to send messages.`
           }
         </p>
       </div>
+
+      {/* Verification Recommendation for Legacy Users */}
+      {userProfile && !userProfile.verification_setup_completed && (
+        <VerificationRecommendation 
+          userProfile={userProfile}
+          onDismiss={() => refetchProfile()}
+        />
+      )}
 
       {/* Onboarding Tracker - Show prominently if not complete */}
       {!isOnboardingComplete && (
@@ -249,6 +292,11 @@ export function Dashboard() {
         </div>
       </div>
 
+      {/* Subscription Status - Show for all users */}
+      {company && (
+        <SubscriptionStatus />
+      )}
+
       {/* Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent Activity */}
@@ -335,18 +383,23 @@ export function Dashboard() {
       
       {/* Show compact onboarding tracker at bottom if complete */}
       {isOnboardingComplete && (
-        <div className="bg-green-50 border-l-4 border-green-400 p-4">
-          <div className="flex">
-            <div className="flex-shrink-0">
-              <CheckCircle className="h-5 w-5 text-green-400" />
-            </div>
-            <div className="ml-3">
-              <p className="text-sm text-green-700">
-                Onboarding complete! You have full access to all platform features.
-              </p>
+        <>
+          <div className="bg-green-50 border-l-4 border-green-400 p-4">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <CheckCircle className="h-5 w-5 text-green-400" />
+              </div>
+              <div className="ml-3">
+                <p className="text-sm text-green-700">
+                  Onboarding complete! You have full access to all platform features.
+                </p>
+              </div>
             </div>
           </div>
-        </div>
+          
+          {/* Compact verification recommendation for users who dismissed the main one */}
+          {userProfile && <VerificationRecommendationCompact userProfile={userProfile} />}
+        </>
       )}
     </div>
   );

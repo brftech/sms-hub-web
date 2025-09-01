@@ -16,6 +16,7 @@ interface CreateCheckoutData {
   priceId?: string;
   successUrl?: string;
   cancelUrl?: string;
+  customerType?: 'company' | 'individual';
 }
 
 serve(async (req) => {
@@ -41,7 +42,8 @@ serve(async (req) => {
       hubId,
       priceId = Deno.env.get("STRIPE_DEFAULT_PRICE_ID"),
       successUrl = `${req.headers.get("origin")}/onboarding?session_id={CHECKOUT_SESSION_ID}`,
-      cancelUrl = `${req.headers.get("origin")}/signup`
+      cancelUrl = `${req.headers.get("origin")}/signup`,
+      customerType = 'company'
     }: CreateCheckoutData = await req.json();
 
     if (!email) {
@@ -98,6 +100,7 @@ serve(async (req) => {
         user_id: userId || "",
         company_id: companyId || "",
         hub_id: hubId?.toString() || "",
+        customer_type: customerType,
       },
       subscription_data: {
         metadata: {
@@ -116,17 +119,86 @@ serve(async (req) => {
 
     console.log("✅ Checkout session created:", session.id);
 
-    // Update company with Stripe customer ID if we have companyId
-    if (companyId && customer.id) {
-      const { error: updateError } = await supabaseAdmin
-        .from("companies")
-        .update({ stripe_customer_id: customer.id })
-        .eq("id", companyId);
+    // Create or update customer record
+    const customerData = {
+      hub_id: hubId || 1,
+      customer_type: customerType,
+      stripe_customer_id: customer.id,
+      billing_email: email,
+      is_active: true,
+      metadata: {
+        stripe_session_id: session.id,
+        user_id: userId,
+        company_id: companyId
+      }
+    };
 
+    // Check if customer already exists
+    const { data: existingCustomer } = await supabaseAdmin
+      .from("customers")
+      .select("id")
+      .eq("stripe_customer_id", customer.id)
+      .single();
+
+    let customerId;
+    if (existingCustomer) {
+      // Update existing customer
+      const { data: updatedCustomer, error: updateError } = await supabaseAdmin
+        .from("customers")
+        .update(customerData)
+        .eq("id", existingCustomer.id)
+        .select("id")
+        .single();
+      
       if (updateError) {
-        console.error("⚠️ Failed to update company with Stripe customer ID:", updateError);
+        console.error("⚠️ Failed to update customer:", updateError);
       } else {
-        console.log("✅ Updated company with Stripe customer ID");
+        customerId = updatedCustomer.id;
+        console.log("✅ Updated customer record");
+      }
+    } else {
+      // Create new customer
+      const { data: newCustomer, error: createError } = await supabaseAdmin
+        .from("customers")
+        .insert(customerData)
+        .select("id")
+        .single();
+      
+      if (createError) {
+        console.error("⚠️ Failed to create customer:", createError);
+      } else {
+        customerId = newCustomer.id;
+        console.log("✅ Created customer record");
+      }
+    }
+
+    // Link customer to company or user
+    if (customerId) {
+      if (customerType === 'company' && companyId) {
+        const { error: linkError } = await supabaseAdmin
+          .from("companies")
+          .update({ customer_id: customerId })
+          .eq("id", companyId);
+        
+        if (linkError) {
+          console.error("⚠️ Failed to link customer to company:", linkError);
+        } else {
+          console.log("✅ Linked customer to company");
+        }
+      } else if (customerType === 'individual' && userId) {
+        const { error: linkError } = await supabaseAdmin
+          .from("user_profiles")
+          .update({ 
+            customer_id: customerId,
+            is_individual_customer: true 
+          })
+          .eq("id", userId);
+        
+        if (linkError) {
+          console.error("⚠️ Failed to link customer to user:", linkError);
+        } else {
+          console.log("✅ Linked customer to individual user");
+        }
       }
     }
 

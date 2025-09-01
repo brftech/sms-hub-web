@@ -1,8 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from './client'
 import { createAuthService } from './auth'
-
-const authService = createAuthService(supabase)
+import type { SupabaseClient } from './client'
 
 // Helper function to check if supabase client is available
 const getSupabaseClient = () => {
@@ -12,19 +11,24 @@ const getSupabaseClient = () => {
   return supabase
 }
 
+// Create auth service lazily to avoid initialization errors
+const getAuthService = () => {
+  return createAuthService(getSupabaseClient())
+}
+
 // Auth Queries
 export const useAuth = () => {
   const queryClient = useQueryClient()
   
   const userQuery = useQuery({
     queryKey: ['auth-user'],
-    queryFn: authService.getCurrentUserProfile,
+    queryFn: () => getAuthService().getCurrentUserProfile(),
     staleTime: 5 * 60 * 1000, // 5 minutes
   })
 
   const signInMutation = useMutation({
     mutationFn: ({ email, password }: { email: string; password: string }) => 
-      authService.signIn(email, password),
+      getAuthService().signIn(email, password),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['auth-user'] })
       queryClient.invalidateQueries({ queryKey: ['user-profile'] })
@@ -32,7 +36,7 @@ export const useAuth = () => {
   })
 
   const signOutMutation = useMutation({
-    mutationFn: authService.signOut,
+    mutationFn: () => getAuthService().signOut(),
     onSuccess: () => {
       queryClient.clear()
     },
@@ -50,7 +54,7 @@ export const useAuth = () => {
 export const useUserProfile = () => {
   return useQuery({
     queryKey: ['user-profile'],
-    queryFn: authService.getCurrentUserProfile,
+    queryFn: () => getAuthService().getCurrentUserProfile(),
     staleTime: 5 * 60 * 1000, // 5 minutes
   })
 }
@@ -190,7 +194,7 @@ export const useCreateTempSignup = () => {
   const queryClient = useQueryClient()
   
   return useMutation({
-    mutationFn: authService.createTempSignup,
+    mutationFn: (data: any) => getAuthService().createTempSignup(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['temp-signups'] })
     },
@@ -201,7 +205,7 @@ export const useVerifyCode = () => {
   const queryClient = useQueryClient()
   
   return useMutation({
-    mutationFn: authService.verifyCode,
+    mutationFn: (data: any) => getAuthService().verifyCode(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user-profile'] })
     },
@@ -573,6 +577,33 @@ export const useUpdateCompany = () => {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['company', data.id] })
       queryClient.invalidateQueries({ queryKey: ['companies'] })
+    },
+  })
+}
+
+// Update user profile mutation
+export const useUpdateProfile = () => {
+  const queryClient = useQueryClient()
+  
+  return useMutation({
+    mutationFn: async (data: {
+      id: string
+      [key: string]: any
+    }) => {
+      const client = getSupabaseClient()
+      const { data: result, error } = await client
+        .from('user_profiles')
+        .update(data)
+        .eq('id', data.id)
+        .select()
+        .single()
+
+      if (error) throw error
+      return result
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['user-profile'] })
+      queryClient.invalidateQueries({ queryKey: ['auth-user'] })
     },
   })
 }

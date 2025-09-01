@@ -89,11 +89,19 @@ export function Verify() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [verificationCode, setVerificationCode] = useState("");
+  const [signupData, setSignupData] = useState<any>(null);
   const tempSignupId = searchParams.get("id");
 
   useEffect(() => {
     if (!tempSignupId) {
       navigate("/signup");
+      return;
+    }
+    
+    // Load signup data from session storage
+    const storedData = sessionStorage.getItem('signup_data');
+    if (storedData) {
+      setSignupData(JSON.parse(storedData));
     }
   }, [tempSignupId, navigate]);
 
@@ -109,13 +117,14 @@ export function Verify() {
     setError("");
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/verify-code`, {
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/submit-verify`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
         },
         body: JSON.stringify({
+          action: "verify",
           temp_signup_id: tempSignupId,
           verification_code: verificationCode,
         }),
@@ -131,30 +140,36 @@ export function Verify() {
       setSuccess(true);
       
       // Handle session if provided
-      if (result.session) {
+      if (result.session || result.session_url) {
         const supabase = createSupabaseClient(
           import.meta.env.VITE_SUPABASE_URL,
           import.meta.env.VITE_SUPABASE_ANON_KEY
         );
-        const { error: sessionError } = await supabase.auth.setSession(result.session);
-        if (sessionError) {
-          console.error("Session error:", sessionError);
+        
+        // For login flow, we might get a session URL
+        if (result.session_url) {
+          window.location.href = result.session_url;
+          return;
+        }
+        
+        // For signup flow, set the session
+        if (result.session) {
+          const { error: sessionError } = await supabase.auth.setSession(result.session);
+          if (sessionError) {
+            console.error("Session error:", sessionError);
+          }
         }
       }
       
-      // Store account info for payment flow
-      if (result.account) {
-        localStorage.setItem("newAccount", JSON.stringify(result.account));
-      }
+      // Clear session storage
+      sessionStorage.removeItem('signup_data');
       
-      // Redirect to Stripe payment
+      // Redirect based on flow type
+      const isLogin = signupData?.isLogin || false;
+      const redirectPath = result.redirect || (isLogin ? "/dashboard" : "/onboarding");
+      
       setTimeout(() => {
-        navigate("/payment-required", {
-          state: {
-            account: result.account,
-            fromVerification: true,
-          },
-        });
+        navigate(redirectPath);
       }, 2000);
 
     } catch (err: any) {
@@ -166,8 +181,44 @@ export function Verify() {
   };
 
   const handleResend = async () => {
-    // TODO: Implement resend functionality
-    console.log("Resend code functionality to be implemented");
+    if (!tempSignupId || !signupData) {
+      setError("Unable to resend code. Please try signing up again.");
+      return;
+    }
+    
+    setIsSubmitting(true);
+    setError("");
+    
+    try {
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/submit-verify`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({
+          action: "send",
+          temp_signup_id: tempSignupId,
+          email: signupData.email,
+          mobile_phone_number: signupData.mobile_phone_number || signupData.phone,
+          auth_method: signupData.authMethod,
+          is_login: signupData.isLogin || false,
+        }),
+      });
+      
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to resend code");
+      }
+      
+      setError("");
+      alert("A new verification code has been sent!");
+    } catch (err: any) {
+      console.error("Resend error:", err);
+      setError(err.message || "Failed to resend code");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (success) {
@@ -176,12 +227,14 @@ export function Verify() {
         <VerifyCard>
           <CardContent className="text-center py-12">
             <CheckCircle className="w-16 h-16 text-green-600 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold mb-2">Account Verified!</h2>
+            <h2 className="text-2xl font-bold mb-2">{signupData?.isLogin ? "Login Successful!" : "Account Verified!"}</h2>
             <p className="text-gray-600 mb-4">
-              Your account has been successfully verified and you're now signed in.
+              {signupData?.isLogin 
+                ? "You have been successfully logged in." 
+                : "Your account has been successfully created and verified."}
             </p>
             <p className="text-sm text-gray-500">
-              Redirecting to payment setup...
+              {signupData?.isLogin ? "Redirecting to dashboard..." : "Redirecting to complete setup..."}
             </p>
           </CardContent>
         </VerifyCard>
@@ -201,7 +254,7 @@ export function Verify() {
             <LogoImage src={logoIcon} alt="Logo" />
             <CardTitle className="text-xl">Verify Your Account</CardTitle>
             <CardDescription className="text-sm">
-              Enter the 6-digit verification code sent to your phone
+              Enter the 6-digit verification code sent to your {signupData?.authMethod === "sms" ? "phone" : "email"}
             </CardDescription>
           </LogoSection>
         </CardHeader>

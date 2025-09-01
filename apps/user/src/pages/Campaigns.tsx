@@ -15,13 +15,12 @@ import {
   RefreshCw
 } from 'lucide-react'
 import { useCurrentUserCampaigns, useCurrentUserCompany, useBrands } from '@sms-hub/supabase/react'
-import type { Campaign } from '@sms-hub/types'
 
 export function Campaigns() {
-  const { hubConfig, currentHub } = useHub()
+  const { currentHub } = useHub()
   const { data: company } = useCurrentUserCompany()
   const { data: campaigns = [] } = useCurrentUserCampaigns()
-  const { data: brands = [] } = useBrands(company?.id || "")
+  useBrands(company?.id || "")
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
 
@@ -39,9 +38,9 @@ export function Campaigns() {
     active: campaigns.filter(c => c.status === 'active').length,
     paused: campaigns.filter(c => c.status === 'paused').length,
     completed: campaigns.filter(c => c.status === 'completed').length,
-    totalMessages: campaigns.reduce((acc, c) => acc + (c.metadata?.message_count || 0), 0),
+    totalMessages: campaigns.reduce((acc, c) => acc + ((c as any).metadata?.message_count || 0), 0),
     deliveryRate: campaigns.length > 0 ? 
-      campaigns.reduce((acc, c) => acc + (c.metadata?.delivery_rate || 0), 0) / campaigns.length : 0
+      campaigns.reduce((acc, c) => acc + ((c as any).metadata?.delivery_rate || 0), 0) / campaigns.length : 0
   }
 
   const getStatusColor = (status: string) => {
@@ -217,10 +216,10 @@ export function Campaigns() {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {(campaign.metadata?.message_count || 0).toLocaleString()}
+                    {((campaign as any).metadata?.message_count || 0).toLocaleString()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {(campaign.metadata?.delivery_rate || 0).toFixed(1)}%
+                    {((campaign as any).metadata?.delivery_rate || 0).toFixed(1)}%
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {campaign.created_at ? new Date(campaign.created_at).toLocaleDateString() : 'Unknown'}

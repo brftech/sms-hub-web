@@ -41,16 +41,25 @@ export function Onboarding() {
   // Initialize company and submission
   useEffect(() => {
     if (user && !companyId) {
-      initializeOnboarding()
+      // Check if user already has a company
+      const existingCompanyId = user.company_id
+      if (existingCompanyId) {
+        setCompanyId(existingCompanyId)
+      } else {
+        initializeOnboarding()
+      }
     }
   }, [user, companyId])
 
-  // Set current step from submission
+  // Set current step from submission or check payment status
   useEffect(() => {
     if (submission) {
       setCurrentStep(submission.current_step as OnboardingStepName)
+    } else if (companyId && user) {
+      // If no submission but we have a company, start at payment
+      setCurrentStep('payment')
     }
-  }, [submission])
+  }, [submission, companyId, user])
 
   const initializeOnboarding = async () => {
     if (!user) return
@@ -122,7 +131,7 @@ export function Onboarding() {
     }
   }
 
-  if (userLoading || submissionLoading || !user || !submission) {
+  if (userLoading || submissionLoading || !user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -131,6 +140,11 @@ export function Onboarding() {
         </div>
       </div>
     )
+  }
+  
+  // If no submission exists and we have a company, create one for payment step
+  if (!submission && companyId && currentStep === 'payment') {
+    // User has company but no onboarding submission - they need to complete payment
   }
 
   const stepConfig = ONBOARDING_STEPS[currentStep]
@@ -143,7 +157,20 @@ export function Onboarding() {
       hubId: hubConfig.hubNumber,
       companyId,
       userId: user.id,
-      submission,
+      submission: submission || {
+        id: '',
+        company_id: companyId,
+        hub_id: hubConfig.hubNumber,
+        user_id: user.id,
+        current_step: currentStep,
+        step_data: {},
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        assigned_phone_number: null,
+        stripe_status: null,
+        tcr_brand_id: null,
+        tcr_campaign_id: null
+      },
       onComplete: handleStepComplete,
       onBack: currentStepIndex > 0 ? handleStepBack : undefined
     }

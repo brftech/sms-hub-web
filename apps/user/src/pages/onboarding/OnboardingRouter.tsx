@@ -127,19 +127,27 @@ export function OnboardingRouter() {
   }
   
   const renderStep = () => {
+    const stepProps = {
+      hubId: userProfile?.hub_id || 1,
+      companyId: company?.id || '',
+      userId: userProfile?.id || '',
+      submission: onboardingSubmission || {} as any,
+      onComplete: handleStepComplete
+    }
+    
     switch (currentStep) {
       case 'brand':
-        return <BrandStep onComplete={handleStepComplete} />
+        return <BrandStep {...stepProps} />
       case 'privacy':
-        return <PrivacyStep onComplete={handleStepComplete} />
+        return <PrivacyStep {...stepProps} />
       case 'campaign':
-        return <CampaignStep onComplete={handleStepComplete} />
+        return <CampaignStep {...stepProps} />
       case 'phone':
-        return <PhoneStep onComplete={handleStepComplete} />
+        return <PhoneStep {...stepProps} />
       case 'platform':
-        return <PlatformAccessStep onComplete={handleStepComplete} />
+        return <PlatformAccessStep {...stepProps} />
       default:
-        return <BrandStep onComplete={handleStepComplete} />
+        return <BrandStep {...stepProps} />
     }
   }
   

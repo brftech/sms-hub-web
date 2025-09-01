@@ -12,7 +12,7 @@ const navigation = [
 ]
 
 export function Layout() {
-  const { hubConfig, currentHub } = useHub()
+  const { hubConfig } = useHub()
   const { data: userProfile } = useUserProfile()
   const location = useLocation()
   const navigate = useNavigate()

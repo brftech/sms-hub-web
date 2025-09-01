@@ -79,6 +79,19 @@ export function VerifyCode() {
   };
 
   const handleVerify = async (verificationCode: string = code) => {
+    console.log("handleVerify called with:", { 
+      code: verificationCode, 
+      tempSignupId,
+      hasValidId: !!tempSignupId 
+    });
+    
+    if (!tempSignupId) {
+      console.error("No temp signup ID available!");
+      setError("Session expired. Please start over.");
+      setTimeout(() => navigate("/signup"), 2000);
+      return;
+    }
+    
     if (verificationCode.length !== 6) {
       setError("Please enter a 6-digit code");
       return;
@@ -94,13 +107,16 @@ export function VerifyCode() {
     console.log("Sending verification payload:", payload);
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/verify-code-simple`, {
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/submit-verify`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({
+          action: "verify",
+          ...payload
+        }),
       });
 
       const data = await response.json();
@@ -110,6 +126,14 @@ export function VerifyCode() {
         console.error("Verification failed:", data);
         throw new Error(data.error || "Verification failed");
       }
+
+      // Check the actual response structure
+      console.log("Response data structure:", {
+        hasAccount: !!data.account,
+        hasSuccess: !!data.success,
+        hasUser: !!data.user,
+        keys: Object.keys(data)
+      });
 
       setSuccess(true);
       
@@ -122,82 +146,73 @@ export function VerifyCode() {
         return;
       }
       
-      // Now create the actual account for new users
-      if (data.tempSignup) {
-        console.log("Creating account for verified signup...");
+      // Account is already created in submit-verify for new users
+      if (data.success) {
+        console.log("Verification successful, data:", data);
         
-        const accountResponse = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-account`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-          },
-          body: JSON.stringify({
-            temp_signup_id: tempSignupId,
-          }),
-        });
+        const accountData = data; // Use the response from submit-verify
         
-        const accountData = await accountResponse.json();
-        console.log("Account creation response:", accountData);
+        // Sign in the user using the magic link URL if provided
+        console.log("Attempting to sign in user...");
         
-        if (accountResponse.ok && accountData.success) {
-          // Try to sign in the user with OTP
-          console.log("Attempting to sign in user with OTP...");
+        if (data.session_url) {
+          // Extract the token from the magic link URL and sign in
           try {
-            const { data: signInData, error: signInError } = await supabase.auth.signInWithOtp({
-              email: data.tempSignup.email,
+            const url = new URL(data.session_url);
+            const token = url.searchParams.get('token');
+            const type = url.searchParams.get('type') || 'magiclink';
+            
+            if (token) {
+              const { data: signInData, error: signInError } = await supabase.auth.verifyOtp({
+                token_hash: token,
+                type: type as any,
+              });
+              
+              if (signInError) {
+                console.error("Magic link sign-in error:", signInError);
+                // Fallback: just redirect to the magic link URL
+                window.location.href = data.session_url;
+                return;
+              } else {
+                console.log("User signed in successfully:", signInData);
+              }
+            }
+          } catch (error) {
+            console.error("Error processing magic link:", error);
+            // Fallback: redirect to magic link
+            window.location.href = data.session_url;
+            return;
+          }
+        } else {
+          // If no magic link, try to sign in with OTP
+          console.log("No magic link provided, trying OTP sign-in...");
+          try {
+            const { error: otpError } = await supabase.auth.signInWithOtp({
+              email: data.user?.email || data.tempSignup.email,
               options: {
-                shouldCreateUser: false, // User already exists
+                shouldCreateUser: false,
               }
             });
             
-            if (signInError) {
-              console.error("OTP sign-in error:", signInError);
-            } else {
-              console.log("OTP sent successfully:", signInData);
+            if (otpError) {
+              console.error("OTP sign-in error:", otpError);
             }
-          } catch (otpError) {
-            console.error("Failed to send OTP:", otpError);
+          } catch (authError) {
+            console.error("Failed to send OTP:", authError);
           }
+        }
           
-          // Now create Stripe checkout session
-          console.log("Creating Stripe checkout session...");
+          // Skip Stripe for now - just go to dashboard
+          console.log("Account created and user signed in, redirecting to dashboard...");
           
-          const checkoutResponse = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-checkout-session`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-            },
-            body: JSON.stringify({
-              email: data.tempSignup.email,
-              userId: accountData.account?.userId,
-              companyId: accountData.account?.companyId,
-              hubId: data.tempSignup.hub_id,
-            }),
-          });
-          
-          const checkoutData = await checkoutResponse.json();
-          console.log("Checkout session response:", checkoutData);
-          
-          if (checkoutResponse.ok && checkoutData.success && checkoutData.url) {
-            // Redirect to Stripe Checkout
-            setTimeout(() => {
-              window.location.href = checkoutData.url;
-            }, 2000);
-          } else {
-            // If checkout fails, still go to dashboard
-            console.error("Checkout session creation failed:", checkoutData.error);
-            setTimeout(() => {
-              navigate("/");
-            }, 2000);
-          }
-        } else {
-          setError(accountData.error || "Failed to create account");
-          setSuccess(false);
+          // Give the auth session a moment to establish
+          setTimeout(() => {
+            navigate("/dashboard");
+          }, 1500);
         }
       }
     } catch (err: any) {
+      console.error("Error in handleVerify:", err);
       setError(err.message || "Invalid verification code");
       setCode("");
     } finally {
@@ -259,7 +274,7 @@ export function VerifyCode() {
             <p className="text-sm text-gray-500">
               {isExistingUser 
                 ? "Redirecting to login..."
-                : "Redirecting to complete payment setup..."
+                : "Redirecting to your dashboard..."
               }
             </p>
           </CardContent>

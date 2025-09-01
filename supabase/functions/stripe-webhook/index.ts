@@ -40,14 +40,37 @@ serve(async (req) => {
         const session = event.data.object as Stripe.Checkout.Session;
         console.log("✅ Checkout completed:", session.id);
         
-        // Update company with subscription info
+        // Get the subscription details
+        const subscription = await stripe.subscriptions.retrieve(
+          session.subscription as string
+        );
+        
+        // Update the customer record with subscription info
+        const { data: customer } = await supabaseAdmin
+          .from("customers")
+          .select("id")
+          .eq("stripe_customer_id", session.customer)
+          .single();
+          
+        if (customer) {
+          await supabaseAdmin
+            .from("customers")
+            .update({
+              stripe_subscription_id: subscription.id,
+              subscription_status: subscription.status,
+              subscription_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+              subscription_tier: "starter",
+              updated_at: new Date().toISOString()
+            })
+            .eq("id", customer.id);
+        }
+        
+        // Update company if B2B
         if (session.metadata?.company_id) {
           const { error } = await supabaseAdmin
             .from("companies")
             .update({
-              stripe_customer_id: session.customer,
               subscription_status: "active",
-              subscription_tier: "starter",
               updated_at: new Date().toISOString(),
             })
             .eq("id", session.metadata.company_id);

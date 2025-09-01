@@ -1,3 +1,4 @@
+import React from "react";
 import { Routes, Route } from "react-router-dom";
 import { useHub } from "@sms-hub/ui";
 import Dashboard from "./pages/Dashboard";
@@ -8,7 +9,7 @@ import Companies from "./pages/Companies";
 import Settings from "./pages/Settings";
 import { Login } from "./pages/Login";
 import Leads from "./pages/Leads";
-import TempSignups from "./pages/TempSignups";
+import Verifications from "./pages/Verifications";
 import Testing from "./pages/Testing";
 import { Layout } from "./components/Layout";
 import { GlobalViewProvider } from "./contexts/GlobalViewContext";
@@ -26,7 +27,7 @@ function App() {
             <Route path="users" element={<Users />} />
             <Route path="companies" element={<Companies />} />
             <Route path="leads" element={<Leads />} />
-            <Route path="temp-signups" element={<TempSignups />} />
+            <Route path="verifications" element={<Verifications />} />
             <Route path="testing" element={<Testing />} />
             {/* <Route path="messages" element={<Messages />} /> */}
             {/* <Route path="analytics" element={<Analytics />} /> */}

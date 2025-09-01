@@ -26,7 +26,7 @@ const navigation = [
   { name: "Users", href: "/users", icon: Users },
   { name: "Companies", href: "/companies", icon: Building },
   { name: "Leads", href: "/leads", icon: UserPlus },
-  { name: "Temp Signups", href: "/temp-signups", icon: Clock },
+  { name: "Verifications", href: "/verifications", icon: Clock },
   { name: "Testing", href: "/testing", icon: Zap },
   // { name: 'Messages', href: '/messages', icon: MessageSquare },
   // { name: 'Analytics', href: '/analytics', icon: BarChart3 },

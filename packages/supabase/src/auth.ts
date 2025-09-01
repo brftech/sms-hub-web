@@ -2,9 +2,9 @@ import { SupabaseClient } from "@supabase/supabase-js";
 import { SignupData, VerificationData, UserProfile } from "@sms-hub/types";
 
 export const createAuthService = (client: SupabaseClient) => ({
-  async createTempSignup(data: SignupData) {
+  async createVerification(data: SignupData) {
     const { data: result, error } = await client.functions.invoke(
-      "create-temp-signup",
+      "create-verification",
       {
         body: data,
       }
@@ -19,7 +19,7 @@ export const createAuthService = (client: SupabaseClient) => ({
       .from("verification_attempts")
       .insert([
         {
-          temp_signup_id: verificationData.temp_signup_id,
+          verification_id: verificationData.verification_id,
           verification_code: verificationData.verification_code,
           attempt_number: 1,
           is_successful: false,
@@ -31,14 +31,14 @@ export const createAuthService = (client: SupabaseClient) => ({
     if (attemptError) throw attemptError;
 
     // Check if verification code matches
-    const { data: tempSignup, error: tempError } = await client
-      .from("temp_signups")
+    const { data: verification, error: verificationError } = await client
+      .from("verifications")
       .select("*")
-      .eq("id", verificationData.temp_signup_id)
+      .eq("id", verificationData.verification_id)
       .eq("verification_code", verificationData.verification_code)
       .single();
 
-    if (tempError || !tempSignup) {
+    if (verificationError || !verification) {
       throw new Error("Invalid verification code");
     }
 
@@ -48,7 +48,7 @@ export const createAuthService = (client: SupabaseClient) => ({
       .update({ is_successful: true })
       .eq("id", attempt.id);
 
-    return tempSignup;
+    return verification;
   },
 
   async getCurrentUserProfile(): Promise<UserProfile | null> {
@@ -67,23 +67,23 @@ export const createAuthService = (client: SupabaseClient) => ({
     return profile as UserProfile;
   },
 
-  async createUserProfile(tempSignupId: string): Promise<UserProfile> {
-    // Get temp signup data
-    const { data: tempSignup, error: tempError } = await client
-      .from("temp_signups")
+  async createUserProfile(verificationId: string): Promise<UserProfile> {
+    // Get verification data
+    const { data: verification, error: verificationError } = await client
+      .from("verifications")
       .select("*")
-      .eq("id", tempSignupId)
+      .eq("id", verificationId)
       .single();
 
-    if (tempError || !tempSignup) {
-      throw new Error("Temp signup not found");
+    if (verificationError || !verification) {
+      throw new Error("Verification not found");
     }
 
     // Get hub name for account number generation
     const { data: hub, error: hubError } = await client
       .from("hubs")
       .select("name")
-      .eq("hub_number", tempSignup.hub_id)
+      .eq("hub_number", verification.hub_id)
       .single();
 
     if (hubError || !hub) {
@@ -92,8 +92,8 @@ export const createAuthService = (client: SupabaseClient) => ({
 
     // Create user in auth
     const { data: authData, error: authError } = await client.auth.signUp({
-      email: tempSignup.email,
-      phone: tempSignup.mobile_phone_number,
+      email: verification.email,
+      phone: verification.mobile_phone_number,
       password: Math.random().toString(36), // Temporary password, user will set their own
     });
 
@@ -115,12 +115,12 @@ export const createAuthService = (client: SupabaseClient) => ({
       .insert([
         {
           id: authData.user.id,
-          hub_id: tempSignup.hub_id,
+          hub_id: verification.hub_id,
           account_number: accountNumber,
-          first_name: tempSignup.first_name,
-          last_name: tempSignup.last_name,
-          mobile_phone_number: tempSignup.mobile_phone_number,
-          email: tempSignup.email,
+          first_name: verification.first_name,
+          last_name: verification.last_name,
+          mobile_phone_number: verification.mobile_phone_number,
+          email: verification.email,
           role: "MEMBER",
           onboarding_step: "payment",
         },
@@ -130,8 +130,8 @@ export const createAuthService = (client: SupabaseClient) => ({
 
     if (profileError) throw profileError;
 
-    // Clean up temp signup
-    await client.from("temp_signups").delete().eq("id", tempSignupId);
+    // Clean up verification
+    await client.from("verifications").delete().eq("id", verificationId);
 
     return profile as UserProfile;
   },

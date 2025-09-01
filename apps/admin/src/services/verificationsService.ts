@@ -1,6 +1,6 @@
 import { createSupabaseClient } from "@sms-hub/supabase";
 
-export interface TempSignup {
+export interface Verification {
   id: string;
   hub_id: number;
   email: string;
@@ -11,7 +11,7 @@ export interface TempSignup {
   auth_method: string;
   verification_code?: string | null;
   verification_attempts?: number | null;
-  max_attempts?: number | null;
+  max_attempts?: string | null;
   stripe_customer_id?: string | null;
   created_at?: string | null;
   expires_at: string;
@@ -19,7 +19,7 @@ export interface TempSignup {
   verified_at?: string | null;
 }
 
-export interface TempSignupStats {
+export interface VerificationStats {
   total: number;
   verified: number;
   unverified: number;
@@ -28,7 +28,7 @@ export interface TempSignupStats {
   byHub: Record<string, number>;
 }
 
-class TempSignupsService {
+class VerificationsService {
   private supabase: ReturnType<typeof createSupabaseClient>;
 
   constructor() {
@@ -46,28 +46,28 @@ class TempSignupsService {
   // Test database connection
   async testConnection(): Promise<boolean> {
     try {
-      console.log("TempSignupsService: Testing database connection...");
+      console.log("VerificationsService: Testing database connection...");
 
       // Try a simple query to test connection
       const { data, error } = await this.supabase
-        .from("temp_signups")
+        .from("verifications")
         .select("count")
         .limit(1);
 
       if (error) {
-        console.error("TempSignupsService: Connection test failed:", error);
+        console.error("VerificationsService: Connection test failed:", error);
         return false;
       }
 
-      console.log("TempSignupsService: Connection test successful");
+      console.log("VerificationsService: Connection test successful");
       return true;
     } catch (err) {
-      console.error("TempSignupsService: Connection test error:", err);
+      console.error("VerificationsService: Connection test error:", err);
       return false;
     }
   }
 
-  async getTempSignups(options?: {
+  async getVerifications(options?: {
     hub_id?: number;
     auth_method?: string;
     is_expired?: boolean;
@@ -75,9 +75,9 @@ class TempSignupsService {
     search?: string;
     limit?: number;
     offset?: number;
-  }): Promise<TempSignup[]> {
+  }): Promise<Verification[]> {
     let query = this.supabase
-      .from("temp_signups")
+      .from("verifications")
       .select("*")
       .order("created_at", { ascending: false });
 
@@ -123,54 +123,55 @@ class TempSignupsService {
     const { data, error } = await query;
 
     if (error) {
-      console.error("Error fetching temp signups:", error);
+      console.error("Error fetching verifications:", error);
       console.error("Error details:", error.message, error.details, error.hint);
-      throw new Error("Failed to fetch temp signups");
+      throw new Error("Failed to fetch verifications");
     }
 
-    return (data || []) as TempSignup[];
+    return (data || []) as Verification[];
   }
 
-  async getTempSignupById(id: string): Promise<TempSignup | null> {
+  async getVerificationById(id: string): Promise<Verification | null> {
     const { data, error } = await this.supabase
-      .from("temp_signups")
+      .from("verifications")
       .select("*")
       .eq("id", id)
       .single();
 
     if (error) {
-      console.error("Error fetching temp signup:", error);
-      throw new Error("Failed to fetch temp signup");
+      console.error("Error fetching verification:", error);
+      throw new Error("Failed to fetch verification");
     }
 
-    return data as TempSignup;
+    return data as Verification;
   }
 
-  async getTempSignupStats(hub_id?: number): Promise<TempSignupStats> {
-    // Get all temp signups for stats calculation
-    const tempSignups = await this.getTempSignups({ hub_id });
+  async getVerificationStats(hub_id?: number): Promise<VerificationStats> {
+    // Get all verifications for stats calculation
+    const verifications = await this.getVerifications({ hub_id });
 
     const now = new Date();
-    const stats: TempSignupStats = {
-      total: tempSignups.length,
-      verified: tempSignups.filter((signup) => signup.is_verified === true)
+    const stats: VerificationStats = {
+      total: verifications.length,
+      verified: verifications.filter((signup) => signup.is_verified === true)
         .length,
-      unverified: tempSignups.filter((signup) => signup.is_verified !== true)
+      unverified: verifications.filter((signup) => signup.is_verified !== true)
         .length,
-      expired: tempSignups.filter((signup) => new Date(signup.expires_at) < now)
-        .length,
+      expired: verifications.filter(
+        (signup) => new Date(signup.expires_at) < now
+      ).length,
       byAuthMethod: {},
       byHub: {},
     };
 
     // Calculate auth method distribution
-    tempSignups.forEach((signup) => {
+    verifications.forEach((signup) => {
       const method = signup.auth_method || "Unknown";
       stats.byAuthMethod[method] = (stats.byAuthMethod[method] || 0) + 1;
     });
 
     // Calculate hub distribution
-    tempSignups.forEach((signup) => {
+    verifications.forEach((signup) => {
       const hub = signup.hub_id.toString();
       stats.byHub[hub] = (stats.byHub[hub] || 0) + 1;
     });
@@ -178,15 +179,15 @@ class TempSignupsService {
     return stats;
   }
 
-  async deleteTempSignup(id: string): Promise<void> {
+  async deleteVerification(id: string): Promise<void> {
     const { error } = await this.supabase
-      .from("temp_signups")
+      .from("verifications")
       .delete()
       .eq("id", id);
 
     if (error) {
-      console.error("Error deleting temp signup:", error);
-      throw new Error("Failed to delete temp signup");
+      console.error("Error deleting verification:", error);
+      throw new Error("Failed to delete verification");
     }
   }
 
@@ -195,7 +196,7 @@ class TempSignupsService {
     attempts: number
   ): Promise<void> {
     const { error } = await this.supabase
-      .from("temp_signups")
+      .from("verifications")
       .update({
         verification_attempts: attempts,
       })
@@ -209,7 +210,7 @@ class TempSignupsService {
 
   async getUniqueAuthMethods(): Promise<string[]> {
     const { data, error } = await this.supabase
-      .from("temp_signups")
+      .from("verifications")
       .select("auth_method")
       .not("auth_method", "is", null);
 
@@ -225,10 +226,10 @@ class TempSignupsService {
     return [...new Set(methods)]; // Remove duplicates
   }
 
-  async getExpiredSignups(): Promise<TempSignup[]> {
+  async getExpiredSignups(): Promise<Verification[]> {
     const now = new Date().toISOString();
     const { data, error } = await this.supabase
-      .from("temp_signups")
+      .from("verifications")
       .select("*")
       .lt("expires_at", now)
       .order("created_at", { ascending: false });
@@ -238,13 +239,13 @@ class TempSignupsService {
       throw new Error("Failed to fetch expired signups");
     }
 
-    return (data || []) as TempSignup[];
+    return (data || []) as Verification[];
   }
 
   async cleanupExpiredSignups(): Promise<number> {
     const now = new Date().toISOString();
     const { data, error } = await this.supabase
-      .from("temp_signups")
+      .from("verifications")
       .delete()
       .lt("expires_at", now)
       .select();
@@ -258,55 +259,55 @@ class TempSignupsService {
   }
 
   // Global methods for fetching data across all hubs
-  async getGlobalTempSignupStats(): Promise<TempSignupStats> {
+  async getGlobalVerificationStats(): Promise<VerificationStats> {
     try {
-      const { data: tempSignups, error } = await this.supabase
-        .from("temp_signups")
+      const { data: verifications, error } = await this.supabase
+        .from("verifications")
         .select("*");
 
       if (error) {
-        console.error("Error fetching global temp signup stats:", error);
-        throw new Error("Failed to fetch global temp signup stats");
+        console.error("Error fetching global verification stats:", error);
+        throw new Error("Failed to fetch global verification stats");
       }
 
       const now = new Date();
-      const stats: TempSignupStats = {
-        total: tempSignups?.length || 0,
+      const stats: VerificationStats = {
+        total: verifications?.length || 0,
         verified:
-          tempSignups?.filter((signup) => signup.is_verified === true).length ||
-          0,
+          verifications?.filter((signup) => signup.is_verified === true)
+            .length || 0,
         unverified:
-          tempSignups?.filter((signup) => signup.is_verified !== true).length ||
-          0,
+          verifications?.filter((signup) => signup.is_verified !== true)
+            .length || 0,
         expired:
-          tempSignups?.filter((signup) => new Date(signup.expires_at) < now)
+          verifications?.filter((signup) => new Date(signup.expires_at) < now)
             .length || 0,
         byAuthMethod: {},
         byHub: {},
       };
 
       // Calculate auth method distribution
-      tempSignups?.forEach((signup) => {
+      verifications?.forEach((signup) => {
         const method = signup.auth_method || "Unknown";
         stats.byAuthMethod[method] = (stats.byAuthMethod[method] || 0) + 1;
       });
 
       // Calculate hub distribution
-      tempSignups?.forEach((signup) => {
+      verifications?.forEach((signup) => {
         const hub = signup.hub_id.toString();
         stats.byHub[hub] = (stats.byHub[hub] || 0) + 1;
       });
 
       return stats;
     } catch (error) {
-      console.error("Error in getGlobalTempSignupStats:", error);
+      console.error("Error in getGlobalVerificationStats:", error);
       throw error;
     }
   }
 
   async getGlobalUniqueAuthMethods(): Promise<string[]> {
     const { data, error } = await this.supabase
-      .from("temp_signups")
+      .from("verifications")
       .select("auth_method")
       .not("auth_method", "is", null);
 
@@ -323,4 +324,4 @@ class TempSignupsService {
   }
 }
 
-export const tempSignupsService = new TempSignupsService();
+export const verificationsService = new VerificationsService();

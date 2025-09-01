@@ -90,10 +90,10 @@ export function Verify() {
   const [success, setSuccess] = useState(false);
   const [verificationCode, setVerificationCode] = useState("");
   const [signupData, setSignupData] = useState<any>(null);
-  const tempSignupId = searchParams.get("id");
+  const verificationId = searchParams.get("id");
 
   useEffect(() => {
-    if (!tempSignupId) {
+    if (!verificationId) {
       navigate("/signup");
       return;
     }
@@ -103,12 +103,12 @@ export function Verify() {
     if (storedData) {
       setSignupData(JSON.parse(storedData));
     }
-  }, [tempSignupId, navigate]);
+  }, [verificationId, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!tempSignupId || !verificationCode) {
+    if (!verificationId || !verificationCode) {
       setError("Please enter the verification code");
       return;
     }
@@ -125,7 +125,7 @@ export function Verify() {
         },
         body: JSON.stringify({
           action: "verify",
-          temp_signup_id: tempSignupId,
+          verification_id: verificationId,
           verification_code: verificationCode,
         }),
       });
@@ -181,7 +181,7 @@ export function Verify() {
   };
 
   const handleResend = async () => {
-    if (!tempSignupId || !signupData) {
+    if (!verificationId || !signupData) {
       setError("Unable to resend code. Please try signing up again.");
       return;
     }
@@ -198,7 +198,7 @@ export function Verify() {
         },
         body: JSON.stringify({
           action: "send",
-          temp_signup_id: tempSignupId,
+          verification_id: verificationId,
           email: signupData.email,
           mobile_phone_number: signupData.mobile_phone_number || signupData.phone,
           auth_method: signupData.authMethod,
@@ -242,7 +242,7 @@ export function Verify() {
     );
   }
 
-  if (!tempSignupId) {
+  if (!verificationId) {
     return null;
   }
 

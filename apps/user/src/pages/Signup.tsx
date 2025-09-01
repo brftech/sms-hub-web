@@ -286,19 +286,17 @@ export function Signup() {
         ? invitationData.hub_id 
         : getHubIdForDatabase(hubConfig.id);
       
-      // Use submit-verify to create temp signup and send verification
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/submit-verify`, {
+      // Call submit-verification to send verification code
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/submit-verification`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
         },
         body: JSON.stringify({
-          action: "send",
           email: formData.email,
           mobile_phone_number: getPhoneForAPI(formData.phone),
           auth_method: authMethod,
-          is_login: false,
           hub_id: hubId,
           signup_type: signupType === "individual" ? "individual" : signupType,
           invitation_token: invitationToken || undefined,
@@ -327,7 +325,7 @@ export function Signup() {
         email: formData.email,
         phone: getPhoneForAPI(formData.phone),
         authMethod,
-        tempSignupId: result.id,
+        signupId: result.signup_id,
         hubId,
         isLogin: false,
         signupType,
@@ -338,7 +336,7 @@ export function Signup() {
       
       // Redirect to verification page
       setTimeout(() => {
-        navigate(`/verify?id=${result.id}`);
+        navigate(`/verify?id=${result.signup_id}`);
       }, 2000);
 
     } catch (err: any) {

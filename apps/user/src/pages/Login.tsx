@@ -199,7 +199,7 @@ export function Login() {
           email,
           phone: getPhoneForAPI(phone),
           authMethod,
-          tempSignupId: result.id,
+          verificationId: result.id,
           isLogin: true,
           from,
         }))

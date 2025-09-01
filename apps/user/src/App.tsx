@@ -7,6 +7,8 @@ import { Login } from "./pages/Login";
 import { Signup } from "./pages/Signup";
 import { Verify } from "./pages/Verify";
 import { VerifyOtp } from "./pages/VerifyOtp";
+import { VerifyCode } from "./pages/VerifyCode";
+import { AccountDetails } from "./pages/AccountDetails";
 import { Campaigns } from "./pages/Campaigns";
 import { Messages } from "./pages/Messages";
 import { Settings } from "./pages/Settings";
@@ -20,8 +22,9 @@ function App() {
     <div className="min-h-screen bg-background">
       <Routes>
         <Route path="/signup" element={<Signup />} />
-        <Route path="/verify" element={<Verify />} />
+        <Route path="/verify" element={<VerifyCode />} />
         <Route path="/verify-otp" element={<VerifyOtp />} />
+        <Route path="/account-details" element={<AccountDetails />} />
         <Route path="/login" element={<Login />} />
         <Route path="/payment-required" element={<PaymentRequired />} />
         <Route path="/payment-success" element={<PaymentSuccess />} />

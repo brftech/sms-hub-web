@@ -2,7 +2,7 @@ import { useState } from "react";
 import { supabase } from "../config/supabase";
 import { SignupData, VerificationData } from "@sms-hub/types";
 
-export const useCreateTempSignup = () => {
+export const useCreateVerification = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -11,9 +11,9 @@ export const useCreateTempSignup = () => {
     setError(null);
 
     try {
-      // Call the Edge Function to create temp signup
+      // Call the Edge Function to create verification
       const { data: result, error } = await supabase.functions.invoke(
-        "create-temp-signup",
+        "create-verification",
         {
           body: data,
         }

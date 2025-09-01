@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
 import { createSupabaseClient } from '@sms-hub/supabase'
-import { useUserProfile } from '@sms-hub/supabase/react'
+import { CheckoutRedirect } from './CheckoutRedirect'
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [userProfile, setUserProfile] = useState<any>(null)
   const location = useLocation()
-  const { data: userProfile, isLoading: profileLoading } = useUserProfile()
   
   const supabase = createSupabaseClient(
     import.meta.env.VITE_SUPABASE_URL,
@@ -20,6 +20,17 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
         const { data: { session } } = await supabase.auth.getSession()
         console.log('Current session:', session)
         setIsAuthenticated(!!session)
+        
+        // If authenticated, load user profile
+        if (session?.user) {
+          const { data: profile } = await supabase
+            .from('user_profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .single()
+          
+          setUserProfile(profile)
+        }
       } catch (error) {
         console.error('Auth check error:', error)
         setIsAuthenticated(false)
@@ -34,12 +45,13 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       console.log('Auth state changed:', event, session)
       setIsAuthenticated(!!session)
+      setIsLoading(false)
     })
     
     return () => subscription.unsubscribe()
   }, [])
   
-  if (isLoading || profileLoading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -53,6 +65,12 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   if (!isAuthenticated) {
     // Save the attempted location for redirect after login
     return <Navigate to="/login" state={{ from: location }} replace />
+  }
+  
+  // Check if there's a pending checkout from signup
+  const pendingCheckout = sessionStorage.getItem('pending_checkout')
+  if (pendingCheckout && location.pathname === '/') {
+    return <CheckoutRedirect />
   }
   
   // Check if user needs to complete payment

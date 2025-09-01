@@ -7,7 +7,7 @@ export interface DashboardStats {
   activeCompanies: number;
   totalLeads: number;
   pendingLeads: number;
-  totalTempSignups: number;
+  totalVerifications: number;
   pendingVerifications: number;
   totalMessages: number;
   messagesThisMonth: number;
@@ -23,7 +23,7 @@ export interface HubBreakdown {
   companies: number;
   users: number;
   leads: number;
-  tempSignups: number;
+  verifications: number;
   pendingVerifications: number;
 }
 
@@ -130,18 +130,19 @@ class DashboardService {
       const pendingLeads =
         leadsData?.filter((lead) => lead.status === "pending").length || 0;
 
-      // Get temp signups stats
-      const { data: tempSignupsData, error: tempSignupsError } =
+      // Get verification stats
+      const { data: verificationsData, error: verificationsError } =
         await this.supabase
-          .from("temp_signups")
+          .from("verifications")
           .select("id, is_verified, created_at")
           .eq("hub_id", hubId);
 
-      if (tempSignupsError) throw tempSignupsError;
+      if (verificationsError) throw verificationsError;
 
-      const totalTempSignups = tempSignupsData?.length || 0;
+      const totalVerifications = verificationsData?.length || 0;
       const pendingVerifications =
-        tempSignupsData?.filter((signup) => !signup.is_verified).length || 0;
+        verificationsData?.filter((verification) => !verification.is_verified)
+          .length || 0;
 
       // Get messages stats (mock for now since we don't have a messages table)
       const totalMessages = 15420; // Mock data
@@ -161,7 +162,7 @@ class DashboardService {
         activeCompanies,
         totalLeads,
         pendingLeads,
-        totalTempSignups,
+        totalVerifications,
         pendingVerifications,
         totalMessages,
         messagesThisMonth,
@@ -211,17 +212,19 @@ class DashboardService {
       const pendingLeads =
         allLeadsData?.filter((lead) => lead.status === "pending").length || 0;
 
-      // Get all temp signups stats across all hubs
-      const { data: allTempSignupsData, error: tempSignupsError } =
+      // Get all verification stats across all hubs
+      const { data: allVerificationsData, error: verificationsError } =
         await this.supabase
-          .from("temp_signups")
+          .from("verifications")
           .select("id, is_verified, created_at, hub_id");
 
-      if (tempSignupsError) throw tempSignupsError;
+      if (verificationsError) throw verificationsError;
 
-      const totalTempSignups = allTempSignupsData?.length || 0;
+      const totalVerifications = allVerificationsData?.length || 0;
       const pendingVerifications =
-        allTempSignupsData?.filter((signup) => !signup.is_verified).length || 0;
+        allVerificationsData?.filter(
+          (verification) => !verification.is_verified
+        ).length || 0;
 
       // Get revenue stats (mock for now since we don't have a revenue table)
       const revenue = 45600 * 4; // Mock data for all hubs
@@ -240,7 +243,7 @@ class DashboardService {
         activeCompanies,
         totalLeads,
         pendingLeads,
-        totalTempSignups,
+        totalVerifications,
         pendingVerifications,
         totalMessages: 15420 * 4, // Mock data for all hubs
         messagesThisMonth: 2340 * 4, // Mock data for all hubs
@@ -342,22 +345,23 @@ class DashboardService {
     try {
       const alerts: Alert[] = [];
 
-      // Check for high temp signup volume
-      const { data: tempSignups, error: tempSignupsError } = await this.supabase
-        .from("temp_signups")
-        .select("id, created_at")
-        .eq("hub_id", hubId)
-        .gte(
-          "created_at",
-          new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
-        ); // Last 24 hours
+      // Check for high verification volume
+      const { data: verifications, error: verificationsError } =
+        await this.supabase
+          .from("verifications")
+          .select("id, created_at")
+          .eq("hub_id", hubId)
+          .gte(
+            "created_at",
+            new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+          ); // Last 24 hours
 
-      if (!tempSignupsError && tempSignups && tempSignups.length > 50) {
+      if (!verificationsError && verifications && verifications.length > 50) {
         alerts.push({
-          id: "high-signups",
+          id: "high-verifications",
           type: "warning",
-          title: "High signup volume",
-          description: `${tempSignups.length} new signups in the last 24 hours`,
+          title: "High verification volume",
+          description: `${verifications.length} new verifications in the last 24 hours`,
           icon: "AlertTriangle",
           color: "text-yellow-600",
         });
@@ -366,7 +370,7 @@ class DashboardService {
       // Check for pending verifications
       const { data: pendingVerifications, error: pendingError } =
         await this.supabase
-          .from("temp_signups")
+          .from("verifications")
           .select("id")
           .eq("hub_id", hubId)
           .eq("is_verified", false);
@@ -754,7 +758,7 @@ class DashboardService {
           companies: 0,
           users: 0,
           leads: 0,
-          tempSignups: 0,
+          verifications: 0,
           pendingVerifications: 0,
         });
       });
@@ -795,16 +799,16 @@ class DashboardService {
         });
       }
 
-      // Get temp signups count by hub
-      const { data: tempSignupsData, error: tempSignupsError } =
-        await this.supabase.from("temp_signups").select("hub_id, is_verified");
+      // Get verifications count by hub
+      const { data: verificationsData, error: verificationsError } =
+        await this.supabase.from("verifications").select("hub_id, is_verified");
 
-      if (!tempSignupsError && tempSignupsData) {
-        tempSignupsData.forEach((signup) => {
-          const hub = hubMap.get(signup.hub_id);
+      if (!verificationsError && verificationsData) {
+        verificationsData.forEach((verification) => {
+          const hub = hubMap.get(verification.hub_id);
           if (hub) {
-            hub.tempSignups++;
-            if (!signup.is_verified) hub.pendingVerifications++;
+            hub.verifications++;
+            if (!verification.is_verified) hub.pendingVerifications++;
           }
         });
       }

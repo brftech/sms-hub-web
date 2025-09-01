@@ -994,6 +994,7 @@ export type Database = {
           created_at: string | null
           hub_id: number | null
           id: string
+          is_active: boolean | null
           role: Database["public"]["Enums"]["user_role"] | null
           status: string | null
           updated_at: string | null
@@ -1004,6 +1005,7 @@ export type Database = {
           created_at?: string | null
           hub_id?: number | null
           id?: string
+          is_active?: boolean | null
           role?: Database["public"]["Enums"]["user_role"] | null
           status?: string | null
           updated_at?: string | null
@@ -1014,6 +1016,7 @@ export type Database = {
           created_at?: string | null
           hub_id?: number | null
           id?: string
+          is_active?: boolean | null
           role?: Database["public"]["Enums"]["user_role"] | null
           status?: string | null
           updated_at?: string | null
@@ -1412,114 +1415,6 @@ export type Database = {
           },
         ]
       }
-      temp_signups: {
-        Row: {
-          auth_method: string
-          company_name: string
-          created_at: string | null
-          email: string
-          existing_user_id: string | null
-          expires_at: string
-          first_name: string
-          hub_id: number
-          id: string
-          is_existing_user: boolean | null
-          is_verified: boolean | null
-          last_name: string
-          last_verification_attempt_at: string | null
-          marketing_consent: boolean | null
-          max_attempts: number | null
-          mobile_phone_number: string
-          onboarding_step: string | null
-          preferred_verification_method: string | null
-          privacy_policy_accepted_at: string | null
-          step_data: Json | null
-          stripe_customer_id: string | null
-          terms_accepted_at: string | null
-          user_created_at: string | null
-          verification_attempts: number | null
-          verification_code: string | null
-          verification_completed_at: string | null
-          verification_sent_at: string | null
-          verified_at: string | null
-        }
-        Insert: {
-          auth_method?: string
-          company_name: string
-          created_at?: string | null
-          email: string
-          existing_user_id?: string | null
-          expires_at?: string
-          first_name: string
-          hub_id: number
-          id?: string
-          is_existing_user?: boolean | null
-          is_verified?: boolean | null
-          last_name: string
-          last_verification_attempt_at?: string | null
-          marketing_consent?: boolean | null
-          max_attempts?: number | null
-          mobile_phone_number: string
-          onboarding_step?: string | null
-          preferred_verification_method?: string | null
-          privacy_policy_accepted_at?: string | null
-          step_data?: Json | null
-          stripe_customer_id?: string | null
-          terms_accepted_at?: string | null
-          user_created_at?: string | null
-          verification_attempts?: number | null
-          verification_code?: string | null
-          verification_completed_at?: string | null
-          verification_sent_at?: string | null
-          verified_at?: string | null
-        }
-        Update: {
-          auth_method?: string
-          company_name?: string
-          created_at?: string | null
-          email?: string
-          existing_user_id?: string | null
-          expires_at?: string
-          first_name?: string
-          hub_id?: number
-          id?: string
-          is_existing_user?: boolean | null
-          is_verified?: boolean | null
-          last_name?: string
-          last_verification_attempt_at?: string | null
-          marketing_consent?: boolean | null
-          max_attempts?: number | null
-          mobile_phone_number?: string
-          onboarding_step?: string | null
-          preferred_verification_method?: string | null
-          privacy_policy_accepted_at?: string | null
-          step_data?: Json | null
-          stripe_customer_id?: string | null
-          terms_accepted_at?: string | null
-          user_created_at?: string | null
-          verification_attempts?: number | null
-          verification_code?: string | null
-          verification_completed_at?: string | null
-          verification_sent_at?: string | null
-          verified_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "temp_signups_existing_user_id_fkey"
-            columns: ["existing_user_id"]
-            isOneToOne: false
-            referencedRelation: "user_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "temp_signups_hub_id_fkey"
-            columns: ["hub_id"]
-            isOneToOne: false
-            referencedRelation: "hubs"
-            referencedColumns: ["hub_number"]
-          },
-        ]
-      }
       user_inbox_assignments: {
         Row: {
           assigned_at: string | null
@@ -1689,7 +1584,7 @@ export type Database = {
           created_at: string | null
           customer_id: string | null
           email: string
-          first_name: string | null
+          first_name: string
           gphone_procured_at: string | null
           hub_id: number
           id: string
@@ -1698,7 +1593,7 @@ export type Database = {
           is_active: boolean | null
           is_individual_customer: boolean | null
           last_login_method: string | null
-          last_name: string | null
+          last_name: string
           last_payment_attempt_at: string | null
           lead_id: string | null
           mobile_phone_number: string | null
@@ -1724,6 +1619,7 @@ export type Database = {
           tcr_campaign_rejection_reason: string | null
           tcr_campaign_submitted_at: string | null
           updated_at: string | null
+          verification_id: string | null
           verification_recommendation_shown: boolean | null
           verification_recommendation_shown_at: string | null
           verification_setup_completed: boolean | null
@@ -1740,7 +1636,7 @@ export type Database = {
           created_at?: string | null
           customer_id?: string | null
           email: string
-          first_name?: string | null
+          first_name?: string
           gphone_procured_at?: string | null
           hub_id: number
           id: string
@@ -1749,7 +1645,7 @@ export type Database = {
           is_active?: boolean | null
           is_individual_customer?: boolean | null
           last_login_method?: string | null
-          last_name?: string | null
+          last_name?: string
           last_payment_attempt_at?: string | null
           lead_id?: string | null
           mobile_phone_number?: string | null
@@ -1775,6 +1671,7 @@ export type Database = {
           tcr_campaign_rejection_reason?: string | null
           tcr_campaign_submitted_at?: string | null
           updated_at?: string | null
+          verification_id?: string | null
           verification_recommendation_shown?: boolean | null
           verification_recommendation_shown_at?: string | null
           verification_setup_completed?: boolean | null
@@ -1791,7 +1688,7 @@ export type Database = {
           created_at?: string | null
           customer_id?: string | null
           email?: string
-          first_name?: string | null
+          first_name?: string
           gphone_procured_at?: string | null
           hub_id?: number
           id?: string
@@ -1800,7 +1697,7 @@ export type Database = {
           is_active?: boolean | null
           is_individual_customer?: boolean | null
           last_login_method?: string | null
-          last_name?: string | null
+          last_name?: string
           last_payment_attempt_at?: string | null
           lead_id?: string | null
           mobile_phone_number?: string | null
@@ -1826,6 +1723,7 @@ export type Database = {
           tcr_campaign_rejection_reason?: string | null
           tcr_campaign_submitted_at?: string | null
           updated_at?: string | null
+          verification_id?: string | null
           verification_recommendation_shown?: boolean | null
           verification_recommendation_shown_at?: string | null
           verification_setup_completed?: boolean | null
@@ -1867,6 +1765,13 @@ export type Database = {
             referencedRelation: "leads"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "user_profiles_verification_id_fkey"
+            columns: ["verification_id"]
+            isOneToOne: false
+            referencedRelation: "verifications"
+            referencedColumns: ["id"]
+          },
         ]
       }
       verification_attempts: {
@@ -1876,9 +1781,9 @@ export type Database = {
           id: string
           ip_address: unknown | null
           is_successful: boolean | null
-          temp_signup_id: string
           user_agent: string | null
           verification_code: string
+          verification_id: string
         }
         Insert: {
           attempt_number: number
@@ -1886,9 +1791,9 @@ export type Database = {
           id?: string
           ip_address?: unknown | null
           is_successful?: boolean | null
-          temp_signup_id: string
           user_agent?: string | null
           verification_code: string
+          verification_id: string
         }
         Update: {
           attempt_number?: number
@@ -1896,17 +1801,125 @@ export type Database = {
           id?: string
           ip_address?: unknown | null
           is_successful?: boolean | null
-          temp_signup_id?: string
           user_agent?: string | null
           verification_code?: string
+          verification_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "verification_attempts_temp_signup_id_fkey"
-            columns: ["temp_signup_id"]
+            foreignKeyName: "verification_attempts_verification_id_fkey"
+            columns: ["verification_id"]
             isOneToOne: false
-            referencedRelation: "temp_signups"
+            referencedRelation: "verifications"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      verifications: {
+        Row: {
+          auth_method: string
+          company_name: string
+          created_at: string | null
+          email: string
+          existing_user_id: string | null
+          expires_at: string
+          first_name: string
+          hub_id: number
+          id: string
+          is_existing_user: boolean | null
+          is_verified: boolean | null
+          last_name: string
+          last_verification_attempt_at: string | null
+          marketing_consent: boolean | null
+          max_attempts: number | null
+          mobile_phone_number: string
+          onboarding_step: string | null
+          preferred_verification_method: string | null
+          privacy_policy_accepted_at: string | null
+          step_data: Json | null
+          stripe_customer_id: string | null
+          terms_accepted_at: string | null
+          user_created_at: string | null
+          verification_attempts: number | null
+          verification_code: string | null
+          verification_completed_at: string | null
+          verification_sent_at: string | null
+          verified_at: string | null
+        }
+        Insert: {
+          auth_method?: string
+          company_name: string
+          created_at?: string | null
+          email: string
+          existing_user_id?: string | null
+          expires_at?: string
+          first_name: string
+          hub_id: number
+          id?: string
+          is_existing_user?: boolean | null
+          is_verified?: boolean | null
+          last_name: string
+          last_verification_attempt_at?: string | null
+          marketing_consent?: boolean | null
+          max_attempts?: number | null
+          mobile_phone_number: string
+          onboarding_step?: string | null
+          preferred_verification_method?: string | null
+          privacy_policy_accepted_at?: string | null
+          step_data?: Json | null
+          stripe_customer_id?: string | null
+          terms_accepted_at?: string | null
+          user_created_at?: string | null
+          verification_attempts?: number | null
+          verification_code?: string | null
+          verification_completed_at?: string | null
+          verification_sent_at?: string | null
+          verified_at?: string | null
+        }
+        Update: {
+          auth_method?: string
+          company_name?: string
+          created_at?: string | null
+          email?: string
+          existing_user_id?: string | null
+          expires_at?: string
+          first_name?: string
+          hub_id?: number
+          id?: string
+          is_existing_user?: boolean | null
+          is_verified?: boolean | null
+          last_name?: string
+          last_verification_attempt_at?: string | null
+          marketing_consent?: boolean | null
+          max_attempts?: number | null
+          mobile_phone_number?: string
+          onboarding_step?: string | null
+          preferred_verification_method?: string | null
+          privacy_policy_accepted_at?: string | null
+          step_data?: Json | null
+          stripe_customer_id?: string | null
+          terms_accepted_at?: string | null
+          user_created_at?: string | null
+          verification_attempts?: number | null
+          verification_code?: string | null
+          verification_completed_at?: string | null
+          verification_sent_at?: string | null
+          verified_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "verifications_existing_user_id_fkey"
+            columns: ["existing_user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "verifications_hub_id_fkey"
+            columns: ["hub_id"]
+            isOneToOne: false
+            referencedRelation: "hubs"
+            referencedColumns: ["hub_number"]
           },
         ]
       }
@@ -1915,7 +1928,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      cleanup_expired_temp_signups: {
+      cleanup_expired_verifications: {
         Args: Record<PropertyKey, never>
         Returns: number
       }

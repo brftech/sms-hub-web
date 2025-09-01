@@ -38,9 +38,13 @@ export function VerifyCode() {
     import.meta.env.VITE_SUPABASE_ANON_KEY
   );
   
-  const tempSignupId = searchParams.get("id");
+  const verificationId = searchParams.get("id");
   const authMethod = searchParams.get("method") || "sms";
   const isExistingUser = searchParams.get("existing") === "true";
+  
+  // Get signup data from session storage
+  const signupData = JSON.parse(sessionStorage.getItem('signup_data') || '{}');
+  const [password, setPassword] = useState("");
   
   const [code, setCode] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
@@ -51,12 +55,12 @@ export function VerifyCode() {
   const [canResend, setCanResend] = useState(false);
 
   useEffect(() => {
-    console.log("VerifyCode mounted with ID:", tempSignupId);
-    if (!tempSignupId) {
+    console.log("VerifyCode mounted with ID:", verificationId);
+    if (!verificationId) {
       console.log("No ID found, redirecting to signup");
       navigate("/signup");
     }
-  }, [tempSignupId, navigate]);
+  }, [verificationId, navigate]);
 
   useEffect(() => {
     if (resendTimer > 0) {
@@ -81,12 +85,12 @@ export function VerifyCode() {
   const handleVerify = async (verificationCode: string = code) => {
     console.log("handleVerify called with:", { 
       code: verificationCode, 
-      tempSignupId,
-      hasValidId: !!tempSignupId 
+      verificationId,
+      hasValidId: !!verificationId 
     });
     
-    if (!tempSignupId) {
-      console.error("No temp signup ID available!");
+    if (!verificationId) {
+      console.error("No verification ID available!");
       setError("Session expired. Please start over.");
       setTimeout(() => navigate("/signup"), 2000);
       return;
@@ -101,116 +105,43 @@ export function VerifyCode() {
     setError("");
 
     const payload = {
-      temp_signup_id: tempSignupId,
-      verification_code: verificationCode,
+      signup_id: signupData.signupId || verificationId,
+      code: verificationCode,
+      email: signupData.email,
+      mobile_phone_number: signupData.phone,
+      auth_method: authMethod
     };
     console.log("Sending verification payload:", payload);
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/submit-verify`, {
+      // Step 1: Verify the code
+      const verifyResponse = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/verify-code`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
         },
-        body: JSON.stringify({
-          action: "verify",
-          ...payload
-        }),
+        body: JSON.stringify(payload),
       });
 
-      const data = await response.json();
-      console.log("Verify response:", response.status, data);
+      const verifyData = await verifyResponse.json();
+      console.log("Verify response:", verifyResponse.status, verifyData);
 
-      if (!response.ok) {
-        console.error("Verification failed:", data);
-        throw new Error(data.error || "Verification failed");
+      if (!verifyResponse.ok) {
+        console.error("Verification failed:", verifyData);
+        throw new Error(verifyData.error || "Verification failed");
       }
 
-      // Check the actual response structure
-      console.log("Response data structure:", {
-        hasAccount: !!data.account,
-        hasSuccess: !!data.success,
-        hasUser: !!data.user,
-        keys: Object.keys(data)
-      });
-
+      // Code is verified! Now redirect to account details
       setSuccess(true);
       
-      // Check if this is an existing user - if so, redirect to login
-      if (isExistingUser) {
-        console.log("Existing user verified, redirecting to login...");
-        setTimeout(() => {
-          navigate("/login");
-        }, 2000);
-        return;
-      }
+      // Store the signup_id for the next step
+      sessionStorage.setItem('verified_signup_id', verifyData.signup_id);
       
-      // Account is already created in submit-verify for new users
-      if (data.success) {
-        console.log("Verification successful, data:", data);
-        
-        const accountData = data; // Use the response from submit-verify
-        
-        // Sign in the user using the magic link URL if provided
-        console.log("Attempting to sign in user...");
-        
-        if (data.session_url) {
-          // Extract the token from the magic link URL and sign in
-          try {
-            const url = new URL(data.session_url);
-            const token = url.searchParams.get('token');
-            const type = url.searchParams.get('type') || 'magiclink';
-            
-            if (token) {
-              const { data: signInData, error: signInError } = await supabase.auth.verifyOtp({
-                token_hash: token,
-                type: type as any,
-              });
-              
-              if (signInError) {
-                console.error("Magic link sign-in error:", signInError);
-                // Fallback: just redirect to the magic link URL
-                window.location.href = data.session_url;
-                return;
-              } else {
-                console.log("User signed in successfully:", signInData);
-              }
-            }
-          } catch (error) {
-            console.error("Error processing magic link:", error);
-            // Fallback: redirect to magic link
-            window.location.href = data.session_url;
-            return;
-          }
-        } else {
-          // If no magic link, try to sign in with OTP
-          console.log("No magic link provided, trying OTP sign-in...");
-          try {
-            const { error: otpError } = await supabase.auth.signInWithOtp({
-              email: data.user?.email || data.tempSignup.email,
-              options: {
-                shouldCreateUser: false,
-              }
-            });
-            
-            if (otpError) {
-              console.error("OTP sign-in error:", otpError);
-            }
-          } catch (authError) {
-            console.error("Failed to send OTP:", authError);
-          }
-        }
-          
-          // Skip Stripe for now - just go to dashboard
-          console.log("Account created and user signed in, redirecting to dashboard...");
-          
-          // Give the auth session a moment to establish
-          setTimeout(() => {
-            navigate("/dashboard");
-          }, 1500);
-        }
-      }
+      setTimeout(() => {
+        navigate(`/account-details?id=${verifyData.signup_id}`);
+      }, 1500);
+      
     } catch (err: any) {
       console.error("Error in handleVerify:", err);
       setError(err.message || "Invalid verification code");
@@ -225,7 +156,7 @@ export function VerifyCode() {
     setError("");
 
     try {
-      // Create a new temp signup with the same data to get a new code
+      // Resend using our custom endpoint
       const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/resend-verification`, {
         method: "POST",
         headers: {
@@ -233,7 +164,7 @@ export function VerifyCode() {
           "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
         },
         body: JSON.stringify({
-          temp_signup_id: tempSignupId,
+          verification_id: verificationId,
           auth_method: authMethod,
         }),
       });

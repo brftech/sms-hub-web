@@ -215,7 +215,7 @@ const Dashboard = () => {
   const navigateToCompanies = () => navigate("/companies");
   const navigateToUsers = () => navigate("/users");
   const navigateToLeads = () => navigate("/leads");
-  const navigateToTempSignups = () => navigate("/temp-signups");
+  const navigateToVerifications = () => navigate("/verifications");
 
   // Data cleanup handlers
   const handleDataCleanup = async () => {
@@ -229,7 +229,7 @@ const Dashboard = () => {
 
     if (
       !confirm(
-        "⚠️ FINAL WARNING: This will delete:\n• All companies created after Sept 1, 2025\n• All temporary signups\n• All user profiles\n• All leads and activities\n• All auth users and sessions\n• All other business data\n\nThis is your LAST chance to cancel. Continue?"
+        "⚠️ FINAL WARNING: This will delete:\n• All companies created after Sept 1, 2025\n• All verifications\n• All user profiles\n• All leads and activities\n• All auth users and sessions\n• All other business data\n\nThis is your LAST chance to cancel. Continue?"
       )
     ) {
       return;
@@ -240,7 +240,7 @@ const Dashboard = () => {
       setCleanupResult(null);
 
       // Try the FK-aware method first
-      console.log("Attempting FK-aware data cleanup...");
+      console.log("Attempting FK-aware verification cleanup...");
       let result = await dataCleanupService.performDataCleanupWithFKHandling();
 
       // If that fails, try the regular method
@@ -283,7 +283,7 @@ const Dashboard = () => {
       alert(
         `Current Data Counts:\n\n` +
           `• Companies: ${counts.companies}\n` +
-          `• Temp Signups: ${counts.tempSignups}\n` +
+          `• Verifications: ${counts.verifications}\n` +
           `• User Profiles: ${counts.userProfiles}\n` +
           `• Leads: ${counts.leads}\n` +
           `• Auth Users: ${counts.authUsers}\n\n` +
@@ -514,7 +514,7 @@ const Dashboard = () => {
 
           <div
             className="bg-white rounded-lg shadow-sm p-4 sm:p-6 cursor-pointer hover:shadow-md hover:scale-105 transition-all duration-200"
-            onClick={navigateToTempSignups}
+            onClick={navigateToVerifications}
           >
             <div className="flex items-center">
               <div className="p-2 bg-yellow-100 rounded-lg flex-shrink-0">
@@ -844,7 +844,7 @@ const Dashboard = () => {
             </span>
           </button>
           <button
-            onClick={navigateToTempSignups}
+            onClick={navigateToVerifications}
             className="flex items-center justify-center px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
           >
             <Shield className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-purple-600" />
@@ -886,7 +886,7 @@ const Dashboard = () => {
                 <br />
                 • Companies created after Sept 1, 2025
                 <br />
-                • All temporary signups
+                • All verifications
                 <br />
                 • All user profiles
                 <br />
@@ -961,8 +961,8 @@ const Dashboard = () => {
                         <strong>Deleted:</strong>
                         <br />• Companies:{" "}
                         {cleanupResult.details.companiesDeleted}
-                        <br />• Temp Signups:{" "}
-                        {cleanupResult.details.tempSignupsDeleted}
+                        <br />• Verifications:{" "}
+                        {cleanupResult.details.verificationsDeleted}
                         <br />• User Profiles:{" "}
                         {cleanupResult.details.userProfilesDeleted}
                         <br />• Leads: {cleanupResult.details.leadsDeleted}

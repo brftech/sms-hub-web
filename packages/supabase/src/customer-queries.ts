@@ -1,23 +1,35 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { supabase } from './client'
+import { createSupabaseClient } from './client'
 import type { Database } from '@sms-hub/types'
-
-// Helper to get supabase client with null check
-const getSupabaseClient = () => {
-  if (!supabase) throw new Error('Supabase client not initialized')
-  return supabase
-}
 
 type Customer = Database['public']['Tables']['customers']['Row']
 
+// Create a single supabase client instance
+const getSupabaseClient = () => {
+  // Get from window if available (set by user app)
+  if (typeof window !== 'undefined' && (window as any).__supabaseClient) {
+    return (window as any).__supabaseClient;
+  }
+  
+  // Otherwise create a new one
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+  const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+  
+  if (!supabaseUrl || !supabaseAnonKey) {
+    throw new Error('Supabase URL and Anon Key are required');
+  }
+  
+  return createSupabaseClient(supabaseUrl, supabaseAnonKey);
+}
+
 // Get customer subscription details (works for both B2B and B2C)
 export const useCustomerSubscription = (customerId: string | null) => {
+  const supabase = getSupabaseClient()
+  
   return useQuery({
     queryKey: ['customer-subscription', customerId],
     queryFn: async () => {
       if (!customerId) throw new Error('Customer ID is required')
-      
-      const supabase = getSupabaseClient()
       const { data, error } = await supabase
         .from('customers')
         .select(`
@@ -52,7 +64,6 @@ export const useCustomerByUser = (userId: string | null) => {
     queryFn: async () => {
       if (!userId) return null
       
-      const supabase = getSupabaseClient()
       
       // First check if user has direct customer relationship
       const { data: userProfile } = await supabase
@@ -85,7 +96,6 @@ export const useCustomerByCompany = (companyId: string | null) => {
     queryFn: async () => {
       if (!companyId) return null
       
-      const supabase = getSupabaseClient()
       
       // First get company's customer_id
       const { data: company } = await supabase

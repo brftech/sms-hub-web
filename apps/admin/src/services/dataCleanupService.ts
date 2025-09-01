@@ -5,7 +5,7 @@ export interface CleanupResult {
   message: string;
   details?: {
     companiesDeleted: number;
-    tempSignupsDeleted: number;
+    verificationsDeleted: number;
     userProfilesDeleted: number;
     leadsDeleted: number;
     authUsersDeleted: number;
@@ -33,13 +33,13 @@ class DataCleanupService {
     try {
       const [
         companiesCount,
-        tempSignupsCount,
+        verificationsCount,
         userProfilesCount,
         leadsCount,
         authUsersCount,
       ] = await Promise.all([
         this.supabase.from("companies").select("id", { count: "exact" }),
-        this.supabase.from("temp_signups").select("id", { count: "exact" }),
+        this.supabase.from("verifications").select("id", { count: "exact" }),
         this.supabase.from("user_profiles").select("id", { count: "exact" }),
         this.supabase.from("leads").select("id", { count: "exact" }),
         this.supabase.auth.admin.listUsers(),
@@ -47,7 +47,7 @@ class DataCleanupService {
 
       return {
         companies: companiesCount.count || 0,
-        tempSignups: tempSignupsCount.count || 0,
+        verifications: verificationsCount.count || 0,
         userProfiles: userProfilesCount.count || 0,
         leads: leadsCount.count || 0,
         authUsers: authUsersCount.data?.length || 0,
@@ -76,7 +76,7 @@ class DataCleanupService {
           .delete()
           .gte("created_at", "2025-09-01"),
 
-        this.supabase.from("temp_signups").delete(),
+        this.supabase.from("verifications").delete(),
         this.supabase.from("verification_attempts").delete(),
         this.supabase.from("user_profiles").delete(),
         this.supabase.from("leads").delete(),
@@ -113,7 +113,8 @@ class DataCleanupService {
       // Calculate what was deleted
       const details = {
         companiesDeleted: beforeCounts.companies - afterCounts.companies,
-        tempSignupsDeleted: beforeCounts.tempSignups - afterCounts.tempSignups,
+        verificationsDeleted:
+          beforeCounts.verifications - afterCounts.verifications,
         userProfilesDeleted:
           beforeCounts.userProfiles - afterCounts.userProfiles,
         leadsDeleted: beforeCounts.leads - afterCounts.leads,
@@ -158,7 +159,7 @@ class DataCleanupService {
           .delete()
           .gte("created_at", "2025-09-01"),
 
-        this.supabase.from("temp_signups").delete(),
+        this.supabase.from("verifications").delete(),
         this.supabase.from("verification_attempts").delete(),
         this.supabase.from("user_profiles").delete(),
         this.supabase.from("leads").delete(),
@@ -191,7 +192,8 @@ class DataCleanupService {
 
       const details = {
         companiesDeleted: beforeCounts.companies - afterCounts.companies,
-        tempSignupsDeleted: beforeCounts.tempSignups - afterCounts.tempSignups,
+        verificationsDeleted:
+          beforeCounts.verifications - afterCounts.verifications,
         userProfilesDeleted:
           beforeCounts.userProfiles - afterCounts.userProfiles,
         leadsDeleted: beforeCounts.leads - afterCounts.leads,
@@ -245,7 +247,7 @@ class DataCleanupService {
         // Core tables
         "leads",
         "user_profiles",
-        "temp_signups",
+        "verifications",
 
         // Companies last (keep those before Sept 1, 2025)
         "companies",
@@ -287,7 +289,8 @@ class DataCleanupService {
 
       const details = {
         companiesDeleted: beforeCounts.companies - afterCounts.companies,
-        tempSignupsDeleted: beforeCounts.tempSignups - afterCounts.tempSignups,
+        verificationsDeleted:
+          beforeCounts.verifications - afterCounts.verifications,
         userProfilesDeleted:
           beforeCounts.userProfiles - afterCounts.userProfiles,
         leadsDeleted: beforeCounts.leads - afterCounts.leads,

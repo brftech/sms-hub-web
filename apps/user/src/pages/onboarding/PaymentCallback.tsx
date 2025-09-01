@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useHub, HubLogo, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sms-hub/ui'
 import { CheckCircle, XCircle, Loader2 } from 'lucide-react'
-import { supabase } from '@sms-hub/supabase'
 import { toast } from 'sonner'
 
 export function PaymentCallback() {
@@ -36,37 +35,18 @@ export function PaymentCallback() {
       return
     }
 
-    try {
-      // Verify the checkout session with our Edge Function
-      const { data, error } = await supabase.functions.invoke('verify-checkout-session', {
-        body: { sessionId }
-      })
-
-      if (error || !data.success) {
-        throw new Error(error?.message || 'Payment verification failed')
-      }
-
-      // Payment successful
-      setStatus('success')
-      setMessage('Payment successful! Redirecting to your dashboard...')
-      toast.success('Payment completed successfully!')
-      
-      // Redirect to dashboard after a brief delay
-      setTimeout(() => {
-        navigate('/dashboard')
-      }, 2000)
-
-    } catch (error: any) {
-      console.error('Payment verification error:', error)
-      setStatus('error')
-      setMessage(error.message || 'Failed to verify payment. Redirecting to dashboard...')
-      toast.error('Payment verification failed')
-      
-      // Still redirect to dashboard after error
-      setTimeout(() => {
-        navigate('/dashboard')
-      }, 3000)
-    }
+    // Payment successful (webhook will handle the database updates)
+    setStatus('success')
+    setMessage('Payment successful! Setting up your account...')
+    toast.success('Payment completed successfully!')
+    
+    // Clear any payment required flags
+    sessionStorage.removeItem('payment_required')
+    
+    // Redirect to dashboard after a brief delay
+    setTimeout(() => {
+      navigate('/')
+    }, 2000)
   }
 
   return (

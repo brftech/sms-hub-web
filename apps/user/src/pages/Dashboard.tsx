@@ -1,5 +1,4 @@
-import { useHub, Card, CardContent, CardDescription, CardHeader, CardTitle, Button, Badge } from "@sms-hub/ui";
-import { Progress } from "@sms-hub/ui";
+import { useHub } from "@sms-hub/ui";
 import {
   MessageSquare,
   Users,
@@ -17,6 +16,9 @@ import {
   Plus,
   Upload,
   Clock,
+  Eye,
+  RefreshCw,
+  Zap
 } from "lucide-react";
 import { 
   useUserProfile, 
@@ -27,575 +29,283 @@ import {
   useCurrentUserPhoneNumbers
 } from "@sms-hub/supabase/react";
 import { Link } from "react-router-dom";
-import styled from "styled-components";
-
-const DashboardContainer = styled.div`
-  background: #f8f9fa;
-  min-height: 100vh;
-  padding: 2rem;
-
-  @media (max-width: 768px) {
-    padding: 1rem;
-  }
-`;
-
-const Header = styled.div`
-  margin-bottom: 2rem;
-`;
-
-const Title = styled.h1`
-  font-size: 1.875rem;
-  font-weight: 600;
-  color: #1f2937;
-  margin: 0;
-  margin-bottom: 0.5rem;
-`;
-
-const Subtitle = styled.p`
-  font-size: 1rem;
-  color: #6b7280;
-  margin: 0;
-`;
-
-const StatsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-`;
-
-const StatCard = styled(Card)`
-  background: white;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-  transition: all 0.2s ease;
-
-  &:hover {
-    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  }
-`;
-
-const StatContent = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: start;
-`;
-
-const StatInfo = styled.div`
-  flex: 1;
-`;
-
-const StatLabel = styled.p`
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #6b7280;
-  margin: 0;
-  margin-bottom: 0.5rem;
-`;
-
-const StatValue = styled.div`
-  font-size: 1.875rem;
-  font-weight: 600;
-  color: #1f2937;
-  line-height: 1.2;
-`;
-
-const StatSubtext = styled.p`
-  font-size: 0.875rem;
-  color: #9ca3af;
-  margin-top: 0.25rem;
-`;
-
-const IconWrapper = styled.div<{ color: string }>`
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
-  background: ${props => props.color};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-`;
-
-const ActionSection = styled.div`
-  margin-bottom: 2rem;
-`;
-
-const SectionTitle = styled.h2`
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #111827;
-  margin-bottom: 1rem;
-`;
-
-const ActionGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 1rem;
-`;
-
-const ActionCard = styled(Card)`
-  background: white;
-  border: 1px solid #e5e7eb;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-
-  &:hover {
-    border-color: #3b82f6;
-    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  }
-`;
-
-const ActionContent = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1.25rem;
-`;
-
-const ActionInfo = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-`;
-
-const ActionIcon = styled.div`
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  background: #f3f4f6;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #374151;
-`;
-
-const ActionText = styled.div``;
-
-const ActionTitle = styled.div`
-  font-weight: 600;
-  color: #111827;
-  margin-bottom: 0.125rem;
-`;
-
-const ActionDescription = styled.div`
-  font-size: 0.875rem;
-  color: #6b7280;
-`;
-
-const ContentGrid = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-
-  @media (max-width: 1024px) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-const ContentCard = styled(Card)`
-  background: white;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-`;
-
-const EmptyState = styled.div`
-  text-align: center;
-  padding: 3rem 2rem;
-  color: #9ca3af;
-`;
-
-const EmptyIcon = styled.div`
-  width: 64px;
-  height: 64px;
-  border-radius: 16px;
-  background: #f9fafb;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 1rem;
-  color: #d1d5db;
-`;
-
-const EmptyText = styled.p`
-  font-size: 0.875rem;
-  color: #6b7280;
-  margin-bottom: 1rem;
-`;
-
-const SetupCard = styled(Card)`
-  background: white;
-  border-left: 4px solid #3b82f6;
-  margin-bottom: 2rem;
-  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-`;
-
-const SetupContent = styled.div`
-  padding: 1.5rem;
-`;
-
-const SetupHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-`;
-
-const SetupTitle = styled.h3`
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #1f2937;
-`;
-
-const SetupProgress = styled.div`
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #3b82f6;
-`;
 
 export function Dashboard() {
-  const { hubConfig, currentHub } = useHub();
-  const { data: userProfile } = useUserProfile();
-  const { data: company } = useCurrentUserCompany();
-  const { data: campaigns = [] } = useCurrentUserCampaigns();
-  const { data: brands = [] } = useBrands(company?.id || "");
-  const { data: phoneNumbers = [] } = useCurrentUserPhoneNumbers();
-  const { data: onboardingSubmission } = useOnboardingSubmission(
-    company?.id || "",
-    hubConfig.hubNumber
-  );
+  const { hubConfig, currentHub } = useHub()
+  const { data: userProfile } = useUserProfile()
+  const { data: company } = useCurrentUserCompany()
+  const { data: onboardingSubmission } = useOnboardingSubmission(company?.id || "", hubConfig.hubNumber)
+  const { data: campaigns } = useCurrentUserCampaigns()
+  const { data: brands } = useBrands(company?.id || "")
+  const { data: phoneNumbers } = useCurrentUserPhoneNumbers()
 
-  // Calculate real onboarding progress
-  const calculateOnboardingProgress = () => {
-    if (!userProfile || !company) return 0;
-    
-    let completed = 0;
-    const total = 6;
-    
-    // Step 1: Account created
-    if (userProfile.id) completed++;
-    
-    // Step 2: Company created
-    if (company.id) completed++;
-    
-    // Step 3: Billing setup
-    if (company.stripe_customer_id) completed++;
-    
-    // Step 4: Brand registered
-    if (brands.length > 0 && brands[0].tcr_brand_id) completed++;
-    
-    // Step 5: Campaign created
-    if (campaigns.length > 0 && campaigns[0].tcr_campaign_id) completed++;
-    
-    // Step 6: Phone number assigned
-    if (phoneNumbers.length > 0) completed++;
-    
-    return (completed / total) * 100;
-  };
-  
-  const completionPercentage = calculateOnboardingProgress();
-  const isOnboardingComplete = completionPercentage === 100;
+  // Mock data for demonstration
+  const stats = {
+    totalMessages: 15420,
+    messagesThisMonth: 2340,
+    totalCampaigns: campaigns?.length || 0,
+    activeCampaigns: campaigns?.filter(c => c.status === 'active').length || 0,
+    totalContacts: 1247,
+    activeContacts: 1189,
+    deliveryRate: 98.5,
+    openRate: 67.2
+  }
+
+  const recentActivity = [
+    {
+      id: 1,
+      type: 'campaign_sent',
+      title: 'Campaign sent',
+      description: 'Welcome campaign sent to 1,234 contacts',
+      time: '2 minutes ago',
+      icon: Send,
+      color: 'text-blue-600'
+    },
+    {
+      id: 2,
+      type: 'contact_added',
+      title: 'Contacts imported',
+      description: '500 new contacts imported from CSV',
+      time: '15 minutes ago',
+      icon: Users,
+      color: 'text-green-600'
+    },
+    {
+      id: 3,
+      type: 'campaign_created',
+      title: 'Campaign created',
+      description: 'New promotional campaign created',
+      time: '1 hour ago',
+      icon: Plus,
+      color: 'text-purple-600'
+    }
+  ]
+
+  const quickActions = [
+    {
+      name: 'Create Campaign',
+      description: 'Start a new messaging campaign',
+      icon: Plus,
+      href: '/campaigns',
+      color: 'text-blue-600'
+    },
+    {
+      name: 'Import Contacts',
+      description: 'Upload contacts from CSV or Excel',
+      icon: Upload,
+      href: '/campaigns',
+      color: 'text-green-600'
+    },
+    {
+      name: 'View Analytics',
+      description: 'Check campaign performance',
+      icon: BarChart3,
+      href: '/campaigns',
+      color: 'text-purple-600'
+    },
+    {
+      name: 'Manage Settings',
+      description: 'Update account preferences',
+      icon: Settings,
+      href: '/settings',
+      color: 'text-orange-600'
+    }
+  ]
 
   return (
-    <DashboardContainer>
-      {/* Header */}
-      <Header>
-        <Title>Welcome back, {userProfile?.first_name || "there"}</Title>
-        <Subtitle>Here's what's happening with your SMS campaigns today.</Subtitle>
-      </Header>
+    <div className="space-y-6 p-6">
+      {/* Page Header */}
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+        <p className="mt-1 text-sm text-gray-500">
+          Welcome back, {userProfile?.first_name}! Here's what's happening with your {currentHub} account.
+        </p>
+      </div>
 
-      {/* Setup Progress Card */}
-      {!isOnboardingComplete && (
-        <SetupCard>
-          <SetupContent>
-            <SetupHeader>
-              <SetupTitle>Complete Your Account Setup</SetupTitle>
-              <SetupProgress>{Math.round(completionPercentage)}% Complete</SetupProgress>
-            </SetupHeader>
-            <Progress value={completionPercentage} className="mb-4" />
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <p style={{ fontSize: '0.875rem', color: '#6b7280' }}>
-                Finish setting up your account to start sending messages
-              </p>
-              <Button asChild>
-                <Link to="/onboarding">
-                  Continue Setup
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
+      {/* Statistics Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="flex items-center">
+            <div className="p-2 bg-blue-100 rounded-lg">
+              <MessageSquare className="w-6 h-6 text-blue-600" />
             </div>
-          </SetupContent>
-        </SetupCard>
-      )}
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-600">Messages Sent</p>
+              <p className="text-2xl font-bold text-gray-900">{stats.totalMessages.toLocaleString()}</p>
+              <p className="text-xs text-blue-600 mt-1">{stats.messagesThisMonth.toLocaleString()} this month</p>
+            </div>
+          </div>
+        </div>
 
-      {/* Stats Grid */}
-      <StatsGrid>
-        <StatCard>
-          <CardContent className="p-6">
-            <StatContent>
-              <StatInfo>
-                <StatLabel>Total Messages</StatLabel>
-                <StatValue>{campaigns.reduce((acc, c) => acc + (c.metadata?.message_count || 0), 0)}</StatValue>
-                <StatSubtext>{campaigns.length > 0 ? 'Across all campaigns' : 'No messages sent yet'}</StatSubtext>
-              </StatInfo>
-              <IconWrapper color="#dbeafe">
-                <MessageSquare className="h-5 w-5" style={{ color: '#3b82f6' }} />
-              </IconWrapper>
-            </StatContent>
-          </CardContent>
-        </StatCard>
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="flex items-center">
+            <div className="p-2 bg-green-100 rounded-lg">
+              <Zap className="w-6 h-6 text-green-600" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-600">Campaigns</p>
+              <p className="text-2xl font-bold text-gray-900">{stats.totalCampaigns}</p>
+              <p className="text-xs text-green-600 mt-1">{stats.activeCampaigns} active</p>
+            </div>
+          </div>
+        </div>
 
-        <StatCard>
-          <CardContent className="p-6">
-            <StatContent>
-              <StatInfo>
-                <StatLabel>Active Campaigns</StatLabel>
-                <StatValue>{campaigns.filter(c => c.status === 'active').length}</StatValue>
-                <StatSubtext>{campaigns.length > 0 ? `${campaigns.length} total campaigns` : 'Create your first campaign'}</StatSubtext>
-              </StatInfo>
-              <IconWrapper color="#dcfce7">
-                <TrendingUp className="h-5 w-5" style={{ color: '#22c55e' }} />
-              </IconWrapper>
-            </StatContent>
-          </CardContent>
-        </StatCard>
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="flex items-center">
+            <div className="p-2 bg-purple-100 rounded-lg">
+              <Users className="w-6 h-6 text-purple-600" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-600">Contacts</p>
+              <p className="text-2xl font-bold text-gray-900">{stats.totalContacts.toLocaleString()}</p>
+              <p className="text-xs text-purple-600 mt-1">{stats.activeContacts} active</p>
+            </div>
+          </div>
+        </div>
 
-        <StatCard>
-          <CardContent className="p-6">
-            <StatContent>
-              <StatInfo>
-                <StatLabel>Total Contacts</StatLabel>
-                <StatValue>{company?.metadata?.contact_count || 0}</StatValue>
-                <StatSubtext>{company?.metadata?.contact_count > 0 ? 'Total contacts' : 'Import your contacts'}</StatSubtext>
-              </StatInfo>
-              <IconWrapper color="#fef3c7">
-                <Users className="h-5 w-5" style={{ color: '#f59e0b' }} />
-              </IconWrapper>
-            </StatContent>
-          </CardContent>
-        </StatCard>
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="flex items-center">
+            <div className="p-2 bg-orange-100 rounded-lg">
+              <TrendingUp className="w-6 h-6 text-orange-600" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-600">Delivery Rate</p>
+              <p className="text-2xl font-bold text-gray-900">{stats.deliveryRate}%</p>
+              <p className="text-xs text-orange-600 mt-1">{stats.openRate}% open rate</p>
+            </div>
+          </div>
+        </div>
+      </div>
 
-        <StatCard>
-          <CardContent className="p-6">
-            <StatContent>
-              <StatInfo>
-                <StatLabel>Delivery Rate</StatLabel>
-                <StatValue>{company?.metadata?.delivery_rate || '--'}%</StatValue>
-                <StatSubtext>{company?.metadata?.delivery_rate ? 'Average delivery rate' : 'No data available'}</StatSubtext>
-              </StatInfo>
-              <IconWrapper color="#f3f4f6">
-                <Activity className="h-5 w-5" style={{ color: '#6b7280' }} />
-              </IconWrapper>
-            </StatContent>
-          </CardContent>
-        </StatCard>
-      </StatsGrid>
+      {/* Secondary Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">Phone Numbers</p>
+              <p className="text-2xl font-bold text-gray-900">{phoneNumbers?.length || 0}</p>
+            </div>
+            <div className="p-2 bg-blue-100 rounded-lg">
+              <Phone className="w-6 h-6 text-blue-600" />
+            </div>
+          </div>
+          <p className="text-xs text-gray-500 mt-2">Active SMS numbers</p>
+        </div>
 
-      {/* Quick Actions */}
-      <ActionSection>
-        <SectionTitle>Quick Actions</SectionTitle>
-        <ActionGrid>
-          <Link to="/campaigns" style={{ textDecoration: 'none' }}>
-            <ActionCard>
-              <ActionContent>
-                <ActionInfo>
-                  <ActionIcon>
-                    <Send className="h-5 w-5" />
-                  </ActionIcon>
-                  <ActionText>
-                    <ActionTitle>New Campaign</ActionTitle>
-                    <ActionDescription>Send bulk SMS</ActionDescription>
-                  </ActionText>
-                </ActionInfo>
-                <ArrowRight className="h-5 w-5" style={{ color: '#9ca3af' }} />
-              </ActionContent>
-            </ActionCard>
-          </Link>
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">Brands</p>
+              <p className="text-2xl font-bold text-gray-900">{brands?.length || 0}</p>
+            </div>
+            <div className="p-2 bg-green-100 rounded-lg">
+              <Building className="w-6 h-6 text-green-600" />
+            </div>
+          </div>
+          <p className="text-xs text-gray-500 mt-2">Registered brands</p>
+        </div>
 
-          <Link to="/contacts" style={{ textDecoration: 'none' }}>
-            <ActionCard>
-              <ActionContent>
-                <ActionInfo>
-                  <ActionIcon>
-                    <Upload className="h-5 w-5" />
-                  </ActionIcon>
-                  <ActionText>
-                    <ActionTitle>Import Contacts</ActionTitle>
-                    <ActionDescription>Add recipients</ActionDescription>
-                  </ActionText>
-                </ActionInfo>
-                <ArrowRight className="h-5 w-5" style={{ color: '#9ca3af' }} />
-              </ActionContent>
-            </ActionCard>
-          </Link>
-
-          <Link to="/messages/new" style={{ textDecoration: 'none' }}>
-            <ActionCard>
-              <ActionContent>
-                <ActionInfo>
-                  <ActionIcon>
-                    <MessageSquare className="h-5 w-5" />
-                  </ActionIcon>
-                  <ActionText>
-                    <ActionTitle>Quick Message</ActionTitle>
-                    <ActionDescription>Send single SMS</ActionDescription>
-                  </ActionText>
-                </ActionInfo>
-                <ArrowRight className="h-5 w-5" style={{ color: '#9ca3af' }} />
-              </ActionContent>
-            </ActionCard>
-          </Link>
-
-          <Link to="/settings" style={{ textDecoration: 'none' }}>
-            <ActionCard>
-              <ActionContent>
-                <ActionInfo>
-                  <ActionIcon>
-                    <Settings className="h-5 w-5" />
-                  </ActionIcon>
-                  <ActionText>
-                    <ActionTitle>Settings</ActionTitle>
-                    <ActionDescription>Manage account</ActionDescription>
-                  </ActionText>
-                </ActionInfo>
-                <ArrowRight className="h-5 w-5" style={{ color: '#9ca3af' }} />
-              </ActionContent>
-            </ActionCard>
-          </Link>
-        </ActionGrid>
-      </ActionSection>
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">Onboarding</p>
+              <p className="text-2xl font-bold text-green-600">
+                {onboardingSubmission ? 'Complete' : 'Pending'}
+              </p>
+            </div>
+            <div className="p-2 bg-green-100 rounded-lg">
+              <CheckCircle className="w-6 h-6 text-green-600" />
+            </div>
+          </div>
+          <p className="text-xs text-gray-500 mt-2">
+            {onboardingSubmission ? 'Account verified' : 'Complete setup'}
+          </p>
+        </div>
+      </div>
 
       {/* Content Grid */}
-      <ContentGrid>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent Activity */}
-        <ContentCard>
-          <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
-            <CardDescription>Your latest campaign activity</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {campaigns.length > 0 || brands.length > 0 ? (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                {/* Show recent campaigns */}
-                {campaigns.slice(0, 3).map(campaign => (
-                  <div key={campaign.id} style={{ 
-                    padding: '0.75rem', 
-                    border: '1px solid #e5e7eb', 
-                    borderRadius: '0.5rem',
-                    background: '#fafafa'
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <div>
-                        <p style={{ fontWeight: 500, color: '#1f2937', marginBottom: '0.25rem' }}>
-                          {campaign.name}
-                        </p>
-                        <p style={{ fontSize: '0.75rem', color: '#6b7280' }}>
-                          Campaign • {new Date(campaign.created_at).toLocaleDateString()}
-                        </p>
-                      </div>
-                      <Badge style={{ 
-                        background: campaign.status === 'active' ? '#dcfce7' : '#fef3c7',
-                        color: campaign.status === 'active' ? '#166534' : '#92400e',
-                        border: 'none'
-                      }}>
-                        {campaign.status || 'pending'}
-                      </Badge>
-                    </div>
+        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h3 className="text-lg font-medium text-gray-900">Recent Activity</h3>
+          </div>
+          <div className="p-6">
+            <div className="space-y-4">
+              {recentActivity.map((activity) => (
+                <div key={activity.id} className="flex items-start space-x-3">
+                  <div className={`p-2 rounded-lg bg-gray-100 ${activity.color}`}>
+                    <activity.icon className="w-4 h-4" />
                   </div>
-                ))}
-                
-                {/* Show recent brands */}
-                {brands.slice(0, 2).map(brand => (
-                  <div key={brand.id} style={{ 
-                    padding: '0.75rem', 
-                    border: '1px solid #e5e7eb', 
-                    borderRadius: '0.5rem',
-                    background: '#fafafa'
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <div>
-                        <p style={{ fontWeight: 500, color: '#1f2937', marginBottom: '0.25rem' }}>
-                          {brand.name}
-                        </p>
-                        <p style={{ fontSize: '0.75rem', color: '#6b7280' }}>
-                          Brand Registration • {brand.tcr_brand_id ? 'Registered' : 'Pending'}
-                        </p>
-                      </div>
-                      <Badge style={{ 
-                        background: brand.tcr_brand_id ? '#dcfce7' : '#fef3c7',
-                        color: brand.tcr_brand_id ? '#166534' : '#92400e',
-                        border: 'none'
-                      }}>
-                        {brand.status || 'pending'}
-                      </Badge>
-                    </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-900">{activity.title}</p>
+                    <p className="text-sm text-gray-500">{activity.description}</p>
+                    <p className="text-xs text-gray-400 mt-1">{activity.time}</p>
                   </div>
-                ))}
-                
-                {campaigns.length > 3 && (
-                  <Button variant="outline" asChild style={{ marginTop: '0.5rem' }}>
-                    <Link to="/campaigns">View All Campaigns</Link>
-                  </Button>
-                )}
-              </div>
-            ) : (
-              <EmptyState>
-                <EmptyIcon>
-                  <Clock className="h-8 w-8" />
-                </EmptyIcon>
-                <EmptyText>No recent activity</EmptyText>
-                <Button variant="outline" asChild>
-                  <Link to="/campaigns">Create Your First Campaign</Link>
-                </Button>
-              </EmptyState>
-            )}
-          </CardContent>
-        </ContentCard>
-
-        {/* Account Info */}
-        <ContentCard>
-          <CardHeader>
-            <CardTitle>Account Information</CardTitle>
-            <CardDescription>Your account details</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                <Building className="h-4 w-4" style={{ color: '#6b7280' }} />
-                <div>
-                  <p style={{ fontSize: '0.875rem', color: '#6b7280' }}>Company</p>
-                  <p style={{ fontWeight: 500, color: '#111827' }}>{company?.public_name || "Not set"}</p>
                 </div>
-              </div>
-              
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                <Mail className="h-4 w-4" style={{ color: '#6b7280' }} />
-                <div>
-                  <p style={{ fontSize: '0.875rem', color: '#6b7280' }}>Email</p>
-                  <p style={{ fontWeight: 500, color: '#111827' }}>{userProfile?.email}</p>
-                </div>
-              </div>
-              
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                <Phone className="h-4 w-4" style={{ color: '#6b7280' }} />
-                <div>
-                  <p style={{ fontSize: '0.875rem', color: '#6b7280' }}>Phone</p>
-                  <p style={{ fontWeight: 500, color: '#111827' }}>{userProfile?.mobile_phone_number || "Not provided"}</p>
-                </div>
-              </div>
-              
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                <BarChart3 className="h-4 w-4" style={{ color: '#6b7280' }} />
-                <div>
-                  <p style={{ fontSize: '0.875rem', color: '#6b7280' }}>Account Number</p>
-                  <p style={{ fontWeight: 500, color: '#111827' }}>{company?.company_account_number || userProfile?.account_number || "Pending"}</p>
-                </div>
-              </div>
+              ))}
             </div>
-          </CardContent>
-        </ContentCard>
-      </ContentGrid>
-    </DashboardContainer>
+          </div>
+        </div>
+
+        {/* Quick Actions */}
+        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h3 className="text-lg font-medium text-gray-900">Quick Actions</h3>
+          </div>
+          <div className="p-6">
+            <div className="grid grid-cols-1 gap-4">
+              {quickActions.map((action) => (
+                <Link
+                  key={action.name}
+                  to={action.href}
+                  className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  <div className={`p-2 rounded-lg bg-gray-100 ${action.color}`}>
+                    <action.icon className="w-5 h-5" />
+                  </div>
+                  <div className="ml-4 flex-1">
+                    <p className="text-sm font-medium text-gray-900">{action.name}</p>
+                    <p className="text-sm text-gray-500">{action.description}</p>
+                  </div>
+                  <ArrowRight className="w-4 h-4 text-gray-400" />
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Company Info */}
+      {company && (
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <h3 className="text-lg font-medium text-gray-900 mb-4">Company Information</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <p className="text-sm font-medium text-gray-600">Company Name</p>
+              <p className="text-lg text-gray-900">{company.public_name}</p>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-600">Account Number</p>
+              <p className="text-lg font-mono text-gray-900">{company.company_account_number}</p>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-600">Billing Email</p>
+              <p className="text-lg text-gray-900">{company.billing_email}</p>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-600">Status</p>
+              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                company.is_active 
+                  ? 'bg-green-100 text-green-800' 
+                  : 'bg-red-100 text-red-800'
+              }`}>
+                {company.is_active ? 'Active' : 'Inactive'}
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

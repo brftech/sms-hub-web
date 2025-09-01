@@ -1,695 +1,446 @@
 import { useState } from 'react'
-import { useHub, Card, CardContent, CardDescription, CardHeader, CardTitle, Button, Input, Label, Switch } from '@sms-hub/ui'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Badge, Separator } from '@sms-hub/ui'
-import { User, Building, Phone, CreditCard, Bell, Shield, Key, ChevronRight } from 'lucide-react'
+import { useHub } from '@sms-hub/ui'
+import { 
+  User, 
+  Building, 
+  Phone, 
+  CreditCard, 
+  Bell, 
+  Shield, 
+  Key, 
+  ChevronRight,
+  Save,
+  Eye,
+  EyeOff
+} from 'lucide-react'
 import { useUserProfile, useCurrentUserCompany, useCurrentUserPhoneNumbers, useBrands, useCurrentUserCampaigns } from '@sms-hub/supabase/react'
-import styled from 'styled-components'
 
-const PageContainer = styled.div`
-  padding: 2rem;
-  background: #f8f9fa;
-  min-height: 100vh;
-
-  @media (max-width: 768px) {
-    padding: 1rem;
-  }
-`;
-
-const Header = styled.div`
-  margin-bottom: 2rem;
-`;
-
-const Title = styled.h1`
-  font-size: 1.875rem;
-  font-weight: 600;
-  color: #1f2937;
-  margin: 0;
-  margin-bottom: 0.25rem;
-`;
-
-const Subtitle = styled.p`
-  font-size: 1rem;
-  color: #6b7280;
-  margin: 0;
-`;
-
-const ContentWrapper = styled.div`
-  display: flex;
-  gap: 1.5rem;
-
-  @media (max-width: 1024px) {
-    flex-direction: column;
-  }
-`;
-
-const SidebarCard = styled(Card)`
-  background: white;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-  height: fit-content;
-  min-width: 260px;
-
-  @media (max-width: 1024px) {
-    width: 100%;
-  }
-`;
-
-const MainCard = styled(Card)`
-  background: white;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-  flex: 1;
-`;
-
-const NavMenu = styled.nav`
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-`;
-
-const NavItem = styled.button<{ $active?: boolean }>`
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.625rem 0.75rem;
-  border: none;
-  background: ${props => props.$active ? '#3b82f6' : 'transparent'};
-  color: ${props => props.$active ? 'white' : '#4b5563'};
-  font-size: 0.875rem;
-  font-weight: 500;
-  text-align: left;
-  border-radius: 0.375rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  &:hover {
-    background: ${props => props.$active ? '#3b82f6' : '#f3f4f6'};
-  }
-
-  svg {
-    width: 1rem;
-    height: 1rem;
-  }
-`;
-
-const FormSection = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-`;
-
-const FormGroup = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.375rem;
-`;
-
-const FormRow = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1rem;
-`;
-
-const SwitchRow = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.75rem 0;
-`;
-
-const SwitchInfo = styled.div`
-  flex: 1;
-`;
-
-const SwitchLabel = styled.div`
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #1f2937;
-  margin-bottom: 0.125rem;
-`;
-
-const SwitchDescription = styled.div`
-  font-size: 0.75rem;
-  color: #6b7280;
-`;
-
-const InfoCard = styled.div`
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.5rem;
-  padding: 1rem;
-  margin-bottom: 1rem;
-`;
-
-const InfoRow = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.75rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.5rem;
-  background: white;
-  margin-bottom: 0.75rem;
-`;
-
-const InfoLabel = styled.div`
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #1f2937;
-`;
-
-const InfoValue = styled.div`
-  font-size: 0.875rem;
-  color: #6b7280;
-  font-family: monospace;
-`;
-
-const ActionButtons = styled.div`
-  display: flex;
-  gap: 0.5rem;
-`;
-
-const ProgressBar = styled.div`
-  width: 100%;
-  height: 0.5rem;
-  background: #e5e7eb;
-  border-radius: 0.25rem;
-  overflow: hidden;
-  margin: 0.75rem 0;
-`;
-
-const ProgressFill = styled.div<{ $percent: number }>`
-  height: 100%;
-  width: ${props => props.$percent}%;
-  background: #3b82f6;
-  transition: width 0.3s ease;
-`;
+type SettingsTab = 'profile' | 'company' | 'billing' | 'notifications' | 'security' | 'phone-numbers'
 
 export function Settings() {
-  useHub() // Initialize hub context
+  const { hubConfig, currentHub } = useHub()
   const { data: userProfile } = useUserProfile()
   const { data: company } = useCurrentUserCompany()
   const { data: phoneNumbers = [] } = useCurrentUserPhoneNumbers()
-  const { data: brands = [] } = useBrands(company?.id || '')
+  const { data: brands = [] } = useBrands(company?.id || "")
   const { data: campaigns = [] } = useCurrentUserCampaigns()
-  const [activeTab, setActiveTab] = useState('profile')
+  
+  const [activeTab, setActiveTab] = useState<SettingsTab>('profile')
+  const [showPassword, setShowPassword] = useState(false)
 
-  const tabs = [
-    { id: 'profile', label: 'Profile', icon: User },
-    { id: 'company', label: 'Company', icon: Building },
-    { id: 'phone', label: 'Phone Numbers', icon: Phone },
-    { id: 'billing', label: 'Billing', icon: CreditCard },
-    { id: 'notifications', label: 'Notifications', icon: Bell },
-    { id: 'security', label: 'Security', icon: Shield },
-    { id: 'api', label: 'API Keys', icon: Key },
+  const navigation = [
+    { id: 'profile', name: 'Profile', icon: User, description: 'Personal information' },
+    { id: 'company', name: 'Company', icon: Building, description: 'Company details' },
+    { id: 'billing', name: 'Billing', icon: CreditCard, description: 'Payment methods' },
+    { id: 'notifications', name: 'Notifications', icon: Bell, description: 'Alert preferences' },
+    { id: 'security', name: 'Security', icon: Shield, description: 'Password & 2FA' },
+    { id: 'phone-numbers', name: 'Phone Numbers', icon: Phone, description: 'SMS numbers' },
   ]
+
+  const renderProfileTab = () => (
+    <div className="space-y-6">
+      <div>
+        <h3 className="text-lg font-medium text-gray-900">Personal Information</h3>
+        <p className="mt-1 text-sm text-gray-500">
+          Update your personal details and contact information.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            First Name
+          </label>
+          <input
+            type="text"
+            defaultValue={userProfile?.first_name || ''}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Last Name
+          </label>
+          <input
+            type="text"
+            defaultValue={userProfile?.last_name || ''}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Email Address
+          </label>
+          <input
+            type="email"
+            defaultValue={userProfile?.email || ''}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Phone Number
+          </label>
+          <input
+            type="tel"
+            defaultValue={userProfile?.mobile_phone_number || ''}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+        </div>
+      </div>
+
+      <div className="flex justify-end">
+        <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+          <Save className="w-4 h-4 mr-2" />
+          Save Changes
+        </button>
+      </div>
+    </div>
+  )
+
+  const renderCompanyTab = () => (
+    <div className="space-y-6">
+      <div>
+        <h3 className="text-lg font-medium text-gray-900">Company Information</h3>
+        <p className="mt-1 text-sm text-gray-500">
+          Manage your company details and account settings.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Company Name
+          </label>
+          <input
+            type="text"
+            defaultValue={company?.public_name || ''}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Account Number
+          </label>
+          <input
+            type="text"
+            defaultValue={company?.company_account_number || ''}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            readOnly
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Billing Email
+          </label>
+          <input
+            type="email"
+            defaultValue={company?.billing_email || ''}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Status
+          </label>
+          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+            company?.is_active 
+              ? 'bg-green-100 text-green-800' 
+              : 'bg-red-100 text-red-800'
+          }`}>
+            {company?.is_active ? 'Active' : 'Inactive'}
+          </span>
+        </div>
+      </div>
+
+      <div className="flex justify-end">
+        <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+          <Save className="w-4 h-4 mr-2" />
+          Save Changes
+        </button>
+      </div>
+    </div>
+  )
+
+  const renderBillingTab = () => (
+    <div className="space-y-6">
+      <div>
+        <h3 className="text-lg font-medium text-gray-900">Billing Information</h3>
+        <p className="mt-1 text-sm text-gray-500">
+          Manage your payment methods and billing preferences.
+        </p>
+      </div>
+
+      <div className="bg-gray-50 rounded-lg p-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h4 className="text-sm font-medium text-gray-900">Current Plan</h4>
+            <p className="text-sm text-gray-500">Professional Plan</p>
+          </div>
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+            Active
+          </span>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Payment Method
+          </label>
+          <div className="border border-gray-300 rounded-lg p-4">
+            <div className="flex items-center">
+              <CreditCard className="w-5 h-5 text-gray-400 mr-3" />
+              <div>
+                <p className="text-sm font-medium text-gray-900">•••• •••• •••• 4242</p>
+                <p className="text-xs text-gray-500">Expires 12/25</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Billing Address
+          </label>
+          <textarea
+            rows={3}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="Enter billing address..."
+          />
+        </div>
+      </div>
+
+      <div className="flex justify-end">
+        <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+          <Save className="w-4 h-4 mr-2" />
+          Update Billing
+        </button>
+      </div>
+    </div>
+  )
+
+  const renderNotificationsTab = () => (
+    <div className="space-y-6">
+      <div>
+        <h3 className="text-lg font-medium text-gray-900">Notification Preferences</h3>
+        <p className="mt-1 text-sm text-gray-500">
+          Choose how you want to be notified about important events.
+        </p>
+      </div>
+
+      <div className="space-y-4">
+        <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+          <div>
+            <h4 className="text-sm font-medium text-gray-900">Campaign Notifications</h4>
+            <p className="text-sm text-gray-500">Get notified when campaigns are sent or completed</p>
+          </div>
+          <label className="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" defaultChecked className="sr-only peer" />
+            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+          </label>
+        </div>
+
+        <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+          <div>
+            <h4 className="text-sm font-medium text-gray-900">Billing Alerts</h4>
+            <p className="text-sm text-gray-500">Receive notifications about billing and payments</p>
+          </div>
+          <label className="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" defaultChecked className="sr-only peer" />
+            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+          </label>
+        </div>
+
+        <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+          <div>
+            <h4 className="text-sm font-medium text-gray-900">Security Alerts</h4>
+            <p className="text-sm text-gray-500">Get notified about account security events</p>
+          </div>
+          <label className="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" className="sr-only peer" />
+            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+          </label>
+        </div>
+      </div>
+
+      <div className="flex justify-end">
+        <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+          <Save className="w-4 h-4 mr-2" />
+          Save Preferences
+        </button>
+      </div>
+    </div>
+  )
+
+  const renderSecurityTab = () => (
+    <div className="space-y-6">
+      <div>
+        <h3 className="text-lg font-medium text-gray-900">Security Settings</h3>
+        <p className="mt-1 text-sm text-gray-500">
+          Manage your password and security preferences.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Current Password
+          </label>
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute inset-y-0 right-0 pr-3 flex items-center"
+            >
+              {showPassword ? <EyeOff className="w-4 h-4 text-gray-400" /> : <Eye className="w-4 h-4 text-gray-400" />}
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            New Password
+          </label>
+          <input
+            type="password"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+        </div>
+      </div>
+
+      <div className="flex justify-end">
+        <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+          <Save className="w-4 h-4 mr-2" />
+          Update Password
+        </button>
+      </div>
+    </div>
+  )
+
+  const renderPhoneNumbersTab = () => (
+    <div className="space-y-6">
+      <div>
+        <h3 className="text-lg font-medium text-gray-900">Phone Numbers</h3>
+        <p className="mt-1 text-sm text-gray-500">
+          Manage your SMS phone numbers and their settings.
+        </p>
+      </div>
+
+      <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-200">
+          <h4 className="text-sm font-medium text-gray-900">Active Phone Numbers</h4>
+        </div>
+        
+        <div className="divide-y divide-gray-200">
+          {phoneNumbers.length > 0 ? (
+            phoneNumbers.map((phone) => (
+              <div key={phone.id} className="px-6 py-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">{phone.phone_number}</p>
+                    <p className="text-xs text-gray-500">ID: {phone.id.slice(0, 8)}...</p>
+                  </div>
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                    Active
+                  </span>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="px-6 py-8 text-center">
+              <Phone className="mx-auto h-12 w-12 text-gray-400" />
+              <h3 className="mt-2 text-sm font-medium text-gray-900">No phone numbers</h3>
+              <p className="mt-1 text-sm text-gray-500">
+                Get started by adding your first phone number.
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="flex justify-end">
+        <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+          <Phone className="w-4 h-4 mr-2" />
+          Add Phone Number
+        </button>
+      </div>
+    </div>
+  )
 
   const renderTabContent = () => {
     switch (activeTab) {
       case 'profile':
-        return (
-          <FormSection>
-            <FormRow>
-              <FormGroup>
-                <Label htmlFor="first-name">First Name</Label>
-                <Input
-                  id="first-name"
-                  defaultValue={userProfile?.first_name || ''}
-                  placeholder="Enter first name"
-                />
-              </FormGroup>
-              <FormGroup>
-                <Label htmlFor="last-name">Last Name</Label>
-                <Input
-                  id="last-name"
-                  defaultValue={userProfile?.last_name || ''}
-                  placeholder="Enter last name"
-                />
-              </FormGroup>
-            </FormRow>
-            
-            <FormGroup>
-              <Label htmlFor="email">Email Address</Label>
-              <Input
-                id="email"
-                type="email"
-                defaultValue={userProfile?.email || ''}
-                placeholder="Enter email"
-              />
-            </FormGroup>
-            
-            <FormGroup>
-              <Label htmlFor="phone">Phone Number</Label>
-              <Input
-                id="phone"
-                type="tel"
-                defaultValue={userProfile?.mobile_phone_number || ''}
-                placeholder="Enter phone number"
-              />
-            </FormGroup>
-            
-            <FormGroup>
-              <Label>Account Details</Label>
-              <InfoCard>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                  <span style={{ fontSize: '0.875rem', color: '#6b7280' }}>Account Number:</span>
-                  <Badge variant="secondary">{userProfile?.account_number || 'Not assigned'}</Badge>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <span style={{ fontSize: '0.875rem', color: '#6b7280' }}>Role:</span>
-                  <Badge variant="secondary">{userProfile?.role || 'Member'}</Badge>
-                </div>
-              </InfoCard>
-            </FormGroup>
-            
-            <Button style={{ background: '#3b82f6', color: 'white', width: 'fit-content' }}>
-              Save Changes
-            </Button>
-          </FormSection>
-        )
-
+        return renderProfileTab()
       case 'company':
-        return (
-          <FormSection>
-            <FormGroup>
-              <Label htmlFor="company-name">Company Name</Label>
-              <Input
-                id="company-name"
-                defaultValue={company?.public_name || ''}
-                placeholder="Enter company name"
-              />
-            </FormGroup>
-            
-            <FormGroup>
-              <Label htmlFor="account-number">Company Account Number</Label>
-              <Input
-                id="account-number"
-                value={company?.company_account_number || ''}
-                disabled
-                style={{ background: '#f9fafb', cursor: 'not-allowed' }}
-              />
-            </FormGroup>
-            
-            <FormRow>
-              <FormGroup>
-                <Label htmlFor="industry">Industry</Label>
-                <Select defaultValue={company?.industry || ''}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select industry" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="retail">Retail</SelectItem>
-                    <SelectItem value="healthcare">Healthcare</SelectItem>
-                    <SelectItem value="financial">Financial Services</SelectItem>
-                    <SelectItem value="technology">Technology</SelectItem>
-                    <SelectItem value="education">Education</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
-              </FormGroup>
-              
-              <FormGroup>
-                <Label htmlFor="company-size">Company Size</Label>
-                <Select defaultValue={company?.size || ''}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select size" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="1-10">1-10 employees</SelectItem>
-                    <SelectItem value="11-50">11-50 employees</SelectItem>
-                    <SelectItem value="51-200">51-200 employees</SelectItem>
-                    <SelectItem value="201-1000">201-1000 employees</SelectItem>
-                    <SelectItem value="1000+">1000+ employees</SelectItem>
-                  </SelectContent>
-                </Select>
-              </FormGroup>
-            </FormRow>
-            
-            <FormGroup>
-              <Label htmlFor="website">Website</Label>
-              <Input
-                id="website"
-                type="url"
-                defaultValue={company?.website || ''}
-                placeholder="https://example.com"
-              />
-            </FormGroup>
-            
-            <Button style={{ background: '#3b82f6', color: 'white', width: 'fit-content' }}>
-              Save Changes
-            </Button>
-          </FormSection>
-        )
-
-      case 'phone':
-        return (
-          <FormSection>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
-              <div>
-                <h3 style={{ fontSize: '1.125rem', fontWeight: 600, color: '#1f2937', marginBottom: '0.25rem' }}>
-                  Phone Numbers
-                </h3>
-                <p style={{ fontSize: '0.875rem', color: '#6b7280' }}>
-                  Manage your SMS sending numbers
-                </p>
-              </div>
-              <Button style={{ background: '#3b82f6', color: 'white' }}>
-                <Phone className="h-4 w-4 mr-2" />
-                Add Number
-              </Button>
-            </div>
-
-            {phoneNumbers.length > 0 ? (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                {phoneNumbers.map((phone) => (
-                  <Card key={phone.id} style={{ border: '1px solid #e5e7eb' }}>
-                    <CardContent className="p-4">
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <div>
-                          <div style={{ fontFamily: 'monospace', fontSize: '1.125rem', fontWeight: 500, color: '#1f2937', marginBottom: '0.25rem' }}>
-                            {phone.phone_number}
-                          </div>
-                          <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>
-                            {phone.assigned_to_campaign ? `Assigned to campaign` : 'Available for use'}
-                          </div>
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                          <Badge style={{
-                            background: phone.is_active ? '#dcfce7' : '#f3f4f6',
-                            color: phone.is_active ? '#166534' : '#6b7280',
-                            border: 'none'
-                          }}>
-                            {phone.is_active ? 'Active' : 'Inactive'}
-                          </Badge>
-                          <Button variant="outline" size="sm">Configure</Button>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            ) : (
-              <Card style={{ border: '1px solid #e5e7eb' }}>
-                <CardContent className="text-center py-8">
-                  <Phone className="h-12 w-12 text-muted-foreground mx-auto mb-4" style={{ color: '#9ca3af' }} />
-                  <h3 style={{ fontSize: '1.125rem', fontWeight: 600, color: '#1f2937', marginBottom: '0.5rem' }}>
-                    No phone numbers
-                  </h3>
-                  <p style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '1.5rem' }}>
-                    Add a phone number to start sending SMS messages
-                  </p>
-                  <Button style={{ background: '#3b82f6', color: 'white' }}>
-                    <Phone className="h-4 w-4 mr-2" />
-                    Get Your First Number
-                  </Button>
-                </CardContent>
-              </Card>
-            )}
-          </FormSection>
-        )
-
+        return renderCompanyTab()
       case 'billing':
-        return (
-          <FormSection>
-            <Card style={{ border: '1px solid #e5e7eb', marginBottom: '1rem' }}>
-              <CardHeader>
-                <CardTitle>Current Plan</CardTitle>
-                <CardDescription>Your subscription details</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <div>
-                    <div style={{ fontWeight: 600, color: '#1f2937', marginBottom: '0.25rem' }}>Starter Plan</div>
-                    <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>
-                      1,000 messages/month • $0.01 per additional message
-                    </div>
-                  </div>
-                  <Button variant="outline">Upgrade Plan</Button>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card style={{ border: '1px solid #e5e7eb' }}>
-              <CardHeader>
-                <CardTitle>Usage This Month</CardTitle>
-                <CardDescription>Your current usage and remaining credits</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {(() => {
-                  const messagesUsed = campaigns.reduce((acc, c) => acc + (c.metadata?.message_count || 0), 0);
-                  const messageLimit = 1000;
-                  const percentage = Math.min((messagesUsed / messageLimit) * 100, 100);
-                  const remaining = Math.max(messageLimit - messagesUsed, 0);
-                  
-                  return (
-                    <>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                        <span style={{ fontSize: '0.875rem', color: '#6b7280' }}>Messages sent</span>
-                        <span style={{ fontWeight: 600, color: '#1f2937' }}>
-                          {messagesUsed.toLocaleString()} / {messageLimit.toLocaleString()}
-                        </span>
-                      </div>
-                      <ProgressBar>
-                        <ProgressFill $percent={percentage} />
-                      </ProgressBar>
-                      <div style={{ fontSize: '0.875rem', color: '#6b7280', marginTop: '0.5rem' }}>
-                        {remaining.toLocaleString()} messages remaining in your plan
-                      </div>
-                    </>
-                  );
-                })()}
-              </CardContent>
-            </Card>
-          </FormSection>
-        )
-
+        return renderBillingTab()
       case 'notifications':
-        return (
-          <FormSection>
-            <Card style={{ border: '1px solid #e5e7eb' }}>
-              <CardHeader>
-                <CardTitle>Email Notifications</CardTitle>
-                <CardDescription>Receive updates via email</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <SwitchRow>
-                  <SwitchInfo>
-                    <SwitchLabel>Campaign Updates</SwitchLabel>
-                    <SwitchDescription>Get notified when campaigns complete</SwitchDescription>
-                  </SwitchInfo>
-                  <Switch defaultChecked />
-                </SwitchRow>
-                
-                <Separator />
-                
-                <SwitchRow>
-                  <SwitchInfo>
-                    <SwitchLabel>Delivery Reports</SwitchLabel>
-                    <SwitchDescription>Daily summary of message delivery</SwitchDescription>
-                  </SwitchInfo>
-                  <Switch defaultChecked />
-                </SwitchRow>
-                
-                <Separator />
-                
-                <SwitchRow>
-                  <SwitchInfo>
-                    <SwitchLabel>Billing Alerts</SwitchLabel>
-                    <SwitchDescription>Notifications about usage and billing</SwitchDescription>
-                  </SwitchInfo>
-                  <Switch defaultChecked />
-                </SwitchRow>
-                
-                <Separator />
-                
-                <SwitchRow>
-                  <SwitchInfo>
-                    <SwitchLabel>Product Updates</SwitchLabel>
-                    <SwitchDescription>New features and improvements</SwitchDescription>
-                  </SwitchInfo>
-                  <Switch />
-                </SwitchRow>
-              </CardContent>
-            </Card>
-            
-            <Button style={{ background: '#3b82f6', color: 'white', width: 'fit-content' }}>
-              Save Preferences
-            </Button>
-          </FormSection>
-        )
-
+        return renderNotificationsTab()
       case 'security':
-        return (
-          <FormSection>
-            <Card style={{ border: '1px solid #e5e7eb', marginBottom: '1rem' }}>
-              <CardHeader>
-                <CardTitle>Password</CardTitle>
-                <CardDescription>Update your account password</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <FormSection>
-                  <FormGroup>
-                    <Label htmlFor="current-password">Current Password</Label>
-                    <Input
-                      id="current-password"
-                      type="password"
-                      placeholder="Enter current password"
-                    />
-                  </FormGroup>
-                  <FormGroup>
-                    <Label htmlFor="new-password">New Password</Label>
-                    <Input
-                      id="new-password"
-                      type="password"
-                      placeholder="Enter new password"
-                    />
-                  </FormGroup>
-                  <FormGroup>
-                    <Label htmlFor="confirm-password">Confirm New Password</Label>
-                    <Input
-                      id="confirm-password"
-                      type="password"
-                      placeholder="Confirm new password"
-                    />
-                  </FormGroup>
-                  <Button style={{ background: '#3b82f6', color: 'white', width: 'fit-content' }}>
-                    Update Password
-                  </Button>
-                </FormSection>
-              </CardContent>
-            </Card>
-
-            <Card style={{ border: '1px solid #e5e7eb' }}>
-              <CardHeader>
-                <CardTitle>Two-Factor Authentication</CardTitle>
-                <CardDescription>Add an extra layer of security to your account</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <div>
-                    <div style={{ fontWeight: 500, color: '#1f2937', marginBottom: '0.25rem' }}>
-                      SMS Authentication
-                    </div>
-                    <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>
-                      Receive verification codes via SMS
-                    </div>
-                  </div>
-                  <Button variant="outline">Enable 2FA</Button>
-                </div>
-              </CardContent>
-            </Card>
-          </FormSection>
-        )
-
-      case 'api':
-        return (
-          <FormSection>
-            <Card style={{ border: '1px solid #e5e7eb', marginBottom: '1rem' }}>
-              <CardHeader>
-                <CardTitle>API Access</CardTitle>
-                <CardDescription>Generate and manage API keys for integration</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <InfoRow>
-                  <div>
-                    <InfoLabel>Production Key</InfoLabel>
-                    <InfoValue>sk_prod_••••••••••••••••</InfoValue>
-                  </div>
-                  <ActionButtons>
-                    <Badge variant="secondary">Active</Badge>
-                    <Button variant="outline" size="sm">Regenerate</Button>
-                  </ActionButtons>
-                </InfoRow>
-                
-                <Button style={{ background: '#3b82f6', color: 'white', marginTop: '1rem' }}>
-                  <Key className="h-4 w-4 mr-2" />
-                  Generate New Key
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card style={{ border: '1px solid #e5e7eb' }}>
-              <CardHeader>
-                <CardTitle>Webhooks</CardTitle>
-                <CardDescription>Configure webhooks for real-time events</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <FormSection>
-                  <FormGroup>
-                    <Label htmlFor="webhook-url">Webhook URL</Label>
-                    <Input
-                      id="webhook-url"
-                      placeholder="https://your-app.com/webhooks"
-                    />
-                  </FormGroup>
-                  
-                  <FormGroup>
-                    <Label>Events</Label>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                      <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem' }}>
-                        <input type="checkbox" />
-                        Message Delivered
-                      </label>
-                      <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem' }}>
-                        <input type="checkbox" />
-                        Message Failed
-                      </label>
-                      <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem' }}>
-                        <input type="checkbox" />
-                        Campaign Completed
-                      </label>
-                    </div>
-                  </FormGroup>
-                  
-                  <Button variant="outline" style={{ width: 'fit-content' }}>
-                    Save Webhook
-                  </Button>
-                </FormSection>
-              </CardContent>
-            </Card>
-          </FormSection>
-        )
-
+        return renderSecurityTab()
+      case 'phone-numbers':
+        return renderPhoneNumbersTab()
       default:
-        return (
-          <div style={{ textAlign: 'center', padding: '3rem 2rem' }}>
-            <p style={{ color: '#6b7280' }}>This section is coming soon</p>
-          </div>
-        )
+        return renderProfileTab()
     }
   }
 
   return (
-    <PageContainer>
-      <Header>
-        <Title>Settings</Title>
-        <Subtitle>Manage your account preferences and configuration</Subtitle>
-      </Header>
+    <div className="space-y-6 p-6">
+      {/* Page Header */}
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
+        <p className="mt-1 text-sm text-gray-500">
+          Manage your account settings and preferences in {currentHub} hub
+        </p>
+      </div>
 
-      <ContentWrapper>
-        <SidebarCard>
-          <CardContent className="p-4">
-            <NavMenu>
-              {tabs.map((tab) => (
-                <NavItem
-                  key={tab.id}
-                  $active={activeTab === tab.id}
-                  onClick={() => setActiveTab(tab.id)}
+      {/* Content */}
+      <div className="flex flex-col lg:flex-row gap-6">
+        {/* Sidebar Navigation */}
+        <div className="lg:w-64">
+          <div className="bg-white rounded-lg shadow-sm p-4">
+            <nav className="space-y-1">
+              {navigation.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => setActiveTab(item.id as SettingsTab)}
+                  className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                    activeTab === item.id
+                      ? 'bg-blue-100 text-blue-700'
+                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                  }`}
                 >
-                  <tab.icon />
-                  {tab.label}
-                </NavItem>
+                  <item.icon className="w-4 h-4 mr-3" />
+                  <div className="text-left">
+                    <div>{item.name}</div>
+                    <div className="text-xs text-gray-500">{item.description}</div>
+                  </div>
+                </button>
               ))}
-            </NavMenu>
-          </CardContent>
-        </SidebarCard>
+            </nav>
+          </div>
+        </div>
 
-        <MainCard>
-          <CardContent className="p-6">
+        {/* Main Content */}
+        <div className="flex-1">
+          <div className="bg-white rounded-lg shadow-sm p-6">
             {renderTabContent()}
-          </CardContent>
-        </MainCard>
-      </ContentWrapper>
-    </PageContainer>
-  )
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }

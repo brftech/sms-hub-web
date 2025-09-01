@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useHub, Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from "@sms-hub/ui";
 import { Input, Label, Checkbox, Alert, AlertDescription } from "@sms-hub/ui";
-import { Shield, Smartphone, Zap, Lock, Bell, CheckCircle2, AlertCircle } from "lucide-react";
+import { Shield, Smartphone, Zap, Lock, Bell, CheckCircle2, AlertCircle, ArrowLeft } from "lucide-react";
 import styled from "styled-components";
 
 const BenefitsList = styled.div`
@@ -129,125 +129,102 @@ export function SignupEnhanced() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-black flex items-center justify-center p-4">
       <div className="w-full max-w-2xl">
-        {/* SMS Benefits Card */}
-        {authMethod === "sms" && (
-          <BenefitsList>
-            <h3 className="text-xl font-bold mb-4 flex items-center">
-              <Shield className="w-6 h-6 mr-2" />
-              SMS Verification Benefits
-            </h3>
-            <BenefitItem>
-              <CheckCircle2 className="w-5 h-5 flex-shrink-0" />
-              <span><strong>2-Factor Authentication:</strong> Extra security for your account</span>
-            </BenefitItem>
-            <BenefitItem>
-              <Zap className="w-5 h-5 flex-shrink-0" />
-              <span><strong>Instant Alerts:</strong> Real-time notifications for critical updates</span>
-            </BenefitItem>
-            <BenefitItem>
-              <Lock className="w-5 h-5 flex-shrink-0" />
-              <span><strong>Passwordless Login:</strong> Quick access with SMS codes</span>
-            </BenefitItem>
-            <BenefitItem>
-              <Bell className="w-5 h-5 flex-shrink-0" />
-              <span><strong>Priority Support:</strong> SMS-verified users get faster response times</span>
-            </BenefitItem>
-            <BenefitItem>
-              <Smartphone className="w-5 h-5 flex-shrink-0" />
-              <span><strong>Mobile Dashboard:</strong> Exclusive access to mobile features</span>
-            </BenefitItem>
-          </BenefitsList>
-        )}
+        {/* Back to Home Link */}
+        <div className="mb-6">
+          <Link
+            to="/"
+            className="inline-flex items-center text-sm text-gray-400 hover:text-orange-500 transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Home
+          </Link>
+        </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-2xl text-center">
-              Create Your {hubConfig.displayName} Account
-            </CardTitle>
-            <CardDescription className="text-center">
-              Join thousands of businesses streamlining their communications
-            </CardDescription>
-          </CardHeader>
+        {/* Main Form Card */}
+        <div className="bg-white rounded-xl shadow-2xl p-6 border border-gray-100">
+          {/* Header */}
+          <div className="text-center mb-6">
+            <div className="w-10 h-10 bg-black rounded-lg flex items-center justify-center mx-auto mb-3">
+              <span className="text-lg font-bold text-orange-500">
+                {hubConfig.displayName.charAt(0)}
+              </span>
+            </div>
+            <h1 className="text-xl font-bold text-gray-900 mb-1">
+              Join {hubConfig.displayName}
+            </h1>
+            <p className="text-xs text-gray-600">
+              Get started in under 2 minutes
+            </p>
+          </div>
           
-          <CardContent>
-            {error && (
-              <Alert className="mb-4 border-red-200 bg-red-50">
-                <AlertCircle className="h-4 w-4 text-red-600" />
-                <AlertDescription className="text-red-800">{error}</AlertDescription>
-              </Alert>
-            )}
+          {error && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+              <div className="flex items-center">
+                <AlertCircle className="h-4 w-4 text-red-600 mr-2" />
+                <span className="text-sm text-red-800">{error}</span>
+              </div>
+            </div>
+          )}
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Company Name - Required */}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Top Row: Company Name */}
+            <div>
+              <Label htmlFor="company_name" className="text-sm font-medium text-gray-700">
+                Company Name
+              </Label>
+              <Input
+                id="company_name"
+                type="text"
+                placeholder="Your company"
+                value={formData.company_name}
+                onChange={(e) => setFormData({ ...formData, company_name: e.target.value })}
+                className="mt-1 border-gray-300 focus:border-orange-500 focus:ring-orange-500"
+                required
+                disabled={isSubmitting}
+              />
+            </div>
+
+            {/* Second Row: Name, Email */}
+            <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="company_name">
-                  Company Name <span className="text-red-500">*</span>
+                <Label htmlFor="first_name" className="text-sm font-medium text-gray-700">
+                  First Name
                 </Label>
                 <Input
-                  id="company_name"
+                  id="first_name"
                   type="text"
-                  placeholder="Acme Corporation"
-                  value={formData.company_name}
-                  onChange={(e) => setFormData({ ...formData, company_name: e.target.value })}
+                  placeholder="John"
+                  value={formData.first_name}
+                  onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
+                  className="mt-1 border-gray-300 focus:border-orange-500 focus:ring-orange-500"
                   required
                   disabled={isSubmitting}
                 />
               </div>
-
-              {/* Name Fields */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="first_name">
-                    First Name <span className="text-red-500">*</span>
-                  </Label>
-                  <Input
-                    id="first_name"
-                    type="text"
-                    placeholder="John"
-                    value={formData.first_name}
-                    onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
-                    required
-                    disabled={isSubmitting}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="last_name">
-                    Last Name <span className="text-red-500">*</span>
-                  </Label>
-                  <Input
-                    id="last_name"
-                    type="text"
-                    placeholder="Doe"
-                    value={formData.last_name}
-                    onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
-                    required
-                    disabled={isSubmitting}
-                  />
-                </div>
-              </div>
-
-              {/* Email */}
               <div>
-                <Label htmlFor="email">
-                  Email Address <span className="text-red-500">*</span>
+                <Label htmlFor="last_name" className="text-sm font-medium text-gray-700">
+                  Last Name
                 </Label>
                 <Input
-                  id="email"
-                  type="email"
-                  placeholder="john@acme.com"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  id="last_name"
+                  type="text"
+                  placeholder="Doe"
+                  value={formData.last_name}
+                  onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
+                  className="mt-1 border-gray-300 focus:border-orange-500 focus:ring-orange-500"
                   required
                   disabled={isSubmitting}
                 />
               </div>
+            </div>
 
-              {/* Phone */}
+            {/* Third Row: Phone, Email */}
+            <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="phone">
-                  Cell Phone Number <span className="text-red-500">*</span>
+                <Label htmlFor="phone" className="text-sm font-medium text-gray-700">
+                  Phone Number
                 </Label>
                 <Input
                   id="phone"
@@ -255,47 +232,67 @@ export function SignupEnhanced() {
                   placeholder="(555) 123-4567"
                   value={formData.phone}
                   onChange={handlePhoneChange}
+                  className="mt-1 border-gray-300 focus:border-orange-500 focus:ring-orange-500"
                   required
                   disabled={isSubmitting}
                 />
-                <p className="text-sm text-gray-500 mt-1">
-                  We'll send a verification code to this number
-                </p>
+                {authMethod === "sms" && (
+                  <p className="text-xs font-semibold text-orange-600 mt-1">
+                    We'll send a verification code to this number
+                  </p>
+                )}
               </div>
+              <div>
+                <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+                  Email Address
+                </Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="john@company.com"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  className="mt-1 border-gray-300 focus:border-orange-500 focus:ring-orange-500"
+                  required
+                  disabled={isSubmitting}
+                />
+                {authMethod === "email" && (
+                  <p className="text-xs font-semibold text-orange-600 mt-1">
+                    We'll send a verification code to this email
+                  </p>
+                )}
+              </div>
+            </div>
 
-              {/* Authentication Method Choice */}
-              <div className="border rounded-lg p-4 space-y-3">
-                <Label>Verification Method</Label>
-                <div className="space-y-2">
-                  <label className="flex items-center space-x-3 cursor-pointer">
+            {/* Bottom Row: Verification Method & Terms */}
+            <div className="grid grid-cols-2 gap-4">
+              {/* Verification Method */}
+              <div>
+                <Label className="text-sm font-medium text-gray-700 mb-2 block">Verification Method</Label>
+                <div className="flex items-center space-x-4">
+                  <label className="flex items-center space-x-2 cursor-pointer">
                     <input
                       type="radio"
                       name="auth_method"
                       value="sms"
                       checked={authMethod === "sms"}
                       onChange={() => setAuthMethod("sms")}
-                      className="w-4 h-4 text-blue-600"
+                      className="w-4 h-4 text-orange-600"
                     />
-                    <span className="flex-1">
-                      <strong>SMS Verification (Recommended)</strong>
-                      <p className="text-sm text-gray-500">Get exclusive benefits and enhanced security</p>
-                    </span>
-                    <span className="px-2 py-1 text-xs font-semibold bg-green-100 text-green-800 rounded">BEST VALUE</span>
+                    <span className="text-sm text-gray-900">SMS</span>
+                    <span className="px-1.5 py-0.5 text-xs font-semibold bg-orange-100 text-orange-800 rounded-full">BEST</span>
                   </label>
                   
-                  <label className="flex items-center space-x-3 cursor-pointer">
+                  <label className="flex items-center space-x-2 cursor-pointer">
                     <input
                       type="radio"
                       name="auth_method"
                       value="email"
                       checked={authMethod === "email"}
                       onChange={() => setAuthMethod("email")}
-                      className="w-4 h-4 text-blue-600"
+                      className="w-4 h-4 text-orange-600"
                     />
-                    <span>
-                      <strong>Email Verification</strong>
-                      <p className="text-sm text-gray-500">Standard verification via email</p>
-                    </span>
+                    <span className="text-sm text-gray-900">Email</span>
                   </label>
                 </div>
               </div>
@@ -307,39 +304,41 @@ export function SignupEnhanced() {
                   checked={formData.agree_terms}
                   onCheckedChange={(checked) => setFormData({ ...formData, agree_terms: checked as boolean })}
                   disabled={isSubmitting}
+                  className="mt-0.5"
                 />
-                <Label htmlFor="agree_terms" className="text-sm leading-relaxed">
+                <Label htmlFor="agree_terms" className="text-xs leading-relaxed text-gray-600">
                   I agree to the{" "}
-                  <a href="/terms" target="_blank" className="text-blue-600 hover:underline">
-                    Terms of Service
+                  <a href="/terms" target="_blank" className="text-orange-600 hover:text-orange-700 font-medium">
+                    Terms
                   </a>{" "}
                   and{" "}
-                  <a href="/privacy" target="_blank" className="text-blue-600 hover:underline">
+                  <a href="/privacy" target="_blank" className="text-orange-600 hover:text-orange-700 font-medium">
                     Privacy Policy
                   </a>
                 </Label>
               </div>
+            </div>
 
-              {/* Submit Button */}
-              <Button
-                type="submit"
-                className="w-full"
-                size="lg"
-                disabled={isSubmitting || !formData.agree_terms}
-              >
-                {isSubmitting ? "Creating Account..." : "Continue with Verification"}
-              </Button>
+            {/* Submit Button */}
+            <Button
+              type="submit"
+              className="w-full bg-black hover:bg-gray-900 text-white font-semibold py-2.5 rounded-lg transition-colors"
+              disabled={isSubmitting || !formData.agree_terms}
+            >
+              {isSubmitting ? "Creating Account..." : "Create Account"}
+            </Button>
 
-              {/* Login Link */}
-              <p className="text-center text-sm text-gray-600">
+            {/* Login Link */}
+            <div className="text-center pt-3 border-t border-gray-100">
+              <p className="text-sm text-gray-600">
                 Already have an account?{" "}
-                <a href="/login" className="text-blue-600 hover:underline">
+                <Link to="/login" className="text-orange-600 hover:text-orange-700 font-medium">
                   Sign in
-                </a>
+                </Link>
               </p>
-            </form>
-          </CardContent>
-        </Card>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );

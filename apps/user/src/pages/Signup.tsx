@@ -1,56 +1,45 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import {
   useHub,
-  HubLogo,
   Button,
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@sms-hub/ui";
-import {
   Input,
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-  RadioGroup,
-  RadioGroupItem,
+  Label,
 } from "@sms-hub/ui";
 import { useCreateTempSignup } from "../hooks/useAuth";
 import { SignupData } from "@sms-hub/types";
-import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { Phone, Mail } from "lucide-react";
+import { Phone, Mail, ArrowLeft } from "lucide-react";
 
 export function Signup() {
-  const { hubConfig, currentHub } = useHub();
+  const { hubConfig } = useHub();
   const createTempSignup = useCreateTempSignup();
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const form = useForm<SignupData>({
-    defaultValues: {
-      hub_id: hubConfig.hubNumber,
-      company_name: "",
-      first_name: "",
-      last_name: "",
-      mobile_phone_number: "",
-      email: "",
-      auth_method: "sms",
-    },
+  
+  // Form state
+  const [formData, setFormData] = useState<SignupData>({
+    hub_id: hubConfig.hubNumber,
+    company_name: "",
+    first_name: "",
+    last_name: "",
+    mobile_phone_number: "",
+    email: "",
+    auth_method: "sms",
   });
 
-  const onSubmit = async (data: SignupData) => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     setIsSubmitting(true);
 
     try {
       const result = await createTempSignup.mutateAsync({
-        ...data,
+        ...formData,
         hub_id: hubConfig.hubNumber,
       });
 
@@ -66,163 +55,170 @@ export function Signup() {
     }
   };
 
+  const updateFormData = (field: keyof SignupData, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <div className="flex justify-center mb-4">
-            <HubLogo hubType={currentHub} variant="full" size="lg" />
-          </div>
-          <CardTitle className="hub-text-primary">
-            Create Your Account
-          </CardTitle>
-          <CardDescription>
-            Start your SMS journey with {hubConfig.displayName}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="company_name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Company Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Your Company" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8">
+        {/* Back to Home Link */}
+        <div className="text-center">
+          <Link
+            to="/"
+            className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Home
+          </Link>
+        </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="first_name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>First Name</FormLabel>
-                      <FormControl>
-                        <Input placeholder="John" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+        <div className="text-center">
+          <h2 className="text-3xl font-extrabold hub-text-primary">
+            Join {hubConfig.displayName}
+          </h2>
+          <p className="mt-2 text-sm text-gray-600">
+            Create your account to start your SMS journey
+          </p>
+        </div>
 
-                <FormField
-                  control={form.control}
-                  name="last_name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Last Name</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Doe" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+        <Card>
+          <CardHeader>
+            <CardTitle>Create your account</CardTitle>
+            <CardDescription>
+              Enter your details to get started with SMS campaigns
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="company_name">Company Name</Label>
+                <Input
+                  id="company_name"
+                  type="text"
+                  value={formData.company_name}
+                  onChange={(e) => updateFormData("company_name", e.target.value)}
+                  placeholder="Your Company"
+                  required
                 />
               </div>
 
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="email"
-                        placeholder="john@company.com"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="first_name">First Name</Label>
+                  <Input
+                    id="first_name"
+                    type="text"
+                    value={formData.first_name}
+                    onChange={(e) => updateFormData("first_name", e.target.value)}
+                    placeholder="John"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="last_name">Last Name</Label>
+                  <Input
+                    id="last_name"
+                    type="text"
+                    value={formData.last_name}
+                    onChange={(e) => updateFormData("last_name", e.target.value)}
+                    placeholder="Doe"
+                    required
+                  />
+                </div>
+              </div>
 
-              <FormField
-                control={form.control}
-                name="mobile_phone_number"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Phone Number</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="tel"
-                        placeholder="(555) 123-4567"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="space-y-2">
+                <Label htmlFor="email">Email Address</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => updateFormData("email", e.target.value)}
+                  placeholder="john@company.com"
+                  required
+                />
+              </div>
 
-              <FormField
-                control={form.control}
-                name="auth_method"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Verification Method</FormLabel>
-                    <FormControl>
-                      <RadioGroup
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                        className="flex flex-col space-y-2"
-                      >
-                        <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-muted/50 cursor-pointer">
-                          <RadioGroupItem value="sms" id="sms" />
-                          <label
-                            htmlFor="sms"
-                            className="flex items-center space-x-2 cursor-pointer flex-1"
-                          >
-                            <Phone className="h-4 w-4" />
-                            <span>Send code via SMS</span>
-                          </label>
-                        </div>
-                        <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-muted/50 cursor-pointer">
-                          <RadioGroupItem value="email" id="email" />
-                          <label
-                            htmlFor="email"
-                            className="flex items-center space-x-2 cursor-pointer flex-1"
-                          >
-                            <Mail className="h-4 w-4" />
-                            <span>Send code via Email</span>
-                          </label>
-                        </div>
-                      </RadioGroup>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="space-y-2">
+                <Label htmlFor="mobile_phone_number">Phone Number</Label>
+                <Input
+                  id="mobile_phone_number"
+                  type="tel"
+                  value={formData.mobile_phone_number}
+                  onChange={(e) => updateFormData("mobile_phone_number", e.target.value)}
+                  placeholder="(555) 123-4567"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Verification Method</Label>
+                <div className="space-y-2">
+                  <div 
+                    className={`flex items-center space-x-2 p-3 border rounded-lg cursor-pointer transition-colors ${
+                      formData.auth_method === 'sms' 
+                        ? 'border-blue-500 bg-blue-50' 
+                        : 'border-gray-200 hover:bg-gray-50'
+                    }`}
+                    onClick={() => updateFormData("auth_method", "sms")}
+                  >
+                    <input
+                      type="radio"
+                      name="auth_method"
+                      value="sms"
+                      checked={formData.auth_method === 'sms'}
+                      onChange={() => updateFormData("auth_method", "sms")}
+                      className="text-blue-600"
+                    />
+                    <Phone className="h-4 w-4 text-gray-600" />
+                    <span className="text-sm">Send code via SMS</span>
+                  </div>
+                  <div 
+                    className={`flex items-center space-x-2 p-3 border rounded-lg cursor-pointer transition-colors ${
+                      formData.auth_method === 'email' 
+                        ? 'border-blue-500 bg-blue-50' 
+                        : 'border-gray-200 hover:bg-gray-50'
+                    }`}
+                    onClick={() => updateFormData("auth_method", "email")}
+                  >
+                    <input
+                      type="radio"
+                      name="auth_method"
+                      value="email"
+                      checked={formData.auth_method === 'email'}
+                      onChange={() => updateFormData("auth_method", "email")}
+                      className="text-blue-600"
+                    />
+                    <Mail className="h-4 w-4 text-gray-600" />
+                    <span className="text-sm">Send code via Email</span>
+                  </div>
+                </div>
+              </div>
 
               <Button
                 type="submit"
-                className="w-full hub-bg-primary hover:hub-bg-primary/90"
+                className="w-full hub-bg-primary"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? "Creating Account..." : "Create Account"}
               </Button>
             </form>
-          </Form>
 
-          <div className="mt-6 text-center text-sm text-muted-foreground">
-            Already have an account?{" "}
-            <button
-              onClick={() => navigate("/login")}
-              className="hub-text-primary hover:underline"
-            >
-              Sign in
-            </button>
-          </div>
-        </CardContent>
-      </Card>
+            <div className="mt-6 text-center">
+              <p className="text-sm text-gray-600">
+                Already have an account?{" "}
+                <Link
+                  to="/login"
+                  className="font-medium hub-text-primary hover:opacity-80"
+                >
+                  Sign in
+                </Link>
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

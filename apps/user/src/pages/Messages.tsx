@@ -1,447 +1,318 @@
 import { useState } from 'react'
-import { useHub, Card, CardContent, CardDescription, CardHeader, CardTitle, Button, Input, Badge, DataTable } from '@sms-hub/ui'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sms-hub/ui'
-import { Search, Send, MessageSquare, Download, CheckCircle, XCircle, Clock } from 'lucide-react'
+import { useHub } from '@sms-hub/ui'
+import { 
+  Search, 
+  Send, 
+  MessageSquare, 
+  Download, 
+  CheckCircle, 
+  XCircle, 
+  Clock,
+  Eye,
+  RefreshCw,
+  Filter
+} from 'lucide-react'
 import { useMessages } from '@sms-hub/supabase/react'
 import type { Message } from '@sms-hub/types'
-import styled from 'styled-components'
-
-const PageContainer = styled.div`
-  padding: 2rem;
-  background: #f8f9fa;
-  min-height: 100vh;
-
-  @media (max-width: 768px) {
-    padding: 1rem;
-  }
-`;
-
-const Header = styled.div`
-  margin-bottom: 2rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-`;
-
-const TitleSection = styled.div``;
-
-const Title = styled.h1`
-  font-size: 1.875rem;
-  font-weight: 600;
-  color: #1f2937;
-  margin: 0;
-  margin-bottom: 0.25rem;
-`;
-
-const Subtitle = styled.p`
-  font-size: 1rem;
-  color: #6b7280;
-  margin: 0;
-`;
-
-const StatsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-`;
-
-const StatCard = styled(Card)`
-  background: white;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-  transition: all 0.2s ease;
-
-  &:hover {
-    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  }
-`;
-
-const StatHeader = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-`;
-
-const StatLabel = styled.p`
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #6b7280;
-`;
-
-const StatValue = styled.div`
-  font-size: 1.875rem;
-  font-weight: 600;
-  color: #1f2937;
-  margin-top: 0.5rem;
-`;
-
-const StatSubtext = styled.p`
-  font-size: 0.75rem;
-  color: #9ca3af;
-  margin-top: 0.25rem;
-`;
-
-const IconWrapper = styled.div<{ color: string }>`
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
-  background: ${props => props.color};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
-const MainCard = styled(Card)`
-  background: white;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-`;
-
-const FilterSection = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1.5rem;
-  gap: 1rem;
-  flex-wrap: wrap;
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-    align-items: stretch;
-  }
-`;
-
-const SearchWrapper = styled.div`
-  position: relative;
-  flex: 1;
-  max-width: 24rem;
-
-  @media (max-width: 768px) {
-    max-width: 100%;
-  }
-`;
-
-const SearchIcon = styled(Search)`
-  position: absolute;
-  left: 0.75rem;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 1rem;
-  height: 1rem;
-  color: #9ca3af;
-`;
-
-const SearchInput = styled(Input)`
-  padding-left: 2.5rem;
-`;
-
-const FilterGroup = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-`;
-
-const EmptyState = styled.div`
-  text-align: center;
-  padding: 3rem 2rem;
-`;
-
-const EmptyIcon = styled.div`
-  width: 64px;
-  height: 64px;
-  border-radius: 12px;
-  background: #f3f4f6;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 1rem;
-`;
-
-const EmptyTitle = styled.h3`
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #1f2937;
-  margin-bottom: 0.5rem;
-`;
-
-const EmptyText = styled.p`
-  font-size: 0.875rem;
-  color: #6b7280;
-  margin-bottom: 1.5rem;
-`;
-
-const LoadingContainer = styled.div`
-  text-align: center;
-  padding: 3rem 2rem;
-`;
-
-const Spinner = styled.div`
-  width: 2rem;
-  height: 2rem;
-  border: 2px solid #e5e7eb;
-  border-top-color: #3b82f6;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-  margin: 0 auto 1rem;
-
-  @keyframes spin {
-    to { transform: rotate(360deg); }
-  }
-`;
-
-const messageColumns = [
-  {
-    accessorKey: 'to_number',
-    header: 'To',
-    cell: ({ row }: { row: { original: Message } }) => (
-      <div className="font-mono text-sm">
-        {row.original.to_number}
-      </div>
-    ),
-  },
-  {
-    accessorKey: 'message_body',
-    header: 'Message',
-    cell: ({ row }: { row: { original: Message } }) => (
-      <div className="max-w-xs truncate text-sm">
-        {row.original.message_body}
-      </div>
-    ),
-  },
-  {
-    accessorKey: 'status',
-    header: 'Status',
-    cell: ({ row }: { row: { original: Message } }) => {
-      const status = row.original.status
-      const statusConfig: Record<string, { bg: string; text: string; label: string }> = {
-        pending: { bg: '#fef3c7', text: '#92400e', label: 'Pending' },
-        sent: { bg: '#dbeafe', text: '#1e40af', label: 'Sent' },
-        delivered: { bg: '#dcfce7', text: '#166534', label: 'Delivered' },
-        failed: { bg: '#fee2e2', text: '#991b1b', label: 'Failed' }
-      }
-      const config = statusConfig[status] || statusConfig.pending
-      return (
-        <Badge style={{ background: config.bg, color: config.text, border: 'none' }}>
-          {config.label}
-        </Badge>
-      )
-    },
-  },
-  {
-    accessorKey: 'created_at',
-    header: 'Sent',
-    cell: ({ row }: { row: { original: Message } }) => (
-      <div className="text-sm text-gray-600">
-        {row.original.created_at 
-          ? new Date(row.original.created_at).toLocaleString('en-US', { 
-              month: 'short', 
-              day: 'numeric', 
-              hour: '2-digit', 
-              minute: '2-digit' 
-            })
-          : 'Not sent'
-        }
-      </div>
-    ),
-  },
-  {
-    id: 'actions',
-    cell: () => (
-      <Button variant="ghost" size="icon">
-        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
-        </svg>
-      </Button>
-    ),
-  },
-]
 
 export function Messages() {
-  useHub() // Initialize hub context
-  const [searchTerm, setSearchTerm] = useState('')
-  const [statusFilter, setStatusFilter] = useState<string>('all')
-  const [dateRange, setDateRange] = useState<string>('7d')
-  const { data: messages = [], isLoading } = useMessages()
+  const { hubConfig, currentHub } = useHub()
+  const { data: messages = [] } = useMessages()
+  const [searchQuery, setSearchQuery] = useState("")
+  const [statusFilter, setStatusFilter] = useState("all")
+  const [typeFilter, setTypeFilter] = useState("all")
 
-  const filteredMessages = messages.filter((message: Message) => {
-    const matchesSearch = 
-      message.to_number.includes(searchTerm) ||
-      message.message_body.toLowerCase().includes(searchTerm.toLowerCase())
-    
-    const matchesStatus = statusFilter === 'all' || message.status === statusFilter
-    
-    return matchesSearch && matchesStatus
+  // Filter messages based on search and filters
+  const filteredMessages = messages.filter(message => {
+    const matchesSearch = message.content?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         message.recipient_phone_number?.includes(searchQuery)
+    const matchesStatus = statusFilter === "all" || message.status === statusFilter
+    const matchesType = typeFilter === "all" || message.message_type === typeFilter
+    return matchesSearch && matchesStatus && matchesType
   })
 
+  // Calculate stats
   const stats = {
     total: messages.length,
-    delivered: messages.filter((m: Message) => m.status === 'delivered').length,
-    failed: messages.filter((m: Message) => m.status === 'failed').length,
-    pending: messages.filter((m: Message) => m.status === 'pending' || m.status === 'sent').length,
+    sent: messages.filter(m => m.status === 'sent').length,
+    delivered: messages.filter(m => m.status === 'delivered').length,
+    failed: messages.filter(m => m.status === 'failed').length,
+    pending: messages.filter(m => m.status === 'pending').length,
+    sms: messages.filter(m => m.message_type === 'sms').length,
+    mms: messages.filter(m => m.message_type === 'mms').length
   }
 
-  const deliveryRate = stats.total > 0 ? Math.round((stats.delivered / stats.total) * 100) : 0
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'sent': return 'bg-blue-100 text-blue-800'
+      case 'delivered': return 'bg-green-100 text-green-800'
+      case 'failed': return 'bg-red-100 text-red-800'
+      case 'pending': return 'bg-yellow-100 text-yellow-800'
+      default: return 'bg-gray-100 text-gray-800'
+    }
+  }
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'sent': return <Send className="w-4 h-4" />
+      case 'delivered': return <CheckCircle className="w-4 h-4" />
+      case 'failed': return <XCircle className="w-4 h-4" />
+      case 'pending': return <Clock className="w-4 h-4" />
+      default: return <Clock className="w-4 h-4" />
+    }
+  }
+
+  const getTypeIcon = (type: string) => {
+    switch (type) {
+      case 'sms': return <MessageSquare className="w-4 h-4" />
+      case 'mms': return <MessageSquare className="w-4 h-4" />
+      default: return <MessageSquare className="w-4 h-4" />
+    }
+  }
 
   return (
-    <PageContainer>
-      <Header>
-        <TitleSection>
-          <Title>Messages</Title>
-          <Subtitle>Track and manage your SMS message history</Subtitle>
-        </TitleSection>
-        <Button style={{ background: '#3b82f6', color: 'white' }}>
-          <Send className="h-4 w-4 mr-2" />
-          Send Message
-        </Button>
-      </Header>
+    <div className="space-y-6 p-6">
+      {/* Page Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Messages</h1>
+          <p className="mt-1 text-sm text-gray-500">
+            View and manage your SMS messages in {currentHub} hub
+          </p>
+        </div>
+        <div className="flex items-center space-x-3">
+          <button className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+            <Send className="w-4 h-4 mr-2" />
+            Send Message
+          </button>
+          <button className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+            <Download className="w-4 h-4 mr-2" />
+            Export
+          </button>
+          <button className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+            <RefreshCw className="w-4 h-4 mr-2" />
+            Refresh
+          </button>
+        </div>
+      </div>
 
-      <StatsGrid>
-        <StatCard>
-          <CardContent className="p-6">
-            <StatHeader>
-              <div>
-                <StatLabel>Total Messages</StatLabel>
-                <StatValue>{stats.total}</StatValue>
-              </div>
-              <IconWrapper color="#dbeafe">
-                <MessageSquare className="h-4 w-4" style={{ color: '#3b82f6' }} />
-              </IconWrapper>
-            </StatHeader>
-          </CardContent>
-        </StatCard>
+      {/* Statistics Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="flex items-center">
+            <div className="p-2 bg-blue-100 rounded-lg">
+              <MessageSquare className="w-6 h-6 text-blue-600" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-600">Total Messages</p>
+              <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+            </div>
+          </div>
+        </div>
 
-        <StatCard>
-          <CardContent className="p-6">
-            <StatHeader>
-              <div>
-                <StatLabel>Delivered</StatLabel>
-                <StatValue style={{ color: '#22c55e' }}>{stats.delivered}</StatValue>
-                <StatSubtext>{deliveryRate}% delivery rate</StatSubtext>
-              </div>
-              <IconWrapper color="#dcfce7">
-                <CheckCircle className="h-4 w-4" style={{ color: '#22c55e' }} />
-              </IconWrapper>
-            </StatHeader>
-          </CardContent>
-        </StatCard>
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="flex items-center">
+            <div className="p-2 bg-green-100 rounded-lg">
+              <CheckCircle className="w-6 h-6 text-green-600" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-600">Delivered</p>
+              <p className="text-2xl font-bold text-green-600">{stats.delivered}</p>
+            </div>
+          </div>
+        </div>
 
-        <StatCard>
-          <CardContent className="p-6">
-            <StatHeader>
-              <div>
-                <StatLabel>Failed</StatLabel>
-                <StatValue style={{ color: '#ef4444' }}>{stats.failed}</StatValue>
-              </div>
-              <IconWrapper color="#fee2e2">
-                <XCircle className="h-4 w-4" style={{ color: '#ef4444' }} />
-              </IconWrapper>
-            </StatHeader>
-          </CardContent>
-        </StatCard>
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="flex items-center">
+            <div className="p-2 bg-red-100 rounded-lg">
+              <XCircle className="w-6 h-6 text-red-600" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-600">Failed</p>
+              <p className="text-2xl font-bold text-red-600">{stats.failed}</p>
+            </div>
+          </div>
+        </div>
 
-        <StatCard>
-          <CardContent className="p-6">
-            <StatHeader>
-              <div>
-                <StatLabel>Pending</StatLabel>
-                <StatValue style={{ color: '#f59e0b' }}>{stats.pending}</StatValue>
-              </div>
-              <IconWrapper color="#fef3c7">
-                <Clock className="h-4 w-4" style={{ color: '#f59e0b' }} />
-              </IconWrapper>
-            </StatHeader>
-          </CardContent>
-        </StatCard>
-      </StatsGrid>
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="flex items-center">
+            <div className="p-2 bg-yellow-100 rounded-lg">
+              <Clock className="w-6 h-6 text-yellow-600" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-600">Pending</p>
+              <p className="text-2xl font-bold text-yellow-600">{stats.pending}</p>
+            </div>
+          </div>
+        </div>
+      </div>
 
-      <MainCard>
-        <CardHeader>
-          <CardTitle>Message History</CardTitle>
-          <CardDescription>
-            View and filter your sent messages
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <FilterSection>
-            <SearchWrapper>
-              <SearchIcon />
-              <SearchInput
-                placeholder="Search messages..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+      {/* Secondary Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">SMS Messages</p>
+              <p className="text-2xl font-bold text-gray-900">{stats.sms}</p>
+            </div>
+            <div className="p-2 bg-blue-100 rounded-lg">
+              <MessageSquare className="w-6 h-6 text-blue-600" />
+            </div>
+          </div>
+          <p className="text-xs text-gray-500 mt-2">Text messages sent</p>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">MMS Messages</p>
+              <p className="text-2xl font-bold text-gray-900">{stats.mms}</p>
+            </div>
+            <div className="p-2 bg-purple-100 rounded-lg">
+              <MessageSquare className="w-6 h-6 text-purple-600" />
+            </div>
+          </div>
+          <p className="text-xs text-gray-500 mt-2">Multimedia messages sent</p>
+        </div>
+      </div>
+
+      {/* Filters and Search */}
+      <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
+          <div className="flex-1 max-w-md">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <input
+                type="text"
+                placeholder="Search messages or phone numbers..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
-            </SearchWrapper>
-            
-            <FilterGroup>
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-40">
-                  <SelectValue placeholder="Filter by status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="sent">Sent</SelectItem>
-                  <SelectItem value="delivered">Delivered</SelectItem>
-                  <SelectItem value="failed">Failed</SelectItem>
-                </SelectContent>
-              </Select>
+            </div>
+          </div>
 
-              <Select value={dateRange} onValueChange={setDateRange}>
-                <SelectTrigger className="w-32">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1d">Last 24h</SelectItem>
-                  <SelectItem value="7d">Last 7 days</SelectItem>
-                  <SelectItem value="30d">Last 30 days</SelectItem>
-                  <SelectItem value="90d">Last 90 days</SelectItem>
-                </SelectContent>
-              </Select>
+          <div className="flex flex-wrap gap-3">
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="all">All Status</option>
+              <option value="sent">Sent</option>
+              <option value="delivered">Delivered</option>
+              <option value="failed">Failed</option>
+              <option value="pending">Pending</option>
+            </select>
 
-              <Button variant="outline" size="icon">
-                <Download className="h-4 w-4" />
-              </Button>
-            </FilterGroup>
-          </FilterSection>
+            <select
+              value={typeFilter}
+              onChange={(e) => setTypeFilter(e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="all">All Types</option>
+              <option value="sms">SMS</option>
+              <option value="mms">MMS</option>
+            </select>
+          </div>
+        </div>
+      </div>
 
-          {isLoading ? (
-            <LoadingContainer>
-              <Spinner />
-              <p style={{ color: '#6b7280' }}>Loading messages...</p>
-            </LoadingContainer>
-          ) : filteredMessages.length > 0 ? (
-            <DataTable
-              columns={messageColumns}
-              data={filteredMessages}
-            />
-          ) : (
-            <EmptyState>
-              {messages.length === 0 ? (
-                <>
-                  <EmptyIcon>
-                    <MessageSquare className="h-8 w-8" style={{ color: '#9ca3af' }} />
-                  </EmptyIcon>
-                  <EmptyTitle>No messages yet</EmptyTitle>
-                  <EmptyText>
-                    Start sending SMS messages to see them here
-                  </EmptyText>
-                  <Button style={{ background: '#3b82f6', color: 'white' }}>
-                    <Send className="h-4 w-4 mr-2" />
-                    Send Your First Message
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <EmptyText>
-                    No messages match your search criteria
-                  </EmptyText>
-                </>
-              )}
-            </EmptyState>
-          )}
-        </CardContent>
-      </MainCard>
-    </PageContainer>
-  )
+      {/* Messages Table */}
+      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-200">
+          <h3 className="text-lg font-medium text-gray-900">
+            Messages ({filteredMessages.length})
+          </h3>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Message
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Recipient
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Type
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Status
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Sent
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {filteredMessages.map((message) => (
+                <tr key={message.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4">
+                    <div className="max-w-xs">
+                      <div className="text-sm text-gray-900 truncate">{message.content}</div>
+                      <div className="text-xs text-gray-500 mt-1">
+                        ID: {message.id.slice(0, 8)}...
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {message.recipient_phone_number}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                      {getTypeIcon(message.message_type || 'sms')}
+                      <span className="ml-1">{message.message_type?.toUpperCase() || 'SMS'}</span>
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(message.status || 'pending')}`}>
+                      {getStatusIcon(message.status || 'pending')}
+                      <span className="ml-1">{message.status || 'pending'}</span>
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {message.created_at ? new Date(message.created_at).toLocaleDateString() : 'Unknown'}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <div className="flex items-center space-x-2">
+                      <button className="text-blue-600 hover:text-blue-900">
+                        <Eye className="w-4 h-4" />
+                      </button>
+                      <button className="text-gray-600 hover:text-gray-900">
+                        <MessageSquare className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {filteredMessages.length === 0 && (
+          <div className="text-center py-12">
+            <MessageSquare className="mx-auto h-12 w-12 text-gray-400" />
+            <h3 className="mt-2 text-sm font-medium text-gray-900">No messages found</h3>
+            <p className="mt-1 text-sm text-gray-500">
+              {searchQuery || statusFilter !== 'all' || typeFilter !== 'all'
+                ? 'Try adjusting your search or filter criteria.'
+                : 'No messages have been sent yet.'}
+            </p>
+            <div className="mt-6">
+              <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                <Send className="w-4 h-4 mr-2" />
+                Send First Message
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }

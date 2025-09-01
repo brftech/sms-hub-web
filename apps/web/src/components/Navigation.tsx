@@ -1,10 +1,9 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button, useHub, HubLogo } from "@sms-hub/ui";
-import { Menu, X, Shield } from "lucide-react";
+import { Menu, X } from "lucide-react";
 // import { HubSwitcher } from "@sms-hub/ui";
 import { getHubColorClasses } from "@sms-hub/utils";
-import { isAdminAccessible } from "../utils/environment";
 
 const Navigation = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -18,7 +17,6 @@ const Navigation = () => {
   };
 
   const isContactPage = location.pathname === "/contact";
-  const showAdminLink = isAdminAccessible();
 
   // Scroll to top function
   const scrollToTop = () => {
@@ -118,19 +116,7 @@ const Navigation = () => {
             >
               Platform Demo
             </button>
-            {showAdminLink && (
-              <button
-                onClick={() => handleDesktopNavClick("/admin")}
-                className={`transition-colors text-sm font-medium ${
-                  location.pathname === "/admin"
-                    ? `${hubColors.text} hub-text-primary`
-                    : "text-white hover:text-gray-300"
-                }`}
-              >
-                <Shield className="w-4 h-4 inline mr-1" />
-                Admin
-              </button>
-            )}
+
           </div>
 
           {/* Mobile header with logo, contact button, and hamburger */}
@@ -273,21 +259,7 @@ const Navigation = () => {
               >
                 Platform Demo
               </button>
-              {showAdminLink && (
-                <button
-                  onClick={() => handleNavClick("/admin")}
-                  className={`block w-full text-left px-3 py-2 text-base font-medium text-white hover:${
-                    hubColors.textHover
-                  } hover:${hubColors.bgLight} transition-colors ${
-                    location.pathname === "/admin"
-                      ? `${hubColors.text} ${hubColors.bgLight}`
-                      : ""
-                  }`}
-                >
-                  <Shield className="w-4 h-4 inline mr-2" />
-                  Admin
-                </button>
-              )}
+
             </div>
           </div>
         )}

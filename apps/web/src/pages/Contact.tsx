@@ -207,11 +207,9 @@ const Contact = () => {
                           First Name *
                         </label>
                         <FormFieldComponent
-                          label="First Name"
                           name="firstName"
                           type="text"
                           placeholder="John"
-                          required
                           value={formData.firstName}
                           onChange={(value) =>
                             setFormData((prev) => ({ ...prev, firstName: value }))
@@ -225,11 +223,9 @@ const Contact = () => {
                           Last Name *
                         </label>
                         <FormFieldComponent
-                          label="Last Name"
                           name="lastName"
                           type="text"
                           placeholder="Doe"
-                          required
                           value={formData.lastName}
                           onChange={(value) =>
                             setFormData((prev) => ({ ...prev, lastName: value }))
@@ -245,11 +241,9 @@ const Contact = () => {
                           Email *
                         </label>
                         <FormFieldComponent
-                          label="Email"
                           name="email"
                           type="email"
                           placeholder="john@speakeasy.com"
-                          required
                           value={formData.email}
                           onChange={(value) =>
                             setFormData((prev) => ({ ...prev, email: value }))

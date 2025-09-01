@@ -275,3 +275,4 @@ const SMSAuthModal: React.FC<SMSAuthModalProps> = ({
 };
 
 export default SMSAuthModal;
+

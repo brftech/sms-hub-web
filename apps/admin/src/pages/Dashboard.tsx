@@ -1,337 +1,346 @@
-import { useHub, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sms-hub/ui'
-import { MessageSquare, Users, Building, TrendingUp, AlertTriangle, DollarSign, Activity, Clock, CheckCircle, XCircle } from 'lucide-react'
-import { useAdminStats } from '@sms-hub/supabase'
-import styled from 'styled-components'
+import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useHub } from '@sms-hub/ui'
+import { 
+  MessageSquare, 
+  Users, 
+  Building, 
+  TrendingUp, 
+  AlertTriangle, 
+  DollarSign, 
+  Activity, 
+  Clock, 
+  CheckCircle, 
+  XCircle,
+  UserPlus,
+  Eye
+} from 'lucide-react'
+import { dashboardService, DashboardStats, RecentActivity, Alert, SystemHealth } from '../services/dashboardService'
 
-const DashboardContainer = styled.div`
-  background: #f8f9fa;
-  min-height: 100vh;
-  padding: 2rem;
+const Dashboard = () => {
+  const { currentHub } = useHub()
+  const navigate = useNavigate()
+  const [stats, setStats] = useState<DashboardStats | null>(null)
+  const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([])
+  const [alerts, setAlerts] = useState<Alert[]>([])
+  const [systemHealth, setSystemHealth] = useState<SystemHealth | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  @media (max-width: 768px) {
-    padding: 1rem;
+  // Fetch dashboard data
+  const fetchDashboardData = async () => {
+    try {
+      setIsLoading(true)
+      setError(null)
+
+      // Get hub ID based on current hub
+      const hubId = currentHub === 'gnymble' ? 1 : 
+                   currentHub === 'percymd' ? 2 :
+                   currentHub === 'percytext' ? 3 :
+                   currentHub === 'percytech' ? 0 : 1 // Default to gnymble (1)
+
+      console.log('Dashboard: Current hub:', currentHub)
+      console.log('Dashboard: Using hub_id:', hubId)
+
+      // Fetch all dashboard data in parallel
+      const [statsData, activityData, alertsData, healthData] = await Promise.all([
+        dashboardService.getDashboardStats(hubId),
+        dashboardService.getRecentActivity(hubId),
+        dashboardService.getAlerts(hubId),
+        dashboardService.getSystemHealth()
+      ])
+
+      setStats(statsData)
+      setRecentActivity(activityData)
+      setAlerts(alertsData)
+      setSystemHealth(healthData)
+    } catch (err) {
+      console.error('Error fetching dashboard data:', err)
+      setError(err instanceof Error ? err.message : 'Failed to fetch dashboard data')
+    } finally {
+      setIsLoading(false)
+    }
   }
-`
 
-const Header = styled.div`
-  margin-bottom: 2rem;
-`
+  // Initial data fetch
+  useEffect(() => {
+    fetchDashboardData()
+  }, [currentHub])
 
-const Title = styled.h1`
-  font-size: 1.875rem;
-  font-weight: 600;
-  color: #1f2937;
-  margin: 0;
-  margin-bottom: 0.5rem;
-`
+  // Refresh data every 30 seconds
+  useEffect(() => {
+    const interval = setInterval(fetchDashboardData, 30000)
+    return () => clearInterval(interval)
+  }, [currentHub])
 
-const Subtitle = styled.p`
-  font-size: 1rem;
-  color: #6b7280;
-  margin: 0;
-`
-
-const StatsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-`
-
-const StatCard = styled(Card)`
-  background: white;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-  transition: all 0.2s ease;
-
-  &:hover {
-    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  // Helper function to get icon component
+  const getIconComponent = (iconName: string) => {
+    const iconMap: { [key: string]: any } = {
+      UserPlus,
+      Building,
+      CheckCircle,
+      MessageSquare,
+      AlertTriangle,
+      Clock
+    }
+    return iconMap[iconName] || Activity
   }
-`
 
-const AlertCard = styled(StatCard)`
-  border-left: 4px solid #ef4444;
-`
+  // Navigation functions for card clicks
+  const navigateToCompanies = () => navigate('/companies')
+  const navigateToUsers = () => navigate('/users')
+  const navigateToLeads = () => navigate('/leads')
+  const navigateToTempSignups = () => navigate('/temp-signups')
 
-const StatContent = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: start;
-`
-
-const StatInfo = styled.div`
-  flex: 1;
-`
-
-const StatLabel = styled.p`
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #6b7280;
-  margin: 0;
-  margin-bottom: 0.5rem;
-`
-
-const StatValue = styled.div`
-  font-size: 1.875rem;
-  font-weight: 600;
-  color: #1f2937;
-  line-height: 1.2;
-`
-
-const IconContainer = styled.div<{ $bgColor: string }>`
-  width: 48px;
-  height: 48px;
-  background: ${props => props.$bgColor};
-  border-radius: 0.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-`
-
-const ContentGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-  gap: 1.5rem;
-`
-
-const ActivityCard = styled(Card)`
-  background: white;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-`
-
-const ActivityList = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-`
-
-const ActivityItem = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.75rem 0;
-  border-bottom: 1px solid #f3f4f6;
-
-  &:last-child {
-    border-bottom: none;
-    padding-bottom: 0;
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading dashboard data...</p>
+        </div>
+      </div>
+    )
   }
-`
 
-const UserInfo = styled.div`
-  flex: 1;
-`
-
-const UserName = styled.div`
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #1f2937;
-`
-
-const UserEmail = styled.div`
-  font-size: 0.75rem;
-  color: #6b7280;
-  margin-top: 0.125rem;
-`
-
-const TimeStamp = styled.div`
-  font-size: 0.75rem;
-  color: #9ca3af;
-`
-
-const StatusIndicator = styled.div<{ $status: 'success' | 'warning' | 'error' }>`
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-  font-size: 0.75rem;
-  color: ${props => props.$status === 'success' ? '#059669' : props.$status === 'warning' ? '#d97706' : '#dc2626'};
-`
-
-const StatusDot = styled.div<{ $status: 'success' | 'warning' | 'error' }>`
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: ${props => props.$status === 'success' ? '#10b981' : props.$status === 'warning' ? '#f59e0b' : '#ef4444'};
-`
-
-const EmptyState = styled.div`
-  text-align: center;
-  padding: 2rem;
-  color: #9ca3af;
-  font-size: 0.875rem;
-`
-
-export function Dashboard() {
-  const { hubConfig, currentHub } = useHub()
-  const { data: stats } = useAdminStats(hubConfig.id)
-
-  const overviewStats = [
-    {
-      title: 'Total Users',
-      value: stats?.totalUsers || 0,
-      icon: Users,
-      color: '#3b82f6',
-      bgColor: '#eff6ff',
-    },
-    {
-      title: 'Active Companies',
-      value: stats?.activeCompanies || 0,
-      icon: Building,
-      color: '#10b981',
-      bgColor: '#f0fdf4',
-    },
-    {
-      title: 'Messages Today',
-      value: stats?.messagesToday || 0,
-      icon: MessageSquare,
-      color: '#8b5cf6',
-      bgColor: '#f5f3ff',
-    },
-    {
-      title: 'Revenue (MTD)',
-      value: `$${(stats?.revenueThisMonth || 0).toLocaleString()}`,
-      icon: DollarSign,
-      color: '#10b981',
-      bgColor: '#f0fdf4',
-    },
-  ]
-
-  const alertsStats = [
-    {
-      title: 'Failed Messages',
-      value: stats?.failedMessages || 0,
-      icon: XCircle,
-      color: '#ef4444',
-      bgColor: '#fef2f2',
-    },
-    {
-      title: 'Pending Reviews',
-      value: stats?.pendingReviews || 0,
-      icon: Clock,
-      color: '#f59e0b',
-      bgColor: '#fffbeb',
-    },
-  ]
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
+            <AlertTriangle className="h-6 w-6 text-red-600" />
+          </div>
+          <h3 className="mt-4 text-lg font-medium text-gray-900">Error Loading Dashboard</h3>
+          <p className="mt-2 text-sm text-gray-500">{error}</p>
+          <div className="mt-6">
+            <button
+              onClick={fetchDashboardData}
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              <Activity className="w-4 h-4 mr-2" />
+              Try Again
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
-    <DashboardContainer>
-      <Header>
-        <Title>Admin Dashboard</Title>
-        <Subtitle>{hubConfig.displayName} platform overview and management</Subtitle>
-      </Header>
+    <div className="space-y-6">
+      {/* Page Header */}
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+        <p className="mt-1 text-sm text-gray-500">
+          Overview of {currentHub} hub activity and performance
+        </p>
+      </div>
 
-      <StatsGrid>
-        {overviewStats.map((stat) => (
-          <StatCard key={stat.title}>
-            <CardContent>
-              <StatContent>
-                <StatInfo>
-                  <StatLabel>{stat.title}</StatLabel>
-                  <StatValue>{stat.value}</StatValue>
-                </StatInfo>
-                <IconContainer $bgColor={stat.bgColor}>
-                  <stat.icon size={24} color={stat.color} />
-                </IconContainer>
-              </StatContent>
-            </CardContent>
-          </StatCard>
-        ))}
-      </StatsGrid>
+      {/* Statistics Cards */}
+      {stats && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div 
+            className="bg-white rounded-lg shadow-sm p-6 cursor-pointer hover:shadow-md hover:scale-105 transition-all duration-200"
+            onClick={navigateToCompanies}
+          >
+            <div className="flex items-center">
+              <div className="p-2 bg-green-100 rounded-lg">
+                <Building className="w-6 h-6 text-green-600" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Companies</p>
+                <p className="text-2xl font-bold text-gray-900">{stats.totalCompanies}</p>
+                <p className="text-xs text-green-600 mt-1">+{stats.activeCompanies} active</p>
+              </div>
+            </div>
+          </div>
 
-      <StatsGrid>
-        {alertsStats.map((stat) => (
-          <AlertCard key={stat.title}>
-            <CardContent>
-              <StatContent>
-                <StatInfo>
-                  <StatLabel>{stat.title}</StatLabel>
-                  <StatValue>{stat.value}</StatValue>
-                </StatInfo>
-                <IconContainer $bgColor={stat.bgColor}>
-                  <stat.icon size={24} color={stat.color} />
-                </IconContainer>
-              </StatContent>
-            </CardContent>
-          </AlertCard>
-        ))}
-      </StatsGrid>
+          <div 
+            className="bg-white rounded-lg shadow-sm p-6 cursor-pointer hover:shadow-md hover:scale-105 transition-all duration-200"
+            onClick={navigateToUsers}
+          >
+            <div className="flex items-center">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Users className="w-6 h-6 text-blue-600" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Total Users</p>
+                <p className="text-2xl font-bold text-gray-900">{stats.totalUsers.toLocaleString()}</p>
+                <p className="text-xs text-green-600 mt-1">+{stats.activeUsers} active</p>
+              </div>
+            </div>
+          </div>
 
-      <ContentGrid>
-        <ActivityCard>
-          <CardHeader>
-            <CardTitle>Recent Signups</CardTitle>
-            <CardDescription>New user registrations today</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ActivityList>
-              {stats?.recentSignups?.length ? (
-                stats.recentSignups.map((signup, i) => (
-                  <ActivityItem key={i}>
-                    <UserInfo>
-                      <UserName>{signup.name}</UserName>
-                      <UserEmail>{signup.email}</UserEmail>
-                    </UserInfo>
-                    <TimeStamp>
-                      {new Date(signup.created_at).toLocaleTimeString()}
-                    </TimeStamp>
-                  </ActivityItem>
-                ))
-              ) : (
-                <EmptyState>No recent signups</EmptyState>
-              )}
-            </ActivityList>
-          </CardContent>
-        </ActivityCard>
+          <div 
+            className="bg-white rounded-lg shadow-sm p-6 cursor-pointer hover:shadow-md hover:scale-105 transition-all duration-200"
+            onClick={navigateToLeads}
+          >
+            <div className="flex items-center">
+              <div className="p-2 bg-purple-100 rounded-lg">
+                <UserPlus className="w-6 h-6 text-purple-600" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Leads</p>
+                <p className="text-2xl font-bold text-gray-900">{stats.totalLeads}</p>
+                <p className="text-xs text-yellow-600 mt-1">{stats.pendingLeads} pending</p>
+              </div>
+            </div>
+          </div>
 
-        <ActivityCard>
-          <CardHeader>
-            <CardTitle>System Health</CardTitle>
-            <CardDescription>Platform status and performance</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ActivityList>
-              <ActivityItem>
-                <UserInfo>
-                  <UserName>API Status</UserName>
-                </UserInfo>
-                <StatusIndicator $status="success">
-                  <StatusDot $status="success" />
-                  Operational
-                </StatusIndicator>
-              </ActivityItem>
-              <ActivityItem>
-                <UserInfo>
-                  <UserName>Message Queue</UserName>
-                </UserInfo>
-                <StatusIndicator $status="success">
-                  <StatusDot $status="success" />
-                  Healthy
-                </StatusIndicator>
-              </ActivityItem>
-              <ActivityItem>
-                <UserInfo>
-                  <UserName>Database</UserName>
-                </UserInfo>
-                <StatusIndicator $status="success">
-                  <StatusDot $status="success" />
-                  Connected
-                </StatusIndicator>
-              </ActivityItem>
-              <ActivityItem>
-                <UserInfo>
-                  <UserName>SMS Gateway</UserName>
-                </UserInfo>
-                <StatusIndicator $status="warning">
-                  <StatusDot $status="warning" />
-                  Degraded
-                </StatusIndicator>
-              </ActivityItem>
-            </ActivityList>
-          </CardContent>
-        </ActivityCard>
-      </ContentGrid>
-    </DashboardContainer>
+          <div 
+            className="bg-white rounded-lg shadow-sm p-6 cursor-pointer hover:shadow-md hover:scale-105 transition-all duration-200"
+            onClick={navigateToTempSignups}
+          >
+            <div className="flex items-center">
+              <div className="p-2 bg-yellow-100 rounded-lg">
+                <Clock className="w-6 h-6 text-yellow-600" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Temp Signups</p>
+                <p className="text-2xl font-bold text-gray-900">{stats.totalTempSignups}</p>
+                <p className="text-xs text-yellow-600 mt-1">{stats.pendingVerifications} pending verification</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Secondary Stats */}
+      {stats && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Messages Sent</p>
+                <p className="text-2xl font-bold text-gray-900">{stats.totalMessages.toLocaleString()}</p>
+              </div>
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <MessageSquare className="w-6 h-6 text-blue-600" />
+              </div>
+            </div>
+            <p className="text-xs text-gray-500 mt-2">{stats.messagesThisMonth.toLocaleString()} this month</p>
+          </div>
+
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Revenue</p>
+                <p className="text-2xl font-bold text-gray-900">${stats.revenue.toLocaleString()}</p>
+              </div>
+              <div className="p-2 bg-orange-100 rounded-lg">
+                <DollarSign className="w-6 h-6 text-orange-600" />
+              </div>
+            </div>
+            <p className="text-xs text-green-600 mt-2">+{stats.revenueGrowth}% this month</p>
+          </div>
+
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">System Health</p>
+                <p className="text-2xl font-bold text-green-600">{systemHealth?.overallHealth || 0}%</p>
+              </div>
+              <div className="p-2 bg-green-100 rounded-lg">
+                <CheckCircle className="w-6 h-6 text-green-600" />
+              </div>
+            </div>
+            <p className="text-xs text-gray-500 mt-2">All systems operational</p>
+          </div>
+        </div>
+      )}
+
+      {/* Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Recent Activity */}
+        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h3 className="text-lg font-medium text-gray-900">Recent Activity</h3>
+          </div>
+          <div className="p-6">
+            {recentActivity.length > 0 ? (
+              <div className="space-y-4">
+                {recentActivity.map((activity) => {
+                  const IconComponent = getIconComponent(activity.icon)
+                  return (
+                    <div key={activity.id} className="flex items-start space-x-3">
+                      <div className={`p-2 rounded-lg bg-gray-100 ${activity.color}`}>
+                        <IconComponent className="w-4 h-4" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-900">{activity.title}</p>
+                        <p className="text-sm text-gray-500">{activity.description}</p>
+                        <p className="text-xs text-gray-400 mt-1">{activity.time}</p>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <Activity className="mx-auto h-8 w-8 text-gray-400" />
+                <p className="mt-2 text-sm text-gray-500">No recent activity</p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Alerts */}
+        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h3 className="text-lg font-medium text-gray-900">Alerts & Notifications</h3>
+          </div>
+          <div className="p-6">
+            {alerts.length > 0 ? (
+              <div className="space-y-4">
+                {alerts.map((alert) => {
+                  const IconComponent = getIconComponent(alert.icon)
+                  return (
+                    <div key={alert.id} className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
+                      <div className={`p-2 rounded-lg bg-white ${alert.color}`}>
+                        <IconComponent className="w-4 h-4" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-900">{alert.title}</p>
+                        <p className="text-sm text-gray-500">{alert.description}</p>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <CheckCircle className="mx-auto h-8 w-8 text-green-400" />
+                <p className="mt-2 text-sm text-gray-500">All systems running smoothly</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Quick Actions */}
+      <div className="bg-white rounded-lg shadow-sm p-6">
+        <h3 className="text-lg font-medium text-gray-900 mb-4">Quick Actions</h3>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <button className="flex items-center justify-center px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+            <UserPlus className="w-5 h-5 mr-2 text-blue-600" />
+            <span className="text-sm font-medium text-gray-700">Add User</span>
+          </button>
+          <button className="flex items-center justify-center px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+            <Building className="w-5 h-5 mr-2 text-green-600" />
+            <span className="text-sm font-medium text-gray-700">Add Company</span>
+          </button>
+          <button className="flex items-center justify-center px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+            <MessageSquare className="w-5 h-5 mr-2 text-purple-600" />
+            <span className="text-sm font-medium text-gray-700">Send Message</span>
+          </button>
+          <button className="flex items-center justify-center px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+            <Eye className="w-5 h-5 mr-2 text-orange-600" />
+            <span className="text-sm font-medium text-gray-700">View Reports</span>
+          </button>
+        </div>
+      </div>
+    </div>
   )
 }
+
+export default Dashboard

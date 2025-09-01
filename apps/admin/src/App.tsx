@@ -1,12 +1,14 @@
 import { Routes, Route } from 'react-router-dom'
 import { useHub } from '@sms-hub/ui'
-import { Dashboard } from './pages/Dashboard'
-import { Users } from './pages/Users'
-import { Companies } from './pages/Companies'
-import { Messages } from './pages/Messages'
-import { Analytics } from './pages/Analytics'
-import { Settings } from './pages/Settings'
+import Dashboard from './pages/Dashboard'
+import Users from './pages/Users'
+import Companies from './pages/Companies'
+// import { Messages } from './pages/Messages'
+// import { Analytics } from './pages/Analytics'
+import Settings from './pages/Settings'
 import { Login } from './pages/Login'
+import Leads from './pages/Leads'
+import TempSignups from './pages/TempSignups'
 import { Layout } from './components/Layout'
 
 function App() {
@@ -18,11 +20,13 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/" element={<Layout />}>
           <Route index element={<Dashboard />} />
-          <Route path="users" element={<Users />} />
-          <Route path="companies" element={<Companies />} />
-          <Route path="messages" element={<Messages />} />
-          <Route path="analytics" element={<Analytics />} />
-          <Route path="settings" element={<Settings />} />
+                  <Route path="users" element={<Users />} />
+        <Route path="companies" element={<Companies />} />
+        <Route path="leads" element={<Leads />} />
+        <Route path="temp-signups" element={<TempSignups />} />
+        {/* <Route path="messages" element={<Messages />} /> */}
+        {/* <Route path="analytics" element={<Analytics />} /> */}
+        <Route path="settings" element={<Settings />} />
         </Route>
       </Routes>
     </div>

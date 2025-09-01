@@ -12,7 +12,9 @@ import {
   LogOut,
   Bell,
   Search,
-  Shield
+  Shield,
+  UserPlus,
+  Clock
 } from 'lucide-react'
 import { useState } from 'react'
 
@@ -20,8 +22,10 @@ const navigation = [
   { name: 'Dashboard', href: '/', icon: Home },
   { name: 'Users', href: '/users', icon: Users },
   { name: 'Companies', href: '/companies', icon: Building },
-  { name: 'Messages', href: '/messages', icon: MessageSquare },
-  { name: 'Analytics', href: '/analytics', icon: BarChart3 },
+  { name: 'Leads', href: '/leads', icon: UserPlus },
+  { name: 'Temp Signups', href: '/temp-signups', icon: Clock },
+  // { name: 'Messages', href: '/messages', icon: MessageSquare },
+  // { name: 'Analytics', href: '/analytics', icon: BarChart3 },
   { name: 'Settings', href: '/settings', icon: Settings },
 ]
 

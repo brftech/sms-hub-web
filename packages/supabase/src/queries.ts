@@ -4,6 +4,14 @@ import { createAuthService } from './auth'
 
 const authService = createAuthService(supabase)
 
+// Helper function to check if supabase client is available
+const getSupabaseClient = () => {
+  if (!supabase) {
+    throw new Error('Supabase client not initialized')
+  }
+  return supabase
+}
+
 // Auth Queries
 export const useAuth = () => {
   const queryClient = useQueryClient()
@@ -52,7 +60,8 @@ export const useHubConfigs = () => {
   return useQuery({
     queryKey: ['hub-configs'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const client = getSupabaseClient()
+      const { data, error } = await client
         .from('hub_configs')
         .select('*, hubs(*)')
         .order('hub_id')
@@ -68,7 +77,8 @@ export const useHubConfig = (hubId: number) => {
   return useQuery({
     queryKey: ['hub-config', hubId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const client = getSupabaseClient()
+      const { data, error } = await client
         .from('hub_configs')
         .select('*, hubs(*)')
         .eq('hub_id', hubId)
@@ -86,7 +96,8 @@ export const useCompanies = (hubId: number) => {
   return useQuery({
     queryKey: ['companies', hubId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const client = getSupabaseClient()
+      const { data, error } = await client
         .from('companies')
         .select('*')
         .eq('hub_id', hubId)
@@ -105,7 +116,8 @@ export const useOnboardingSubmission = (companyId: string, hubId: number) => {
   return useQuery({
     queryKey: ['onboarding-submission', companyId, hubId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const client = getSupabaseClient()
+      const { data, error } = await client
         .from('onboarding_submissions')
         .select('*')
         .eq('company_id', companyId)
@@ -122,7 +134,8 @@ export const useOnboardingSteps = (hubId: number) => {
   return useQuery({
     queryKey: ['onboarding-steps', hubId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const client = getSupabaseClient()
+      const { data, error } = await client
         .from('onboarding_steps')
         .select('*')
         .eq('hub_id', hubId)
@@ -139,7 +152,8 @@ export const useLeads = (hubId: number) => {
   return useQuery({
     queryKey: ['leads', hubId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const client = getSupabaseClient()
+      const { data, error } = await client
         .from('leads')
         .select('*')
         .eq('hub_id', hubId)
@@ -156,7 +170,8 @@ export const useBrands = (companyId: string) => {
   return useQuery({
     queryKey: ['brands', companyId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const client = getSupabaseClient()
+      const { data, error } = await client
         .from('brands')
         .select('*')
         .eq('company_id', companyId)
@@ -204,7 +219,8 @@ export const useCreateCompany = () => {
       created_by_profile_id: string
     }) => {
       // Get hub name for account number generation
-      const { data: hub, error: hubError } = await supabase
+      const client = getSupabaseClient()
+      const { data: hub, error: hubError } = await client
         .from('hubs')
         .select('name')
         .eq('hub_number', data.hub_id)
@@ -215,12 +231,12 @@ export const useCreateCompany = () => {
       }
 
       // Generate company account number
-      const { data: accountNumber, error: accountError } = await supabase
+      const { data: accountNumber, error: accountError } = await client
         .rpc('generate_company_account_number', { hub_name: hub.name })
 
       if (accountError) throw accountError
 
-      const { data: result, error } = await supabase
+      const { data: result, error } = await client
         .from('companies')
         .insert([{
           ...data,
@@ -253,7 +269,8 @@ export const useCreateLead = () => {
       message?: string
       ip_address?: string
     }) => {
-      const { data: result, error } = await supabase
+      const client = getSupabaseClient()
+      const { data: result, error } = await client
         .from('leads')
         .insert([data])
         .select()
@@ -281,7 +298,8 @@ export const useUpdateOnboardingSubmission = () => {
       tcr_campaign_id?: string
       assigned_phone_number?: string
     }) => {
-      const { data: result, error } = await supabase
+      const client = getSupabaseClient()
+      const { data: result, error } = await client
         .from('onboarding_submissions')
         .update(data)
         .eq('id', data.id)
@@ -309,7 +327,8 @@ export const useCreateOnboardingSubmission = () => {
       current_step: string
       step_data: Record<string, any>
     }) => {
-      const { data: result, error } = await supabase
+      const client = getSupabaseClient()
+      const { data: result, error } = await client
         .from('onboarding_submissions')
         .insert([data])
         .select()
@@ -331,7 +350,8 @@ export const useCurrentUserCompany = () => {
     queryKey: ['company', userProfile?.company_id],
     queryFn: async () => {
       if (!userProfile?.company_id) return null
-      const { data, error } = await supabase
+      const client = getSupabaseClient()
+      const { data, error } = await client
         .from('companies')
         .select('*')
         .eq('id', userProfile.company_id)

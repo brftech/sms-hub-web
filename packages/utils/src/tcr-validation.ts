@@ -33,9 +33,9 @@ export function validateWebsite(url: string): boolean {
 }
 
 /**
- * Validates US phone number
+ * Validates US phone number for TCR compliance
  */
-export function validatePhoneNumber(phone: string): boolean {
+export function validateTCRPhoneNumber(phone: string): boolean {
   const cleaned = phone.replace(/[^\d]/g, '')
   return cleaned.length === 10 || (cleaned.length === 11 && cleaned[0] === '1')
 }
@@ -82,12 +82,12 @@ export function validateCallToAction(text: string): { valid: boolean; error?: st
 /**
  * Validates brand data for TCR submission
  */
-export interface BrandValidationResult {
+export interface TCRBrandValidationResult {
   valid: boolean
   errors: Record<string, string>
 }
 
-export function validateBrandData(data: any): BrandValidationResult {
+export function validateTCRBrandData(data: any): TCRBrandValidationResult {
   const errors: Record<string, string> = {}
   
   // Required fields
@@ -156,7 +156,7 @@ export function validateBrandData(data: any): BrandValidationResult {
   
   if (!data.contact_phone?.trim()) {
     errors.contact_phone = 'Contact phone is required'
-  } else if (!validatePhoneNumber(data.contact_phone)) {
+  } else if (!validateTCRPhoneNumber(data.contact_phone)) {
     errors.contact_phone = 'Please enter a valid US phone number'
   }
   
@@ -169,13 +169,13 @@ export function validateBrandData(data: any): BrandValidationResult {
 /**
  * Validates campaign data for TCR submission
  */
-export interface CampaignValidationResult {
+export interface TCRCampaignValidationResult {
   valid: boolean
   errors: Record<string, string>
   warnings: string[]
 }
 
-export function validateCampaignData(data: any): CampaignValidationResult {
+export function validateTCRCampaignData(data: any): TCRCampaignValidationResult {
   const errors: Record<string, string> = {}
   const warnings: string[] = []
   
@@ -256,8 +256,8 @@ export function validateCampaignData(data: any): CampaignValidationResult {
  * Check if all required TCR fields are present for API submission
  */
 export function hasAllTCRFields(brandData: any, campaignData: any): boolean {
-  const brandValidation = validateBrandData(brandData)
-  const campaignValidation = validateCampaignData(campaignData)
+  const brandValidation = validateTCRBrandData(brandData)
+  const campaignValidation = validateTCRCampaignData(campaignData)
   
   return brandValidation.valid && campaignValidation.valid
 }

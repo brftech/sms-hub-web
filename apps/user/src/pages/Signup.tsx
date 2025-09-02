@@ -365,7 +365,7 @@ export function Signup() {
           email: formData.email,
           phone: getPhoneForAPI(formData.phone),
           authMethod,
-          signupId: result.verification_id,
+          verificationId: result.verification_id,
           hubId,
           isLogin: false,
           signupType,

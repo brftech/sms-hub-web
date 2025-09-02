@@ -5,7 +5,7 @@ import { StepComponentProps } from '@sms-hub/types'
 import { Phone, ChevronRight, RefreshCw } from 'lucide-react'
 
 export function BandwidthStep({ onComplete }: StepComponentProps) {
-  const { } = useHub()
+  const { hubConfig } = useHub()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [selectedNumber, setSelectedNumber] = useState<string>('')
   

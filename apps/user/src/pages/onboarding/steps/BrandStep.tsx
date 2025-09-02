@@ -29,7 +29,7 @@ interface BrandFormData {
 }
 
 export function BrandStep({ onComplete }: StepComponentProps) {
-  const { } = useHub()
+  const { hubConfig } = useHub()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const form = useForm<BrandFormData>({

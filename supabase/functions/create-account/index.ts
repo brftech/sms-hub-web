@@ -8,7 +8,7 @@ serve(async (req) => {
   }
 
   try {
-    const { signup_id, password, company_name, first_name, last_name } =
+    const { verification_id, password, company_name, first_name, last_name } =
       await req.json();
 
     // Create Supabase admin client
@@ -22,7 +22,7 @@ serve(async (req) => {
     const { data: verificationRequest, error: findError } = await supabaseAdmin
       .from("verifications")
       .select("*")
-      .eq("id", signup_id)
+      .eq("id", verification_id)
       .eq("is_verified", true)
       .single();
 
@@ -72,7 +72,7 @@ serve(async (req) => {
           is_active: true,
           first_name: first_name || verificationRequest.first_name || "",
           last_name: last_name || verificationRequest.last_name || "",
-          verification_id: signup_id, // Link to verification record
+          verification_id: verification_id, // Link to verification record
         },
       ])
       .select()
@@ -172,7 +172,7 @@ serve(async (req) => {
         email: verificationRequest.email,
         hub_id: verificationRequest.hub_id,
         customer_type: verificationRequest.step_data?.customer_type,
-        verification_id: signup_id, // Reference to verification record
+        verification_id: verification_id, // Reference to verification record
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );

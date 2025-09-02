@@ -32,7 +32,7 @@ export function AccountDetails() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   
-  const signupId = searchParams.get("id");
+  const verificationId = searchParams.get("id");
   const signupData = JSON.parse(sessionStorage.getItem('signup_data') || '{}');
   
   const [formData, setFormData] = useState({
@@ -50,7 +50,7 @@ export function AccountDetails() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!signupId) {
+    if (!verificationId) {
       setError("Session expired. Please start over.");
       setTimeout(() => navigate("/signup"), 2000);
       return;
@@ -75,9 +75,15 @@ export function AccountDetails() {
     setIsSubmitting(true);
     setError("");
 
+    console.log("AccountDetails debug:", {
+      verificationId,
+      signupData,
+      formData: { ...formData, password: "***", confirmPassword: "***" }
+    });
+
     try {
       // Update verifications with the collected info
-      const updateResponse = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/rest/v1/verifications?id=eq.${signupId}`, {
+      const updateResponse = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/rest/v1/verifications?id=eq.${verificationId}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -99,19 +105,23 @@ export function AccountDetails() {
       }
 
       // Create the account
+      const createAccountPayload = {
+        verification_id: verificationId,
+        password: formData.password,
+        company_name: formData.companyName,
+        first_name: formData.firstName,
+        last_name: formData.lastName
+      };
+      
+      console.log("Sending create-account request:", createAccountPayload);
+      
       const accountResponse = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-account`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
         },
-        body: JSON.stringify({
-          signup_id: signupId,
-          password: formData.password,
-          company_name: formData.companyName,
-          first_name: formData.firstName,
-          last_name: formData.lastName
-        }),
+        body: JSON.stringify(createAccountPayload),
       });
 
       const accountData = await accountResponse.json();
@@ -162,41 +172,6 @@ export function AccountDetails() {
     }
   };
 
-  const handleCheckout = async (accountData: any) => {
-    try {
-      const checkoutResponse = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-checkout-session`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-        },
-        body: JSON.stringify({
-          email: accountData.email,
-          userId: accountData.user_id,
-          companyId: accountData.company_id,
-          hubId: accountData.hub_id,
-          customerType: signupData.customer_type || 'company',
-          successUrl: `${window.location.origin}/payment-callback?session_id={CHECKOUT_SESSION_ID}`,
-          cancelUrl: `${window.location.origin}/signup`
-        }),
-      });
-
-      const checkoutData = await checkoutResponse.json();
-      
-      if (!checkoutResponse.ok) {
-        throw new Error(checkoutData.error || "Failed to create checkout session");
-      }
-
-      // Redirect to Stripe
-      if (checkoutData.url) {
-        window.location.href = checkoutData.url;
-      }
-    } catch (err: any) {
-      console.error("Checkout error:", err);
-      // If checkout fails, still let them into the app
-      navigate("/");
-    }
-  };
 
   if (success) {
     return (

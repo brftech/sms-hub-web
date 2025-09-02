@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { createAuthService } from "./auth";
 import { createSupabaseClient } from "./client";
+import { Company, UserProfile } from "@sms-hub/types";
 
 // Create a single supabase client instance
 const getSupabaseClient = () => {
@@ -498,15 +499,15 @@ export const useAdminStats = (hubId: number) => {
 
       return {
         totalCompanies: companies?.length || 0,
-        activeCompanies: companies?.filter((c) => c.is_active)?.length || 0,
+        activeCompanies: companies?.filter((c: Company) => c.is_active)?.length || 0,
         totalUsers: users?.length || 0,
-        activeUsers: users?.filter((u) => u.is_active)?.length || 0,
+        activeUsers: users?.filter((u: UserProfile) => u.is_active)?.length || 0,
         messagesToday: 0,
         revenueThisMonth: 0,
         failedMessages: 0,
         pendingReviews: 0,
         recentSignups:
-          users?.filter((u) => {
+          users?.filter((u: UserProfile) => {
             const createdAt = new Date(u.created_at!);
             const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
             return createdAt > weekAgo;

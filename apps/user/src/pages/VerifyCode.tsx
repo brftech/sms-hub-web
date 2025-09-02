@@ -55,9 +55,14 @@ export function VerifyCode() {
   const [canResend, setCanResend] = useState(false);
 
   useEffect(() => {
-    console.log("VerifyCode mounted with ID:", verificationId);
-    if (!verificationId) {
-      console.log("No ID found, redirecting to signup");
+    console.log("VerifyCode mounted with:", {
+      verificationId,
+      signupData,
+      authMethod,
+      urlParams: window.location.search
+    });
+    if (!verificationId && !signupData.verificationId) {
+      console.log("No verification ID found, redirecting to signup");
       navigate("/signup");
     }
   }, [verificationId, navigate]);
@@ -104,9 +109,18 @@ export function VerifyCode() {
     setIsVerifying(true);
     setError("");
 
+    // Use verificationId from URL as primary source, fall back to session storage
+    const actualVerificationId = verificationId || signupData.verificationId;
+    
+    if (!actualVerificationId) {
+      setError("Verification session expired. Please start over.");
+      setTimeout(() => navigate("/signup"), 2000);
+      return;
+    }
+    
     const payload = {
-      signup_id: signupData.signupId || verificationId,
-      code: verificationCode,
+      verification_id: actualVerificationId,
+      verification_code: verificationCode,  // Changed from 'code' to 'verification_code'
       email: signupData.email,
       mobile_phone_number: signupData.phone,
       auth_method: authMethod
@@ -135,11 +149,11 @@ export function VerifyCode() {
       // Code is verified! Now redirect to account details
       setSuccess(true);
       
-      // Store the signup_id for the next step
-      sessionStorage.setItem('verified_signup_id', verifyData.signup_id);
+      // Store the verification_id for the next step
+      sessionStorage.setItem('verified_verification_id', verifyData.verification_id);
       
       setTimeout(() => {
-        navigate(`/account-details?id=${verifyData.signup_id}`);
+        navigate(`/account-details?id=${verifyData.verification_id}`);
       }, 1500);
       
     } catch (err: any) {

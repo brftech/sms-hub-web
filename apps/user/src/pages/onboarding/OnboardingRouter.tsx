@@ -115,7 +115,7 @@ export function OnboardingRouter() {
     setCompletedSteps(completed)
   }, [company, brands, campaigns])
   
-  const handleStepComplete = async (data: any) => {
+  const handleStepComplete = async (_data: any) => {
     // Mark current step as completed
     setCompletedSteps(prev => new Set([...prev, currentStep]))
     

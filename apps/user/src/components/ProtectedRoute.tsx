@@ -2,12 +2,14 @@ import { useEffect, useState } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
 import { createSupabaseClient } from '@sms-hub/supabase'
 import { CheckoutRedirect } from './CheckoutRedirect'
+import { useDevAuth } from '../hooks/useDevAuth'
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [userProfile, setUserProfile] = useState<any>(null)
   const location = useLocation()
+  const devAuth = useDevAuth()
   
   const supabase = createSupabaseClient(
     import.meta.env.VITE_SUPABASE_URL,
@@ -15,6 +17,20 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   )
   
   useEffect(() => {
+    // Wait for dev auth to initialize
+    if (!devAuth.isInitialized) {
+      return
+    }
+    
+    // Check for dev superadmin mode first - this happens synchronously
+    if (devAuth.isSuperadmin) {
+      console.log('Dev superadmin mode active')
+      setIsAuthenticated(true)
+      setUserProfile(devAuth.devUserProfile)
+      setIsLoading(false)
+      return
+    }
+    
     const checkAuth = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession()
@@ -44,12 +60,15 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
     // Subscribe to auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       console.log('Auth state changed:', event, session)
-      setIsAuthenticated(!!session)
-      setIsLoading(false)
+      // Don't override dev superadmin mode
+      if (!devAuth.isSuperadmin) {
+        setIsAuthenticated(!!session)
+        setIsLoading(false)
+      }
     })
     
     return () => subscription.unsubscribe()
-  }, [])
+  }, [devAuth.isInitialized, devAuth.isSuperadmin, devAuth.devUserProfile])
   
   if (isLoading) {
     return (

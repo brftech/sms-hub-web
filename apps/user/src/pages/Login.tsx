@@ -1,10 +1,12 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, Link, useLocation } from 'react-router-dom'
 import { useHub, Button, Card, CardContent, CardDescription, CardHeader, CardTitle, HubLogo } from '@sms-hub/ui'
 import { Input, Label, Alert, AlertDescription } from '@sms-hub/ui'
 import { Mail, Phone, CheckCircle, Shield, Lock } from 'lucide-react'
 import styled from 'styled-components'
 import { createSupabaseClient } from '@sms-hub/supabase'
+import { useDevAuth, activateDevAuth } from '../hooks/useDevAuth'
+import { DevAuthToggle } from '../components/DevAuthToggle'
 
 const LoginContainer = styled.div`
   min-height: 100vh;
@@ -51,6 +53,7 @@ export function Login() {
   const { hubConfig } = useHub()
   const navigate = useNavigate()
   const location = useLocation()
+  const devAuth = useDevAuth()
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
   const [password, setPassword] = useState('')
@@ -61,7 +64,15 @@ export function Login() {
   const [success, setSuccess] = useState(false)
   const [showLegacyOption, setShowLegacyOption] = useState(false)
   
-  const from = location.state?.from?.pathname || '/dashboard'
+  const from = location.state?.from?.pathname || '/'
+  
+  // Check for dev superadmin mode and redirect
+  useEffect(() => {
+    if (devAuth.isInitialized && devAuth.isSuperadmin) {
+      console.log('Dev superadmin mode active - redirecting from login')
+      navigate(from, { replace: true })
+    }
+  }, [devAuth.isInitialized, devAuth.isSuperadmin, from, navigate])
 
   const formatPhoneNumber = (value: string) => {
     const cleaned = value.replace(/\D/g, '')
@@ -239,6 +250,7 @@ export function Login() {
   
   return (
     <LoginContainer>
+      <DevAuthToggle onActivate={() => activateDevAuth()} />
       <Card className="w-full max-w-md">
         <CardHeader>
           <div className="text-center mb-6">

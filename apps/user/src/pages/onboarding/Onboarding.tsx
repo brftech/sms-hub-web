@@ -6,6 +6,8 @@ import { useAuth, useOnboardingSubmission, useCreateOnboardingSubmission, useUpd
 import { ONBOARDING_STEPS, OnboardingStepName } from '@sms-hub/types'
 import { toast } from 'sonner'
 import { ChevronLeft } from 'lucide-react'
+import { useDevAuth } from '../../hooks/useDevAuth'
+import { DevAdminBanner } from '../../components/DevAdminBanner'
 
 // Import step components (to be created)
 import { PaymentStep } from './steps/PaymentStep'
@@ -18,6 +20,7 @@ import { ActivationStep } from './steps/ActivationStep'
 export function Onboarding() {
   const { hubConfig, currentHub } = useHub()
   const navigate = useNavigate()
+  const devAuth = useDevAuth()
   const { data: user, isLoading: userLoading } = useAuth()
   const [currentStep, setCurrentStep] = useState<OnboardingStepName>('payment')
   const [companyId, setCompanyId] = useState<string>('')
@@ -31,12 +34,12 @@ export function Onboarding() {
     hubConfig.hubNumber
   )
 
-  // Redirect if not authenticated
+  // Redirect if not authenticated (but allow dev superadmin)
   useEffect(() => {
-    if (!userLoading && !user) {
+    if (!userLoading && !user && !devAuth.isSuperadmin) {
       navigate('/signup')
     }
-  }, [user, userLoading, navigate])
+  }, [user, userLoading, navigate, devAuth.isSuperadmin])
 
   // Initialize company and submission
   useEffect(() => {
@@ -170,7 +173,7 @@ export function Onboarding() {
     }
   }
 
-  if (userLoading || submissionLoading || !user) {
+  if ((userLoading || submissionLoading || !user) && !devAuth.isSuperadmin) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -252,6 +255,7 @@ export function Onboarding() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted p-4">
+      <DevAdminBanner />
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">

@@ -1,6 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import { Dashboard } from "./pages/Dashboard";
 import { Onboarding } from "./pages/onboarding/Onboarding";
+import { OnboardingProgress } from "./pages/OnboardingProgress";
 import { PaymentCallback } from "./pages/onboarding/PaymentCallback";
 import { BusinessInfoStep } from "./pages/onboarding/steps/BusinessInfoStep";
 import { Login } from "./pages/Login";
@@ -36,6 +37,7 @@ function App() {
           </ProtectedRoute>
         }>
           <Route index element={<Dashboard />} />
+          <Route path="onboarding-progress" element={<OnboardingProgress />} />
           <Route path="campaigns" element={<Campaigns />} />
           <Route path="messages" element={<Messages />} />
           <Route path="settings" element={<Settings />} />

@@ -22,6 +22,8 @@ import {
 import styled from "styled-components";
 import logoIcon from "@sms-hub/ui/assets/gnymble-icon-logo.svg";
 import { createSupabaseClient } from "@sms-hub/supabase";
+import { useDevAuth, activateDevAuth } from '../hooks/useDevAuth';
+import { DevAuthToggle } from '../components/DevAuthToggle';
 
 const SignupContainer = styled.div`
   min-height: 100vh;
@@ -183,6 +185,7 @@ const supabase = createSupabaseClient(
 export function Signup() {
   const { hubConfig } = useHub();
   const navigate = useNavigate();
+  const devAuth = useDevAuth();
   const [searchParams] = useSearchParams();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -199,6 +202,14 @@ export function Signup() {
     email: "",
     phone: "",
   });
+
+  // Check for dev superadmin mode and redirect
+  useEffect(() => {
+    if (devAuth.isInitialized && devAuth.isSuperadmin) {
+      console.log('Dev superadmin mode active - redirecting from signup')
+      navigate('/', { replace: true })
+    }
+  }, [devAuth.isInitialized, devAuth.isSuperadmin, navigate]);
 
   // Check for invitation token in URL
   useEffect(() => {
@@ -390,6 +401,7 @@ export function Signup() {
   if (success) {
     return (
       <SignupContainer>
+        <DevAuthToggle onActivate={() => activateDevAuth()} />
         <SignupCard>
           <CardContent className="text-center py-12">
             <CheckCircle className="w-16 h-16 text-green-600 mx-auto mb-4" />
@@ -409,6 +421,7 @@ export function Signup() {
 
   return (
     <SignupContainer>
+      <DevAuthToggle onActivate={() => activateDevAuth()} />
       <SignupCard>
         <CardHeader>
           <LogoSection>

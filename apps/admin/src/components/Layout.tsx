@@ -17,9 +17,15 @@ import {
   Clock,
   Zap,
   Globe,
+  RefreshCw,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useGlobalView } from "../contexts/GlobalViewContext";
+import { DevAdminBanner } from "./DevAdminBanner";
+import { navigationCountsService, NavigationCounts } from "../services/navigationCountsService";
+
+// Export for use in Dashboard
+export { navigationCountsService };
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: Home },
@@ -38,6 +44,36 @@ export function Layout() {
   const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { isGlobalView, setIsGlobalView } = useGlobalView();
+  const [counts, setCounts] = useState<NavigationCounts>({
+    companies: 0,
+    users: 0,
+    verifications: 0,
+    leads: 0
+  });
+
+  const [isRefreshingCounts, setIsRefreshingCounts] = useState(false);
+
+  const fetchCounts = async () => {
+    const hubId = currentHub === "gnymble" ? 1 
+      : currentHub === "percymd" ? 2 
+      : currentHub === "percytext" ? 3 
+      : currentHub === "percytech" ? 0 
+      : 1;
+    
+    const newCounts = await navigationCountsService.getCounts(hubId, isGlobalView);
+    setCounts(newCounts);
+  };
+
+  const handleRefreshCounts = async () => {
+    setIsRefreshingCounts(true);
+    await fetchCounts();
+    setIsRefreshingCounts(false);
+  };
+
+  // Initial fetch of counts
+  useEffect(() => {
+    fetchCounts();
+  }, []);
 
   const isActive = (path: string) => {
     if (path === "/" && location.pathname === "/") return true;
@@ -47,6 +83,9 @@ export function Layout() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Dev Admin Banner */}
+      <DevAdminBanner />
+      
       {/* Mobile sidebar backdrop */}
       {isSidebarOpen && (
         <div
@@ -96,12 +135,21 @@ export function Layout() {
                   <item.icon
                     className={`h-5 w-5 ${active ? "text-blue-600" : "text-gray-400"}`}
                   />
-                  <span className="font-medium">{item.name}</span>
-                  {item.name === "Messages" && (
-                    <span className="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
-                      3
-                    </span>
-                  )}
+                  <span className="font-medium text-base flex-1">
+                    {item.name}
+                    {item.name === "Companies" && counts.companies > 0 && (
+                      <span className="ml-1 text-gray-500">({counts.companies})</span>
+                    )}
+                    {item.name === "Users" && counts.users > 0 && (
+                      <span className="ml-1 text-gray-500">({counts.users})</span>
+                    )}
+                    {item.name === "Verifications" && counts.verifications > 0 && (
+                      <span className="ml-1 text-gray-500">({counts.verifications})</span>
+                    )}
+                    {item.name === "Leads" && counts.leads > 0 && (
+                      <span className="ml-1 text-gray-500">({counts.leads})</span>
+                    )}
+                  </span>
                 </Link>
               );
             })}
@@ -169,14 +217,9 @@ export function Layout() {
               {/* Admin Portal Title */}
               <div className="flex items-center space-x-2">
                 <Shield className="h-6 w-6 text-blue-600" />
-                <div>
-                  <h2 className="text-lg font-semibold text-gray-900">
-                    Admin Portal
-                  </h2>
-                  <p className="text-xs text-gray-500">
-                    {hubConfig.displayName}
-                  </p>
-                </div>
+                <h2 className="text-lg font-semibold text-gray-900">
+                  Admin Portal
+                </h2>
               </div>
 
               {/* Global View Toggle */}
@@ -237,7 +280,7 @@ export function Layout() {
         </header>
 
         {/* Page content */}
-        <main className="p-6">
+        <main className="p-6 h-[calc(100vh-4rem)] overflow-hidden">
           <Outlet />
         </main>
       </div>

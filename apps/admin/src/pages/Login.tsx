@@ -1,18 +1,29 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useHub, Card, CardContent, CardDescription, CardHeader, CardTitle, Button, Input, Label } from '@sms-hub/ui'
 import { Shield, Eye, EyeOff } from 'lucide-react'
 import { useAuth } from '@sms-hub/supabase'
+import { useDevAuth, activateDevAuth } from '../hooks/useDevAuth'
+import { DevAuthToggle } from '../components/DevAuthToggle'
 
 export function Login() {
   const { hubConfig } = useHub()
   const { signIn } = useAuth()
   const navigate = useNavigate()
+  const devAuth = useDevAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
+  
+  // Check for dev superadmin mode and redirect
+  useEffect(() => {
+    if (devAuth.isInitialized && devAuth.isSuperadmin) {
+      console.log('Dev superadmin mode active - redirecting from admin login')
+      navigate('/', { replace: true })
+    }
+  }, [devAuth.isInitialized, devAuth.isSuperadmin, navigate])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -33,6 +44,7 @@ export function Login() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <DevAuthToggle onActivate={() => activateDevAuth()} />
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <div className="flex justify-center mb-6">

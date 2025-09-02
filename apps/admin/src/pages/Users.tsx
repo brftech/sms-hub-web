@@ -1,47 +1,59 @@
 import { useState, useEffect } from "react";
 import { useHub } from "@sms-hub/ui";
+import { useGlobalView } from "../contexts/GlobalViewContext";
 import {
   Search,
   UserPlus,
-  MoreHorizontal,
   Users as UsersIcon,
-  CheckCircle,
-  Clock,
-  Shield,
   RefreshCw,
   Eye,
-  AlertTriangle,
+  Edit,
+  X,
+  Trash2,
+  MoreVertical,
+  ChevronUp,
+  ChevronDown,
+  Filter,
+  Shield,
 } from "lucide-react";
-import { usersService, UserProfile, UserStats } from "../services/usersService";
+import {
+  usersService,
+  UserProfile,
+} from "../services/usersService";
 
 const Users = () => {
   const { currentHub } = useHub();
+  const { isGlobalView } = useGlobalView();
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<UserProfile[]>([]);
-  const [stats, setStats] = useState<UserStats | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [roleFilter, setRoleFilter] = useState<string>("all");
-  const [paymentStatusFilter, setPaymentStatusFilter] = useState<string>("all");
-  const [onboardingStepFilter, setOnboardingStepFilter] =
-    useState<string>("all");
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [availableRoles, setAvailableRoles] = useState<string[]>([]);
-  const [availablePaymentStatuses, setAvailablePaymentStatuses] = useState<
-    string[]
-  >([]);
-  const [availableOnboardingSteps, setAvailableOnboardingSteps] = useState<
-    string[]
-  >([]);
+  const [editingUser, setEditingUser] = useState<UserProfile | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
+  
+  // Filtering states
+  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
+  const [roleFilter, setRoleFilter] = useState<string>("all");
+  const [paymentFilter, setPaymentFilter] = useState<string>("all");
+  
+  // Sorting states
+  const [sortField, setSortField] = useState<keyof UserProfile>("created_at");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
 
-  // Fetch users and stats from database
+  // Fetch users from database
   const fetchData = async () => {
     try {
       setIsLoading(true);
       setError(null);
 
-      // Get hub ID based on current hub
+      // Get hub ID based on current hub (only used for non-global view)
       const hubId =
         currentHub === "gnymble"
           ? 1
@@ -54,25 +66,21 @@ const Users = () => {
                 : 1; // Default to gnymble (1)
 
       console.log("Users: Current hub:", currentHub);
-      console.log("Users: Using hub_id:", hubId);
+      console.log("Users: Global view:", isGlobalView);
+      console.log(
+        "Users: Using hub_id:",
+        isGlobalView ? "ALL HUBS" : hubId
+      );
 
       // Build filter options
       const filterOptions: any = {
-        hub_id: hubId,
         search: searchQuery || undefined,
         limit: 1000,
       };
 
-      if (roleFilter !== "all") {
-        filterOptions.role = roleFilter;
-      }
-
-      if (paymentStatusFilter !== "all") {
-        filterOptions.payment_status = paymentStatusFilter;
-      }
-
-      if (onboardingStepFilter !== "all") {
-        filterOptions.onboarding_step = onboardingStepFilter;
+      // Only filter by hub_id if not in global view
+      if (!isGlobalView) {
+        filterOptions.hub_id = hubId;
       }
 
       // Fetch users with filters
@@ -81,20 +89,8 @@ const Users = () => {
       console.log("Users: Fetched users:", fetchedUsers);
       console.log("Users: Count:", fetchedUsers.length);
 
-      // Fetch stats
-      const fetchedStats = await usersService.getUserStats(hubId);
-
-      // Fetch available filter options
-      const roles = await usersService.getUniqueRoles();
-      const paymentStatuses = await usersService.getUniquePaymentStatuses();
-      const onboardingSteps = await usersService.getUniqueOnboardingSteps();
-
       setUsers(fetchedUsers);
       setFilteredUsers(fetchedUsers);
-      setStats(fetchedStats);
-      setAvailableRoles(roles);
-      setAvailablePaymentStatuses(paymentStatuses);
-      setAvailableOnboardingSteps(onboardingSteps);
     } catch (err) {
       console.error("Error fetching data:", err);
       setError(err instanceof Error ? err.message : "Failed to fetch data");
@@ -110,15 +106,133 @@ const Users = () => {
     setIsRefreshing(false);
   };
 
+  const handleEditUser = (user: UserProfile) => {
+    setEditingUser(user);
+    setIsEditModalOpen(true);
+  };
+
+  const handleCloseEditModal = () => {
+    setEditingUser(null);
+    setIsEditModalOpen(false);
+  };
+
+  const handleUpdateUser = async () => {
+    if (!editingUser) return;
+    
+    try {
+      setIsUpdating(true);
+      // TODO: Implement user update in service
+      // const result = await usersService.updateUser(editingUser.id, editingUser);
+      
+      // if (result.success) {
+      await fetchData();
+      handleCloseEditModal();
+      // } else {
+      //   alert(`Failed to update: ${result.error}`);
+      // }
+    } catch (error) {
+      console.error("Error updating user:", error);
+      alert("Failed to update user");
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleDeleteUser = async () => {
+    if (!deletingUserId) return;
+    
+    try {
+      // TODO: Implement user deletion in service
+      // const result = await usersService.deleteUser(deletingUserId);
+      
+      // if (result.success) {
+      await fetchData();
+      setShowDeleteConfirm(false);
+      setDeletingUserId(null);
+      // } else {
+      //   alert(`Failed to delete: ${result.error}`);
+      // }
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      alert("Failed to delete user");
+    }
+  };
+
+  const handleCreateUser = async (newUser: Partial<UserProfile>) => {
+    try {
+      setIsUpdating(true);
+      // TODO: Implement user creation in service
+      // const result = await usersService.createUser(newUser);
+      
+      // if (result.success) {
+      await fetchData();
+      setIsCreateModalOpen(false);
+      // } else {
+      //   alert(`Failed to create: ${result.error}`);
+      // }
+    } catch (error) {
+      console.error("Error creating user:", error);
+      alert("Failed to create user");
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
   // Initial data fetch
   useEffect(() => {
     fetchData();
   }, []);
 
-  // Filter users when filters change
+  // Filter users when search query or global view changes
   useEffect(() => {
     fetchData();
-  }, [roleFilter, paymentStatusFilter, onboardingStepFilter, searchQuery]);
+  }, [
+    searchQuery,
+    isGlobalView,
+  ]);
+
+  // Apply filters and sorting to users
+  useEffect(() => {
+    let filtered = [...users];
+    
+    // Apply status filter
+    if (statusFilter !== "all") {
+      filtered = filtered.filter(u => statusFilter === "active" ? u.is_active : !u.is_active);
+    }
+    
+    // Apply role filter
+    if (roleFilter !== "all") {
+      filtered = filtered.filter(u => u.role === roleFilter);
+    }
+    
+    // Apply payment filter
+    if (paymentFilter !== "all") {
+      filtered = filtered.filter(u => u.payment_status === paymentFilter);
+    }
+    
+    // Apply sorting
+    filtered.sort((a, b) => {
+      const aVal = a[sortField] || "";
+      const bVal = b[sortField] || "";
+      
+      if (sortDirection === "asc") {
+        return aVal > bVal ? 1 : -1;
+      } else {
+        return aVal < bVal ? 1 : -1;
+      }
+    });
+    
+    setFilteredUsers(filtered);
+  }, [users, statusFilter, roleFilter, paymentFilter, sortField, sortDirection]);
+
+  const handleSort = (field: keyof UserProfile) => {
+    if (field === sortField) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortDirection("asc");
+    }
+  };
 
   if (isLoading) {
     return (
@@ -157,19 +271,36 @@ const Users = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="h-full flex flex-col space-y-4">
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Users</h1>
+          <h1 className="text-2xl font-bold text-gray-900">
+            {isGlobalView ? "Global Users" : "Users"}
+          </h1>
           <p className="mt-1 text-sm text-gray-500">
-            Manage users from {currentHub} hub
+            {isGlobalView
+              ? "Manage users from all hubs"
+              : `Manage users from ${currentHub} hub`}
           </p>
         </div>
         <div className="flex items-center space-x-3">
-          <button className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+          <div className="relative max-w-xs">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <input
+              type="text"
+              placeholder="Search users..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+            />
+          </div>
+          <button
+            onClick={() => setIsCreateModalOpen(true)}
+            className="inline-flex items-center px-3 py-2 border border-transparent shadow-sm text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+          >
             <UserPlus className="w-4 h-4 mr-2" />
-            Invite User
+            Add User
           </button>
           <button
             onClick={handleRefresh}
@@ -184,175 +315,125 @@ const Users = () => {
         </div>
       </div>
 
-      {/* Statistics Cards */}
-      {stats && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-          <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 hover:shadow-md hover:scale-105 transition-all duration-200 cursor-pointer group">
-            <div className="flex items-center">
-              <div className="p-2 sm:p-3 bg-blue-100 rounded-lg group-hover:bg-blue-200 transition-colors duration-200">
-                <UsersIcon className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
-              </div>
-              <div className="ml-3 sm:ml-4 min-w-0 flex-1">
-                <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">
-                  Total Users
-                </p>
-                <p className="text-xl sm:text-2xl font-bold text-gray-900">
-                  {stats.total}
-                </p>
-                <p className="text-xs text-blue-600 mt-1 truncate">All users</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 hover:shadow-md hover:scale-105 transition-all duration-200 cursor-pointer group">
-            <div className="flex items-center">
-              <div className="p-2 sm:p-3 bg-green-100 rounded-lg group-hover:bg-green-200 transition-colors duration-200">
-                <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
-              </div>
-              <div className="ml-3 sm:ml-4 min-w-0 flex-1">
-                <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">
-                  Active Users
-                </p>
-                <p className="text-xl sm:text-2xl font-bold text-green-600">
-                  {stats.active}
-                </p>
-                <p className="text-xs text-green-600 mt-1 truncate">
-                  Currently active
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 hover:shadow-md hover:scale-105 transition-all duration-200 cursor-pointer group">
-            <div className="flex items-center">
-              <div className="p-2 sm:p-3 bg-red-100 rounded-lg group-hover:bg-red-200 transition-colors duration-200">
-                <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-red-600" />
-              </div>
-              <div className="ml-3 sm:ml-4 min-w-0 flex-1">
-                <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">
-                  Inactive Users
-                </p>
-                <p className="text-xl sm:text-2xl font-bold text-red-600">
-                  {stats.inactive}
-                </p>
-                <p className="text-xs text-red-600 mt-1 truncate">
-                  Needs attention
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 hover:shadow-md hover:scale-105 transition-all duration-200 cursor-pointer group">
-            <div className="flex items-center">
-              <div className="p-2 sm:p-3 bg-yellow-100 rounded-lg group-hover:bg-yellow-200 transition-colors duration-200">
-                <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-600" />
-              </div>
-              <div className="ml-3 sm:ml-4 min-w-0 flex-1">
-                <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">
-                  Roles
-                </p>
-                <p className="text-xl sm:text-2xl font-bold text-yellow-600">
-                  {Object.keys(stats.byRole).length}
-                </p>
-                <p className="text-xs text-yellow-600 mt-1 truncate">
-                  User roles
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Filters and Search */}
-      <div className="bg-white rounded-lg shadow-sm p-6">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
-          <div className="flex-1 max-w-md">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-              <input
-                type="text"
-                placeholder="Search users..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-          </div>
-
-          <div className="flex flex-wrap gap-3">
-            <select
-              value={roleFilter}
-              onChange={(e) => setRoleFilter(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="all">All Roles</option>
-              {availableRoles.map((role) => (
-                <option key={role} value={role}>
-                  {role}
-                </option>
-              ))}
-            </select>
-
-            <select
-              value={paymentStatusFilter}
-              onChange={(e) => setPaymentStatusFilter(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="all">All Payment Status</option>
-              {availablePaymentStatuses.map((status) => (
-                <option key={status} value={status}>
-                  {status}
-                </option>
-              ))}
-            </select>
-
-            <select
-              value={onboardingStepFilter}
-              onChange={(e) => setOnboardingStepFilter(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="all">All Onboarding Steps</option>
-              {availableOnboardingSteps.map((step) => (
-                <option key={step} value={step}>
-                  {step}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-      </div>
-
       {/* Users Table */}
-      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-medium text-gray-900">
+      <div className="bg-white rounded-lg shadow-sm overflow-hidden flex flex-col flex-1">
+        <div className="px-4 py-3 border-b border-gray-200 flex items-center justify-between">
+          <h3 className="text-base font-medium text-gray-900">
             Users ({filteredUsers.length})
           </h3>
+          
+          {/* Filters */}
+          <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2">
+              <Filter className="w-4 h-4 text-gray-400" />
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value as "all" | "active" | "inactive")}
+                className="text-xs border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="all">All Status</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
+              
+              <select
+                value={roleFilter}
+                onChange={(e) => setRoleFilter(e.target.value)}
+                className="text-xs border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="all">All Roles</option>
+                <option value="admin">Admin</option>
+                <option value="manager">Manager</option>
+                <option value="user">User</option>
+              </select>
+              
+              <select
+                value={paymentFilter}
+                onChange={(e) => setPaymentFilter(e.target.value)}
+                className="text-xs border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="all">All Payment</option>
+                <option value="paid">Paid</option>
+                <option value="pending">Pending</option>
+                <option value="failed">Failed</option>
+              </select>
+            </div>
+          </div>
         </div>
 
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto overflow-y-auto flex-1">
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+            <thead className="bg-gray-50 sticky top-0 z-10">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  User
+                <th 
+                  className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  onClick={() => handleSort("first_name")}
+                >
+                  <div className="flex items-center space-x-1">
+                    <span>User</span>
+                    {sortField === "first_name" && (
+                      sortDirection === "asc" ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />
+                    )}
+                  </div>
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Account
+                {isGlobalView && (
+                  <th 
+                    className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                    onClick={() => handleSort("hub_id")}
+                  >
+                    <div className="flex items-center space-x-1">
+                      <span>Hub</span>
+                      {sortField === "hub_id" && (
+                        sortDirection === "asc" ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />
+                      )}
+                    </div>
+                  </th>
+                )}
+                <th 
+                  className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  onClick={() => handleSort("email")}
+                >
+                  <div className="flex items-center space-x-1">
+                    <span>Email</span>
+                    {sortField === "email" && (
+                      sortDirection === "asc" ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />
+                    )}
+                  </div>
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Role
+                <th 
+                  className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  onClick={() => handleSort("role")}
+                >
+                  <div className="flex items-center space-x-1">
+                    <span>Role</span>
+                    {sortField === "role" && (
+                      sortDirection === "asc" ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />
+                    )}
+                  </div>
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
+                <th 
+                  className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  onClick={() => handleSort("payment_status")}
+                >
+                  <div className="flex items-center space-x-1">
+                    <span>Payment</span>
+                    {sortField === "payment_status" && (
+                      sortDirection === "asc" ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />
+                    )}
+                  </div>
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Payment
+                <th 
+                  className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  onClick={() => handleSort("is_active")}
+                >
+                  <div className="flex items-center space-x-1">
+                    <span>Status</span>
+                    {sortField === "is_active" && (
+                      sortDirection === "asc" ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />
+                    )}
+                  </div>
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Joined
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
@@ -360,22 +441,37 @@ const Users = () => {
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredUsers.map((user) => (
                 <tr key={user.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-4 py-2 whitespace-nowrap">
                     <div>
                       <div className="text-sm font-medium text-gray-900">
                         {user.first_name} {user.last_name}
                       </div>
-                      <div className="text-sm text-gray-500">{user.email}</div>
+                      <div className="text-xs text-gray-500 font-mono">
+                        {user.account_number}
+                      </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="font-mono text-sm">
-                      {user.account_number}
-                    </div>
+                  {isGlobalView && (
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        {user.hub_id === 0
+                          ? "PercyTech"
+                          : user.hub_id === 1
+                            ? "Gnymble"
+                            : user.hub_id === 2
+                              ? "PercyMD"
+                              : user.hub_id === 3
+                                ? "PercyText"
+                                : "Unknown"}
+                      </span>
+                    </td>
+                  )}
+                  <td className="px-4 py-2 whitespace-nowrap text-xs text-gray-600">
+                    {user.email}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-4 py-2 whitespace-nowrap">
                     <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                      className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
                         user.role === "admin"
                           ? "bg-red-100 text-red-800"
                           : user.role === "manager"
@@ -386,33 +482,53 @@ const Users = () => {
                       {user.role || "user"}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-4 py-2 whitespace-nowrap">
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                      {user.payment_status || "None"}
+                    </span>
+                  </td>
+                  <td className="px-4 py-2 whitespace-nowrap">
                     <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                      className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
                         user.is_active
                           ? "bg-green-100 text-green-800"
-                          : "bg-gray-100 text-gray-800"
+                          : "bg-red-100 text-red-800"
                       }`}
                     >
                       {user.is_active ? "Active" : "Inactive"}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {user.payment_status || "Not specified"}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {user.created_at
-                      ? new Date(user.created_at).toLocaleDateString()
-                      : "Unknown"}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <div className="flex items-center space-x-2">
-                      <button className="text-blue-600 hover:text-blue-900">
+                  <td className="px-4 py-2 whitespace-nowrap text-sm font-medium">
+                    <div className="flex items-center space-x-3">
+                      <button
+                        onClick={() => setSelectedUser(user)}
+                        className="text-blue-600 hover:text-blue-900"
+                        title="View Details"
+                      >
                         <Eye className="w-4 h-4" />
                       </button>
-                      <button className="text-gray-600 hover:text-gray-900">
-                        <MoreHorizontal className="w-4 h-4" />
+                      <button 
+                        onClick={() => handleEditUser(user)}
+                        className="text-green-600 hover:text-green-900"
+                        title="Edit User"
+                      >
+                        <Edit className="w-4 h-4" />
                       </button>
+                      <button
+                        onClick={() => {
+                          setDeletingUserId(user.id);
+                          setShowDeleteConfirm(true);
+                        }}
+                        className="text-red-600 hover:text-red-900"
+                        title="Delete User"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                      <div className="relative inline-block text-left">
+                        <button className="text-gray-400 hover:text-gray-600">
+                          <MoreVertical className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
                   </td>
                 </tr>
@@ -428,16 +544,15 @@ const Users = () => {
               No users found
             </h3>
             <p className="mt-1 text-sm text-gray-500">
-              {searchQuery ||
-              roleFilter !== "all" ||
-              paymentStatusFilter !== "all" ||
-              onboardingStepFilter !== "all"
+              {searchQuery || statusFilter !== "all" || roleFilter !== "all" || paymentFilter !== "all"
                 ? "Try adjusting your search or filter criteria."
                 : "No users have been created yet."}
             </p>
           </div>
         )}
       </div>
+
+      {/* TODO: Add modals for edit, create, delete, and view details */}
     </div>
   );
 };

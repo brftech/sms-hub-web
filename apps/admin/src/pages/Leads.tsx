@@ -1,45 +1,62 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useHub } from "@sms-hub/ui";
+import { useGlobalView } from "../contexts/GlobalViewContext";
 import {
-  Users,
-  MessageSquare,
-  TrendingUp,
   Search,
-  Download,
+  UserPlus,
+  RefreshCw,
   Eye,
   Edit,
+  X,
   Trash2,
-  Phone,
+  MoreVertical,
+  ChevronUp,
+  ChevronDown,
+  Filter,
   Clock,
+  MessageSquare,
   CheckCircle,
-  AlertCircle,
+  TrendingUp,
   XCircle,
-  RefreshCw,
-  UserPlus,
+  AlertCircle,
 } from "lucide-react";
-import { leadsService, Lead, LeadStats } from "../services/leadsService";
+import {
+  leadsService,
+  Lead,
+} from "../services/leadsService";
 
 const Leads = () => {
   const { currentHub } = useHub();
+  const { isGlobalView } = useGlobalView();
   const [leads, setLeads] = useState<Lead[]>([]);
-  const [filteredLeads, setFilteredLeads] = useState<Lead[]>([]);
-  const [stats, setStats] = useState<LeadStats | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [priorityFilter, setPriorityFilter] = useState<string>("all");
-  const [sourceFilter, setSourceFilter] = useState<string>("all");
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [availableSources, setAvailableSources] = useState<string[]>([]);
+  const [editingLead, setEditingLead] = useState<Lead | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deletingLeadId, setDeletingLeadId] = useState<string | null>(null);
+  
+  // Filtering states
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [priorityFilter, setPriorityFilter] = useState<string>("all");
+  const [sourceFilter, setSourceFilter] = useState<string>("all");
+  
+  // Sorting states
+  const [sortField, setSortField] = useState<keyof Lead>("created_at");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
 
-  // Fetch leads and stats from database
+  // Fetch leads from database
   const fetchData = async () => {
     try {
       setIsLoading(true);
       setError(null);
 
-      // Get hub ID based on current hub
+      // Get hub ID based on current hub (only used for non-global view)
       const hubId =
         currentHub === "gnymble"
           ? 1
@@ -52,31 +69,30 @@ const Leads = () => {
                 : 1; // Default to gnymble (1)
 
       console.log("Leads: Current hub:", currentHub);
-      console.log("Leads: Using hub_id:", hubId);
+      console.log("Leads: Global view:", isGlobalView);
+      console.log(
+        "Leads: Using hub_id:",
+        isGlobalView ? "ALL HUBS" : hubId
+      );
 
-      // Fetch leads with filters
-      const fetchedLeads = await leadsService.getLeads({
-        hub_id: hubId,
-        status: statusFilter !== "all" ? statusFilter : undefined,
-        priority: priorityFilter !== "all" ? priorityFilter : undefined,
-        source: sourceFilter !== "all" ? sourceFilter : undefined,
+      // Build filter options
+      const filterOptions: any = {
         search: searchQuery || undefined,
         limit: 1000,
-      });
+      };
+
+      // Only filter by hub_id if not in global view
+      if (!isGlobalView) {
+        filterOptions.hub_id = hubId;
+      }
+
+      // Fetch leads with filters
+      const fetchedLeads = await leadsService.getLeads(filterOptions);
 
       console.log("Leads: Fetched leads:", fetchedLeads);
-      console.log("Leads: Lead count:", fetchedLeads.length);
-
-      // Fetch stats
-      const fetchedStats = await leadsService.getLeadStats(hubId);
-
-      // Fetch available sources for filter dropdown
-      const sources = await leadsService.getUniqueSources();
+      console.log("Leads: Count:", fetchedLeads.length);
 
       setLeads(fetchedLeads);
-      setFilteredLeads(fetchedLeads);
-      setStats(fetchedStats);
-      setAvailableSources(sources);
     } catch (err) {
       console.error("Error fetching data:", err);
       setError(err instanceof Error ? err.message : "Failed to fetch data");
@@ -92,39 +108,57 @@ const Leads = () => {
     setIsRefreshing(false);
   };
 
-  // Update lead status
-  const handleStatusUpdate = async (leadId: string, newStatus: string) => {
-    try {
-      await leadsService.updateLeadStatus(leadId, newStatus);
-      await leadsService.addLeadActivity(
-        leadId,
-        "status_change",
-        `Status changed to ${newStatus}`
-      );
+  const handleEditLead = (lead: Lead) => {
+    setEditingLead(lead);
+    setIsEditModalOpen(true);
+  };
 
-      // Refresh data to show updated status
+  const handleCloseEditModal = () => {
+    setEditingLead(null);
+    setIsEditModalOpen(false);
+  };
+
+  const handleUpdateLead = async () => {
+    if (!editingLead) return;
+    
+    try {
+      setIsUpdating(true);
+      // TODO: Implement lead update in service
       await fetchData();
-    } catch (err) {
-      console.error("Error updating status:", err);
-      setError("Failed to update lead status");
+      handleCloseEditModal();
+    } catch (error) {
+      console.error("Error updating lead:", error);
+      alert("Failed to update lead");
+    } finally {
+      setIsUpdating(false);
     }
   };
 
-  // Update lead priority
-  const handlePriorityUpdate = async (leadId: string, newPriority: string) => {
+  const handleDeleteLead = async () => {
+    if (!deletingLeadId) return;
+    
     try {
-      await leadsService.updateLeadPriority(leadId, newPriority);
-      await leadsService.addLeadActivity(
-        leadId,
-        "priority_change",
-        `Priority changed to ${newPriority}`
-      );
-
-      // Refresh data to show updated priority
+      // TODO: Implement lead deletion in service
       await fetchData();
-    } catch (err) {
-      console.error("Error updating priority:", err);
-      setError("Failed to update lead priority");
+      setShowDeleteConfirm(false);
+      setDeletingLeadId(null);
+    } catch (error) {
+      console.error("Error deleting lead:", error);
+      alert("Failed to delete lead");
+    }
+  };
+
+  const handleCreateLead = async (newLead: Partial<Lead>) => {
+    try {
+      setIsUpdating(true);
+      // TODO: Implement lead creation in service
+      await fetchData();
+      setIsCreateModalOpen(false);
+    } catch (error) {
+      console.error("Error creating lead:", error);
+      alert("Failed to create lead");
+    } finally {
+      setIsUpdating(false);
     }
   };
 
@@ -133,73 +167,89 @@ const Leads = () => {
     fetchData();
   }, []);
 
-  // Filter leads when filters change
+  // Filter leads when search query or global view changes
   useEffect(() => {
     fetchData();
-  }, [statusFilter, priorityFilter, sourceFilter, searchQuery]);
+  }, [
+    searchQuery,
+    isGlobalView,
+  ]);
 
-  // Get status color and icon
+  // Compute filtered and sorted leads using useMemo to prevent flicker
+  const filteredLeads = useMemo(() => {
+    let filtered = [...leads];
+    
+    // Apply status filter
+    if (statusFilter !== "all") {
+      filtered = filtered.filter(l => l.status === statusFilter);
+    }
+    
+    // Apply priority filter
+    if (priorityFilter !== "all") {
+      filtered = filtered.filter(l => l.priority === priorityFilter);
+    }
+    
+    // Apply source filter
+    if (sourceFilter !== "all") {
+      filtered = filtered.filter(l => l.source === sourceFilter);
+    }
+    
+    // Apply sorting
+    filtered.sort((a, b) => {
+      const aVal = a[sortField] || "";
+      const bVal = b[sortField] || "";
+      
+      if (sortDirection === "asc") {
+        return aVal > bVal ? 1 : -1;
+      } else {
+        return aVal < bVal ? 1 : -1;
+      }
+    });
+    
+    return filtered;
+  }, [leads, statusFilter, priorityFilter, sourceFilter, sortField, sortDirection]);
+
+  const handleSort = (field: keyof Lead) => {
+    if (field === sortField) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortDirection("asc");
+    }
+  };
+
+  // Get status info
   const getStatusInfo = (status: string) => {
     switch (status) {
       case "new":
-        return {
-          color: "bg-blue-100 text-blue-800",
-          icon: <Clock className="w-4 h-4" />,
-        };
+        return { label: "New", icon: Clock, color: "text-blue-600", bg: "bg-blue-100" };
       case "contacted":
-        return {
-          color: "bg-yellow-100 text-yellow-800",
-          icon: <MessageSquare className="w-4 h-4" />,
-        };
+        return { label: "Contacted", icon: MessageSquare, color: "text-yellow-600", bg: "bg-yellow-100" };
       case "qualified":
-        return {
-          color: "bg-purple-100 text-purple-800",
-          icon: <CheckCircle className="w-4 h-4" />,
-        };
+        return { label: "Qualified", icon: CheckCircle, color: "text-purple-600", bg: "bg-purple-100" };
       case "converted":
-        return {
-          color: "bg-green-100 text-green-800",
-          icon: <TrendingUp className="w-4 h-4" />,
-        };
+        return { label: "Converted", icon: TrendingUp, color: "text-green-600", bg: "bg-green-100" };
       case "lost":
-        return {
-          color: "bg-red-100 text-red-800",
-          icon: <XCircle className="w-4 h-4" />,
-        };
+        return { label: "Lost", icon: XCircle, color: "text-red-600", bg: "bg-red-100" };
       default:
-        return {
-          color: "bg-gray-100 text-gray-800",
-          icon: <AlertCircle className="w-4 h-4" />,
-        };
+        return { label: status, icon: AlertCircle, color: "text-gray-600", bg: "bg-gray-100" };
     }
   };
 
   // Get priority color
-  const getPriorityColor = (priority: string) => {
+  const getPriorityInfo = (priority: string) => {
     switch (priority) {
-      case "high":
-        return "bg-red-100 text-red-800";
-      case "medium":
-        return "bg-yellow-100 text-yellow-800";
-      case "low":
-        return "bg-green-100 text-green-800";
       case "urgent":
-        return "bg-purple-100 text-purple-800";
+        return { label: "Urgent", color: "text-purple-800", bg: "bg-purple-100" };
+      case "high":
+        return { label: "High", color: "text-red-800", bg: "bg-red-100" };
+      case "medium":
+        return { label: "Medium", color: "text-yellow-800", bg: "bg-yellow-100" };
+      case "low":
+        return { label: "Low", color: "text-green-800", bg: "bg-green-100" };
       default:
-        return "bg-gray-100 text-gray-800";
+        return { label: priority, color: "text-gray-800", bg: "bg-gray-100" };
     }
-  };
-
-  // Format date
-  const formatDate = (dateString: string | null) => {
-    if (!dateString) return "Unknown";
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
   };
 
   // Get display name for lead
@@ -211,11 +261,6 @@ const Leads = () => {
       return lead.name;
     }
     return "Unknown";
-  };
-
-  // Get display phone for lead
-  const getLeadDisplayPhone = (lead: Lead) => {
-    return lead.phone || lead.lead_phone_number || "No phone";
   };
 
   if (isLoading) {
@@ -255,16 +300,37 @@ const Leads = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="h-full flex flex-col space-y-4">
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Leads Management</h1>
+          <h1 className="text-2xl font-bold text-gray-900">
+            {isGlobalView ? "Global Leads" : "Leads"}
+          </h1>
           <p className="mt-1 text-sm text-gray-500">
-            Manage and track leads from {currentHub} hub
+            {isGlobalView
+              ? "Manage leads from all hubs"
+              : `Manage leads from ${currentHub} hub`}
           </p>
         </div>
         <div className="flex items-center space-x-3">
+          <div className="relative max-w-xs">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <input
+              type="text"
+              placeholder="Search leads..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+            />
+          </div>
+          <button
+            onClick={() => setIsCreateModalOpen(true)}
+            className="inline-flex items-center px-3 py-2 border border-transparent shadow-sm text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+          >
+            <UserPlus className="w-4 h-4 mr-2" />
+            Add Lead
+          </button>
           <button
             onClick={handleRefresh}
             disabled={isRefreshing}
@@ -275,321 +341,304 @@ const Leads = () => {
             />
             {isRefreshing ? "Refreshing..." : "Refresh"}
           </button>
-          <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-            <UserPlus className="w-4 h-4 mr-2" />
-            Add Lead
-          </button>
-        </div>
-      </div>
-
-      {/* Statistics Cards */}
-      {stats && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 sm:gap-6">
-          <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 hover:shadow-md hover:scale-105 transition-all duration-200 cursor-pointer group">
-            <div className="flex items-center">
-              <div className="p-2 sm:p-3 bg-blue-100 rounded-lg group-hover:bg-blue-200 transition-colors duration-200">
-                <Users className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
-              </div>
-              <div className="ml-3 sm:ml-4 min-w-0 flex-1">
-                <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">
-                  Total Leads
-                </p>
-                <p className="text-xl sm:text-2xl font-bold text-gray-900">
-                  {stats.total}
-                </p>
-                <p className="text-xs text-blue-600 mt-1 truncate">All time</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 hover:shadow-md hover:scale-105 transition-all duration-200 cursor-pointer group">
-            <div className="flex items-center">
-              <div className="p-2 sm:p-3 bg-blue-100 rounded-lg group-hover:bg-blue-200 transition-colors duration-200">
-                <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
-              </div>
-              <div className="ml-3 sm:ml-4 min-w-0 flex-1">
-                <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">
-                  New
-                </p>
-                <p className="text-xl sm:text-2xl font-bold text-blue-600">
-                  {stats.new}
-                </p>
-                <p className="text-xs text-blue-600 mt-1 truncate">Recent</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 hover:shadow-md hover:scale-105 transition-all duration-200 cursor-pointer group">
-            <div className="flex items-center">
-              <div className="p-2 sm:p-3 bg-yellow-100 rounded-lg group-hover:bg-yellow-200 transition-colors duration-200">
-                <MessageSquare className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-600" />
-              </div>
-              <div className="ml-3 sm:ml-4 min-w-0 flex-1">
-                <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">
-                  Contacted
-                </p>
-                <p className="text-xl sm:text-2xl font-bold text-yellow-600">
-                  {stats.contacted}
-                </p>
-                <p className="text-xs text-yellow-600 mt-1 truncate">
-                  In progress
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 hover:shadow-md hover:scale-105 transition-all duration-200 cursor-pointer group">
-            <div className="flex items-center">
-              <div className="p-2 sm:p-3 bg-purple-100 rounded-lg group-hover:bg-purple-200 transition-colors duration-200">
-                <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" />
-              </div>
-              <div className="ml-3 sm:ml-4 min-w-0 flex-1">
-                <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">
-                  Qualified
-                </p>
-                <p className="text-xl sm:text-2xl font-bold text-purple-600">
-                  {stats.qualified}
-                </p>
-                <p className="text-xs text-purple-600 mt-1 truncate">
-                  Ready to convert
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 hover:shadow-md hover:scale-105 transition-all duration-200 cursor-pointer group">
-            <div className="flex items-center">
-              <div className="p-2 sm:p-3 bg-green-100 rounded-lg group-hover:bg-green-200 transition-colors duration-200">
-                <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
-              </div>
-              <div className="ml-3 sm:ml-4 min-w-0 flex-1">
-                <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">
-                  Converted
-                </p>
-                <p className="text-xl sm:text-2xl font-bold text-green-600">
-                  {stats.converted}
-                </p>
-                <p className="text-xs text-green-600 mt-1 truncate">Success!</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 hover:shadow-md hover:scale-105 transition-all duration-200 cursor-pointer group">
-            <div className="flex items-center">
-              <div className="p-2 sm:p-3 bg-red-100 rounded-lg group-hover:bg-red-200 transition-colors duration-200">
-                <XCircle className="w-5 h-5 sm:w-6 sm:h-6 text-red-600" />
-              </div>
-              <div className="ml-3 sm:ml-4 min-w-0 flex-1">
-                <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">
-                  Lost
-                </p>
-                <p className="text-xl sm:text-2xl font-bold text-red-600">
-                  {stats.lost}
-                </p>
-                <p className="text-xs text-red-600 mt-1 truncate">
-                  Need follow-up
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Filters and Search */}
-      <div className="bg-white rounded-lg shadow-sm p-6">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
-          <div className="flex-1 max-w-md">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-              <input
-                type="text"
-                placeholder="Search leads..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-          </div>
-
-          <div className="flex flex-wrap gap-3">
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="all">All Statuses</option>
-              <option value="new">New</option>
-              <option value="contacted">Contacted</option>
-              <option value="qualified">Qualified</option>
-              <option value="converted">Converted</option>
-              <option value="lost">Lost</option>
-            </select>
-
-            <select
-              value={priorityFilter}
-              onChange={(e) => setPriorityFilter(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="all">All Priorities</option>
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
-              <option value="urgent">Urgent</option>
-            </select>
-
-            <select
-              value={sourceFilter}
-              onChange={(e) => setSourceFilter(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="all">All Sources</option>
-              {availableSources.map((source) => (
-                <option key={source} value={source}>
-                  {source}
-                </option>
-              ))}
-            </select>
-          </div>
         </div>
       </div>
 
       {/* Leads Table */}
-      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-medium text-gray-900">
+      <div className="bg-white rounded-lg shadow-sm overflow-hidden flex flex-col flex-1">
+        <div className="px-4 py-3 border-b border-gray-200 flex items-center justify-between">
+          <h3 className="text-base font-medium text-gray-900">
             Leads ({filteredLeads.length})
           </h3>
+          
+          {/* Filters */}
+          <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2">
+              <Filter className="w-4 h-4 text-gray-400" />
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="text-xs border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="all">All Status</option>
+                <option value="new">New</option>
+                <option value="contacted">Contacted</option>
+                <option value="qualified">Qualified</option>
+                <option value="converted">Converted</option>
+                <option value="lost">Lost</option>
+              </select>
+              
+              <select
+                value={priorityFilter}
+                onChange={(e) => setPriorityFilter(e.target.value)}
+                className="text-xs border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="all">All Priority</option>
+                <option value="urgent">Urgent</option>
+                <option value="high">High</option>
+                <option value="medium">Medium</option>
+                <option value="low">Low</option>
+              </select>
+              
+              <select
+                value={sourceFilter}
+                onChange={(e) => setSourceFilter(e.target.value)}
+                className="text-xs border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="all">All Sources</option>
+                <option value="website">Website</option>
+                <option value="referral">Referral</option>
+                <option value="campaign">Campaign</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+          </div>
         </div>
 
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto overflow-y-auto flex-1">
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+            <thead className="bg-gray-50 sticky top-0 z-10">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Lead
+                <th 
+                  className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  onClick={() => handleSort("name")}
+                >
+                  <div className="flex items-center space-x-1">
+                    <span>Lead</span>
+                    {sortField === "name" && (
+                      sortDirection === "asc" ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />
+                    )}
+                  </div>
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Company
+                {isGlobalView && (
+                  <th 
+                    className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                    onClick={() => handleSort("hub_id")}
+                  >
+                    <div className="flex items-center space-x-1">
+                      <span>Hub</span>
+                      {sortField === "hub_id" && (
+                        sortDirection === "asc" ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />
+                      )}
+                    </div>
+                  </th>
+                )}
+                <th 
+                  className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  onClick={() => handleSort("email")}
+                >
+                  <div className="flex items-center space-x-1">
+                    <span>Contact</span>
+                    {sortField === "email" && (
+                      sortDirection === "asc" ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />
+                    )}
+                  </div>
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Source
+                <th 
+                  className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  onClick={() => handleSort("status")}
+                >
+                  <div className="flex items-center space-x-1">
+                    <span>Status</span>
+                    {sortField === "status" && (
+                      sortDirection === "asc" ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />
+                    )}
+                  </div>
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
+                <th 
+                  className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  onClick={() => handleSort("priority")}
+                >
+                  <div className="flex items-center space-x-1">
+                    <span>Priority</span>
+                    {sortField === "priority" && (
+                      sortDirection === "asc" ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />
+                    )}
+                  </div>
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Priority
+                <th 
+                  className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  onClick={() => handleSort("source")}
+                >
+                  <div className="flex items-center space-x-1">
+                    <span>Source</span>
+                    {sortField === "source" && (
+                      sortDirection === "asc" ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />
+                    )}
+                  </div>
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Created
+                <th 
+                  className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  onClick={() => handleSort("created_at")}
+                >
+                  <div className="flex items-center space-x-1">
+                    <span>Created</span>
+                    {sortField === "created_at" && (
+                      sortDirection === "asc" ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />
+                    )}
+                  </div>
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredLeads.map((lead) => (
-                <tr key={lead.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold">
-                        {getLeadDisplayName(lead).charAt(0).toUpperCase()}
-                      </div>
-                      <div className="ml-4">
+              {filteredLeads.map((lead) => {
+                const statusInfo = getStatusInfo(lead.status || "new");
+                const priorityInfo = getPriorityInfo(lead.priority || "medium");
+                return (
+                  <tr key={lead.id} className="hover:bg-gray-50">
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      <div>
                         <div className="text-sm font-medium text-gray-900">
                           {getLeadDisplayName(lead)}
                         </div>
-                        <div className="text-sm text-gray-500">
-                          {lead.email}
-                        </div>
-                        <div className="text-sm text-gray-500 flex items-center mt-1">
-                          <Phone className="w-3 h-3 mr-1" />
-                          {getLeadDisplayPhone(lead)}
+                        {lead.company_name && (
+                          <div className="text-xs text-gray-500">
+                            {lead.company_name}
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                    {isGlobalView && (
+                      <td className="px-4 py-2 whitespace-nowrap">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                          {lead.hub_id === 0
+                            ? "PercyTech"
+                            : lead.hub_id === 1
+                              ? "Gnymble"
+                              : lead.hub_id === 2
+                                ? "PercyMD"
+                                : lead.hub_id === 3
+                                  ? "PercyText"
+                                  : "Unknown"}
+                        </span>
+                      </td>
+                    )}
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      <div className="text-xs text-gray-600">
+                        <div>{lead.email}</div>
+                        <div>{lead.phone || lead.lead_phone_number}</div>
+                      </div>
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      <span
+                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${statusInfo.bg} ${statusInfo.color}`}
+                      >
+                        <statusInfo.icon className="w-3 h-3 mr-1" />
+                        {statusInfo.label}
+                      </span>
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      <span
+                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${priorityInfo.bg} ${priorityInfo.color}`}
+                      >
+                        {priorityInfo.label}
+                      </span>
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap text-xs text-gray-600">
+                      {lead.source || "-"}
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap text-xs text-gray-600">
+                      {lead.created_at
+                        ? new Date(lead.created_at).toLocaleDateString()
+                        : "-"}
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap text-sm font-medium">
+                      <div className="flex items-center space-x-3">
+                        <button
+                          onClick={() => setSelectedLead(lead)}
+                          className="text-blue-600 hover:text-blue-900"
+                          title="View Details"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </button>
+                        <button 
+                          onClick={() => handleEditLead(lead)}
+                          className="text-green-600 hover:text-green-900"
+                          title="Edit Lead"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => {
+                            setDeletingLeadId(lead.id);
+                            setShowDeleteConfirm(true);
+                          }}
+                          className="text-red-600 hover:text-red-900"
+                          title="Delete Lead"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                        <div className="relative inline-block text-left">
+                          <button className="text-gray-400 hover:text-gray-600">
+                            <MoreVertical className="w-4 h-4" />
+                          </button>
                         </div>
                       </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">
-                      {lead.company_name || "N/A"}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">
-                      {lead.source || "Unknown"}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <select
-                      value={lead.status}
-                      onChange={(e) =>
-                        handleStatusUpdate(lead.id, e.target.value)
-                      }
-                      className={`text-xs font-medium rounded-full px-2.5 py-0.5 border-0 ${getStatusInfo(lead.status).color}`}
-                    >
-                      <option value="new">New</option>
-                      <option value="contacted">Contacted</option>
-                      <option value="qualified">Qualified</option>
-                      <option value="converted">Converted</option>
-                      <option value="lost">Lost</option>
-                    </select>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <select
-                      value={lead.priority || "medium"}
-                      onChange={(e) =>
-                        handlePriorityUpdate(lead.id, e.target.value)
-                      }
-                      className={`text-xs font-medium rounded-full px-2.5 py-0.5 border-0 ${getPriorityColor(lead.priority || "medium")}`}
-                    >
-                      <option value="low">Low</option>
-                      <option value="medium">Medium</option>
-                      <option value="high">High</option>
-                      <option value="urgent">Urgent</option>
-                    </select>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">
-                      {formatDate(lead.created_at)}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <div className="flex items-center space-x-2">
-                      <button className="text-blue-600 hover:text-blue-900">
-                        <Eye className="w-4 h-4" />
-                      </button>
-                      <button className="text-green-600 hover:text-green-900">
-                        <Edit className="w-4 h-4" />
-                      </button>
-                      <button className="text-red-600 hover:text-red-900">
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
 
         {filteredLeads.length === 0 && (
           <div className="text-center py-12">
-            <Users className="mx-auto h-12 w-12 text-gray-400" />
+            <UserPlus className="mx-auto h-12 w-12 text-gray-400" />
             <h3 className="mt-2 text-sm font-medium text-gray-900">
               No leads found
             </h3>
             <p className="mt-1 text-sm text-gray-500">
-              {searchQuery ||
-              statusFilter !== "all" ||
-              priorityFilter !== "all" ||
-              sourceFilter !== "all"
+              {searchQuery || statusFilter !== "all" || priorityFilter !== "all" || sourceFilter !== "all"
                 ? "Try adjusting your search or filter criteria."
-                : "No leads have been submitted yet."}
+                : "No leads have been created yet."}
             </p>
           </div>
         )}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            <div className="flex items-center space-x-3 mb-4">
+              <div className="p-3 bg-red-100 rounded-full">
+                <AlertCircle className="w-6 h-6 text-red-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900">
+                Delete Lead
+              </h3>
+            </div>
+            
+            <p className="text-gray-600 mb-6">
+              Are you sure you want to delete this lead? This action cannot be undone and will remove all associated data.
+            </p>
+
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={() => {
+                  setShowDeleteConfirm(false);
+                  setDeletingLeadId(null);
+                }}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteLead}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+              >
+                Delete Lead
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TODO: Add modals for edit, create, and view details */}
     </div>
   );
 };

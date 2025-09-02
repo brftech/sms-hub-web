@@ -14,7 +14,7 @@ import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import About from "./pages/About";
 import Pricing from "./pages/Pricing";
-
+import Landing from "./pages/Landing";
 
 import FAQ from "./pages/FAQ";
 import PhoneDemo from "./pages/PhoneDemo";
@@ -33,6 +33,7 @@ const AppRoutes = () => {
   return (
     <Routes>
       <Route path="/" element={<PageTransition><Home /></PageTransition>} />
+      <Route path="/landing" element={<PageTransition><Landing /></PageTransition>} />
       <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
 
 

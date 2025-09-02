@@ -110,3 +110,4 @@ Thumbs.db
 # Package manager lock files (keep pnpm-lock.yaml)
 yarn.lock
 package-lock.json
+.vercel

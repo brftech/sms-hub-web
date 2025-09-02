@@ -409,6 +409,107 @@ class CompaniesService {
       };
     }
   }
+
+  // Create a new company
+  async createCompany(company: Partial<Company>): Promise<{ success: boolean; data?: Company; error?: string }> {
+    try {
+      const { data, error } = await this.supabase
+        .from("companies")
+        .insert([{
+          ...company,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        }])
+        .select()
+        .single();
+
+      if (error) {
+        console.error("Error creating company:", error);
+        return { success: false, error: error.message };
+      }
+
+      return { success: true, data: data as Company };
+    } catch (error) {
+      console.error("Error creating company:", error);
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : "Unknown error" 
+      };
+    }
+  }
+
+  // Update company details
+  async updateCompany(
+    companyId: string,
+    updates: Partial<Company>
+  ): Promise<{ success: boolean; error?: string }> {
+    try {
+      const { error } = await this.supabase
+        .from("companies")
+        .update({
+          ...updates,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", companyId);
+
+      if (error) {
+        console.error("Error updating company:", error);
+        return { success: false, error: error.message };
+      }
+
+      return { success: true };
+    } catch (error) {
+      console.error("Error updating company:", error);
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : "Unknown error" 
+      };
+    }
+  }
+
+  // Delete a company
+  async deleteCompany(companyId: string): Promise<{ success: boolean; error?: string }> {
+    try {
+      const { error } = await this.supabase
+        .from("companies")
+        .delete()
+        .eq("id", companyId);
+
+      if (error) {
+        console.error("Error deleting company:", error);
+        return { success: false, error: error.message };
+      }
+
+      return { success: true };
+    } catch (error) {
+      console.error("Error deleting company:", error);
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : "Unknown error" 
+      };
+    }
+  }
+
+  // Get users for a company
+  async getCompanyUsers(companyId: string): Promise<any[]> {
+    try {
+      const { data, error } = await this.supabase
+        .from("user_profiles")
+        .select("*")
+        .eq("company_id", companyId)
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("Error fetching company users:", error);
+        return [];
+      }
+
+      return data || [];
+    } catch (error) {
+      console.error("Error fetching company users:", error);
+      return [];
+    }
+  }
 }
 
 export const companiesService = new CompaniesService();

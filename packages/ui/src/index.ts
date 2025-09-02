@@ -53,6 +53,10 @@ export * from "./components/hub-themed-button";
 export * from "./components/hub-logo";
 export * from "./components/hub-switcher";
 
+// Dev mode components
+export * from "./components/DevAdminBanner";
+export * from "./components/DevAuthToggle";
+
 // Phone Interactive components
 export { default as PhoneInteractive } from "./components/PhoneInteractive";
 export { default as SMSAuthModal } from "./components/SMSAuthModal";

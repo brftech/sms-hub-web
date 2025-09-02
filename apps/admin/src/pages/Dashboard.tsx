@@ -39,6 +39,7 @@ import {
   dataCleanupService,
   CleanupResult,
 } from "../services/dataCleanupService";
+import { navigationCountsService } from "../components/Layout";
 
 const Dashboard = () => {
   const { currentHub } = useHub();
@@ -57,6 +58,7 @@ const Dashboard = () => {
   const [cleanupResult, setCleanupResult] = useState<CleanupResult | null>(
     null
   );
+  const [isRefreshingCounts, setIsRefreshingCounts] = useState(false);
 
   // Fetch dashboard data
   const fetchDashboardData = async () => {
@@ -216,6 +218,26 @@ const Dashboard = () => {
   const navigateToUsers = () => navigate("/users");
   const navigateToLeads = () => navigate("/leads");
   const navigateToVerifications = () => navigate("/verifications");
+  
+  // Refresh navigation counts
+  const handleRefreshCounts = async () => {
+    try {
+      setIsRefreshingCounts(true);
+      const hubId = currentHub === "gnymble" ? 1 
+        : currentHub === "percymd" ? 2 
+        : currentHub === "percytext" ? 3 
+        : currentHub === "percytech" ? 0 
+        : 1;
+      
+      await navigationCountsService.getCounts(hubId, isGlobalView);
+      // Force a page refresh to update counts in Layout
+      window.location.reload();
+    } catch (error) {
+      console.error("Error refreshing counts:", error);
+    } finally {
+      setIsRefreshingCounts(false);
+    }
+  };
 
   // Data cleanup handlers
   const handleDataCleanup = async () => {
@@ -365,8 +387,17 @@ const Dashboard = () => {
           </p>
         </div>
         
-        {/* Data Cleanup Button - Easy Access */}
+        {/* Data Management Buttons */}
         <div className="flex items-center space-x-2">
+          <button
+            onClick={handleRefreshCounts}
+            disabled={isRefreshingCounts}
+            className="inline-flex items-center px-2 py-1.5 text-xs font-medium rounded-md text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            title="Refresh navigation counts"
+          >
+            <RefreshCw className={`w-3 h-3 ${isRefreshingCounts ? 'animate-spin' : ''}`} />
+          </button>
+          
           <button
             onClick={handleDataCleanup}
             disabled={isCleanupRunning}

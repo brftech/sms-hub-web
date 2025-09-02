@@ -1,0 +1,27 @@
+{
+  "buildCommand": "pnpm build --filter=@sms-hub/web",
+  "installCommand": "pnpm install",
+  "outputDirectory": "apps/web/dist",
+  "framework": null,
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/landing"
+    },
+    {
+      "source": "/:path*",
+      "destination": "/landing"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/:path*",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
+    }
+  ]
+}

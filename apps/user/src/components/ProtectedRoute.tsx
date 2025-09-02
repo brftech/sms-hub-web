@@ -68,15 +68,24 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   }
   
   // Check if there's a pending checkout from signup
+  // Note: We now use webhooks instead of sessionStorage for payment flow
   const pendingCheckout = sessionStorage.getItem('pending_checkout')
   if (pendingCheckout && location.pathname === '/') {
-    return <CheckoutRedirect />
+    // Only redirect to CheckoutRedirect if they're not trying to access onboarding
+    if (!location.pathname.includes('onboarding')) {
+      return <CheckoutRedirect />
+    }
   }
   
   // Check if user needs to complete payment
   if (userProfile && !userProfile.payment_status) {
-    // If they're not already on a payment-related page, redirect to payment
-    if (!location.pathname.includes('payment') && !location.pathname.includes('stripe')) {
+    // Allow access to onboarding - webhook will handle payment status updates
+    if (location.pathname.includes('onboarding')) {
+      return <>{children}</>
+    }
+    
+    // If they're not already on a payment-related page or onboarding, redirect to payment
+    if (!location.pathname.includes('payment') && !location.pathname.includes('stripe') && !location.pathname.includes('onboarding')) {
       return <Navigate to="/payment-required" replace />
     }
   }

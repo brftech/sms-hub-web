@@ -173,6 +173,7 @@ export function InfoGatheringModal({ isOpen, onComplete, userProfile, signupType
                     onChange={(e) => setFormData({ ...formData, company_name: e.target.value })}
                     disabled={isSubmitting}
                     autoFocus={needsCompany}
+                    autoComplete="organization"
                   />
                 </FormGroup>
               )}
@@ -191,6 +192,7 @@ export function InfoGatheringModal({ isOpen, onComplete, userProfile, signupType
                     onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
                     disabled={isSubmitting}
                     autoFocus={!needsCompany}
+                    autoComplete="given-name"
                   />
                 </FormGroup>
                 
@@ -205,6 +207,7 @@ export function InfoGatheringModal({ isOpen, onComplete, userProfile, signupType
                     value={formData.last_name}
                     onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
                     disabled={isSubmitting}
+                    autoComplete="family-name"
                   />
                 </FormGroup>
               </NameRow>

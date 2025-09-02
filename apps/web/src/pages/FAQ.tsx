@@ -2,7 +2,7 @@ import { PageLayout, useHub } from "@sms-hub/ui";
 import { getHubColorClasses } from "@sms-hub/utils";
 import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";
-import { HelpCircle, MessageSquare, Shield, CreditCard, Users, Zap, ChevronDown, ChevronUp } from "lucide-react";
+import { HelpCircle, MessageSquare, Shield, CreditCard, Users, Zap, Building, ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
 
 const FAQ = () => {
@@ -22,44 +22,54 @@ const FAQ = () => {
 
   const faqData = [
     {
-      category: "General Questions",
+      category: "Getting Started",
       icon: HelpCircle,
       items: [
         {
-          id: "what-is-sms-hub",
-          question: "What is SMS Hub and how does it work?",
-          answer: "SMS Hub is a comprehensive SMS messaging platform designed for premium venues and businesses. We provide compliant, reliable SMS services with specialized platforms for healthcare (Virtue) and premium retail (Vice) communications. Our platform handles everything from message delivery to regulatory compliance monitoring."
+          id: "why-different",
+          question: "Why should I use you instead of other SMS platforms?",
+          answer: "Most SMS platforms reject cigar retailers, private clubs, and premium venues as 'high-risk.' We built our platform specifically for regulated businesses. We understand your compliance needs, never ban accounts, and provide industry-specific expertise that generic platforms can't offer."
         },
         {
-          id: "who-is-it-for",
-          question: "Who is SMS Hub designed for?",
-          answer: "SMS Hub is designed for sophisticated businesses that require premium communication solutions. This includes healthcare providers, luxury retail establishments, premium venues, and any business that values regulatory compliance, reliability, and exceptional customer service."
+          id: "setup-time",
+          question: "How long does setup actually take?",
+          answer: "Setup takes 7-10 business days from payment to going live. We handle carrier approvals, compliance setup, platform configuration, and training. You'll have a dedicated specialist who keeps you updated every step of the way."
         },
         {
-          id: "how-to-get-started",
-          question: "How do I get started with SMS Hub?",
-          answer: "Getting started is simple. Contact our team for a personalized consultation where we'll assess your needs, explain our onboarding process, and create a custom implementation plan. We handle all the technical setup and provide comprehensive training for your team."
+          id: "onboarding-cost",
+          question: "Why do you charge $179 for onboarding?",
+          answer: "The $179 covers compliance consultation, carrier approvals, platform setup, training, and your first month of service. It's a one-time fee that ensures you're set up correctly and compliantly from day one. Most competitors charge much more for similar setup services."
+        },
+        {
+          id: "after-onboarding",
+          question: "What happens after the onboarding month?",
+          answer: "After your first month (included in onboarding), you choose a monthly plan based on your actual usage. You can upgrade, downgrade, or cancel at any time. Most businesses start with Core ($179/month) but you can adjust based on your needs."
         }
       ]
     },
     {
-      category: "Compliance & Security",
+      category: "Compliance & Regulations",
       icon: Shield,
       items: [
         {
+          id: "cigar-compliance",
+          question: "Are you compliant for cigar retailers specifically?",
+          answer: "Yes. We understand tobacco retail regulations, age verification requirements, and advertising restrictions. Our platform includes specific compliance features for cigar retailers including proper consent management and compliant messaging templates."
+        },
+        {
+          id: "account-suspension",
+          question: "Will my account get suspended like with other platforms?",
+          answer: "No. We don't suspend accounts for being in regulated industries. Our compliance is built for your business type from the ground up. We work WITH you to maintain compliance, not against you by shutting you down."
+        },
+        {
           id: "tcpa-compliance",
-          question: "How does SMS Hub ensure TCPA compliance?",
-          answer: "We provide comprehensive TCPA compliance tools including consent management, opt-out handling, and regulatory monitoring. Our platform automatically tracks consent status, manages opt-outs, and provides audit trails to help you maintain compliance with all TCPA requirements."
+          question: "How do you handle TCPA compliance?",
+          answer: "We provide comprehensive TCPA compliance including proper consent collection, opt-out management, and audit trails. Our platform automatically handles compliance requirements and we provide ongoing monitoring to ensure you stay compliant."
         },
         {
-          id: "hipaa-compliance",
-          question: "What about HIPAA compliance for healthcare communications?",
-          answer: "Our Virtue platform is built specifically for healthcare communications with full HIPAA compliance. This includes business associate agreements, encryption of protected health information, comprehensive audit trails, and secure data handling procedures that meet or exceed HIPAA standards."
-        },
-        {
-          id: "data-security",
-          question: "How secure is my data with SMS Hub?",
-          answer: "We implement enterprise-grade security measures including end-to-end encryption, secure data transmission, regular security assessments, and compliance with industry security standards. Your data is protected at every level with multiple layers of security."
+          id: "legal-support",
+          question: "Do you provide legal support for compliance issues?",
+          answer: "While we're not a law firm, we have extensive experience with regulated business compliance and can connect you with legal experts who specialize in your industry. Our compliance features are designed to meet regulatory requirements."
         }
       ]
     },
@@ -68,61 +78,50 @@ const FAQ = () => {
       icon: CreditCard,
       items: [
         {
-          id: "pricing-structure",
-          question: "How does your pricing work?",
-          answer: "We offer transparent, monthly pricing with no hidden fees. Our pricing is based on your messaging volume and specific needs. We provide a custom quote after understanding your requirements, ensuring you only pay for what you need."
+          id: "total-cost",
+          question: "What's the total cost to get started?",
+          answer: "$179 total to get started. This includes setup, compliance consultation, training, and your first month of service. After that, monthly plans start at $79/month. No contracts, no hidden fees, no surprises."
         },
         {
-          id: "billing-cycle",
-          question: "What is your billing cycle?",
-          answer: "We bill monthly in advance for all services. There are no setup fees or hidden charges. We provide clear invoices and can work with your accounting team to ensure smooth billing processes."
+          id: "plan-changes",
+          question: "Can I change plans later?",
+          answer: "Yes, you can upgrade or downgrade at any time after your first month. Most businesses start with one plan and adjust based on their actual usage. We'll help you pick the right plan as your business grows."
         },
         {
-          id: "refund-policy",
-          question: "What is your refund policy?",
-          answer: "We provide refunds as required by law or at our discretion. We're committed to customer satisfaction and will work with you to resolve any issues. Most concerns can be resolved through our dedicated support team."
+          id: "no-contract",
+          question: "Are there contracts or cancellation fees?",
+          answer: "No contracts. After the initial onboarding, all plans are month-to-month. You can cancel at any time with 30 days notice. No cancellation fees, no penalties."
+        },
+        {
+          id: "what-included",
+          question: "What's included in every plan?",
+          answer: "Every plan includes: dedicated phone number, full compliance monitoring, customer support, message delivery, analytics, and all core platform features. The only difference between plans is contact limits and message volume."
         }
       ]
     },
     {
-      category: "Technical Support",
-      icon: Users,
+      category: "For Specific Industries",
+      icon: Building,
       items: [
         {
-          id: "support-availability",
-          question: "What kind of support do you provide?",
-          answer: "We provide comprehensive support including 24/7 technical assistance, dedicated account management, and personalized training. Our support team includes SMS experts who understand your industry and can help with both technical and strategic questions."
+          id: "cigar-retailers",
+          question: "Do you work with cigar retailers?",
+          answer: "Yes, cigar retailers are one of our primary focuses. We understand tobacco retail regulations, age verification, and advertising restrictions. Many cigar shops use our platform for event announcements, new arrivals, and customer loyalty programs."
         },
         {
-          id: "onboarding-process",
-          question: "What does your onboarding process look like?",
-          answer: "Our onboarding process is comprehensive and personalized. We start with a detailed assessment of your needs, create a custom implementation plan, handle all technical setup, provide team training, and offer ongoing support to ensure your success."
+          id: "private-clubs",
+          question: "What about private clubs and member organizations?",
+          answer: "Absolutely. We work with private clubs, member organizations, and exclusive venues. Our platform handles member communications, event notifications, and exclusive offers while maintaining the sophistication your members expect."
         },
         {
-          id: "integration-options",
-          question: "What integration options do you offer?",
-          answer: "We offer multiple integration options including API access, webhook support, and direct integrations with popular platforms. Our technical team will work with your developers to ensure seamless integration with your existing systems."
-        }
-      ]
-    },
-    {
-      category: "Features & Capabilities",
-      icon: Zap,
-      items: [
-        {
-          id: "message-delivery",
-          question: "How reliable is your message delivery?",
-          answer: "We maintain 99.9%+ message delivery rates through redundant infrastructure and multiple carrier partnerships. Our platform automatically handles delivery confirmations and provides detailed analytics on message status and delivery performance."
+          id: "premium-venues",
+          question: "Do you serve restaurants, bars, and hospitality venues?",
+          answer: "Yes, especially premium venues that other platforms reject. We serve upscale restaurants, wine bars, cocktail lounges, and hospitality venues that need sophisticated, compliant communication tools."
         },
         {
-          id: "analytics-reporting",
-          question: "What analytics and reporting do you provide?",
-          answer: "We provide comprehensive analytics including delivery rates, engagement metrics, compliance reports, and custom reporting. Our dashboard gives you real-time insights into your SMS performance and helps you optimize your messaging strategy."
-        },
-        {
-          id: "customization-options",
-          question: "How customizable is your platform?",
-          answer: "Our platform is highly customizable to meet your specific needs. We can customize everything from message templates to compliance workflows, ensuring the platform works exactly how you need it to for your business."
+          id: "other-regulated",
+          question: "What about other regulated businesses?",
+          answer: "We serve various regulated industries including healthcare, financial services, and any business that faces compliance challenges or has been rejected by other SMS platforms. Contact us to discuss your specific industry."
         }
       ]
     }
@@ -135,54 +134,47 @@ const FAQ = () => {
       navigation={<Navigation />}
       footer={<Footer />}
     >
-      <div className="min-h-screen bg-black pt-24 pb-16 px-4 sm:px-6 lg:px-8 relative">
-        {/* Background gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black"></div>
+      <div className="min-h-screen bg-black pt-20 pb-12 px-4 sm:px-6 lg:px-8 relative">
+        {/* Minimal background */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black via-gray-900/20 to-black"></div>
         
-        {/* Floating elements */}
-        <div className="absolute top-20 left-10 w-32 h-32 bg-orange-500/10 rounded-full blur-3xl"></div>
-        <div className="absolute top-40 right-20 w-24 h-24 bg-purple-500/10 rounded-full blur-3xl"></div>
-        
-        <div className="relative z-10 max-w-6xl mx-auto">
+        <div className="relative z-10 max-w-4xl mx-auto">
           {/* Hero Section */}
-          <div className="text-center mb-20">
-            <div className="inline-flex items-center px-4 py-2 rounded-full bg-orange-500/10 border border-orange-500/20 mb-8">
-              <HelpCircle className="w-5 h-5 text-orange-400 mr-2" />
-              <span className={`text-sm font-medium ${hubColors.text}`}>
-                Frequently Asked Questions
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center px-3 py-1 rounded-full bg-orange-500/20 border border-orange-500/30 mb-6">
+              <HelpCircle className="w-4 h-4 text-orange-400 mr-2" />
+              <span className="text-xs font-medium text-orange-400">
+                COMMON QUESTIONS
               </span>
             </div>
-            <h1 className="text-5xl md:text-7xl font-bold text-white mb-8 leading-tight">
-              <span className="block">Got Questions?</span>
-              <span className={`${hubColors.text} bg-gradient-to-r from-orange-400 to-purple-500 bg-clip-text text-transparent`}>
-                We've Got Answers
-              </span>
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
+              Questions from
+              <span className="gradient-text block">regulated businesses</span>
             </h1>
-            <p className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
-              Everything you need to know about SMS Hub, our services, and how we can help 
-              elevate your business communications.
+            <p className="text-lg text-gray-300 max-w-2xl mx-auto">
+              The most common questions we get from cigar retailers, private clubs, 
+              and premium venues about SMS compliance and our platform.
             </p>
           </div>
 
           {/* FAQ Categories */}
-          <div className="space-y-16">
+          <div className="space-y-12">
             {faqData.map((category, categoryIndex) => (
-              <div key={categoryIndex} className="space-y-8">
-                <div className="text-center mb-12">
-                  <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-orange-500/20 to-purple-500/20 border border-orange-500/30 rounded-3xl mb-6">
-                    <category.icon className="w-10 h-10 text-orange-400" />
+              <div key={categoryIndex} className="space-y-6">
+                <div className="text-center mb-8">
+                  <div className="inline-flex items-center justify-center w-12 h-12 bg-orange-500/20 border border-orange-500/30 rounded-xl mb-4">
+                    <category.icon className="w-6 h-6 text-orange-400" />
                   </div>
-                  <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+                  <h2 className="text-2xl md:text-3xl font-bold text-white">
                     {category.category}
                   </h2>
-                  <div className="w-24 h-1 bg-gradient-to-r from-orange-400 to-purple-500 mx-auto rounded-full"></div>
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {category.items.map((item) => (
                     <div
                       key={item.id}
-                      className="bg-gradient-to-br from-gray-800/30 to-gray-900/30 backdrop-blur-sm rounded-2xl border border-gray-700/30 overflow-hidden transition-all duration-300 hover:border-orange-500/30"
+                      className="card-modern rounded-xl overflow-hidden transition-all duration-300 hover:border-orange-500/40"
                     >
                       <button
                         onClick={() => toggleItem(item.id)}
@@ -217,29 +209,28 @@ const FAQ = () => {
           </div>
 
           {/* Contact CTA Section */}
-          <section className="mt-20 bg-gradient-to-br from-gray-800/30 to-gray-900/30 backdrop-blur-sm rounded-3xl border border-gray-700/30 p-12 text-center">
-            <div className="max-w-3xl mx-auto">
-              <h2 className="text-4xl font-bold text-white mb-6">
-                Still Have Questions?
+          <section className="mt-20 card-modern rounded-2xl p-8 text-center">
+            <div className="max-w-2xl mx-auto">
+              <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
+                Ready to get started for $179?
               </h2>
-              <p className="text-xl text-gray-300 mb-8 leading-relaxed">
-                Our team of SMS experts is here to help. Whether you have technical questions, 
-                need pricing information, or want to discuss your specific use case, we're ready to assist.
+              <p className="text-gray-300 mb-6 leading-relaxed">
+                No more SMS rejections. No compliance headaches. Just professional texting 
+                that works for your regulated business.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <a
                   href="/contact"
-                  className="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-orange-500 to-purple-600 text-white font-semibold rounded-2xl hover:from-orange-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+                  className="btn-modern inline-flex items-center justify-center px-8 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold rounded-lg hover:from-orange-600 hover:to-orange-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-orange-500/25"
                 >
-                  <MessageSquare className="w-5 h-5 mr-2" />
-                  Contact Our Team
+                  <MessageSquare className="w-4 h-4 mr-2" />
+                  Get Started Today
                 </a>
                 <a
-                  href="/solutions"
-                  className="inline-flex items-center justify-center px-8 py-4 bg-transparent border-2 border-orange-500/30 text-orange-400 font-semibold rounded-2xl hover:bg-orange-500/10 hover:border-orange-500/50 transition-all duration-300"
+                  href="/pricing"
+                  className="btn-modern inline-flex items-center justify-center px-8 py-3 border border-orange-500/50 text-orange-400 font-semibold rounded-lg hover:bg-orange-500/10 hover:border-orange-400 transition-all duration-300"
                 >
-                  <Zap className="w-5 h-5 mr-2" />
-                  View Solutions
+                  View Pricing Details
                 </a>
               </div>
             </div>

@@ -389,6 +389,11 @@ export type Database = {
           is_active: boolean | null
           legal_form: string | null
           legal_name: string | null
+          one_time_payment_amount: number | null
+          one_time_payment_currency: string | null
+          one_time_payment_date: string | null
+          payment_status: string | null
+          payment_type: string | null
           phone_number_provisioned: boolean | null
           phone_number_provisioned_at: string | null
           platform_access_granted: boolean | null
@@ -403,6 +408,7 @@ export type Database = {
           signup_type: string | null
           size: string | null
           state_region: string | null
+          stripe_checkout_session_id: string | null
           tax_issuing_country: string | null
           tcr_brand_approved_at: string | null
           tcr_brand_rejected_at: string | null
@@ -442,6 +448,11 @@ export type Database = {
           is_active?: boolean | null
           legal_form?: string | null
           legal_name?: string | null
+          one_time_payment_amount?: number | null
+          one_time_payment_currency?: string | null
+          one_time_payment_date?: string | null
+          payment_status?: string | null
+          payment_type?: string | null
           phone_number_provisioned?: boolean | null
           phone_number_provisioned_at?: string | null
           platform_access_granted?: boolean | null
@@ -456,6 +467,7 @@ export type Database = {
           signup_type?: string | null
           size?: string | null
           state_region?: string | null
+          stripe_checkout_session_id?: string | null
           tax_issuing_country?: string | null
           tcr_brand_approved_at?: string | null
           tcr_brand_rejected_at?: string | null
@@ -495,6 +507,11 @@ export type Database = {
           is_active?: boolean | null
           legal_form?: string | null
           legal_name?: string | null
+          one_time_payment_amount?: number | null
+          one_time_payment_currency?: string | null
+          one_time_payment_date?: string | null
+          payment_status?: string | null
+          payment_type?: string | null
           phone_number_provisioned?: boolean | null
           phone_number_provisioned_at?: string | null
           platform_access_granted?: boolean | null
@@ -509,6 +526,7 @@ export type Database = {
           signup_type?: string | null
           size?: string | null
           state_region?: string | null
+          stripe_checkout_session_id?: string | null
           tax_issuing_country?: string | null
           tcr_brand_approved_at?: string | null
           tcr_brand_rejected_at?: string | null
@@ -1190,7 +1208,11 @@ export type Database = {
           current_step: string | null
           hub_id: number
           id: string
+          payment_amount: number | null
+          payment_currency: string | null
+          payment_method: string | null
           step_data: Json | null
+          stripe_checkout_session_id: string | null
           stripe_status: string | null
           tcr_brand_id: string | null
           tcr_campaign_id: string | null
@@ -1204,7 +1226,11 @@ export type Database = {
           current_step?: string | null
           hub_id: number
           id?: string
+          payment_amount?: number | null
+          payment_currency?: string | null
+          payment_method?: string | null
           step_data?: Json | null
+          stripe_checkout_session_id?: string | null
           stripe_status?: string | null
           tcr_brand_id?: string | null
           tcr_campaign_id?: string | null
@@ -1218,7 +1244,11 @@ export type Database = {
           current_step?: string | null
           hub_id?: number
           id?: string
+          payment_amount?: number | null
+          payment_currency?: string | null
+          payment_method?: string | null
           step_data?: Json | null
+          stripe_checkout_session_id?: string | null
           stripe_status?: string | null
           tcr_brand_id?: string | null
           tcr_campaign_id?: string | null

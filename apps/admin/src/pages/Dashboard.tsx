@@ -43,7 +43,7 @@ import {
 const Dashboard = () => {
   const { currentHub } = useHub();
   const navigate = useNavigate();
-  const { isGlobalView } = useGlobalView();
+  const { isGlobalView, setIsGlobalView } = useGlobalView();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
   const [alerts, setAlerts] = useState<Alert[]>([]);
@@ -334,29 +334,80 @@ const Dashboard = () => {
   return (
     <div className="space-y-4 sm:space-y-6">
       {/* Page Header */}
-      <div>
-        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
-          {isGlobalView ? "Global Dashboard" : `${currentHub} Dashboard`}
-        </h1>
-        <p className="mt-1 text-xs sm:text-sm text-gray-500">
-          {isGlobalView
-            ? "Overview of all hubs combined"
-            : `Overview of ${currentHub} hub activity and performance`}
-        </p>
+      <div className="flex items-start justify-between">
+        <div>
+          <div className="flex items-center space-x-3">
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
+              {isGlobalView ? "Global Dashboard" : `${currentHub} Dashboard`}
+            </h1>
+            <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+              isGlobalView 
+                ? "bg-blue-100 text-blue-800 border border-blue-200" 
+                : "bg-green-100 text-green-800 border border-green-200"
+            }`}>
+              {isGlobalView ? (
+                <>
+                  <Globe className="w-3 h-3 mr-1" />
+                  Global View
+                </>
+              ) : (
+                <>
+                  <Building className="w-3 h-3 mr-1" />
+                  Hub View
+                </>
+              )}
+            </div>
+          </div>
+          <p className="mt-1 text-xs sm:text-sm text-gray-500">
+            {isGlobalView
+              ? "Overview of all hubs combined - see total numbers and cross-hub insights"
+              : `Overview of ${currentHub} hub activity and performance - hub-specific data only`}
+          </p>
+        </div>
+        
+        {/* Data Cleanup Button - Easy Access */}
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={handleDataCleanup}
+            disabled={isCleanupRunning}
+            className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            title="Delete all records except companies created before Sept 1, 2025 (keeps your 53 existing clients)"
+          >
+            {isCleanupRunning ? (
+              <>
+                <RefreshCw className="w-3 h-3 mr-1 animate-spin" />
+                Running...
+              </>
+            ) : (
+              <>
+                <Trash2 className="w-3 h-3 mr-1" />
+                Cleanup (Keep 53)
+              </>
+            )}
+          </button>
+          
+          <button
+            onClick={handleCheckDataCounts}
+            className="inline-flex items-center px-2 py-1.5 text-xs font-medium rounded-md text-red-700 bg-white border border-red-300 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
+            title="Check current data counts"
+          >
+            <Eye className="w-3 h-3" />
+          </button>
+        </div>
       </div>
 
       {/* Onboarding Pipeline Overview */}
       {stats && (
         <div className="bg-white rounded-lg shadow-sm p-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 space-y-3 sm:space-y-0">
-            <div>
-              <h2 className="text-base sm:text-lg font-medium text-gray-900">
-                Onboarding Pipeline
-              </h2>
-              <p className="text-xs sm:text-sm text-gray-500">
-                Track companies through their onboarding journey
-              </p>
-            </div>
+                      <div>
+            <h2 className="text-base sm:text-lg font-medium text-gray-900">
+              Onboarding Pipeline
+            </h2>
+            <p className="text-xs sm:text-sm text-gray-500">
+              Track companies through their onboarding journey
+            </p>
+          </div>
             <div className="text-left sm:text-right">
               <p className="text-xl sm:text-2xl font-bold text-gray-900">
                 {stats.totalCompanies}
@@ -514,21 +565,21 @@ const Dashboard = () => {
 
           <div
             className="bg-white rounded-lg shadow-sm p-4 sm:p-6 cursor-pointer hover:shadow-md hover:scale-105 transition-all duration-200"
-            onClick={navigateToVerifications}
+            onClick={navigateToCompanies}
           >
             <div className="flex items-center">
-              <div className="p-2 bg-yellow-100 rounded-lg flex-shrink-0">
-                <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-600" />
+              <div className="p-2 bg-orange-100 rounded-lg flex-shrink-0">
+                <Activity className="w-5 h-5 sm:w-6 sm:h-6 text-orange-600" />
               </div>
               <div className="ml-3 sm:ml-4 min-w-0 flex-1">
                 <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">
-                  Pending Verification
+                  Onboarding Progress
                 </p>
                 <p className="text-xl sm:text-2xl font-bold text-gray-900">
-                  {stats.pendingVerifications}
+                  {stats.totalCompanies - stats.activeCompanies}
                 </p>
-                <p className="text-xs text-yellow-600 mt-1 truncate">
-                  awaiting action
+                <p className="text-xs text-orange-600 mt-1 truncate">
+                  in progress
                 </p>
               </div>
             </div>
@@ -844,7 +895,7 @@ const Dashboard = () => {
             </span>
           </button>
           <button
-            onClick={navigateToVerifications}
+            onClick={navigateToCompanies}
             className="flex items-center justify-center px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
           >
             <Shield className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-purple-600" />
@@ -864,124 +915,46 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Data Cleanup Section - Admin Only */}
-      <div className="bg-red-50 border border-red-200 rounded-lg shadow-sm p-4 sm:p-6">
-        <div className="flex items-start">
-          <div className="flex-shrink-0">
-            <AlertTriangle className="h-6 w-6 text-red-600" />
-          </div>
-          <div className="ml-3 flex-1">
-            <h3 className="text-lg font-medium text-red-900 mb-2">
-              ⚠️ Data Cleanup Operations
-            </h3>
-            <p className="text-sm text-red-700 mb-4">
-              <strong>DANGER:</strong> This will permanently delete data from
-              the database. This operation cannot be undone and will affect all
-              hubs. Only use this for development/testing purposes.
-            </p>
-
-            <div className="bg-white border border-red-200 rounded-lg p-3 mb-4">
-              <p className="text-xs text-red-600 font-mono">
-                <strong>What will be deleted:</strong>
-                <br />
-                • Companies created after Sept 1, 2025
-                <br />
-                • All verifications
-                <br />
-                • All user profiles
-                <br />
-                • All leads and activities
-                <br />
-                • All other business data
-                <br />
-                <br />
-                <strong>Note:</strong> Auth schema cleanup requires admin
-                privileges
-                <br />
-                and may need to be done manually via database access.
-              </p>
+      {/* Cleanup Results Display */}
+      {cleanupResult && (
+        <div className="bg-white rounded-lg shadow-sm p-4">
+          <div className="flex items-start">
+            <div className="flex-shrink-0">
+              {cleanupResult.success ? (
+                <CheckCircle className="h-5 w-5 text-green-600" />
+              ) : (
+                <XCircle className="h-5 w-5 text-red-600" />
+              )}
             </div>
-
-            <div className="flex flex-col sm:flex-row gap-3">
-              <button
-                onClick={handleDataCleanup}
-                disabled={isCleanupRunning}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                {isCleanupRunning ? (
-                  <>
-                    <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                    Running Cleanup...
-                  </>
-                ) : (
-                  <>
-                    <Trash2 className="w-4 h-4 mr-2" />
-                    Execute Data Cleanup
-                  </>
-                )}
-              </button>
-
-              <button
-                onClick={handleCheckDataCounts}
-                className="inline-flex items-center px-4 py-2 border border-red-300 text-sm font-medium rounded-md text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
-              >
-                <Eye className="w-4 h-4 mr-2" />
-                Check Current Data
-              </button>
-            </div>
-
-            {cleanupResult && (
-              <div
-                className={`mt-4 p-3 rounded-lg ${
+            <div className="ml-3">
+              <p
+                className={`text-sm font-medium ${
                   cleanupResult.success
-                    ? "bg-green-50 border border-green-200"
-                    : "bg-red-50 border border-red-200"
+                    ? "text-green-800"
+                    : "text-red-800"
                 }`}
               >
-                <div className="flex items-start">
-                  <div className="flex-shrink-0">
-                    {cleanupResult.success ? (
-                      <CheckCircle className="h-5 w-5 text-green-600" />
-                    ) : (
-                      <XCircle className="h-5 w-5 text-red-600" />
-                    )}
-                  </div>
-                  <div className="ml-3">
-                    <p
-                      className={`text-sm font-medium ${
-                        cleanupResult.success
-                          ? "text-green-800"
-                          : "text-red-800"
-                      }`}
-                    >
-                      {cleanupResult.message}
-                    </p>
-                    {cleanupResult.details && (
-                      <div className="mt-2 text-xs text-green-700">
-                        <strong>Deleted:</strong>
-                        <br />• Companies:{" "}
-                        {cleanupResult.details.companiesDeleted}
-                        <br />• Verifications:{" "}
-                        {cleanupResult.details.verificationsDeleted}
-                        <br />• User Profiles:{" "}
-                        {cleanupResult.details.userProfilesDeleted}
-                        <br />• Leads: {cleanupResult.details.leadsDeleted}
-                        <br />• Auth Users:{" "}
-                        {cleanupResult.details.authUsersDeleted}
-                      </div>
-                    )}
-                    {cleanupResult.error && (
-                      <p className="mt-2 text-xs text-red-700">
-                        <strong>Error:</strong> {cleanupResult.error}
-                      </p>
-                    )}
-                  </div>
+                {cleanupResult.message}
+              </p>
+              {cleanupResult.details && (
+                <div className="mt-2 text-xs text-green-700">
+                  <strong>Deleted:</strong>
+                  <br />• Companies: {cleanupResult.details.companiesDeleted}
+                  <br />• Verifications: {cleanupResult.details.verificationsDeleted}
+                  <br />• User Profiles: {cleanupResult.details.userProfilesDeleted}
+                  <br />• Leads: {cleanupResult.details.leadsDeleted}
+                  <br />• Auth Users: {cleanupResult.details.authUsersDeleted}
                 </div>
-              </div>
-            )}
+              )}
+              {cleanupResult.error && (
+                <p className="mt-2 text-xs text-red-700">
+                  <strong>Error:</strong> {cleanupResult.error}
+                </p>
+              )}
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

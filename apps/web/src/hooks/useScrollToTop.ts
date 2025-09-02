@@ -1,11 +1,11 @@
-import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 
-// Custom hook to scroll to top on route changes
 export const useScrollToTop = () => {
   const { pathname } = useLocation();
-  
+
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Instant scroll to top for better UX and no transition conflicts
+    window.scrollTo(0, 0);
   }, [pathname]);
 };

@@ -10,7 +10,8 @@ import {
   Plus,
   DollarSign,
   Eye,
-  MoreHorizontal,
+  Edit,
+  X,
 } from "lucide-react";
 import {
   companiesService,
@@ -25,17 +26,12 @@ const Companies = () => {
   const [filteredCompanies, setFilteredCompanies] = useState<Company[]>([]);
   const [stats, setStats] = useState<CompanyStats | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [industryFilter, setIndustryFilter] = useState<string>("all");
-  const [sizeFilter, setSizeFilter] = useState<string>("all");
-  const [subscriptionFilter, setSubscriptionFilter] = useState<string>("all");
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [availableIndustries, setAvailableIndustries] = useState<string[]>([]);
-  const [availableSizes, setAvailableSizes] = useState<string[]>([]);
-  const [availableSubscriptionTiers, setAvailableSubscriptionTiers] = useState<
-    string[]
-  >([]);
+  const [editingCompany, setEditingCompany] = useState<Company | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   // Fetch companies and stats from database
   const fetchData = async () => {
@@ -73,18 +69,6 @@ const Companies = () => {
         filterOptions.hub_id = hubId;
       }
 
-      if (industryFilter !== "all") {
-        filterOptions.industry = industryFilter;
-      }
-
-      if (sizeFilter !== "all") {
-        filterOptions.size = sizeFilter;
-      }
-
-      if (subscriptionFilter !== "all") {
-        filterOptions.subscription_tier = subscriptionFilter;
-      }
-
       // Fetch companies with filters
       const fetchedCompanies =
         await companiesService.getCompanies(filterOptions);
@@ -97,23 +81,9 @@ const Companies = () => {
         ? await companiesService.getGlobalCompanyStats()
         : await companiesService.getCompanyStats(hubId);
 
-      // Fetch available filter options (global or hub-specific)
-      const industries = isGlobalView
-        ? await companiesService.getGlobalUniqueIndustries()
-        : await companiesService.getUniqueIndustries();
-      const sizes = isGlobalView
-        ? await companiesService.getGlobalUniqueSizes()
-        : await companiesService.getUniqueSizes();
-      const subscriptionTiers = isGlobalView
-        ? await companiesService.getGlobalUniqueSubscriptionTiers()
-        : await companiesService.getUniqueSubscriptionTiers();
-
       setCompanies(fetchedCompanies);
       setFilteredCompanies(fetchedCompanies);
       setStats(fetchedStats);
-      setAvailableIndustries(industries);
-      setAvailableSizes(sizes);
-      setAvailableSubscriptionTiers(subscriptionTiers);
     } catch (err) {
       console.error("Error fetching data:", err);
       setError(err instanceof Error ? err.message : "Failed to fetch data");
@@ -129,18 +99,45 @@ const Companies = () => {
     setIsRefreshing(false);
   };
 
+  const handleEditCompany = (company: Company) => {
+    setEditingCompany(company);
+    setIsEditModalOpen(true);
+  };
+
+  const handleCloseEditModal = () => {
+    setEditingCompany(null);
+    setIsEditModalOpen(false);
+  };
+
+  const handleUpdateOnboardingStep = async (companyId: string, newStep: string) => {
+    try {
+      setIsUpdating(true);
+      const result = await companiesService.updateCompanyOnboardingStep(companyId, newStep);
+      
+      if (result.success) {
+        // Refresh the data to show the update
+        await fetchData();
+        handleCloseEditModal();
+      } else {
+        alert(`Failed to update: ${result.error}`);
+      }
+    } catch (error) {
+      console.error("Error updating company:", error);
+      alert("Failed to update company");
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
   // Initial data fetch
   useEffect(() => {
     fetchData();
   }, []);
 
-  // Filter companies when filters change or global view changes
+  // Filter companies when search query or global view changes
   useEffect(() => {
     fetchData();
   }, [
-    industryFilter,
-    sizeFilter,
-    subscriptionFilter,
     searchQuery,
     isGlobalView,
   ]);
@@ -217,7 +214,7 @@ const Companies = () => {
 
       {/* Statistics Cards */}
       {stats && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 hover:shadow-md hover:scale-105 transition-all duration-200 cursor-pointer group">
             <div className="flex items-center">
               <div className="p-2 sm:p-3 bg-blue-100 rounded-lg group-hover:bg-blue-200 transition-colors duration-200">
@@ -275,24 +272,7 @@ const Companies = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 hover:shadow-md hover:scale-105 transition-all duration-200 cursor-pointer group">
-            <div className="flex items-center">
-              <div className="p-2 sm:p-3 bg-yellow-100 rounded-lg group-hover:bg-yellow-200 transition-colors duration-200">
-                <DollarSign className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-600" />
-              </div>
-              <div className="ml-3 sm:ml-4 min-w-0 flex-1">
-                <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">
-                  Industries
-                </p>
-                <p className="text-xl sm:text-2xl font-bold text-yellow-600">
-                  {Object.keys(stats.byIndustry).length}
-                </p>
-                <p className="text-xs text-yellow-600 mt-1 truncate">
-                  Unique sectors
-                </p>
-              </div>
-            </div>
-          </div>
+
         </div>
       )}
 
@@ -312,46 +292,7 @@ const Companies = () => {
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-3">
-            <select
-              value={industryFilter}
-              onChange={(e) => setIndustryFilter(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="all">All Industries</option>
-              {availableIndustries.map((industry) => (
-                <option key={industry} value={industry}>
-                  {industry}
-                </option>
-              ))}
-            </select>
 
-            <select
-              value={sizeFilter}
-              onChange={(e) => setSizeFilter(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="all">All Sizes</option>
-              {availableSizes.map((size) => (
-                <option key={size} value={size}>
-                  {size}
-                </option>
-              ))}
-            </select>
-
-            <select
-              value={subscriptionFilter}
-              onChange={(e) => setSubscriptionFilter(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="all">All Subscriptions</option>
-              {availableSubscriptionTiers.map((tier) => (
-                <option key={tier} value={tier}>
-                  {tier}
-                </option>
-              ))}
-            </select>
-          </div>
         </div>
       </div>
 
@@ -375,17 +316,12 @@ const Companies = () => {
                     Hub
                   </th>
                 )}
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Industry
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Size
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Subscription
-                </th>
+
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Billing Email
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Onboarding Step
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
@@ -423,19 +359,14 @@ const Companies = () => {
                       </span>
                     </td>
                   )}
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                      {company.industry || "Not specified"}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {company.size || "Not specified"}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {company.subscription_tier || "Not specified"}
-                  </td>
+
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                     {company.billing_email}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                      {company.account_onboarding_step || "Not set"}
+                    </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span
@@ -453,8 +384,12 @@ const Companies = () => {
                       <button className="text-blue-600 hover:text-blue-900">
                         <Eye className="w-4 h-4" />
                       </button>
-                      <button className="text-gray-600 hover:text-gray-900">
-                        <MoreHorizontal className="w-4 h-4" />
+                      <button 
+                        onClick={() => handleEditCompany(company)}
+                        className="text-green-600 hover:text-green-900"
+                        title="Edit Company"
+                      >
+                        <Edit className="w-4 h-4" />
                       </button>
                     </div>
                   </td>
@@ -481,6 +416,72 @@ const Companies = () => {
           </div>
         )}
       </div>
+
+      {/* Edit Company Modal */}
+      {isEditModalOpen && editingCompany && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-medium text-gray-900">
+                Edit {editingCompany.public_name}
+              </h3>
+              <button
+                onClick={handleCloseEditModal}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Onboarding Step
+                </label>
+                <select
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  value={editingCompany.account_onboarding_step || ""}
+                  onChange={(e) => setEditingCompany({
+                    ...editingCompany,
+                    account_onboarding_step: e.target.value
+                  })}
+                >
+                  <option value="">Select Step</option>
+                  <option value="authentication">Authentication</option>
+                  <option value="payment">Payment</option>
+                  <option value="personalInfo">Personal Info</option>
+                  <option value="businessInfo">Business Info</option>
+                  <option value="brandSubmission">Brand Submission</option>
+                  <option value="privacySetup">Privacy Setup</option>
+                  <option value="campaignSubmission">Campaign Submission</option>
+                  <option value="gphoneProcurement">gPhone Procurement</option>
+                  <option value="accountSetup">Account Setup</option>
+                  <option value="completed">Completed</option>
+                </select>
+              </div>
+
+              <div className="flex justify-end space-x-3 pt-4">
+                <button
+                  onClick={handleCloseEditModal}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => handleUpdateOnboardingStep(
+                    editingCompany.id, 
+                    editingCompany.account_onboarding_step || ""
+                  )}
+                  disabled={isUpdating}
+                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isUpdating ? "Updating..." : "Update"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

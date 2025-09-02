@@ -23,14 +23,13 @@ import { useGlobalView } from "../contexts/GlobalViewContext";
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: Home },
-  { name: "Users", href: "/users", icon: Users },
   { name: "Companies", href: "/companies", icon: Building },
-  { name: "Leads", href: "/leads", icon: UserPlus },
+  { name: "Users", href: "/users", icon: Users },
   { name: "Verifications", href: "/verifications", icon: Clock },
+  { name: "Leads", href: "/leads", icon: UserPlus },
   { name: "Testing", href: "/testing", icon: Zap },
   // { name: 'Messages', href: '/messages', icon: MessageSquare },
   // { name: 'Analytics', href: '/analytics', icon: BarChart3 },
-  { name: "Settings", href: "/settings", icon: Settings },
 ];
 
 export function Layout() {
@@ -108,6 +107,24 @@ export function Layout() {
             })}
           </nav>
 
+          {/* Settings Link - positioned above user profile */}
+          <div className="border-t border-gray-200 p-3">
+            <Link
+              to="/settings"
+              className={`
+                flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-colors
+                ${location.pathname === "/settings"
+                  ? "bg-blue-50 text-blue-600"
+                  : "text-gray-700 hover:bg-gray-50"
+                }
+              `}
+              onClick={() => setIsSidebarOpen(false)}
+            >
+              <Settings className={`h-5 w-5 ${location.pathname === "/settings" ? "text-blue-600" : "text-gray-400"}`} />
+              <span className="font-medium">Settings</span>
+            </Link>
+          </div>
+
           {/* Bottom section */}
           <div className="border-t border-gray-200 p-4">
             <div className="flex items-center justify-between">
@@ -164,17 +181,38 @@ export function Layout() {
 
               {/* Global View Toggle */}
               <div className="flex items-center space-x-2 ml-6">
-                <button
-                  onClick={() => setIsGlobalView(!isGlobalView)}
-                  className={`inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors ${
-                    isGlobalView
-                      ? "bg-blue-600 text-white border-blue-600 hover:bg-blue-700"
-                      : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
-                  }`}
-                >
-                  <Globe className="w-4 h-4 mr-1.5" />
-                  {isGlobalView ? "Global" : "Hub"}
-                </button>
+                <div className="flex items-center space-x-1">
+                  <span className="text-xs text-gray-500 font-medium">View:</span>
+                  <div className="flex bg-gray-100 rounded-lg p-1">
+                    <button
+                      onClick={() => setIsGlobalView(true)}
+                      title="View data from all hubs combined"
+                      className={`inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-md transition-all duration-200 ${
+                        isGlobalView
+                          ? "bg-white text-blue-600 shadow-sm border border-blue-200"
+                          : "text-gray-600 hover:text-gray-800 hover:bg-gray-50"
+                      }`}
+                    >
+                      <Globe className="w-4 h-4 mr-1.5" />
+                      Global
+                    </button>
+                    <button
+                      onClick={() => setIsGlobalView(false)}
+                      title="View data from current hub only"
+                      className={`inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-md transition-all duration-200 ${
+                        !isGlobalView
+                          ? "bg-white text-blue-600 shadow-sm border border-blue-200"
+                          : "text-gray-600 hover:text-gray-800 hover:bg-gray-50"
+                        }`}
+                    >
+                      <Building className="w-4 h-4 mr-1.5" />
+                      Hub
+                    </button>
+                  </div>
+                </div>
+                <div className="text-xs text-gray-400 max-w-xs">
+                  {isGlobalView ? "All hubs combined" : "Current hub only"}
+                </div>
               </div>
             </div>
 

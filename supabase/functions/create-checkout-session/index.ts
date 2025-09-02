@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import Stripe from "https://esm.sh/stripe@13.10.0?target=deno";
+import Stripe from "https://esm.sh/stripe@14.18.0?target=deno";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
 const corsHeaders = {
@@ -29,8 +29,18 @@ serve(async (req) => {
     if (!stripeKey) {
       throw new Error("Stripe secret key not configured");
     }
+    
+    // Log the key length and check for line breaks
+    console.log("🔑 Stripe key length:", stripeKey.length);
+    console.log("🔑 Stripe key contains newlines:", stripeKey.includes('\n'));
+    console.log("🔑 Stripe key starts with:", stripeKey.substring(0, 20));
+    console.log("🔑 Stripe key ends with:", stripeKey.substring(stripeKey.length - 20));
+    
+    // Clean the key by removing any whitespace and newlines
+    const cleanStripeKey = stripeKey.trim().replace(/\s+/g, '');
+    console.log("🧹 Cleaned key length:", cleanStripeKey.length);
 
-    const stripe = new Stripe(stripeKey, {
+    const stripe = new Stripe(cleanStripeKey, {
       apiVersion: "2023-10-16",
       httpClient: Stripe.createFetchHttpClient(),
     });

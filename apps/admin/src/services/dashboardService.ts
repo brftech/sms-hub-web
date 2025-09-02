@@ -489,7 +489,7 @@ class DashboardService {
     try {
       const { data: companies, error } = await this.supabase
         .from("companies")
-        .select("id, account_onboarding_step")
+        .select("id, account_onboarding_step, created_at")
         .eq("hub_id", hubId);
 
       if (error) throw error;
@@ -509,7 +509,22 @@ class DashboardService {
 
       companies?.forEach((company) => {
         const stage = company.account_onboarding_step || "authentication";
-        if (stageCounts.hasOwnProperty(stage)) {
+        
+        // For migration scenario: if company is in authentication stage and was created before today,
+        // consider it as "migrated" rather than "pending verification"
+        if (stage === "authentication") {
+          const companyCreated = new Date(company.created_at || Date.now());
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          
+          if (companyCreated < today) {
+            // This is a migrated company, count it as "completed" for now
+            stageCounts.completed++;
+          } else {
+            // This is a new company that needs verification
+            stageCounts.authentication++;
+          }
+        } else if (stageCounts.hasOwnProperty(stage)) {
           stageCounts[stage as keyof OnboardingStageStats]++;
         }
       });
@@ -696,7 +711,7 @@ class DashboardService {
     try {
       const { data: companies, error } = await this.supabase
         .from("companies")
-        .select("id, account_onboarding_step");
+        .select("id, account_onboarding_step, created_at");
 
       if (error) throw error;
 

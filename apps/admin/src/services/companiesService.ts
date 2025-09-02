@@ -27,6 +27,7 @@ export interface Company {
   subscription_status?: string | null;
   subscription_tier?: string | null;
   is_active?: boolean | null;
+  account_onboarding_step?: string | null;
   created_by_profile_id?: string | null;
   created_at?: string | null;
   updated_at?: string | null;
@@ -381,6 +382,32 @@ class CompaniesService {
         ?.map((item) => item.subscription_tier)
         .filter((tier): tier is string => tier !== null) || [];
     return [...new Set(tiers)]; // Remove duplicates
+  }
+
+  // Update company onboarding step
+  async updateCompanyOnboardingStep(
+    companyId: string,
+    onboardingStep: string
+  ): Promise<{ success: boolean; error?: string }> {
+    try {
+      const { error } = await this.supabase
+        .from("companies")
+        .update({ account_onboarding_step: onboardingStep })
+        .eq("id", companyId);
+
+      if (error) {
+        console.error("Error updating company onboarding step:", error);
+        return { success: false, error: error.message };
+      }
+
+      return { success: true };
+    } catch (error) {
+      console.error("Error updating company onboarding step:", error);
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : "Unknown error" 
+      };
+    }
   }
 }
 

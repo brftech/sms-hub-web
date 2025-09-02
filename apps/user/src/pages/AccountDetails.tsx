@@ -46,6 +46,7 @@ export function AccountDetails() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [accountData, setAccountData] = useState<any>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -131,6 +132,15 @@ export function AccountDetails() {
         throw new Error(accountData.error || "Failed to create account");
       }
 
+      // Check if this is an existing user
+      if (accountData.is_existing_user) {
+        setAccountData(accountData);
+        setSuccess(true);
+        // For existing users, we might want to handle differently
+        console.log("Existing user detected:", accountData.message);
+        // Still proceed with checkout flow
+      }
+
       // Store user info for checkout
       sessionStorage.setItem('account_data', JSON.stringify({
         user_id: accountData.user_id,
@@ -142,26 +152,51 @@ export function AccountDetails() {
         verification_id: accountData.verification_id
       }));
 
+      setAccountData(accountData);
       setSuccess(true);
 
-      // Always use magic link to authenticate first
-      if (accountData.magic_link) {
-        console.log("Using magic link for authentication...");
-        // Store account data for after login
-        sessionStorage.setItem('pending_checkout', JSON.stringify({
-          email: accountData.email,
-          userId: accountData.user_id,
-          companyId: accountData.company_id,
-          hubId: accountData.hub_id,
-          customerType: accountData.customer_type || signupData.customer_type
-        }));
-        // Redirect to magic link which will log them in
-        window.location.href = accountData.magic_link;
-        return;
-      } else {
-        // Fallback - shouldn't happen
-        console.error("No magic link generated");
-        navigate("/login");
+      // Redirect to Stripe checkout instead of magic link
+      console.log("Redirecting to Stripe checkout...");
+      
+      try {
+        // Create checkout session
+        const checkoutResponse = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-checkout-session`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({
+            email: accountData.email,
+            userId: accountData.user_id,
+            companyId: accountData.company_id,
+            hubId: accountData.hub_id,
+            customerType: accountData.customer_type || signupData.customer_type,
+            successUrl: `${window.location.origin}/payment-callback?session_id={CHECKOUT_SESSION_ID}`,
+            cancelUrl: `${window.location.origin}/signup`,
+          }),
+        });
+
+        const checkoutData = await checkoutResponse.json();
+        
+        if (checkoutResponse.ok && checkoutData.url) {
+          // Redirect to Stripe checkout - webhook will handle post-payment flow
+          console.log('🔄 Redirecting to Stripe checkout...')
+          window.location.href = checkoutData.url;
+          return;
+        } else {
+          throw new Error(checkoutData.error || "Failed to create checkout session");
+        }
+      } catch (checkoutError) {
+        console.error("Error creating checkout session:", checkoutError);
+        // Fallback to magic link if checkout fails
+        if (accountData.magic_link) {
+          console.log("Falling back to magic link...")
+          window.location.href = accountData.magic_link;
+          return;
+        } else {
+          throw new Error("Failed to create checkout session and no magic link available");
+        }
       }
       
     } catch (err: any) {
@@ -179,12 +214,17 @@ export function AccountDetails() {
         <Card className="w-full max-w-md">
           <CardContent className="text-center py-12">
             <CheckCircle2 className="w-16 h-16 text-green-600 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold mb-2">Account Created!</h2>
+            <h2 className="text-2xl font-bold mb-2">
+              {accountData?.is_existing_user ? "Welcome Back!" : "Account Created!"}
+            </h2>
             <p className="text-gray-600 mb-4">
-              Welcome to {hubConfig.displayName}!
+              {accountData?.is_existing_user 
+                ? `Welcome back to ${hubConfig.displayName}!`
+                : `Welcome to ${hubConfig.displayName}!`
+              }
             </p>
             <p className="text-sm text-gray-500">
-              Redirecting to payment setup...
+              Redirecting to Stripe checkout...
             </p>
           </CardContent>
         </Card>
@@ -228,6 +268,7 @@ export function AccountDetails() {
                     onChange={(e) => setFormData({...formData, companyName: e.target.value})}
                     placeholder="Enter your company name"
                     required
+                    autoComplete="organization"
                   />
                 </div>
               </FormSection>
@@ -248,6 +289,7 @@ export function AccountDetails() {
                     onChange={(e) => setFormData({...formData, firstName: e.target.value})}
                     placeholder="First name"
                     required
+                    autoComplete="given-name"
                   />
                 </div>
                 <div className="space-y-2">
@@ -259,6 +301,7 @@ export function AccountDetails() {
                     onChange={(e) => setFormData({...formData, lastName: e.target.value})}
                     placeholder="Last name"
                     required
+                    autoComplete="family-name"
                   />
                 </div>
               </div>
@@ -280,6 +323,7 @@ export function AccountDetails() {
                     placeholder="Create a password"
                     required
                     minLength={6}
+                    autoComplete="new-password"
                   />
                 </div>
                 <div className="space-y-2">
@@ -291,6 +335,7 @@ export function AccountDetails() {
                     onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
                     placeholder="Confirm your password"
                     required
+                    autoComplete="new-password"
                   />
                 </div>
               </div>

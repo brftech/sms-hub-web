@@ -31,22 +31,35 @@ serve(async (req) => {
       throw new Error("Invalid verification request");
     }
 
-    // Create auth user
-    const { data: authData, error: authError } =
-      await supabaseAdmin.auth.admin.createUser({
-        email: verificationRequest.email,
-        password: password,
-        email_confirm: true,
-        user_metadata: {
-          hub_id: verificationRequest.hub_id,
-          signup_type: verificationRequest.step_data?.signup_type,
-          customer_type: verificationRequest.step_data?.customer_type,
-        },
-      });
+    // Check if user already exists
+    const { data: existingUser } = await supabaseAdmin.auth.admin.listUsers({
+      filter: `email.eq.${verificationRequest.email}`
+    });
 
-    if (authError) {
-      console.error("Failed to create auth user:", authError);
-      throw new Error("Failed to create account");
+    let authData;
+    if (existingUser && existingUser.users.length > 0) {
+      // User already exists - return existing user info
+      console.log("User already exists:", existingUser.users[0].id);
+      authData = { user: existingUser.users[0] };
+    } else {
+      // Create new auth user
+      const { data: newAuthData, error: authError } =
+        await supabaseAdmin.auth.admin.createUser({
+          email: verificationRequest.email,
+          password: password,
+          email_confirm: true,
+          user_metadata: {
+            hub_id: verificationRequest.hub_id,
+            signup_type: verificationRequest.step_data?.signup_type,
+            customer_type: verificationRequest.step_data?.customer_type,
+          },
+        });
+
+      if (authError) {
+        console.error("Failed to create auth user:", authError);
+        throw new Error("Failed to create account");
+      }
+      authData = newAuthData;
     }
 
     // Generate user account number
@@ -163,6 +176,8 @@ serve(async (req) => {
       console.error("Failed to generate session:", sessionError);
     }
 
+    const isExistingUser = existingUser && existingUser.users.length > 0;
+    
     return new Response(
       JSON.stringify({
         success: true,
@@ -173,6 +188,8 @@ serve(async (req) => {
         hub_id: verificationRequest.hub_id,
         customer_type: verificationRequest.step_data?.customer_type,
         verification_id: verification_id, // Reference to verification record
+        is_existing_user: isExistingUser,
+        message: isExistingUser ? "Welcome back! Your account already exists." : "Account created successfully!"
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );

@@ -7,6 +7,8 @@ serve(async (req) => {
     return new Response("ok", { headers: corsHeaders });
   }
 
+  console.log("🔄 Submit verification request received");
+
   try {
     const {
       email,
@@ -29,6 +31,8 @@ serve(async (req) => {
     const verificationCode = Math.floor(
       100000 + Math.random() * 900000
     ).toString();
+    
+    console.log("📧 Generated verification code for:", email);
 
     // Store verification request - only include fields that exist in the table
     const { data: verificationData, error: verificationError } =
@@ -90,8 +94,27 @@ serve(async (req) => {
       // Send email via Resend
       const resendApiKey = Deno.env.get("RESEND_API_KEY");
       if (!resendApiKey) {
+        console.error("❌ RESEND_API_KEY not configured");
         throw new Error("Email service not configured");
       }
+
+      const emailPayload = {
+        from: "SMS Hub <noreply@resend.dev>",
+        to: email,
+        subject: "Verify your email",
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2>Verify Your Email</h2>
+            <p>Your verification code is:</p>
+            <h1 style="font-size: 36px; letter-spacing: 5px; text-align: center; background: #f4f4f4; padding: 20px; border-radius: 8px;">
+              ${verificationCode}
+            </h1>
+            <p>This code will expire in 10 minutes.</p>
+            <p style="color: #666; font-size: 14px;">If you didn't request this code, please ignore this email.</p>
+          </div>
+        `,
+        text: `Your verification code is: ${verificationCode}\n\nThis code will expire in 10 minutes.`,
+      };
 
       const emailResponse = await fetch("https://api.resend.com/emails", {
         method: "POST",
@@ -99,28 +122,19 @@ serve(async (req) => {
           Authorization: `Bearer ${resendApiKey}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          from: "SMS Hub <noreply@smshub.com>",
-          to: email,
-          subject: "Verify your email",
-          html: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-              <h2>Verify your email</h2>
-              <p>Your verification code is:</p>
-              <h1 style="font-size: 36px; letter-spacing: 5px; text-align: center; background: #f0f0f0; padding: 20px; border-radius: 8px;">
-                ${verificationCode}
-              </h1>
-              <p>This code will expire in 10 minutes.</p>
-            </div>
-          `,
-        }),
+        body: JSON.stringify(emailPayload),
       });
 
       if (!emailResponse.ok) {
-        console.error("Email send failed:", await emailResponse.text());
+        const errorText = await emailResponse.text();
+        console.error("❌ Email send failed:", errorText);
         throw new Error("Failed to send email");
       }
+      
+      console.log("✅ Email verification sent successfully to:", email);
     }
+
+    console.log("✅ Verification request completed successfully");
 
     return new Response(
       JSON.stringify({

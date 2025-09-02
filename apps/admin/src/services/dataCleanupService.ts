@@ -70,11 +70,11 @@ class DataCleanupService {
       console.log("Deleting data from public schema tables...");
 
       const cleanupResults = await Promise.allSettled([
-        // Keep companies created before Sept 1, 2025
+        // Keep companies created before Sept 1, 2025 (delete those created after)
         this.supabase
           .from("companies")
           .delete()
-          .gte("created_at", "2025-09-01"),
+          .gt("created_at", "2025-09-01"),
 
         this.supabase.from("verifications").delete(),
         this.supabase.from("verification_attempts").delete(),
@@ -153,11 +153,11 @@ class DataCleanupService {
       console.log("Executing cleanup using direct table operations...");
 
       const cleanupResults = await Promise.allSettled([
-        // Keep companies created before Sept 1, 2025
+        // Keep companies created before Sept 1, 2025 (delete those created after)
         this.supabase
           .from("companies")
           .delete()
-          .gte("created_at", "2025-09-01"),
+          .gt("created_at", "2025-09-01"),
 
         this.supabase.from("verifications").delete(),
         this.supabase.from("verification_attempts").delete(),
@@ -258,11 +258,11 @@ class DataCleanupService {
       for (const tableName of cleanupOrder) {
         try {
           if (tableName === "companies") {
-            // Special handling for companies - keep those before Sept 1, 2025
+            // Special handling for companies - keep those before Sept 1, 2025 (delete those created after)
             const { error } = await this.supabase
               .from(tableName)
               .delete()
-              .gte("created_at", "2025-09-01");
+              .gt("created_at", "2025-09-01");
 
             if (error) {
               console.error(`Failed to delete from ${tableName}:`, error);

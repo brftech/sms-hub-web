@@ -25,12 +25,13 @@ export const GlobalViewProvider: React.FC<GlobalViewProviderProps> = ({
   children,
 }) => {
   const [isGlobalView, setIsGlobalView] = useState(() => {
-    // Initialize from localStorage if available
+    // Initialize from localStorage if available, default to Global view (true)
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("admin-global-view");
-      return saved === "true";
+      // If no saved preference, default to Global view (true)
+      return saved === null ? true : saved === "true";
     }
-    return false;
+    return true; // Default to Global view
   });
 
   // Persist to localStorage whenever the value changes

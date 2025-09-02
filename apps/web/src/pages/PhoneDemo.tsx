@@ -2,6 +2,7 @@
 import { PhoneInteractive, LiveMessagingProvider, PageLayout } from "@sms-hub/ui";
 import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";
+import { MessageSquare, ArrowRight, Eye } from "lucide-react";
 
 export default function PhoneDemo() {
   return (
@@ -11,7 +12,7 @@ export default function PhoneDemo() {
       navigation={<Navigation />}
       footer={<Footer />}
     >
-      {/* Hero Section with proper top padding for fixed navigation */}
+      {/* Hero Section */}
       <div className="min-h-screen bg-black pt-24 pb-16 relative overflow-hidden">
         {/* Background gradient */}
         <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black"></div>
@@ -22,55 +23,61 @@ export default function PhoneDemo() {
         
         <div className="relative z-10 max-w-6xl mx-auto px-6">
           {/* Hero Content */}
-          <div className="text-center mb-20">
+          <div className="text-center mb-16">
             <div className="inline-flex items-center px-4 py-2 rounded-full bg-orange-500/10 border border-orange-500/20 mb-8">
+              <Eye className="w-4 h-4 text-orange-400 mr-2" />
               <span className="text-sm font-medium text-orange-400">
-                Interactive Demo
+                Customer Experience Preview
               </span>
             </div>
             
-            <h1 className="text-5xl md:text-7xl font-bold text-white mb-8 leading-tight">
-              <span className="block">Phone Interactive</span>
+            <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight">
+              <span className="block">What Your</span>
               <span className="bg-gradient-to-r from-orange-400 to-purple-500 bg-clip-text text-transparent">
-                SMS Demo
+                Customers See
               </span>
             </h1>
             
-            <p className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
-              Experience our interactive SMS demo with a realistic phone interface. 
-              See how businesses can engage with customers through our platform.
+            <p className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
+              This is exactly what your customers experience when you send them SMS messages. 
+              Professional, engaging, and compliant.
             </p>
           </div>
 
-          {/* Phone Interactive Component */}
-          <div className="flex justify-center mb-20">
+          {/* Phone Demo */}
+          <div className="flex justify-center mb-16">
             <LiveMessagingProvider>
               <PhoneInteractive />
             </LiveMessagingProvider>
           </div>
 
-          {/* Additional Info */}
+          {/* Business Side CTA */}
           <div className="text-center">
-            <div className="bg-gradient-to-r from-orange-500/10 to-purple-500/10 border border-orange-500/20 rounded-3xl p-12 backdrop-blur-sm">
-              <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
-                Try the Platform Demo
+            <div className="card-modern rounded-2xl p-8 max-w-2xl mx-auto">
+              <div className="flex justify-center mb-4">
+                <div className="w-12 h-12 bg-orange-500/20 border border-orange-500/30 rounded-xl flex items-center justify-center">
+                  <MessageSquare className="w-6 h-6 text-orange-400" />
+                </div>
+              </div>
+              <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
+                See the Business Side
               </h2>
-              <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-                Open the Platform Demo in another tab to see the business side and experience 
-                real-time interaction between customer and business.
+              <p className="text-gray-300 mb-6">
+                Want to see how easy it is to send these messages? Check out the platform demo to see the business dashboard.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <button
                   onClick={() => window.open('/platform-demo', '_blank')}
-                  className="px-8 py-4 bg-gradient-to-r from-orange-500 to-purple-600 text-white font-semibold rounded-xl hover:from-orange-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-orange-500/25"
+                  className="btn-modern bg-gradient-to-r from-orange-500 to-purple-600 text-white font-semibold px-6 py-3 rounded-xl hover:from-orange-600 hover:to-purple-700 flex items-center justify-center gap-2"
                 >
-                  Open Platform Demo
+                  Platform Demo
+                  <ArrowRight className="w-4 h-4" />
                 </button>
                 <button
-                  onClick={() => window.location.href = '/contact'}
-                  className="px-8 py-4 border-2 border-orange-500/50 text-orange-400 font-semibold rounded-xl hover:bg-orange-500/10 hover:border-orange-400 transition-all duration-300"
+                  onClick={() => window.location.href = '/'}
+                  className="btn-modern border-2 border-orange-500/50 text-orange-400 font-semibold px-6 py-3 rounded-xl hover:bg-orange-500/10 hover:border-orange-400"
                 >
-                  Get Started
+                  Get Started for $179
                 </button>
               </div>
             </div>

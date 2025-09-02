@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useHub, HubLogo, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sms-hub/ui'
 import { CheckCircle, XCircle, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
+import { createClient } from '@supabase/supabase-js'
 
 export function PaymentCallback() {
   const { hubConfig, currentHub } = useHub()
@@ -35,18 +36,29 @@ export function PaymentCallback() {
       return
     }
 
-    // Payment successful (webhook will handle the database updates)
-    setStatus('success')
-    setMessage('Payment successful! Setting up your account...')
-    toast.success('Payment completed successfully!')
-    
-    // Clear any payment required flags
-    sessionStorage.removeItem('payment_required')
-    
-    // Redirect to dashboard after a brief delay
-    setTimeout(() => {
-      navigate('/')
-    }, 2000)
+    try {
+      // Payment successful - webhook will handle all database updates
+      setStatus('success')
+      setMessage('Payment successful! Setting up your account...')
+      toast.success('Payment completed successfully!')
+      
+      // Clear any payment required flags
+      sessionStorage.removeItem('payment_required')
+      
+      // Clear pending checkout data since webhook handles everything now
+      sessionStorage.removeItem('pending_checkout')
+      
+      // Redirect to onboarding flow - webhook will have updated the database
+      setTimeout(() => {
+        console.log('🔄 Redirecting to onboarding - webhook should have updated database')
+        navigate('/onboarding')
+      }, 2000)
+      
+    } catch (error) {
+      console.error('Error in payment verification:', error)
+      setStatus('error')
+      setMessage('Error processing payment. Please contact support.')
+    }
   }
 
   return (

@@ -7,17 +7,17 @@ const Footer = () => {
   const hubColors = getHubColorClasses(currentHub);
 
   const getLogo = () => {
-    return <HubLogo hubType={currentHub} variant="text" size="xl" />;
+    return <HubLogo hubType={currentHub} variant="text" size="lg" />;
   };
 
   return (
-    <footer className="bg-black text-white py-12">
+    <footer className="bg-black text-white py-8 border-t border-gray-800/50">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           {/* Logo and Description */}
           <div className="col-span-1 md:col-span-2">
-            <div className="mb-4 flex justify-start">{getLogo()}</div>
-            <p className="text-gray-400 mb-4 max-w-md">
+            <div className="mb-3 flex justify-start">{getLogo()}</div>
+            <p className="text-gray-400 mb-4 max-w-md text-sm">
               {currentHub === "percytech"
                 ? "Enterprise technology solutions and platforms for modern businesses."
                 : "Compliant SMS marketing platform designed for premium retailers and sophisticated customer engagement."}
@@ -25,19 +25,19 @@ const Footer = () => {
             <div className="flex space-x-4">
               <a
                 href="#"
-                className={`${hubColors.text} hover:${hubColors.textHover} transition-colors`}
+                className={`${hubColors.text} hover:${hubColors.textHover} transition-colors text-sm`}
               >
                 Twitter
               </a>
               <a
                 href="#"
-                className={`${hubColors.text} hover:${hubColors.textHover} transition-colors`}
+                className={`${hubColors.text} hover:${hubColors.textHover} transition-colors text-sm`}
               >
                 LinkedIn
               </a>
               <a
                 href="#"
-                className={`${hubColors.text} hover:${hubColors.textHover} transition-colors`}
+                className={`${hubColors.text} hover:${hubColors.textHover} transition-colors text-sm`}
               >
                 GitHub
               </a>
@@ -46,20 +46,13 @@ const Footer = () => {
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
-            <ul className="space-y-2">
-              <li>
-                <Link
-                  to="/solutions"
-                  className="text-gray-400 hover:text-white transition-colors"
-                >
-                  Solutions
-                </Link>
-              </li>
+            <h3 className="text-base font-semibold mb-3">Quick Links</h3>
+            <ul className="space-y-1">
+
               <li>
                 <Link
                   to="/pricing"
-                  className="text-gray-400 hover:text-white transition-colors"
+                  className="text-gray-400 hover:text-white transition-colors text-sm"
                 >
                   Pricing
                 </Link>
@@ -67,7 +60,7 @@ const Footer = () => {
               <li>
                 <Link
                   to="/about"
-                  className="text-gray-400 hover:text-white transition-colors"
+                  className="text-gray-400 hover:text-white transition-colors text-sm"
                 >
                   About
                 </Link>
@@ -75,7 +68,7 @@ const Footer = () => {
               <li>
                 <Link
                   to="/contact"
-                  className="text-gray-400 hover:text-white transition-colors"
+                  className="text-gray-400 hover:text-white transition-colors text-sm"
                 >
                   Contact
                 </Link>
@@ -85,12 +78,12 @@ const Footer = () => {
 
           {/* Legal */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Legal</h3>
-            <ul className="space-y-2">
+            <h3 className="text-base font-semibold mb-3">Legal</h3>
+            <ul className="space-y-1">
               <li>
                 <Link
                   to="/privacy"
-                  className="text-gray-400 hover:text-white transition-colors"
+                  className="text-gray-400 hover:text-white transition-colors text-sm"
                 >
                   Privacy Policy
                 </Link>
@@ -98,42 +91,26 @@ const Footer = () => {
               <li>
                 <Link
                   to="/terms"
-                  className="text-gray-400 hover:text-white transition-colors"
+                  className="text-gray-400 hover:text-white transition-colors text-sm"
                 >
                   Terms of Service
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/sms-privacy-terms"
-                  className="text-gray-400 hover:text-white transition-colors"
-                >
-                  SMS Terms
                 </Link>
               </li>
             </ul>
           </div>
         </div>
 
-        {/* Bottom Bar */}
-        <div className="border-t border-gray-800 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-gray-400 text-sm">
-            © 2024 {currentHub === "percytech" ? "PercyTech" : "Gnymble"}. All
-            rights reserved.
-          </p>
-          <div className="flex space-x-6 mt-4 md:mt-0">
-            <Link
-              to="/privacy"
-              className="text-gray-400 hover:text-white text-sm transition-colors"
-            >
-              Privacy
-            </Link>
-            <Link
-              to="/terms"
-              className="text-gray-400 hover:text-white text-sm transition-colors"
-            >
-              Terms
-            </Link>
+        {/* Bottom section */}
+        <div className="mt-6 pt-6 border-t border-gray-800/50">
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            <p className="text-gray-400 text-sm">
+              © 2024 {currentHub === "percytech" ? "PercyTech" : "SMS Hub"}. All rights reserved.
+            </p>
+            <div className="mt-2 md:mt-0">
+              <p className="text-gray-500 text-xs">
+                Built with ❤️ for premium venues
+              </p>
+            </div>
           </div>
         </div>
       </div>

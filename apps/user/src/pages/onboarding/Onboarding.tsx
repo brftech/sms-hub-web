@@ -46,20 +46,58 @@ export function Onboarding() {
       if (existingCompanyId) {
         setCompanyId(existingCompanyId)
       } else {
-        initializeOnboarding()
+        // Only initialize if user doesn't have pending checkout
+        const pendingCheckout = sessionStorage.getItem('pending_checkout')
+        if (!pendingCheckout) {
+          initializeOnboarding()
+        }
       }
     }
   }, [user, companyId])
 
+  // Set initial step based on pending checkout status - CONSOLIDATED BELOW
+  // useEffect(() => {
+  //   const pendingCheckout = sessionStorage.getItem('pending_checkout')
+  //   console.log('🎯 Setting initial step - Pending checkout:', !!pendingCheckout, 'User:', !!user)
+  //   
+  //   if (pendingCheckout && user) {
+  //     // If payment complete, start at brand step
+  //     console.log('✅ Payment complete, starting at brand step')
+  //     setCurrentStep('brand')
+  //   } else if (!pendingCheckout && user) {
+  //     // If no pending checkout, start at payment step
+  //     console.log('💳 No payment, starting at payment step')
+  //     setCurrentStep('payment')
+  //   }
+  // }, [user])
+
   // Set current step from submission or check payment status
   useEffect(() => {
+    console.log('🎯 useEffect - Submission:', !!submission, 'CompanyId:', !!companyId, 'User:', !!user)
+    console.log('📊 Submission details:', submission ? {
+      id: submission.id,
+      current_step: submission.current_step,
+      stripe_status: submission.stripe_status,
+      created_at: submission.created_at
+    } : 'No submission')
+    
     if (submission) {
+      console.log('📋 Using submission step:', submission.current_step)
       setCurrentStep(submission.current_step as OnboardingStepName)
     } else if (companyId && user) {
-      // If no submission but we have a company, start at payment
-      setCurrentStep('payment')
+      // Check if user has already completed payment by looking at the submission
+      // The webhook should have created/updated this after payment
+      if (submission?.stripe_status === 'completed') {
+        // Payment is complete, start at brand step
+        console.log('✅ Payment complete (from submission), starting at brand step')
+        setCurrentStep('brand')
+      } else {
+        // No payment completed, start at payment step
+        console.log('💳 No payment completed, starting at payment step')
+        setCurrentStep('payment')
+      }
     }
-  }, [submission, companyId, user])
+  }, [submission, companyId, user, createSubmission, hubConfig.hubNumber])
 
   const initializeOnboarding = async () => {
     if (!user) return
@@ -75,7 +113,8 @@ export function Onboarding() {
 
       setCompanyId(company.id)
 
-      // Create onboarding submission
+      // Create onboarding submission starting at payment step
+      // The webhook will update this to 'brand' step after payment is complete
       await createSubmission.mutateAsync({
         company_id: company.id,
         hub_id: hubConfig.hubNumber,
@@ -147,12 +186,23 @@ export function Onboarding() {
     // User has company but no onboarding submission - they need to complete payment
   }
 
+  // Check if user should skip payment step based on database state
+  if (submission?.stripe_status === 'completed' && currentStep === 'payment') {
+    console.log('🔄 Payment already completed, redirecting from payment to brand step')
+    setCurrentStep('brand')
+    return null
+  }
+
+  console.log('🔍 Current step:', currentStep, 'Submission stripe status:', submission?.stripe_status)
+
   const stepConfig = ONBOARDING_STEPS[currentStep]
   const stepNames = Object.keys(ONBOARDING_STEPS) as OnboardingStepName[]
   const currentStepIndex = stepNames.indexOf(currentStep)
   const progress = ((currentStepIndex + 1) / stepNames.length) * 100
 
   const renderStepComponent = () => {
+    console.log('🎭 Rendering step component for:', currentStep)
+    
     const stepProps = {
       hubId: hubConfig.hubNumber,
       companyId,
@@ -177,19 +227,26 @@ export function Onboarding() {
 
     switch (currentStep) {
       case 'payment':
+        console.log('💳 Rendering PaymentStep')
         return <PaymentStep {...stepProps} />
       case 'brand':
+        console.log('🏢 Rendering BrandStep')
         return <BrandStep {...stepProps} />
       case 'privacy_terms':
+        console.log('📋 Rendering PrivacyTermsStep')
         return <PrivacyTermsStep {...stepProps} />
       case 'campaign':
+        console.log('📢 Rendering CampaignStep')
         return <CampaignStep {...stepProps} />
       case 'bandwidth':
+        console.log('📱 Rendering BandwidthStep')
         return <BandwidthStep {...stepProps} />
       case 'activation':
+        console.log('🚀 Rendering ActivationStep')
         return <ActivationStep {...stepProps} />
       default:
-        return <div>Step not found</div>
+        console.log('❌ Unknown step:', currentStep)
+        return <div>Step not found: {currentStep}</div>
     }
   }
 

@@ -7,23 +7,21 @@ import { HubProvider } from "@sms-hub/ui";
 import { ErrorBoundary } from "@sms-hub/ui";
 import { webEnvironment } from "./config/webEnvironment";
 
-import { lazy, Suspense } from "react";
+// Import all pages directly - no lazy loading
+import Home from "./pages/Home";
+import Contact from "./pages/Contact";
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
+import About from "./pages/About";
+import Pricing from "./pages/Pricing";
 
-// Lazy load non-critical pages
-const Home = lazy(() => import("./pages/Home"));
-const Contact = lazy(() => import("./pages/Contact"));
-const Terms = lazy(() => import("./pages/Terms"));
-const Privacy = lazy(() => import("./pages/Privacy"));
-const About = lazy(() => import("./pages/About"));
-const Pricing = lazy(() => import("./pages/Pricing"));
-const Solutions = lazy(() => import("./pages/Solutions"));
-const Testimonials = lazy(() => import("./pages/Testimonials"));
-const FAQ = lazy(() => import("./pages/FAQ"));
-const PhoneDemo = lazy(() => import("./pages/PhoneDemo"));
-const PlatformDemo = lazy(() => import("./pages/PlatformDemo"));
+
+import FAQ from "./pages/FAQ";
+import PhoneDemo from "./pages/PhoneDemo";
+import PlatformDemo from "./pages/PlatformDemo";
 
 import { useScrollToTop } from "./hooks/useScrollToTop";
-import PageSkeleton from "./components/PageSkeleton";
+import { PageTransition } from "./components/PageTransition";
 
 const queryClient = new QueryClient();
 
@@ -33,22 +31,20 @@ const AppRoutes = () => {
   useScrollToTop();
 
   return (
-    <Suspense fallback={<PageSkeleton />}>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/solutions" element={<Solutions />} />
-        <Route path="/testimonials" element={<Testimonials />} />
-        <Route path="/faq" element={<FAQ />} />
-        <Route path="/terms" element={<Terms />} />
-        <Route path="/privacy" element={<Privacy />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/pricing" element={<Pricing />} />
-        <Route path="/phone-demo" element={<PhoneDemo />} />
-        <Route path="/platform-demo" element={<PlatformDemo />} />
-        <Route path="*" element={<Home />} />
-      </Routes>
-    </Suspense>
+    <Routes>
+      <Route path="/" element={<PageTransition><Home /></PageTransition>} />
+      <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
+
+
+      <Route path="/faq" element={<PageTransition><FAQ /></PageTransition>} />
+      <Route path="/terms" element={<PageTransition><Terms /></PageTransition>} />
+      <Route path="/privacy" element={<PageTransition><Privacy /></PageTransition>} />
+      <Route path="/about" element={<PageTransition><About /></PageTransition>} />
+      <Route path="/pricing" element={<PageTransition><Pricing /></PageTransition>} />
+      <Route path="/phone-demo" element={<PageTransition><PhoneDemo /></PageTransition>} />
+      <Route path="/platform-demo" element={<PageTransition><PlatformDemo /></PageTransition>} />
+      <Route path="*" element={<PageTransition><Home /></PageTransition>} />
+    </Routes>
   );
 };
 

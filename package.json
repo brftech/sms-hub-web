@@ -36,7 +36,14 @@
       "react": "^19.1.0",
       "react-dom": "^19.1.0",
       "@types/react": "^19.1.0",
-      "@types/react-dom": "^19.1.1"
+      "@types/react-dom": "^19.1.1",
+      "typescript": "^5.9.2",
+      "styled-components": "^6.1.13",
+      "@types/styled-components": "^5.1.34"
+    },
+    "peerDependencyRules": {
+      "allowAny": ["react", "react-dom"],
+      "ignoreMissing": ["@types/react", "@types/react-dom"]
     }
   },
   "devDependencies": {

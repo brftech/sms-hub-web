@@ -1,17 +1,58 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import Stripe from "https://esm.sh/stripe@13.10.0?target=deno";
+import Stripe from "https://esm.sh/stripe@14.18.0?target=deno";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
 serve(async (req) => {
+  console.log("🔔 Webhook endpoint called - Method:", req.method);
+  console.log("🔔 Webhook endpoint called - Headers:", Object.fromEntries(req.headers.entries()));
+  
+  // Handle CORS preflight
+  if (req.method === "OPTIONS") {
+    return new Response("ok", {
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Stripe-Signature",
+      },
+    });
+  }
+  
+  // Add CORS headers to all responses
+  const corsHeaders = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Stripe-Signature",
+  };
+  
+  // Test endpoint to verify function is accessible
+  if (req.method === "GET") {
+    console.log("🔔 Test GET request received");
+    return new Response(JSON.stringify({ 
+      message: "Webhook endpoint is accessible",
+      timestamp: new Date().toISOString(),
+      method: req.method
+    }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+  
   const signature = req.headers.get("stripe-signature");
   
   if (!signature) {
-    return new Response("No signature", { status: 400 });
+    console.log("❌ No Stripe signature found in headers");
+    return new Response(JSON.stringify({ error: "No signature" }), { 
+      status: 400,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   }
 
   try {
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
     const webhookSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET");
+    
+    console.log("🔑 Stripe key configured:", !!stripeKey);
+    console.log("🔑 Webhook secret configured:", !!webhookSecret);
+    console.log("🔑 Webhook secret length:", webhookSecret?.length || 0);
     
     if (!stripeKey || !webhookSecret) {
       throw new Error("Stripe configuration missing");
@@ -23,7 +64,7 @@ serve(async (req) => {
     });
 
     const body = await req.text();
-    const event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+    const event = await stripe.webhooks.constructEventAsync(body, signature, webhookSecret);
 
     console.log(`🔔 Webhook received: ${event.type}`);
 
@@ -39,93 +80,156 @@ serve(async (req) => {
       case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session;
         console.log("✅ Checkout completed:", session.id);
+        console.log("📊 Session metadata:", session.metadata);
+        console.log("💰 Payment details:", {
+          amount_total: session.amount_total,
+          currency: session.currency,
+          mode: session.mode,
+          subscription: session.subscription
+        });
         
-        // Get the subscription details
-        const subscription = await stripe.subscriptions.retrieve(
-          session.subscription as string
-        );
-        
-        // Update the customer record with subscription info
-        const { data: customer } = await supabaseAdmin
-          .from("customers")
-          .select("id")
-          .eq("stripe_customer_id", session.customer)
-          .single();
+        try {
+          // Determine if this is a one-time purchase or subscription
+          const isOneTimePurchase = !session.subscription;
+          const paymentAmount = session.amount_total || 0;
+          const paymentCurrency = session.currency || 'usd';
           
-        if (customer) {
-          await supabaseAdmin
-            .from("customers")
-            .update({
-              stripe_subscription_id: subscription.id,
-              subscription_status: subscription.status,
-              subscription_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
-              subscription_tier: "starter",
-              updated_at: new Date().toISOString()
-            })
-            .eq("id", customer.id);
-        }
-        
-        // Update company if B2B
-        if (session.metadata?.company_id) {
-          const { error } = await supabaseAdmin
-            .from("companies")
-            .update({
-              subscription_status: "active",
-              updated_at: new Date().toISOString(),
-            })
-            .eq("id", session.metadata.company_id);
-
-          if (error) {
-            console.error("Failed to update company:", error);
-          }
-        }
-
-        // Update user profile onboarding step
-        if (session.metadata?.user_id) {
-          const { error } = await supabaseAdmin
-            .from("user_profiles")
-            .update({
-              onboarding_step: "brand_registration",
-              updated_at: new Date().toISOString(),
-            })
-            .eq("id", session.metadata.user_id);
-
-          if (error) {
-            console.error("Failed to update user profile:", error);
-          }
-        }
-
-        // Create or update onboarding submission
-        if (session.metadata?.company_id && session.metadata?.user_id) {
-          const { data: existing } = await supabaseAdmin
-            .from("onboarding_submissions")
-            .select("id")
-            .eq("company_id", session.metadata.company_id)
-            .single();
-
-          if (existing) {
-            // Update existing
-            await supabaseAdmin
-              .from("onboarding_submissions")
-              .update({
-                stripe_status: "completed",
-                current_step: "brand_registration",
+          // Update customer record with payment details
+          if (session.metadata?.company_id) {
+            // First, find the customer record for this company
+            const { data: customer, error: customerFindError } = await supabaseAdmin
+              .from("customers")
+              .select("id, stripe_customer_id")
+              .eq("billing_email", session.customer_details?.email || session.metadata?.email)
+              .single();
+            
+            if (customerFindError && customerFindError.code !== 'PGRST116') {
+              console.error("❌ Error finding customer:", customerFindError);
+            }
+            
+            if (customer) {
+              // Update existing customer
+              const updateData: any = {
+                last_payment_amount: paymentAmount,
+                last_payment_at: new Date().toISOString(),
+                total_spent: (customer.total_spent || 0) + paymentAmount,
                 updated_at: new Date().toISOString(),
-              })
-              .eq("id", existing.id);
-          } else {
-            // Create new
-            await supabaseAdmin
-              .from("onboarding_submissions")
-              .insert({
-                hub_id: parseInt(session.metadata.hub_id || "2"),
-                company_id: session.metadata.company_id,
-                user_id: session.metadata.user_id,
-                stripe_status: "completed",
-                current_step: "brand_registration",
-                step_data: { checkout_session_id: session.id },
-              });
+              };
+              
+              if (isOneTimePurchase) {
+                // One-time purchase - mark as active
+                updateData.subscription_status = "active";
+                updateData.subscription_tier = "one_time";
+              } else {
+                // Subscription - will be handled by subscription events
+                updateData.subscription_status = "pending";
+              }
+              
+              const { error: customerUpdateError } = await supabaseAdmin
+                .from("customers")
+                .update(updateData)
+                .eq("id", customer.id);
+                
+              if (customerUpdateError) {
+                console.error("❌ Failed to update customer:", customerUpdateError);
+              } else {
+                console.log("✅ Updated customer payment details");
+              }
+            } else {
+              // Create new customer record
+              const { error: customerCreateError } = await supabaseAdmin
+                .from("customers")
+                .insert({
+                  hub_id: parseInt(session.metadata.hub_id || "1"),
+                  billing_email: session.customer_details?.email || session.metadata?.email || "unknown@example.com",
+                  customer_type: session.metadata?.customer_type || "b2b",
+                  stripe_customer_id: session.customer as string,
+                  last_payment_amount: paymentAmount,
+                  last_payment_at: new Date().toISOString(),
+                  total_spent: paymentAmount,
+                  subscription_status: isOneTimePurchase ? "active" : "pending",
+                  subscription_tier: isOneTimePurchase ? "one_time" : "starter",
+                  is_active: true,
+                  metadata: {
+                    company_id: session.metadata.company_id,
+                    checkout_session_id: session.id,
+                    payment_type: isOneTimePurchase ? "one_time" : "subscription"
+                  }
+                });
+                
+              if (customerCreateError) {
+                console.error("❌ Failed to create customer:", customerCreateError);
+              } else {
+                console.log("✅ Created new customer record");
+              }
+            }
           }
+          
+          // Create or update onboarding submission and ensure proper user-company linkage
+          if (session.metadata?.company_id && session.metadata?.user_id) {
+            console.log("📝 Processing onboarding submission for company:", session.metadata.company_id);
+            console.log("👤 Processing for user:", session.metadata.user_id);
+            
+            // First, ensure the company is linked to the user profile
+            const { error: membershipError } = await supabaseAdmin
+              .from("user_profiles")
+              .update({ company_id: session.metadata.company_id })
+              .eq("id", session.metadata.user_id);
+            
+            if (membershipError) {
+              console.error("❌ Failed to link user to company:", membershipError);
+            } else {
+              console.log("✅ Linked user profile to company");
+            }
+            
+            const { data: existing } = await supabaseAdmin
+              .from("onboarding_submissions")
+              .select("id")
+              .eq("company_id", session.metadata.company_id)
+              .single();
+
+            if (existing) {
+              // Update existing
+              const { error } = await supabaseAdmin
+                .from("onboarding_submissions")
+                .update({
+                  stripe_status: "completed",
+                  current_step: "brand",
+                  updated_at: new Date().toISOString(),
+                })
+                .eq("id", existing.id);
+                
+              if (error) {
+                console.error("❌ Failed to update onboarding submission:", error);
+              } else {
+                console.log("✅ Updated onboarding submission");
+              }
+            } else {
+              // Create new
+              const { error } = await supabaseAdmin
+                .from("onboarding_submissions")
+                .insert({
+                  hub_id: parseInt(session.metadata.hub_id || "1"),
+                  company_id: session.metadata.company_id,
+                  user_id: session.metadata.user_id,
+                  stripe_status: "completed",
+                  current_step: "brand",
+                  step_data: { checkout_session_id: session.id },
+                });
+                
+              if (error) {
+                console.error("❌ Failed to create onboarding submission:", error);
+                console.error("Error details:", JSON.stringify(error, null, 2));
+              } else {
+                console.log("✅ Created new onboarding submission");
+              }
+            }
+          } else {
+            console.log("⚠️ Missing metadata for onboarding submission");
+            console.log("Metadata received:", JSON.stringify(session.metadata, null, 2));
+          }
+        } catch (error) {
+          console.error("❌ Error processing checkout completion:", error);
         }
         break;
       }
@@ -135,23 +239,28 @@ serve(async (req) => {
         const subscription = event.data.object as Stripe.Subscription;
         console.log("📊 Subscription event:", subscription.id);
         
-        // Update company subscription status
+        // Update customer subscription status
         if (subscription.metadata?.company_id) {
           const status = subscription.status === "active" ? "active" : 
                          subscription.status === "trialing" ? "trialing" : 
                          "inactive";
           
           const { error } = await supabaseAdmin
-            .from("companies")
+            .from("customers")
             .update({
               subscription_status: status,
               stripe_subscription_id: subscription.id,
+              subscription_tier: subscription.metadata?.tier || "starter",
+              subscription_ends_at: subscription.current_period_end ? new Date(subscription.current_period_end * 1000).toISOString() : null,
+              trial_ends_at: subscription.trial_end ? new Date(subscription.trial_end * 1000).toISOString() : null,
               updated_at: new Date().toISOString(),
             })
-            .eq("id", subscription.metadata.company_id);
+            .eq("stripe_customer_id", subscription.customer);
 
           if (error) {
-            console.error("Failed to update subscription:", error);
+            console.error("Failed to update customer subscription:", error);
+          } else {
+            console.log("✅ Updated customer subscription status");
           }
         }
         break;
@@ -161,18 +270,21 @@ serve(async (req) => {
         const subscription = event.data.object as Stripe.Subscription;
         console.log("❌ Subscription cancelled:", subscription.id);
         
-        // Update company subscription status
+        // Update customer subscription status
         if (subscription.metadata?.company_id) {
           const { error } = await supabaseAdmin
-            .from("companies")
+            .from("customers")
             .update({
               subscription_status: "cancelled",
+              subscription_ends_at: new Date().toISOString(),
               updated_at: new Date().toISOString(),
             })
-            .eq("id", subscription.metadata.company_id);
+            .eq("stripe_customer_id", subscription.customer);
 
           if (error) {
             console.error("Failed to update cancelled subscription:", error);
+          } else {
+            console.log("✅ Updated customer subscription to cancelled");
           }
         }
         break;
@@ -233,14 +345,17 @@ serve(async (req) => {
     }
 
     return new Response(JSON.stringify({ received: true }), {
-      headers: { "Content-Type": "application/json" },
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });
   } catch (error: any) {
     console.error("Webhook error:", error);
     return new Response(
       JSON.stringify({ error: error.message }),
-      { status: 400 }
+      { 
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" }
+      }
     );
   }
 });

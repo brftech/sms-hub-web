@@ -133,11 +133,7 @@ const Dashboard = () => {
     fetchDashboardData();
   }, [currentHub, isGlobalView]);
 
-  // Refresh data every 30 seconds
-  useEffect(() => {
-    const interval = setInterval(fetchDashboardData, 30000);
-    return () => clearInterval(interval);
-  }, [currentHub, isGlobalView]);
+  // Removed auto-refresh - now manual only
 
   // Helper function to get icon component
   const getIconComponent = (iconName: string) => {

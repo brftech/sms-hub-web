@@ -87,6 +87,10 @@ const Contact = () => {
       // Redirect to landing page after 3 seconds
       setTimeout(() => {
         navigate("/");
+        // Ensure we scroll to the top after navigation
+        setTimeout(() => {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }, 100);
       }, 3000);
     } catch (error) {
       console.error("Submission error:", error);

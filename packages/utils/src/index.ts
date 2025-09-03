@@ -7,6 +7,9 @@ export * from "./validation-advanced";
 export * from "./logger";
 export * from "./tcr-validation";
 
+// React hooks
+export * from "./useScrollToTop";
+
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 

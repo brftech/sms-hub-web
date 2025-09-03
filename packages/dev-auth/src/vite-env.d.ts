@@ -2,10 +2,9 @@
 
 interface ImportMetaEnv {
   readonly VITE_DEV_SUPERADMIN?: string
-  // Add more env variables as needed
+  // add more env variables here as needed
 }
 
 interface ImportMeta {
   readonly env: ImportMetaEnv
 }
-

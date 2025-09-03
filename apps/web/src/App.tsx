@@ -3,8 +3,8 @@ import { Toaster, SonnerToaster, TooltipProvider } from "@sms-hub/ui";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 
-import { HubProvider } from "@sms-hub/ui";
-import { ErrorBoundary } from "@sms-hub/ui";
+import { HubProvider, ErrorBoundary, PageTransition } from "@sms-hub/ui";
+import { useScrollToTop } from "@sms-hub/utils";
 import { webEnvironment } from "./config/webEnvironment";
 
 // Import all pages directly - no lazy loading
@@ -20,9 +20,6 @@ import FAQ from "./pages/FAQ";
 import PhoneDemo from "./pages/PhoneDemo";
 import PlatformDemo from "./pages/PlatformDemo";
 
-import { useScrollToTop } from "./hooks/useScrollToTop";
-import { PageTransition } from "./components/PageTransition";
-
 const queryClient = new QueryClient();
 
 // AppRoutes component that uses the hub context and scroll-to-top
@@ -30,10 +27,15 @@ const AppRoutes = () => {
   // Apply scroll-to-top on route changes
   useScrollToTop();
 
+  // In production, show Landing page by default; in dev, show Home page
+  const isProduction = import.meta.env.PROD;
+  const DefaultComponent = isProduction ? Landing : Home;
+
   return (
     <Routes>
-      <Route path="/" element={<PageTransition><Home /></PageTransition>} />
+      <Route path="/" element={<PageTransition><DefaultComponent /></PageTransition>} />
       <Route path="/landing" element={<PageTransition><Landing /></PageTransition>} />
+      <Route path="/home" element={<PageTransition><Home /></PageTransition>} />
       <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
 
 

@@ -12,15 +12,15 @@ interface SEOProps {
 }
 
 const SEO: React.FC<SEOProps> = ({
-  title = "SMS Hub - Compliant Texting for Cigar Retailers",
-  description = "Professional SMS platform for cigar retailers. Compliant texting, customer engagement, and business growth tools.",
-  keywords = "SMS, texting, cigar retailers, business communication, customer engagement",
+  title = "SMS Hub - Compliant Texting for Business",
+  description = "Professional SMS platform for businesses. Compliant texting, customer engagement, and growth tools.",
+  keywords = "SMS, texting, business communication, customer engagement",
   image = "/og-image.jpg",
   url = "",
   type = "website",
   siteName = "SMS Hub"
 }) => {
-  const fullTitle = title === "SMS Hub - Compliant Texting for Cigar Retailers" 
+  const fullTitle = title === "SMS Hub - Compliant Texting for Business" 
     ? title 
     : `${title} | SMS Hub`;
 

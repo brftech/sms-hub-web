@@ -67,6 +67,14 @@ export * from "./components/error-boundary";
 export * from "./components/forms";
 export * from "./components/page-layout";
 
+// Web utility components
+export { default as SEO } from "./components/seo";
+export { default as OptimizedImage } from "./components/optimized-image";
+export { default as LoadingSpinner } from "./components/loading-spinner";
+export { default as PageTransition } from "./components/page-transition";
+
+// Layout components (page-layout is exported above)
+
 // Providers - HubProvider is exported from contexts/HubContext
 
 // Hooks

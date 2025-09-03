@@ -36,7 +36,7 @@ export const useDevAuth = (environment: EnvironmentAdapter): DevAuthState => {
     
     // Also check environment variable (both Vite and standard)
     const envSuperadmin = 
-      (typeof import.meta !== 'undefined' && import.meta.env?.VITE_DEV_SUPERADMIN === 'true') ||
+      (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_DEV_SUPERADMIN === 'true') ||
       (typeof process !== 'undefined' && process.env?.DEV_SUPERADMIN === 'true')
     
     // Enable superadmin if query param matches or env var is set

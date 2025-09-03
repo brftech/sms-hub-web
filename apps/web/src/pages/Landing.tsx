@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useHub, HubLogo, FormFieldComponent, useToast } from "@sms-hub/ui";
 import { ArrowRight, Loader2 } from "lucide-react";
-import SEO from "../components/SEO";
+import { SEO } from "@sms-hub/ui";
 import { contactService } from "../services/contactService";
 import ansteadsMessageExample from "@sms-hub/ui/assets/ansteads-message-example.png";
 

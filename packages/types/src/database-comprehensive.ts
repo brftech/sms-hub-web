@@ -640,6 +640,7 @@ export type Database = {
         Row: {
           billing_address: Json | null
           billing_email: string
+          company_id: string | null
           created_at: string | null
           customer_type: string
           hub_id: number
@@ -658,10 +659,12 @@ export type Database = {
           total_spent: number | null
           trial_ends_at: string | null
           updated_at: string | null
+          user_id: string | null
         }
         Insert: {
           billing_address?: Json | null
           billing_email: string
+          company_id?: string | null
           created_at?: string | null
           customer_type: string
           hub_id: number
@@ -680,10 +683,12 @@ export type Database = {
           total_spent?: number | null
           trial_ends_at?: string | null
           updated_at?: string | null
+          user_id?: string | null
         }
         Update: {
           billing_address?: Json | null
           billing_email?: string
+          company_id?: string | null
           created_at?: string | null
           customer_type?: string
           hub_id?: number
@@ -702,14 +707,29 @@ export type Database = {
           total_spent?: number | null
           trial_ends_at?: string | null
           updated_at?: string | null
+          user_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "customers_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "customers_hub_id_fkey"
             columns: ["hub_id"]
             isOneToOne: false
             referencedRelation: "hubs"
             referencedColumns: ["hub_number"]
+          },
+          {
+            foreignKeyName: "customers_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
           },
         ]
       }

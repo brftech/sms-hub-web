@@ -1,4 +1,3 @@
-import React from 'react';
 import { Menu, Bell, Search, Shield, Globe, Building, RefreshCw } from 'lucide-react';
 import type { HeaderConfig } from './types';
 

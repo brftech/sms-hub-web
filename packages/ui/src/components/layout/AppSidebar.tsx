@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { X, LogOut, Settings, ShieldCheck } from 'lucide-react';
 import { HubSwitcher } from '../hub-switcher';

@@ -5,20 +5,21 @@ import { ArrowRight, Shield, Zap, Users, Clock } from "lucide-react";
 import AppLayout from "../components/AppLayout";
 
 
+const businessTypes = [
+  "cigar lounges...",
+  "employers...", 
+  "dog groomers...",
+  "whiskey bars...",
+  "construction crews...",
+  "retail stores..."
+];
+
 const Home = () => {
   const [showText, setShowText] = useState(false);
 
   const { currentHub } = useHub();
 
   const fixedText = "Compliant, slick SMS for";
-  const businessTypes = [
-    "cigar lounges...",
-    "employers...", 
-    "dog groomers...",
-    "whiskey bars...",
-    "construction crews...",
-    "retail stores..."
-  ];
   
   const [currentBusinessIndex, setCurrentBusinessIndex] = useState(0);
   const [isTyping, setIsTyping] = useState(true);

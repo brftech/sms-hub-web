@@ -1,4 +1,4 @@
-import { createSupabaseClient } from "@sms-hub/supabase";
+import { getSupabaseClient } from "@sms-hub/supabase";
 
 export interface DashboardStats {
   totalUsers: number;
@@ -78,7 +78,7 @@ export interface SystemHealth {
 }
 
 class DashboardService {
-  private supabase: ReturnType<typeof createSupabaseClient>;
+  private supabase: ReturnType<typeof getSupabaseClient>;
 
   constructor() {
     // Get environment variables
@@ -89,7 +89,7 @@ class DashboardService {
       throw new Error("Missing Supabase environment variables");
     }
 
-    this.supabase = createSupabaseClient(supabaseUrl, supabaseAnonKey);
+    this.supabase = getSupabaseClient(supabaseUrl, supabaseAnonKey);
   }
 
   async getDashboardStats(hubId: number): Promise<DashboardStats> {

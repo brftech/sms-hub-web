@@ -22,7 +22,10 @@ createRoot(document.getElementById('root')!).render(
     <QueryClientProvider client={queryClient}>
       <HubProvider environment={adminEnvironment} defaultHub="gnymble">
         <StyledHubProvider>
-          <BrowserRouter>
+          <BrowserRouter future={{ 
+            v7_startTransition: true,
+            v7_relativeSplatPath: true 
+          }}>
             <App />
             <Toaster position="top-right" />
           </BrowserRouter>

@@ -1,4 +1,4 @@
-import { createSupabaseClient } from '@sms-hub/supabase'
+import { getSupabaseClient } from '@sms-hub/supabase'
 
 export interface UserProfile {
   id: string
@@ -31,18 +31,13 @@ export interface UserStats {
 }
 
 class UsersService {
-  private supabase: ReturnType<typeof createSupabaseClient>
+  private supabase: ReturnType<typeof getSupabaseClient>
 
   constructor() {
-    // Get environment variables
-    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-    const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
-    
-    if (!supabaseUrl || !supabaseAnonKey) {
-      throw new Error('Missing Supabase environment variables')
-    }
-    
-    this.supabase = createSupabaseClient(supabaseUrl, supabaseAnonKey)
+    this.supabase = getSupabaseClient(
+      import.meta.env.VITE_SUPABASE_URL,
+      import.meta.env.VITE_SUPABASE_ANON_KEY
+    )
   }
 
   // Test database connection

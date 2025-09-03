@@ -1,4 +1,4 @@
-import { createSupabaseClient } from "@sms-hub/supabase";
+import { getSupabaseClient } from "@sms-hub/supabase";
 
 export interface Company {
   id: string;
@@ -43,7 +43,7 @@ export interface CompanyStats {
 }
 
 class CompaniesService {
-  private supabase: ReturnType<typeof createSupabaseClient>;
+  private supabase: ReturnType<typeof getSupabaseClient>;
 
   constructor() {
     // Get environment variables
@@ -54,7 +54,7 @@ class CompaniesService {
       throw new Error("Missing Supabase environment variables");
     }
 
-    this.supabase = createSupabaseClient(supabaseUrl, supabaseAnonKey);
+    this.supabase = getSupabaseClient(supabaseUrl, supabaseAnonKey);
   }
 
   // Test database connection

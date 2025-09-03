@@ -73,7 +73,8 @@ export { default as OptimizedImage } from "./components/optimized-image";
 export { default as LoadingSpinner } from "./components/loading-spinner";
 export { default as PageTransition } from "./components/page-transition";
 
-// Layout components (page-layout is exported above)
+// Layout components
+export * from "./components/layout";
 
 // Providers - HubProvider is exported from contexts/HubContext
 

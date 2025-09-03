@@ -11,6 +11,7 @@ import { Login } from "./pages/Login";
 import Leads from "./pages/Leads";
 import Verifications from "./pages/Verifications";
 import Testing from "./pages/Testing";
+import { LayoutDemo } from "./pages/LayoutDemo";
 
 import { Layout } from "./components/Layout";
 import { GlobalViewProvider } from "./contexts/GlobalViewContext";
@@ -33,6 +34,7 @@ function App() {
             {/* <Route path="messages" element={<Messages />} /> */}
             {/* <Route path="analytics" element={<Analytics />} /> */}
             <Route path="settings" element={<Settings />} />
+            <Route path="layout-demo" element={<LayoutDemo />} />
           </Route>
         </Routes>
       </GlobalViewProvider>

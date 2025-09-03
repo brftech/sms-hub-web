@@ -1,4 +1,4 @@
-import { createSupabaseClient } from "@sms-hub/supabase";
+import { getSupabaseClient } from "@sms-hub/supabase";
 
 export interface CleanupResult {
   success: boolean;
@@ -15,7 +15,7 @@ export interface CleanupResult {
 }
 
 class DataCleanupService {
-  private supabase: ReturnType<typeof createSupabaseClient>;
+  private supabase: ReturnType<typeof getSupabaseClient>;
 
   constructor() {
     const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
@@ -25,7 +25,7 @@ class DataCleanupService {
       throw new Error("Missing Supabase environment variables");
     }
 
-    this.supabase = createSupabaseClient(supabaseUrl, supabaseAnonKey);
+    this.supabase = getSupabaseClient(supabaseUrl, supabaseAnonKey);
   }
 
   // Get current data counts for safety check

@@ -3,3 +3,4 @@ export * from "./auth";
 export * from './queries'
 export * from './customer-queries'
 export * from './client-context'
+export * from './singleton'

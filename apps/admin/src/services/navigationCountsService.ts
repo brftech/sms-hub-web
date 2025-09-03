@@ -1,4 +1,4 @@
-import { createSupabaseClient } from '@sms-hub/supabase'
+import { getSupabaseClient } from '@sms-hub/supabase'
 
 export interface NavigationCounts {
   companies: number;
@@ -8,17 +8,13 @@ export interface NavigationCounts {
 }
 
 class NavigationCountsService {
-  private supabase: ReturnType<typeof createSupabaseClient>
+  private supabase: ReturnType<typeof getSupabaseClient>
 
   constructor() {
-    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-    const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
-    
-    if (!supabaseUrl || !supabaseAnonKey) {
-      throw new Error('Missing Supabase environment variables')
-    }
-    
-    this.supabase = createSupabaseClient(supabaseUrl, supabaseAnonKey)
+    this.supabase = getSupabaseClient(
+      import.meta.env.VITE_SUPABASE_URL,
+      import.meta.env.VITE_SUPABASE_ANON_KEY
+    )
   }
 
   async getCounts(hubId?: number, isGlobalView?: boolean): Promise<NavigationCounts> {

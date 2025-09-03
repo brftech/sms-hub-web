@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useHub } from "@sms-hub/ui";
+import { Link } from "react-router-dom";
 import {
   Play,
   Square,
@@ -252,6 +253,12 @@ const Testing = () => {
         <p className="mt-1 text-sm text-gray-500">
           Run and monitor tests for the {currentHub} hub
         </p>
+        <Link 
+          to="/layout-demo" 
+          className="inline-flex items-center mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+        >
+          View New Layout Component Demo →
+        </Link>
       </div>
 
       {/* Action Bar */}

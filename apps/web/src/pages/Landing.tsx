@@ -225,7 +225,7 @@ const Landing = () => {
                 className="px-8 py-4 bg-orange-600 text-white font-bold rounded-full hover:bg-orange-700 transition-all duration-300 text-sm tracking-wide uppercase flex items-center justify-center mx-auto group"
                 style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
               >
-                Get Early Access
+                Get Information
                 <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
               </button>
             </div>
@@ -234,8 +234,8 @@ const Landing = () => {
             <div className="w-32 h-px bg-gradient-to-r from-transparent via-orange-500 to-transparent mx-auto mb-10 md:mb-12 lg:mb-16"></div>
             
             {/* Subtitle - Centered between dividers */}
-            <div className="flex items-center justify-center min-h-[120px] md:min-h-[140px] lg:min-h-[160px] w-full">
-              <p className="text-lg sm:text-xl md:text-2xl text-gray-400 max-w-4xl leading-relaxed text-center px-4" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+            <div className="py-8 md:py-12 lg:py-16 w-full">
+              <p className="text-lg sm:text-xl md:text-2xl text-gray-400 max-w-4xl mx-auto leading-relaxed text-center px-4" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
                 Robust SMS for regulated industries, savvy employers, and customer-focused businesses
               </p>
             </div>

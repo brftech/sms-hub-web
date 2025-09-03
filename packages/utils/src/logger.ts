@@ -122,7 +122,7 @@ class Logger {
     this.requestId = null;
   }
 
-  public withContext(context: Partial<LogContext>): Logger {
+  public withContext(_context: Partial<LogContext>): Logger {
     const newLogger = new Logger(this.config);
     newLogger.requestId = this.requestId;
     return newLogger;

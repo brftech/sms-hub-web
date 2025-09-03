@@ -618,7 +618,7 @@ export const useUpdateProfile = () => {
       if (error) throw error;
       return result;
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user-profile"] });
       queryClient.invalidateQueries({ queryKey: ["auth-user"] });
     },

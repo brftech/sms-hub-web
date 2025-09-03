@@ -1,17 +1,14 @@
-import React, { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { Button } from "./button";
 import { Input } from "./input";
 import { Badge } from "./badge";
-import { Card } from "./card";
-import { Avatar } from "./avatar";
-import { ScrollArea } from "./scroll-area";
-import { Separator } from "./separator";
+// Unused imports removed: Card, Avatar, ScrollArea, Separator
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./select";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./dropdown-menu";
 import { useLiveMessaging } from "../contexts/LiveMessagingContext";
 import { 
-  Search, Filter, MoreVertical, Send, Paperclip, Smile, Clock, CheckCircle, AlertCircle, 
-  MessageSquare, Phone, Users, Archive, Trash2, Star, StarOff, Grid3X3, List, 
+  Search, Filter, MoreVertical, Send, CheckCircle, 
+  MessageSquare, Users, Archive, Trash2, Grid3X3, List, 
   Eye, Edit, Play, Plus, Bell, UserPlus, Lock, Globe, Settings, RefreshCw, Contact
 } from "lucide-react";
 
@@ -58,7 +55,7 @@ interface Contact {
 }
 
 export default function PlatformDemo() {
-  const { state, addMessage, removeMessage } = useLiveMessaging();
+  const { state } = useLiveMessaging();
   const [currentView, setCurrentView] = useState<'conversations' | 'broadcasts' | 'contacts'>('conversations');
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -269,9 +266,7 @@ export default function PlatformDemo() {
 
 
   // Handle view toggle
-  const handleViewToggle = useCallback(() => {
-    setCurrentView(prev => prev === 'conversations' ? 'broadcasts' : 'conversations');
-  }, []);
+  // Unused function removed: handleViewToggle
 
   // Handle view mode toggle
   const handleViewModeToggle = useCallback(() => {
@@ -288,33 +283,9 @@ export default function PlatformDemo() {
     setCurrentView(view);
   }, []);
 
-  // Get priority color
-  const getPriorityColor = useCallback((priority: string) => {
-    switch (priority) {
-      case 'high':
-        return 'bg-red-100 text-red-800';
-      case 'medium':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'low':
-        return 'bg-green-100 text-green-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  }, []);
+  // Unused function removed: getPriorityColor
 
-  // Get status color
-  const getStatusColor = useCallback((status: string) => {
-    switch (status) {
-      case 'active':
-        return 'bg-blue-100 text-blue-800';
-      case 'resolved':
-        return 'bg-green-100 text-green-800';
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  }, []);
+  // Unused function removed: getStatusColor
 
   // Get contact status color
   const getContactStatusColor = useCallback((status: string) => {

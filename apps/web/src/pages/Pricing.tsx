@@ -1,14 +1,13 @@
-import { Button, PageLayout, useHub } from "@sms-hub/ui";
-import { getHubColorClasses } from "@sms-hub/utils";
+import { PageLayout } from "@sms-hub/ui";
+
 import { useNavigate } from "react-router-dom";
-import { Check, Star, Zap, Shield, Clock, ArrowRight, MessageSquare, Phone, Headphones } from "lucide-react";
+import { Check, Zap, Shield, Clock, MessageSquare, Phone, Headphones } from "lucide-react";
 import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";
 
 const Pricing = () => {
   const navigate = useNavigate();
-  const { currentHub } = useHub();
-  const hubColors = getHubColorClasses(currentHub);
+
 
   const onboardingPlan = {
     name: "Onboarding Package",

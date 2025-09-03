@@ -1,14 +1,13 @@
-import { PageLayout, useHub } from "@sms-hub/ui";
-import { getHubColorClasses } from "@sms-hub/utils";
+import { PageLayout } from "@sms-hub/ui";
+
 import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";
-import { Shield, Users, Building, CheckCircle, Star, Zap, X, Clock } from "lucide-react";
+import { Shield, Users, CheckCircle, Star, X, Clock } from "lucide-react";
 // Import Bryan's profile image from UI assets
 import bryanProfileImage from "@sms-hub/ui/assets/bryan-profile.png";
 
 const About = () => {
-  const { currentHub } = useHub();
-  const hubColors = getHubColorClasses(currentHub);
+
 
   return (
     <PageLayout

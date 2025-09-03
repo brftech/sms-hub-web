@@ -1,17 +1,16 @@
 import { useState, useEffect } from "react";
 import { useHub, HubLogo } from "@sms-hub/ui";
-import { getHubColorClasses } from "@sms-hub/utils";
-import { Shield, MessageSquare, ArrowRight, CheckCircle, X, Star } from "lucide-react";
+
+import { ArrowRight } from "lucide-react";
 import AppLayout from "../components/AppLayout";
 import SEO from "../components/SEO";
-import cigarImage from "@sms-hub/ui/assets/cigar.png";
+
 
 const Home = () => {
   const [showText, setShowText] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  const { currentHub, hubConfig } = useHub();
-  const hubColors = getHubColorClasses(currentHub);
+  const { currentHub } = useHub();
 
   const textParts = ["SMS for businesses others won't serve..."];
   const totalLength = textParts.join("").length;
@@ -69,10 +68,7 @@ const Home = () => {
     return result;
   };
 
-  const handleClick = () => {
-    setShowText(true);
-    setCurrentIndex(totalLength);
-  };
+
 
   // Static phone component for demo
   const StaticPhone = () => (

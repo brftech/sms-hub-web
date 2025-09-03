@@ -2,7 +2,7 @@
 // LIVE MESSAGING CONTEXT - PROPERLY ARCHITECTED
 // =============================================================================
 
-import React, {
+import {
   createContext,
   useContext,
   useReducer,

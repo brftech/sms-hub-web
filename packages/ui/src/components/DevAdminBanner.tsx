@@ -2,7 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 import { useNavigate } from 'react-router-dom'
 import { useDevAuth, clearDevAuth } from '@sms-hub/dev-auth'
-import { EnvironmentAdapter } from '../types'
+// import { EnvironmentAdapter } from '../types' // Type not used
 
 const IndicatorContainer = styled.div`
   position: fixed;
@@ -85,7 +85,7 @@ const CloseButton = styled.button`
 `
 
 interface DevAdminBannerProps {
-  environment: EnvironmentAdapter
+  environment: any // EnvironmentAdapter type not available
   onboardingPath?: string
 }
 

@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { X, Phone, Shield, Lock, CheckCircle, AlertCircle } from "lucide-react";
+import { X, Phone, Shield, CheckCircle, AlertCircle } from "lucide-react";
 import { Button } from "./button";
 import { Input } from "./input";
-import { Badge } from "./badge";
+// Unused import removed: Badge
 import { Card, CardContent, CardHeader, CardTitle } from "./card";
 import { logError } from "@sms-hub/utils";
 

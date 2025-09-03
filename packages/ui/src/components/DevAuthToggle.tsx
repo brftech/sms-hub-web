@@ -1,7 +1,7 @@
-import React from 'react'
+
 import styled from 'styled-components'
 import { Shield } from 'lucide-react'
-import { EnvironmentAdapter } from '../types'
+// import { EnvironmentAdapter } from '../types' // Type not used
 
 const ToggleButton = styled.button`
   position: fixed;
@@ -45,7 +45,7 @@ const DevBadge = styled.span`
 `
 
 interface DevAuthToggleProps {
-  environment: EnvironmentAdapter
+  environment: any // EnvironmentAdapter type not available
   onActivate: () => void
 }
 

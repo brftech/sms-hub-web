@@ -3,7 +3,7 @@
 // =============================================================================
 
 import { z } from "zod";
-import { createValidationError, ErrorCode } from "./errors";
+import { createValidationError } from "./errors";
 
 // =============================================================================
 // COMMON VALIDATION SCHEMAS

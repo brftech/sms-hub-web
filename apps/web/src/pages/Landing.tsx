@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useHub, HubLogo, FormContainerComponent, FormFieldComponent, useToast } from "@sms-hub/ui";
+import { useHub, HubLogo, FormFieldComponent, useToast } from "@sms-hub/ui";
 import { ArrowRight, Loader2 } from "lucide-react";
 import SEO from "../components/SEO";
 import { contactService } from "../services/contactService";
@@ -234,8 +234,8 @@ const Landing = () => {
             <div className="w-32 h-px bg-gradient-to-r from-transparent via-orange-500 to-transparent mx-auto mb-10 md:mb-12 lg:mb-16"></div>
             
             {/* Subtitle - Centered between dividers */}
-            <div className="flex items-center justify-center min-h-[120px] md:min-h-[140px] lg:min-h-[160px]">
-              <p className="text-lg sm:text-xl md:text-2xl text-gray-400 max-w-3xl mx-auto leading-relaxed text-center" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+            <div className="flex items-center justify-center min-h-[120px] md:min-h-[140px] lg:min-h-[160px] w-full">
+              <p className="text-lg sm:text-xl md:text-2xl text-gray-400 max-w-4xl leading-relaxed text-center px-4" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
                 Robust SMS for regulated industries, savvy employers, and customer-focused businesses
               </p>
             </div>

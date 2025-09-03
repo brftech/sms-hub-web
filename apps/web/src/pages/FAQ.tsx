@@ -1,13 +1,12 @@
-import { PageLayout, useHub } from "@sms-hub/ui";
-import { getHubColorClasses } from "@sms-hub/utils";
+import { PageLayout } from "@sms-hub/ui";
+
 import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";
-import { HelpCircle, MessageSquare, Shield, CreditCard, Users, Zap, Building, ChevronDown, ChevronUp } from "lucide-react";
+import { HelpCircle, MessageSquare, Shield, CreditCard, Building, ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
 
 const FAQ = () => {
-  const { currentHub } = useHub();
-  const hubColors = getHubColorClasses(currentHub);
+
   const [openItems, setOpenItems] = useState<Set<string>>(new Set());
 
   const toggleItem = (id: string) => {

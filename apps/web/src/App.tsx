@@ -27,9 +27,8 @@ const AppRoutes = () => {
   // Apply scroll-to-top on route changes
   useScrollToTop();
 
-  // In production, show Landing page by default; in dev, show Home page
-  const isProduction = import.meta.env.PROD;
-  const DefaultComponent = isProduction ? Landing : Home;
+  // Always show the new Resend-inspired Home page as default
+  const DefaultComponent = Home;
 
   return (
     <Routes>

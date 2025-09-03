@@ -84,7 +84,7 @@ const Contact = () => {
         message: "",
       });
 
-      // Redirect to home page after 3 seconds
+      // Redirect to landing page after 3 seconds
       setTimeout(() => {
         navigate("/");
       }, 3000);

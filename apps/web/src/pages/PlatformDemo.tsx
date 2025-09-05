@@ -1,4 +1,3 @@
-
 import { PlatformDemo, LiveMessagingProvider, PageLayout } from "@sms-hub/ui";
 import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";
@@ -15,7 +14,7 @@ export default function PlatformDemoPage() {
   }, []);
 
   const handleOpenPhoneDemo = () => {
-    window.open('/phone-demo', '_blank');
+    window.open("/phone-demo", "_blank");
     // Show connection indicator when opening phone demo
     setShowConnectedIndicator(true);
   };
@@ -29,13 +28,9 @@ export default function PlatformDemoPage() {
     >
       {/* Hero Section */}
       <div className="min-h-screen bg-black pt-24 pb-16 relative overflow-hidden">
-        {/* Background gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black"></div>
-        
-        {/* Floating elements */}
-        <div className="absolute top-20 left-10 w-32 h-32 bg-orange-500/10 rounded-full blur-3xl"></div>
-        <div className="absolute top-40 right-20 w-24 h-24 bg-purple-500/10 rounded-full blur-3xl"></div>
-        
+        {/* Background */}
+        <div className="absolute inset-0 bg-black"></div>
+
         <div className="relative z-10 max-w-7xl mx-auto px-6">
           {/* Hero Content */}
           <div className="text-center mb-12">
@@ -45,32 +40,37 @@ export default function PlatformDemoPage() {
                 Business Dashboard Demo
               </span>
             </div>
-            
+
             <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight">
               <span className="block">Your SMS</span>
               <span className="bg-gradient-to-r from-orange-400 to-purple-500 bg-clip-text text-transparent">
                 Command Center
               </span>
             </h1>
-            
+
             <p className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed mb-8">
-              This is how simple SMS management looks for your business. 
-              Send messages, manage conversations, and track engagement—all in one place.
+              This is how simple SMS management looks for your business. Send
+              messages, manage conversations, and track engagement—all in one
+              place.
             </p>
 
             {/* Live Connection Indicator */}
-            <div className={`inline-flex items-center px-4 py-2 rounded-full border transition-all duration-500 ${
-              showConnectedIndicator 
-                ? 'bg-green-500/10 border-green-500/30 text-green-400' 
-                : 'bg-gray-500/10 border-gray-500/30 text-gray-400'
-            }`}>
-              <div className={`w-2 h-2 rounded-full mr-2 ${
-                showConnectedIndicator 
-                  ? 'bg-green-400 animate-pulse' 
-                  : 'bg-gray-400'
-              }`}></div>
+            <div
+              className={`inline-flex items-center px-4 py-2 rounded-full border transition-all duration-500 ${
+                showConnectedIndicator
+                  ? "bg-green-500/10 border-green-500/30 text-green-400"
+                  : "bg-gray-500/10 border-gray-500/30 text-gray-400"
+              }`}
+            >
+              <div
+                className={`w-2 h-2 rounded-full mr-2 ${
+                  showConnectedIndicator
+                    ? "bg-green-400 animate-pulse"
+                    : "bg-gray-400"
+                }`}
+              ></div>
               <span className="text-sm font-medium">
-                {showConnectedIndicator ? 'Live Demo Active' : 'Demo Ready'}
+                {showConnectedIndicator ? "Live Demo Active" : "Demo Ready"}
               </span>
             </div>
           </div>
@@ -96,15 +96,16 @@ export default function PlatformDemoPage() {
                   </div>
                 </div>
               </div>
-              
+
               <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
                 See Both Sides Live
               </h2>
               <p className="text-gray-300 mb-6 max-w-2xl mx-auto">
-                Open the Phone Demo in another tab and watch messages flow between 
-                your business dashboard and your customer's phone in real-time.
+                Open the Phone Demo in another tab and watch messages flow
+                between your business dashboard and your customer's phone in
+                real-time.
               </p>
-              
+
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <button
                   onClick={handleOpenPhoneDemo}
@@ -115,7 +116,7 @@ export default function PlatformDemoPage() {
                   <ArrowRight className="w-4 h-4" />
                 </button>
                 <button
-                  onClick={() => window.location.href = '/'}
+                  onClick={() => (window.location.href = "/")}
                   className="btn-modern border-2 border-orange-500/50 text-orange-400 font-semibold px-6 py-3 rounded-xl hover:bg-orange-500/10 hover:border-orange-400 flex items-center justify-center gap-2"
                 >
                   <Zap className="w-4 h-4" />

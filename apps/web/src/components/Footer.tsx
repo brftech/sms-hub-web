@@ -7,7 +7,7 @@ const Footer = () => {
   const hubColors = getHubColorClasses(currentHub);
 
   const getLogo = () => {
-    return <HubLogo hubType={currentHub} variant="text" size="lg" />;
+    return <HubLogo hubType={currentHub} variant="main" size="lg" />;
   };
 
   return (
@@ -48,7 +48,6 @@ const Footer = () => {
           <div>
             <h3 className="text-base font-semibold mb-3">Quick Links</h3>
             <ul className="space-y-1">
-
               <li>
                 <Link
                   to="/pricing"
@@ -104,7 +103,8 @@ const Footer = () => {
         <div className="mt-6 pt-6 border-t border-gray-800/50">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-gray-400 text-sm">
-              © 2024 {currentHub === "percytech" ? "PercyTech" : "SMS Hub"}. All rights reserved.
+              © 2024 {currentHub === "percytech" ? "PercyTech" : "SMS Hub"}.
+              All rights reserved.
             </p>
             <div className="mt-2 md:mt-0">
               <p className="text-gray-500 text-xs">

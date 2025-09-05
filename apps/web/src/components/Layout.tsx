@@ -1,20 +1,32 @@
-import { Outlet, Link, useLocation } from 'react-router-dom'
-import { useHub, HubLogo, Button } from '@sms-hub/ui'
-import { Badge, Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger } from '@sms-hub/ui'
-import { Home, MessageSquare, Settings, Zap, LogOut } from 'lucide-react'
-import { useUserProfile } from '@sms-hub/supabase'
+import { Outlet, Link, useLocation } from "react-router-dom";
+import { useHub, HubLogo, Button, HubSwitcher } from "@sms-hub/ui";
+import {
+  Badge,
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@sms-hub/ui";
+import { Home, MessageSquare, Settings, Zap, LogOut } from "lucide-react";
+import { useUserProfile } from "@sms-hub/supabase";
+// ... existing code ...
 
 const navigation = [
-  { name: 'Dashboard', href: '/', icon: Home },
-  { name: 'Campaigns', href: '/campaigns', icon: Zap },
-  { name: 'Messages', href: '/messages', icon: MessageSquare },
-  { name: 'Settings', href: '/settings', icon: Settings },
-]
+  { name: "Dashboard", href: "/", icon: Home },
+  { name: "Campaigns", href: "/campaigns", icon: Zap },
+  { name: "Messages", href: "/messages", icon: MessageSquare },
+  { name: "Settings", href: "/settings", icon: Settings },
+];
 
 export function Layout() {
-  const { hubConfig, currentHub } = useHub()
-  const { data: userProfile } = useUserProfile()
-  const location = useLocation()
+  const { hubConfig, currentHub } = useHub();
+  const { data: userProfile } = useUserProfile();
+  const location = useLocation();
 
   return (
     <SidebarProvider>
@@ -22,16 +34,15 @@ export function Layout() {
         <Sidebar>
           <SidebarContent>
             <div className="p-4 border-b">
-              <HubLogo hubType={currentHub} variant="full" size="md" />
-              {/* HubSwitcher hidden for now */}
-              {/* <HubSwitcher className="mt-2" /> */}
+              <HubLogo hubType={currentHub} variant="main" size="md" />
+              <HubSwitcher className="mt-2" />
             </div>
-            
+
             <SidebarGroup>
               <SidebarGroupContent>
                 <SidebarMenu>
                   {navigation.map((item) => {
-                    const isActive = location.pathname === item.href
+                    const isActive = location.pathname === item.href;
                     return (
                       <SidebarMenuItem key={item.name}>
                         <SidebarMenuButton asChild isActive={isActive}>
@@ -41,7 +52,7 @@ export function Layout() {
                           </Link>
                         </SidebarMenuButton>
                       </SidebarMenuItem>
-                    )
+                    );
                   })}
                 </SidebarMenu>
               </SidebarGroupContent>
@@ -89,5 +100,5 @@ export function Layout() {
         </div>
       </div>
     </SidebarProvider>
-  )
+  );
 }

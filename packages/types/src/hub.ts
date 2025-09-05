@@ -45,53 +45,6 @@ export interface HubConfig {
 }
 
 export const HUB_CONFIGS: Record<HubType, HubConfig> = {
-  percytech: {
-    id: "percytech",
-    hubNumber: 0,
-    name: "PercyTech",
-    displayName: "PercyTech Platform",
-    tagline: "Enterprise Technology Solutions",
-    description:
-      "Umbrella administrative hub for multi-tenant SMS platform management.",
-    primaryColor: "#1F2937",
-    secondaryColor: "#6B7280",
-    accentColor: "#3B82F6",
-    logo: "/percytech-text-logo.svg",
-    iconLogo: "/percytech-icon-logo.svg",
-    favicon: "/percytech-favicon.ico",
-    theme: {
-      primary: "31 41 55",
-      secondary: "107 114 128",
-      accent: "59 130 246",
-      background: "0 0% 100%",
-      foreground: "0 0% 3.9%",
-      card: "0 0% 100%",
-      border: "0 0% 89.8%",
-      muted: "0 0% 96.1%",
-    },
-    content: {
-      heroTitle: "PercyTech Platform",
-      heroSubtitle: "Administrative hub for SMS platform management",
-      features: [
-        "Super admin controls",
-        "Analytics dashboard",
-        "Support texting",
-        "Hub management",
-        "User administration",
-      ],
-      ctaText: "Access Admin Portal",
-    },
-    deploymentUrls: {
-      production: "https://percytech.com",
-      staging: "https://staging.percytech.com",
-      development: "http://localhost:3000",
-    },
-    features: ["super_admin", "analytics", "support_texting"],
-    settings: {
-      tcr_enabled: true,
-      bandwidth_enabled: true,
-    },
-  },
   gnymble: {
     id: "gnymble",
     hubNumber: 1,
@@ -232,6 +185,53 @@ export const HUB_CONFIGS: Record<HubType, HubConfig> = {
       tcr_enabled: true,
       bandwidth_enabled: true,
       texting_focused: true,
+    },
+  },
+  percytech: {
+    id: "percytech",
+    hubNumber: 0,
+    name: "PercyTech",
+    displayName: "PercyTech Platform",
+    tagline: "Enterprise Technology Solutions",
+    description:
+      "Umbrella administrative hub for multi-tenant SMS platform management.",
+    primaryColor: "#1F2937",
+    secondaryColor: "#6B7280",
+    accentColor: "#3B82F6",
+    logo: "/percytech-text-logo.svg",
+    iconLogo: "/percytech-icon-logo.svg",
+    favicon: "/percytech-favicon.ico",
+    theme: {
+      primary: "31 41 55",
+      secondary: "107 114 128",
+      accent: "59 130 246",
+      background: "0 0% 100%",
+      foreground: "0 0% 3.9%",
+      card: "0 0% 100%",
+      border: "0 0% 89.8%",
+      muted: "0 0% 96.1%",
+    },
+    content: {
+      heroTitle: "PercyTech Platform",
+      heroSubtitle: "Administrative hub for SMS platform management",
+      features: [
+        "Super admin controls",
+        "Analytics dashboard",
+        "Support texting",
+        "Hub management",
+        "User administration",
+      ],
+      ctaText: "Access Admin Portal",
+    },
+    deploymentUrls: {
+      production: "https://percytech.com",
+      staging: "https://staging.percytech.com",
+      development: "http://localhost:3000",
+    },
+    features: ["super_admin", "analytics", "support_texting"],
+    settings: {
+      tcr_enabled: true,
+      bandwidth_enabled: true,
     },
   },
 };

@@ -64,6 +64,7 @@ export const HubSwitcher: React.FC<HubSwitcherProps> = ({
                     switchHub(value as HubType);
                     setOpen(false);
                   }}
+                  className="data-[selected=true]:bg-transparent data-[selected=true]:text-foreground"
                 >
                   <div className="flex items-center">
                     <HubLogo hubType={hub.id} variant="icon" size="sm" />

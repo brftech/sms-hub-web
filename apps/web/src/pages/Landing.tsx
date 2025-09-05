@@ -1,5 +1,11 @@
 import { useState, useEffect, useRef } from "react";
-import { useHub, HubLogo, FormFieldComponent, useToast, StaticPhoneDemo } from "@sms-hub/ui";
+import {
+  useHub,
+  HubLogo,
+  FormFieldComponent,
+  useToast,
+  StaticPhoneDemo,
+} from "@sms-hub/ui";
 import { ArrowRight, Loader2 } from "lucide-react";
 import { SEO } from "@sms-hub/ui";
 import { contactService } from "../services/contactService";
@@ -51,10 +57,15 @@ const Landing = () => {
     e.preventDefault();
 
     // Client-side validation
-    if (!formData.firstName.trim() || !formData.lastName.trim() || !formData.email.trim()) {
+    if (
+      !formData.firstName.trim() ||
+      !formData.lastName.trim() ||
+      !formData.email.trim()
+    ) {
       toast({
         title: "Required fields missing",
-        description: "Please fill in your first name, last name, and email address.",
+        description:
+          "Please fill in your first name, last name, and email address.",
         variant: "destructive",
       });
       return;
@@ -100,10 +111,12 @@ const Landing = () => {
 
   const scrollToForm = () => {
     if (formRef.current) {
-      formRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      formRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
       // Focus on first field after scroll completes
       setTimeout(() => {
-        const firstInput = formRef.current?.querySelector('input[name="firstName"]') as HTMLInputElement;
+        const firstInput = formRef.current?.querySelector(
+          'input[name="firstName"]'
+        ) as HTMLInputElement;
         if (firstInput) {
           firstInput.focus();
         }
@@ -113,19 +126,19 @@ const Landing = () => {
 
   return (
     <>
-      <SEO 
+      <SEO
         title="Gnymble - New Era Coming Soon"
         description="Gnymble is evolving. New brand, new features, same commitment to businesses others won't serve."
         keywords="Gnymble, SMS, business texting, rebrand, announcement"
       />
-      
+
       {/* Teaser Landing Page */}
       <div className="min-h-screen bg-black relative overflow-hidden">
         {/* Contact Us button - absolute top right with padding */}
         <button
           onClick={scrollToForm}
           className="absolute top-6 right-4 sm:top-8 sm:right-8 md:right-12 lg:right-24 xl:right-32 z-50 px-4 sm:px-6 py-2 sm:py-3 bg-white/10 backdrop-blur-sm border border-white/20 text-white font-medium rounded-full hover:bg-white/20 transition-all duration-300 text-sm"
-          style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
+          style={{ fontFamily: "Inter, system-ui, sans-serif" }}
         >
           Contact Us
         </button>
@@ -137,109 +150,162 @@ const Landing = () => {
         </div>
 
         <div className="min-h-screen flex items-center justify-center px-4 sm:px-8 md:px-12 lg:px-24 xl:px-32 py-20 sm:py-24 md:py-28 lg:py-32">
-          <div className={`w-full max-w-6xl text-center transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+          <div
+            className={`w-full max-w-6xl text-center transition-all duration-1000 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
+          >
             {/* Logo */}
             <div className="mb-20 sm:mb-24 md:mb-28 lg:mb-32">
               <HubLogo
                 hubType={currentHub}
-                variant="text"
+                variant="main"
                 size="xl"
                 className="!flex-none !items-center justify-center opacity-90 transform scale-125 sm:scale-150 md:scale-175 lg:scale-200"
-                style={{ transformOrigin: 'center' }}
+                style={{ transformOrigin: "center" }}
               />
             </div>
 
             {/* Teaser Message - Under Logo */}
-            <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-16 md:mb-20 lg:mb-24 tracking-tight" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
-              Big, <span className="text-orange-500">gn</span>ew texting stuff coming soon...😏💬
+            <h1
+              className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-16 md:mb-20 lg:mb-24 tracking-tight"
+              style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+            >
+              Big, <span className="text-orange-500">gn</span>ew texting stuff
+              coming soon...😏💬
             </h1>
-            
+
             {/* Phone Demo - More Prominent */}
             <div className="mb-12 sm:mb-16 md:mb-20 lg:mb-24 scale-90 sm:scale-100 md:scale-110">
               <StaticPhoneDemo messages={demoMessages} />
             </div>
-            
+
             {/* Real Customer Example */}
             <div className="mb-8 md:mb-10 lg:mb-12">
-              <p className="text-sm text-gray-500 mb-3" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+              <p
+                className="text-sm text-gray-500 mb-3"
+                style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+              >
                 Real message from Ansteads Tobacco Co.
               </p>
               <div className="bg-gray-800/30 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-6 max-w-md mx-auto">
-                <img 
-                  src={ansteadsMessageExample} 
+                <img
+                  src={ansteadsMessageExample}
                   alt="Real SMS message from Ansteads Tobacco Co. announcing Carlito Fuente event"
                   className="w-full h-auto rounded-xl shadow-lg"
-                  style={{ maxWidth: '100%', height: 'auto' }}
+                  style={{ maxWidth: "100%", height: "auto" }}
                 />
               </div>
             </div>
-            
+
             {/* Divider */}
             <div className="w-32 h-px bg-gradient-to-r from-transparent via-orange-500 to-transparent mx-auto mb-10 md:mb-12 lg:mb-16"></div>
-            
+
             {/* Main Description */}
-            <div className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-300 mb-12 md:mb-16 lg:mb-20 max-w-4xl mx-auto leading-relaxed" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
-              <div className="mb-2">Coming soon: <span className="text-orange-500">gn</span>ew brand, <span className="text-orange-500">gn</span>ew features, same commitment to you.</div>
+            <div
+              className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-300 mb-12 md:mb-16 lg:mb-20 max-w-4xl mx-auto leading-relaxed"
+              style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+            >
+              <div className="mb-2">
+                Coming soon: <span className="text-orange-500">gn</span>ew
+                brand, <span className="text-orange-500">gn</span>ew features,
+                same commitment to you.
+              </div>
             </div>
-            
+
             {/* CTA Button */}
             <div className="mb-12 md:mb-16 lg:mb-20">
               <button
                 onClick={scrollToForm}
                 className="px-8 py-4 bg-orange-600 text-white font-bold rounded-full hover:bg-orange-700 transition-all duration-300 text-sm tracking-wide uppercase flex items-center justify-center mx-auto group"
-                style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
+                style={{ fontFamily: "Inter, system-ui, sans-serif" }}
               >
                 Get Information
                 <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
               </button>
             </div>
-            
+
             {/* Divider */}
             <div className="w-32 h-px bg-gradient-to-r from-transparent via-orange-500 to-transparent mx-auto mb-10 md:mb-12 lg:mb-16"></div>
-            
+
             {/* Subtitle - Centered between dividers */}
             <div className="py-8 md:py-12 lg:py-16 w-full">
-              <p className="text-lg sm:text-xl md:text-2xl text-gray-400 max-w-4xl mx-auto leading-relaxed text-center px-4" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
-                Robust SMS for regulated industries, savvy employers, and customer-focused businesses
+              <p
+                className="text-lg sm:text-xl md:text-2xl text-gray-400 max-w-4xl mx-auto leading-relaxed text-center px-4"
+                style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+              >
+                Robust SMS for regulated industries, savvy employers, and
+                customer-focused businesses
               </p>
             </div>
-            
+
             {/* Divider */}
             <div className="w-32 h-px bg-gradient-to-r from-transparent via-orange-500 to-transparent mx-auto mb-10 md:mb-12 lg:mb-16"></div>
-            
+
             {/* Features Preview */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-10 md:gap-12 lg:gap-16 mb-20 sm:mb-24 md:mb-28 lg:mb-32 text-left max-w-5xl mx-auto">
               <div className="space-y-4">
                 <div className="w-10 h-10 rounded-full bg-orange-500/20 flex items-center justify-center mb-4">
                   <div className="w-2.5 h-2.5 bg-orange-500 rounded-full"></div>
                 </div>
-                <h3 className="text-white font-semibold text-lg" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>Full Compliance</h3>
-                <p className="text-gray-400 text-sm leading-relaxed" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>Built for regulated industries from day one</p>
+                <h3
+                  className="text-white font-semibold text-lg"
+                  style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+                >
+                  Full Compliance
+                </h3>
+                <p
+                  className="text-gray-400 text-sm leading-relaxed"
+                  style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+                >
+                  Built for regulated industries from day one
+                </p>
               </div>
-              
+
               <div className="space-y-4">
                 <div className="w-10 h-10 rounded-full bg-orange-500/20 flex items-center justify-center mb-4">
                   <div className="w-2.5 h-2.5 bg-orange-500 rounded-full"></div>
                 </div>
-                <h3 className="text-white font-semibold text-lg" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>Premium Service</h3>
-                <p className="text-gray-400 text-sm leading-relaxed" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>White-glove support for businesses that matter</p>
+                <h3
+                  className="text-white font-semibold text-lg"
+                  style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+                >
+                  Premium Service
+                </h3>
+                <p
+                  className="text-gray-400 text-sm leading-relaxed"
+                  style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+                >
+                  White-glove support for businesses that matter
+                </p>
               </div>
-              
+
               <div className="space-y-4">
                 <div className="w-10 h-10 rounded-full bg-orange-500/20 flex items-center justify-center mb-4">
                   <div className="w-2.5 h-2.5 bg-orange-500 rounded-full"></div>
                 </div>
-                <h3 className="text-white font-semibold text-lg" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>No Rejections</h3>
-                <p className="text-gray-400 text-sm leading-relaxed" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>We specialize where others say no</p>
+                <h3
+                  className="text-white font-semibold text-lg"
+                  style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+                >
+                  No Rejections
+                </h3>
+                <p
+                  className="text-gray-400 text-sm leading-relaxed"
+                  style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+                >
+                  We specialize where others say no
+                </p>
               </div>
             </div>
 
             {/* Contact Form - Using the exact same components as Contact page */}
             <div ref={formRef} id="contact-form" className="max-w-4xl mx-auto">
-              <h3 className="text-xl sm:text-2xl font-bold text-white mb-8 sm:mb-10" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+              <h3
+                className="text-xl sm:text-2xl font-bold text-white mb-8 sm:mb-10"
+                style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+              >
                 Get Started Today
               </h3>
-              
+
               <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-8 lg:p-10">
                 <form onSubmit={handleSubmit}>
                   <div className="grid md:grid-cols-2 gap-8 mb-8">
@@ -249,17 +315,21 @@ const Landing = () => {
                       type="text"
                       placeholder="John"
                       value={formData.firstName}
-                      onChange={(value) => setFormData((prev) => ({ ...prev, firstName: value }))}
+                      onChange={(value) =>
+                        setFormData((prev) => ({ ...prev, firstName: value }))
+                      }
                       required
                     />
-                    
+
                     <FormFieldComponent
                       label="Last Name *"
                       name="lastName"
                       type="text"
                       placeholder="Doe"
                       value={formData.lastName}
-                      onChange={(value) => setFormData((prev) => ({ ...prev, lastName: value }))}
+                      onChange={(value) =>
+                        setFormData((prev) => ({ ...prev, lastName: value }))
+                      }
                       required
                     />
                   </div>
@@ -271,17 +341,21 @@ const Landing = () => {
                       type="email"
                       placeholder="john@company.com"
                       value={formData.email}
-                      onChange={(value) => setFormData((prev) => ({ ...prev, email: value }))}
+                      onChange={(value) =>
+                        setFormData((prev) => ({ ...prev, email: value }))
+                      }
                       required
                     />
-                    
+
                     <FormFieldComponent
                       label="Phone"
                       name="phone"
                       type="tel"
                       placeholder="(555) 123-4567"
                       value={formData.phone}
-                      onChange={(value) => setFormData((prev) => ({ ...prev, phone: value }))}
+                      onChange={(value) =>
+                        setFormData((prev) => ({ ...prev, phone: value }))
+                      }
                     />
                   </div>
 
@@ -292,7 +366,9 @@ const Landing = () => {
                       type="text"
                       placeholder="Company Name"
                       value={formData.company}
-                      onChange={(value) => setFormData((prev) => ({ ...prev, company: value }))}
+                      onChange={(value) =>
+                        setFormData((prev) => ({ ...prev, company: value }))
+                      }
                     />
                   </div>
 
@@ -303,7 +379,9 @@ const Landing = () => {
                       type="textarea"
                       placeholder="Tell us about your business and how we can help..."
                       value={formData.message}
-                      onChange={(value) => setFormData((prev) => ({ ...prev, message: value }))}
+                      onChange={(value) =>
+                        setFormData((prev) => ({ ...prev, message: value }))
+                      }
                     />
                   </div>
 
@@ -312,7 +390,7 @@ const Landing = () => {
                       type="submit"
                       disabled={isSubmitting}
                       className="px-10 py-4 bg-white text-black font-bold rounded-full hover:bg-gray-100 transition-all duration-300 text-sm tracking-wide uppercase disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center mx-auto"
-                      style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
+                      style={{ fontFamily: "Inter, system-ui, sans-serif" }}
                     >
                       {isSubmitting ? (
                         <>
@@ -329,8 +407,11 @@ const Landing = () => {
                   </div>
                 </form>
               </div>
-              
-              <p className="text-gray-500 text-sm mt-8 leading-relaxed" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+
+              <p
+                className="text-gray-500 text-sm mt-8 leading-relaxed"
+                style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+              >
                 Sign up today. We're ready for you.
               </p>
             </div>
@@ -344,8 +425,18 @@ const Landing = () => {
           <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl border border-gray-700/50 p-8 shadow-2xl max-w-md w-full text-center">
             <div className="flex justify-center mb-6">
               <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center">
-                <svg className="w-8 h-8 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                <svg
+                  className="w-8 h-8 text-green-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 13l4 4L19 7"
+                  />
                 </svg>
               </div>
             </div>

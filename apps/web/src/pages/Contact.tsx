@@ -12,7 +12,19 @@ import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";
 import { contactService } from "../services/contactService";
 
-import { CheckCircle, Loader2, MessageSquare, Mail, Phone, Building, User, ArrowRight, Star, Shield, Zap } from "lucide-react";
+import {
+  CheckCircle,
+  Loader2,
+  MessageSquare,
+  Mail,
+  Phone,
+  Building,
+  User,
+  ArrowRight,
+  Star,
+  Shield,
+  Zap,
+} from "lucide-react";
 
 const Contact = () => {
   const { hubConfig, currentHub } = useHub();
@@ -89,7 +101,7 @@ const Contact = () => {
         navigate("/");
         // Ensure we scroll to the top after navigation
         setTimeout(() => {
-          window.scrollTo({ top: 0, behavior: 'smooth' });
+          window.scrollTo({ top: 0, behavior: "smooth" });
         }, 100);
       }, 3000);
     } catch (error) {
@@ -112,13 +124,9 @@ const Contact = () => {
       footer={<Footer />}
     >
       <div className="min-h-screen bg-black pt-20 sm:pt-24 pb-12 sm:pb-16 relative overflow-hidden">
-        {/* Background gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black"></div>
-        
-        {/* Floating elements */}
-        <div className="absolute top-20 left-10 w-32 h-32 bg-orange-500/10 rounded-full blur-3xl"></div>
-        <div className="absolute top-40 right-20 w-24 h-24 bg-purple-500/10 rounded-full blur-3xl"></div>
-        
+        {/* Background */}
+        <div className="absolute inset-0 bg-black"></div>
+
         <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6">
           {/* Hero Content */}
           <div className="text-center mb-12 sm:mb-16 lg:mb-20">
@@ -127,18 +135,21 @@ const Contact = () => {
                 Get In Touch
               </span>
             </div>
-            
+
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold text-white mb-6 sm:mb-8 leading-tight px-2">
               <span className="block">Ready to</span>
-              <span className={`${hubColors.text} bg-gradient-to-r from-orange-400 to-purple-500 bg-clip-text text-transparent`}>
+              <span
+                className={`${hubColors.text} bg-gradient-to-r from-orange-400 to-purple-500 bg-clip-text text-transparent`}
+              >
                 elevate your venue
               </span>
               <span className="block">with premium SMS?</span>
             </h1>
-            
+
             <p className="text-lg sm:text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto leading-relaxed mb-8 sm:mb-12 px-4">
-              Premium venues deserve premium solutions. Let's discuss how our regulatory expertise 
-              and sophisticated platform can transform your customer communication.
+              Premium venues deserve premium solutions. Let's discuss how our
+              regulatory expertise and sophisticated platform can transform your
+              customer communication.
             </p>
 
             {/* Contact Info Cards */}
@@ -154,7 +165,7 @@ const Contact = () => {
                   Get detailed responses within 24 hours
                 </p>
               </div>
-              
+
               <div className="group bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-4 sm:p-6 hover:border-orange-500/30 transition-all duration-300 hover:transform hover:scale-105">
                 <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-orange-500/20 to-purple-500/20 border border-orange-500/30 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 group-hover:scale-110 transition-transform duration-300">
                   <Phone className="w-6 h-6 sm:w-8 sm:h-8 text-orange-400" />
@@ -166,7 +177,7 @@ const Contact = () => {
                   Schedule a personalized consultation call
                 </p>
               </div>
-              
+
               <div className="group bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-4 sm:p-6 hover:border-orange-500/30 transition-all duration-300 hover:transform hover:scale-105 sm:col-span-2 lg:col-span-1">
                 <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-orange-500/20 to-purple-500/20 border border-orange-500/30 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 group-hover:scale-110 transition-transform duration-300">
                   <MessageSquare className="w-6 h-6 sm:w-8 sm:h-8 text-orange-400" />
@@ -188,15 +199,16 @@ const Contact = () => {
                 Let's Start the Conversation
               </h2>
               <p className="text-lg sm:text-xl text-gray-300 max-w-3xl mx-auto px-4">
-                Tell us about your venue and how we can help elevate your customer communication.
+                Tell us about your venue and how we can help elevate your
+                customer communication.
               </p>
             </div>
-            
+
             <div className="max-w-4xl mx-auto px-2 sm:px-0">
               <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-2xl sm:rounded-3xl border border-gray-700/50 p-4 sm:p-6 lg:p-8 shadow-2xl relative overflow-hidden">
                 {/* Background pattern */}
                 <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-purple-500/5"></div>
-                
+
                 <div className="relative z-10">
                   <FormContainerComponent
                     onSubmit={handleSubmit}
@@ -217,11 +229,14 @@ const Contact = () => {
                           placeholder="John"
                           value={formData.firstName}
                           onChange={(value) =>
-                            setFormData((prev) => ({ ...prev, firstName: value }))
+                            setFormData((prev) => ({
+                              ...prev,
+                              firstName: value,
+                            }))
                           }
                         />
                       </div>
-                      
+
                       <div className="group">
                         <label className="block text-sm font-medium text-gray-300 mb-2 group-hover:text-orange-400 transition-colors">
                           <User className="w-4 h-4 inline mr-2" />
@@ -234,7 +249,10 @@ const Contact = () => {
                           placeholder="Doe"
                           value={formData.lastName}
                           onChange={(value) =>
-                            setFormData((prev) => ({ ...prev, lastName: value }))
+                            setFormData((prev) => ({
+                              ...prev,
+                              lastName: value,
+                            }))
                           }
                         />
                       </div>
@@ -257,7 +275,7 @@ const Contact = () => {
                           }
                         />
                       </div>
-                      
+
                       <div className="group">
                         <label className="block text-sm font-medium text-gray-300 mb-2 group-hover:text-orange-400 transition-colors">
                           <Phone className="w-4 h-4 inline mr-2" />
@@ -347,38 +365,48 @@ const Contact = () => {
                   Why Choose Our Platform?
                 </h2>
                 <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-                  We're not just another SMS provider. We're the platform that understands premium venues.
+                  We're not just another SMS provider. We're the platform that
+                  understands premium venues.
                 </p>
               </div>
-              
+
               <div className="grid md:grid-cols-3 gap-8">
                 <div className="text-center">
                   <div className="w-16 h-16 bg-gradient-to-br from-orange-500/20 to-purple-500/20 border border-orange-500/30 rounded-2xl flex items-center justify-center mx-auto mb-6">
                     <Star className="w-8 h-8 text-orange-400" />
                   </div>
-                  <h3 className="text-xl font-semibold text-white mb-3">Regulatory Expertise</h3>
+                  <h3 className="text-xl font-semibold text-white mb-3">
+                    Regulatory Expertise
+                  </h3>
                   <p className="text-gray-300 text-sm leading-relaxed">
-                    Built-in compliance features that meet industry standards and regulatory requirements.
+                    Built-in compliance features that meet industry standards
+                    and regulatory requirements.
                   </p>
                 </div>
-                
+
                 <div className="text-center">
                   <div className="w-16 h-16 bg-gradient-to-br from-orange-500/20 to-purple-500/20 border border-orange-500/30 rounded-2xl flex items-center justify-center mx-auto mb-6">
                     <Shield className="w-8 h-8 text-orange-400" />
                   </div>
-                  <h3 className="text-xl font-semibold text-white mb-3">Premium Support</h3>
+                  <h3 className="text-xl font-semibold text-white mb-3">
+                    Premium Support
+                  </h3>
                   <p className="text-gray-300 text-sm leading-relaxed">
-                    Dedicated assistance that matches your establishment's standards and expectations.
+                    Dedicated assistance that matches your establishment's
+                    standards and expectations.
                   </p>
                 </div>
-                
+
                 <div className="text-center">
                   <div className="w-16 h-16 bg-gradient-to-br from-orange-500/20 to-purple-500/20 border border-orange-500/30 rounded-2xl flex items-center justify-center mx-auto mb-6">
                     <Zap className="w-8 h-8 text-orange-400" />
                   </div>
-                  <h3 className="text-xl font-semibold text-white mb-3">Custom Solutions</h3>
+                  <h3 className="text-xl font-semibold text-white mb-3">
+                    Custom Solutions
+                  </h3>
                   <p className="text-gray-300 text-sm leading-relaxed">
-                    Tailored platforms built specifically for sophisticated establishments like yours.
+                    Tailored platforms built specifically for sophisticated
+                    establishments like yours.
                   </p>
                 </div>
               </div>

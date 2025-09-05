@@ -1,7 +1,15 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Button, useHub, HubLogo } from "@sms-hub/ui";
-import { Menu, X, Phone, MessageSquare, Users, HelpCircle, CreditCard } from "lucide-react";
+import { Button, useHub, HubLogo, HubSwitcher } from "@sms-hub/ui";
+import {
+  Menu,
+  X,
+  Phone,
+  MessageSquare,
+  Users,
+  HelpCircle,
+  CreditCard,
+} from "lucide-react";
 import { getHubColorClasses } from "@sms-hub/utils";
 
 const Navigation = () => {
@@ -103,7 +111,8 @@ const Navigation = () => {
           </div>
 
           {/* Right side - Contact button (Desktop only) */}
-          <div className="hidden md:flex items-center">
+          <div className="hidden md:flex items-center space-x-4">
+            <HubSwitcher />
             <Button
               variant="outline"
               size="sm"
@@ -170,7 +179,7 @@ const Navigation = () => {
                   </button>
                 );
               })}
-              
+
               {/* Mobile-specific CTA */}
               <div className="pt-4 border-t border-white/10">
                 <Button

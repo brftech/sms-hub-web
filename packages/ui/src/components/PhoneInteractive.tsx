@@ -35,10 +35,39 @@ interface PhoneState {
 const DEMO_SCENARIOS: DemoScenario[] = [
   {
     id: 1,
-    title: "Event Announcement",
+    title: "Gnymble Event",
     messages: [
       {
         id: "scenario-1-1",
+        text: "Gymble Cigar Lounge: We're coming up to our biggest event ever! Carlito Fuente will be IN THE HOUSE this upcoming Friday at 6p! Tickets only $50.",
+        sender: "business",
+        timestamp: new Date().toISOString(),
+        businessName: "",
+        metadata: { source: "demo-scenario" },
+      },
+      {
+        id: "scenario-1-2",
+        text: "This is amazing! I've been waiting for this. How do I get tickets?",
+        sender: "user",
+        timestamp: new Date().toISOString(),
+        metadata: { source: "demo-scenario" },
+      },
+      {
+        id: "scenario-1-3",
+        text: "Tickets go on sale tomorrow at 10am! @gnymble for the link. VIP packages available with meet & greet!",
+        sender: "business",
+        timestamp: new Date().toISOString(),
+        businessName: "",
+        metadata: { source: "demo-scenario" },
+      },
+    ],
+  },
+  {
+    id: 2,
+    title: "Event Announcement",
+    messages: [
+      {
+        id: "scenario-2-1",
         text: "🔥 EXCLUSIVE: Drew Estate Masterclass this Saturday 7PM! Master blender Jonathan Drew will be here. Only 15 spots left. Age 21+ required. Call to RSVP!",
         sender: "business",
         timestamp: new Date().toISOString(),
@@ -46,7 +75,7 @@ const DEMO_SCENARIOS: DemoScenario[] = [
         metadata: { source: "demo-scenario" },
       },
       {
-        id: "scenario-1-2",
+        id: "scenario-2-2",
         text: "Absolutely! Can't wait to meet Jonathan Drew. Count me in!",
         sender: "user",
         timestamp: new Date().toISOString(),
@@ -55,11 +84,11 @@ const DEMO_SCENARIOS: DemoScenario[] = [
     ],
   },
   {
-    id: 2,
+    id: 3,
     title: "New Arrivals",
     messages: [
       {
-        id: "scenario-2-1",
+        id: "scenario-3-1",
         text: "🚨 JUST ARRIVED: Limited Edition Arturo Fuente Opus X 25th Anniversary! Only 2 boxes available. These won't last long. First come, first served!",
         sender: "business",
         timestamp: new Date().toISOString(),
@@ -67,7 +96,7 @@ const DEMO_SCENARIOS: DemoScenario[] = [
         metadata: { source: "demo-scenario" },
       },
       {
-        id: "scenario-2-2",
+        id: "scenario-3-2",
         text: "Hold one for me! I'll be there in 30 minutes.",
         sender: "user",
         timestamp: new Date().toISOString(),
@@ -77,11 +106,11 @@ const DEMO_SCENARIOS: DemoScenario[] = [
     ],
   },
   {
-    id: 3,
+    id: 4,
     title: "Industry News",
     messages: [
       {
-        id: "scenario-3-1",
+        id: "scenario-4-1",
         text: "🎉 BIG NEWS: We're now the exclusive regional dealer for Davidoff's new Master Selection series! Follow our Instagram @premiumcigarsco for the launch party details tomorrow!",
         sender: "business",
         timestamp: new Date().toISOString(),
@@ -361,8 +390,8 @@ export default function PhoneInteractive() {
         <div className="phone-screen">
           {/* Status bar */}
           <div className="phone-status-bar">
-            <span className="text-transparent bg-gradient-to-r from-orange-500 to-red-600 bg-clip-text font-black tracking-tight">
-              gnymble
+            <span className="text-white font-medium text-sm">
+              Customer Phone
             </span>
             <span>12:21</span>
             <div className="flex items-center gap-1">
@@ -449,9 +478,6 @@ export default function PhoneInteractive() {
             </button>
           </div>
         </div>
-
-        {/* Scenario indicator */}
-        <div className="phone-scenario-indicator">{currentScenario.title}</div>
       </div>
 
       {/* Demo Button - Right of Phone */}
@@ -562,4 +588,3 @@ export default function PhoneInteractive() {
     </div>
   );
 }
-

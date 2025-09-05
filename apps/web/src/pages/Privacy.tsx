@@ -16,13 +16,9 @@ const Privacy = () => {
       footer={<Footer />}
     >
       <div className="min-h-screen bg-black pt-24 pb-16 px-4 sm:px-6 lg:px-8 relative">
-        {/* Background gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black"></div>
-        
-        {/* Floating elements */}
-        <div className="absolute top-20 left-10 w-32 h-32 bg-orange-500/10 rounded-full blur-3xl"></div>
-        <div className="absolute top-40 right-20 w-24 h-24 bg-purple-500/10 rounded-full blur-3xl"></div>
-        
+        {/* Background */}
+        <div className="absolute inset-0 bg-black"></div>
+
         <div className="relative z-10 max-w-6xl mx-auto">
           {/* Hero Section */}
           <div className="text-center mb-20">
@@ -34,13 +30,16 @@ const Privacy = () => {
             </div>
             <h1 className="text-5xl md:text-7xl font-bold text-white mb-8 leading-tight">
               <span className="block">Privacy Policy</span>
-              <span className={`${hubColors.text} bg-gradient-to-r from-orange-400 to-purple-500 bg-clip-text text-transparent`}>
+              <span
+                className={`${hubColors.text} bg-gradient-to-r from-orange-400 to-purple-500 bg-clip-text text-transparent`}
+              >
                 Built on Trust
               </span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
-              We believe transparency and security are the foundation of every great relationship. 
-              Learn how we protect your information and maintain the highest standards of data privacy.
+              We believe transparency and security are the foundation of every
+              great relationship. Learn how we protect your information and
+              maintain the highest standards of data privacy.
             </p>
             <div className="mt-8 text-sm text-gray-400">
               Last updated: {new Date().toLocaleDateString()}
@@ -57,7 +56,8 @@ const Privacy = () => {
                 Secure by Design
               </h3>
               <p className="text-gray-400 text-sm leading-relaxed">
-                Enterprise-grade encryption and security measures protect your data at every level
+                Enterprise-grade encryption and security measures protect your
+                data at every level
               </p>
             </div>
 
@@ -69,7 +69,8 @@ const Privacy = () => {
                 Complete Transparency
               </h3>
               <p className="text-gray-400 text-sm leading-relaxed">
-                Clear visibility into how we collect, use, and protect your information
+                Clear visibility into how we collect, use, and protect your
+                information
               </p>
             </div>
 
@@ -81,7 +82,8 @@ const Privacy = () => {
                 Regulatory Compliance
               </h3>
               <p className="text-gray-400 text-sm leading-relaxed">
-                Built to meet and exceed industry standards including HIPAA and TCPA
+                Built to meet and exceed industry standards including HIPAA and
+                TCPA
               </p>
             </div>
           </div>
@@ -94,32 +96,46 @@ const Privacy = () => {
                 Information We Collect
               </h2>
               <p className="text-lg text-gray-300 mb-6 leading-relaxed">
-                We collect information you provide directly to us, such as when you create an account, 
-                use our services, or contact us for support. This includes:
+                We collect information you provide directly to us, such as when
+                you create an account, use our services, or contact us for
+                support. This includes:
               </p>
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-3">
                   <div className="flex items-start space-x-3">
                     <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <span className="text-gray-300">Account information (name, email, phone number, company name)</span>
+                    <span className="text-gray-300">
+                      Account information (name, email, phone number, company
+                      name)
+                    </span>
                   </div>
                   <div className="flex items-start space-x-3">
                     <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <span className="text-gray-300">Payment information (processed securely through our payment providers)</span>
+                    <span className="text-gray-300">
+                      Payment information (processed securely through our
+                      payment providers)
+                    </span>
                   </div>
                   <div className="flex items-start space-x-3">
                     <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <span className="text-gray-300">Communication data (messages sent through our platform)</span>
+                    <span className="text-gray-300">
+                      Communication data (messages sent through our platform)
+                    </span>
                   </div>
                 </div>
                 <div className="space-y-3">
                   <div className="flex items-start space-x-3">
                     <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <span className="text-gray-300">Usage information (how you interact with our services)</span>
+                    <span className="text-gray-300">
+                      Usage information (how you interact with our services)
+                    </span>
                   </div>
                   <div className="flex items-start space-x-3">
                     <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <span className="text-gray-300">Device and technical information (IP address, browser type, device identifiers)</span>
+                    <span className="text-gray-300">
+                      Device and technical information (IP address, browser
+                      type, device identifiers)
+                    </span>
                   </div>
                 </div>
               </div>
@@ -131,35 +147,49 @@ const Privacy = () => {
                 How We Use Your Information
               </h2>
               <p className="text-lg text-gray-300 mb-6 leading-relaxed">
-                We use the information we collect to provide exceptional service and maintain the highest standards:
+                We use the information we collect to provide exceptional service
+                and maintain the highest standards:
               </p>
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-3">
                   <div className="flex items-start space-x-3">
                     <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <span className="text-gray-300">Provide, maintain, and improve our messaging services</span>
+                    <span className="text-gray-300">
+                      Provide, maintain, and improve our messaging services
+                    </span>
                   </div>
                   <div className="flex items-start space-x-3">
                     <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <span className="text-gray-300">Process transactions and send billing-related communications</span>
+                    <span className="text-gray-300">
+                      Process transactions and send billing-related
+                      communications
+                    </span>
                   </div>
                   <div className="flex items-start space-x-3">
                     <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <span className="text-gray-300">Monitor compliance with regulatory requirements</span>
+                    <span className="text-gray-300">
+                      Monitor compliance with regulatory requirements
+                    </span>
                   </div>
                 </div>
                 <div className="space-y-3">
                   <div className="flex items-start space-x-3">
                     <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <span className="text-gray-300">Provide customer support and respond to inquiries</span>
+                    <span className="text-gray-300">
+                      Provide customer support and respond to inquiries
+                    </span>
                   </div>
                   <div className="flex items-start space-x-3">
                     <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <span className="text-gray-300">Send service-related announcements and updates</span>
+                    <span className="text-gray-300">
+                      Send service-related announcements and updates
+                    </span>
                   </div>
                   <div className="flex items-start space-x-3">
                     <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <span className="text-gray-300">Protect against fraud and unauthorized access</span>
+                    <span className="text-gray-300">
+                      Protect against fraud and unauthorized access
+                    </span>
                   </div>
                 </div>
               </div>
@@ -171,27 +201,36 @@ const Privacy = () => {
                 HIPAA Compliance
               </h2>
               <p className="text-lg text-gray-300 mb-6 leading-relaxed">
-                For healthcare communications through our Virtue platform, we maintain the highest HIPAA compliance standards:
+                For healthcare communications through our Virtue platform, we
+                maintain the highest HIPAA compliance standards:
               </p>
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-3">
                   <div className="flex items-start space-x-3">
                     <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <span className="text-gray-300">Business associate agreements</span>
+                    <span className="text-gray-300">
+                      Business associate agreements
+                    </span>
                   </div>
                   <div className="flex items-start space-x-3">
                     <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <span className="text-gray-300">Encryption of protected health information</span>
+                    <span className="text-gray-300">
+                      Encryption of protected health information
+                    </span>
                   </div>
                 </div>
                 <div className="space-y-3">
                   <div className="flex items-start space-x-3">
                     <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <span className="text-gray-300">Comprehensive audit trails</span>
+                    <span className="text-gray-300">
+                      Comprehensive audit trails
+                    </span>
                   </div>
                   <div className="flex items-start space-x-3">
                     <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <span className="text-gray-300">Secure data handling procedures</span>
+                    <span className="text-gray-300">
+                      Secure data handling procedures
+                    </span>
                   </div>
                 </div>
               </div>
@@ -209,25 +248,35 @@ const Privacy = () => {
                 <div className="space-y-3">
                   <div className="flex items-start space-x-3">
                     <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <span className="text-gray-300">Access and update your personal information</span>
+                    <span className="text-gray-300">
+                      Access and update your personal information
+                    </span>
                   </div>
                   <div className="flex items-start space-x-3">
                     <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <span className="text-gray-300">Request deletion of your data</span>
+                    <span className="text-gray-300">
+                      Request deletion of your data
+                    </span>
                   </div>
                   <div className="flex items-start space-x-3">
                     <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <span className="text-gray-300">Opt out of non-essential communications</span>
+                    <span className="text-gray-300">
+                      Opt out of non-essential communications
+                    </span>
                   </div>
                 </div>
                 <div className="space-y-3">
                   <div className="flex items-start space-x-3">
                     <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <span className="text-gray-300">Request a copy of your data</span>
+                    <span className="text-gray-300">
+                      Request a copy of your data
+                    </span>
                   </div>
                   <div className="flex items-start space-x-3">
                     <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <span className="text-gray-300">File a complaint with relevant authorities</span>
+                    <span className="text-gray-300">
+                      File a complaint with relevant authorities
+                    </span>
                   </div>
                 </div>
               </div>
@@ -235,14 +284,29 @@ const Privacy = () => {
 
             {/* Contact Section */}
             <section className="bg-gradient-to-br from-gray-800/30 to-gray-900/30 backdrop-blur-sm rounded-3xl border border-gray-700/30 p-8 text-center">
-              <h2 className="text-3xl font-bold text-white mb-6">Questions About Privacy?</h2>
+              <h2 className="text-3xl font-bold text-white mb-6">
+                Questions About Privacy?
+              </h2>
               <p className="text-lg text-gray-300 mb-8 max-w-2xl mx-auto">
-                We're committed to transparency and are here to answer any questions about our data practices.
+                We're committed to transparency and are here to answer any
+                questions about our data practices.
               </p>
               <div className="grid md:grid-cols-3 gap-6 max-w-2xl mx-auto">
                 <div className="flex items-center justify-center space-x-3 text-gray-300">
                   <Mail className="w-5 h-5 text-orange-400" />
-                  <span>privacy@{currentHub === "gnymble" ? "gnymble" : currentHub === "percytech" ? "percytech" : currentHub === "percymd" ? "percymd" : currentHub === "percytext" ? "percytext" : "ourplatform"}.com</span>
+                  <span>
+                    privacy@
+                    {currentHub === "gnymble"
+                      ? "gnymble"
+                      : currentHub === "percytech"
+                        ? "percytech"
+                        : currentHub === "percymd"
+                          ? "percymd"
+                          : currentHub === "percytext"
+                            ? "percytext"
+                            : "ourplatform"}
+                    .com
+                  </span>
                 </div>
                 <div className="flex items-center justify-center space-x-3 text-gray-300">
                   <Phone className="w-5 h-5 text-orange-400" />
@@ -250,7 +314,18 @@ const Privacy = () => {
                 </div>
                 <div className="flex items-center justify-center space-x-3 text-gray-300">
                   <MapPin className="w-5 h-5 text-orange-400" />
-                  <span>{currentHub === "gnymble" ? "Gnymble" : currentHub === "percytech" ? "PercyTech" : currentHub === "percymd" ? "PercyMD" : currentHub === "percytext" ? "PercyText" : "Our Platform"} Privacy Office</span>
+                  <span>
+                    {currentHub === "gnymble"
+                      ? "Gnymble"
+                      : currentHub === "percytech"
+                        ? "PercyTech"
+                        : currentHub === "percymd"
+                          ? "PercyMD"
+                          : currentHub === "percytext"
+                            ? "PercyText"
+                            : "Our Platform"}{" "}
+                    Privacy Office
+                  </span>
                 </div>
               </div>
             </section>

@@ -5,6 +5,7 @@ import { cn } from "@sms-hub/utils";
 // Import all logo assets
 import gnymbleTextLogo from "../assets/gnymble-text-logo.svg";
 import gnymbleIconLogo from "../assets/gnymble-icon-logo.svg";
+import gnymbleMainLogo from "../assets/gnymble-main-logo.png";
 import percytechTextLogo from "../assets/percytech-text-logo.svg";
 import percytechIconLogo from "../assets/percytech-icon-logo.svg";
 import percymdTextLogo from "../assets/percymd-text-logo.svg";
@@ -14,35 +15,49 @@ import percytextIconLogo from "../assets/percytext-icon-logo.svg";
 
 interface HubLogoProps extends React.HTMLAttributes<HTMLDivElement> {
   hubType: HubType;
-  variant?: "icon" | "text" | "full";
+  variant?: "icon" | "text" | "full" | "main";
   size?: "sm" | "md" | "lg" | "xl";
 }
 
 const sizeClasses = {
-  sm: "h-6 w-auto",
-  md: "h-8 w-auto",
-  lg: "h-12 w-auto",
-  xl: "h-16 w-auto",
+  sm: "h-6 w-auto max-w-[120px]",
+  md: "h-8 w-auto max-w-[160px]",
+  lg: "h-12 w-auto max-w-[240px]",
+  xl: "h-16 w-auto max-w-[320px]",
 };
 
-const logoMap: Record<HubType, { text: string; icon: string }> = {
-  gnymble: { text: gnymbleTextLogo, icon: gnymbleIconLogo },
-  percytech: { text: percytechTextLogo, icon: percytechIconLogo },
-  percymd: { text: percymdTextLogo, icon: percymdIconLogo },
-  percytext: { text: percytextTextLogo, icon: percytextIconLogo },
-};
+const logoMap: Record<HubType, { text: string; icon: string; main?: string }> =
+  {
+    gnymble: {
+      text: gnymbleTextLogo,
+      icon: gnymbleIconLogo,
+      main: gnymbleMainLogo,
+    },
+    percytech: { text: percytechTextLogo, icon: percytechIconLogo },
+    percymd: { text: percymdTextLogo, icon: percymdIconLogo },
+    percytext: { text: percytextTextLogo, icon: percytextIconLogo },
+  };
 
 export const HubLogo = React.forwardRef<HTMLDivElement, HubLogoProps>(
   ({ hubType, variant = "text", size = "md", className, ...props }, ref) => {
     const logos = logoMap[hubType];
-    const logoSrc = variant === "icon" ? logos.icon : logos.text;
+    const logoSrc =
+      variant === "icon"
+        ? logos.icon
+        : variant === "main"
+          ? logos.main || logos.text
+          : logos.text;
 
     return (
-      <div ref={ref} className={cn("flex items-center", className)} {...props}>
+      <div
+        ref={ref}
+        className={cn("flex items-center justify-center", className)}
+        {...props}
+      >
         <img
           src={logoSrc}
           alt={`${hubType} Logo`}
-          className={cn(sizeClasses[size], "object-contain")}
+          className={cn(sizeClasses[size], "object-contain object-center")}
         />
       </div>
     );

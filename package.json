@@ -26,7 +26,11 @@
     "supabase:start": "supabase start",
     "supabase:stop": "supabase stop",
     "storybook": "turbo run storybook",
-    "build-storybook": "turbo run build-storybook"
+    "build-storybook": "turbo run build-storybook",
+    "export:phone": "node scripts/export-phone-component.js",
+    "export:phone:event": "node scripts/export-phone-component.js 0",
+    "export:phone:arrivals": "node scripts/export-phone-component.js 1",
+    "export:phone:news": "node scripts/export-phone-component.js 2"
   },
   "workspaces": [
     "apps/*",

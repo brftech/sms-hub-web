@@ -362,7 +362,7 @@ export default function PhoneInteractive() {
           {/* Status bar */}
           <div className="phone-status-bar">
             <span className="text-transparent bg-gradient-to-r from-orange-500 to-red-600 bg-clip-text font-black tracking-tight">
-              sms-hub
+              gnymble
             </span>
             <span>12:21</span>
             <div className="flex items-center gap-1">

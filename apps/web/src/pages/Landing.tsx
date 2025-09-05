@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useHub, HubLogo, FormFieldComponent, useToast } from "@sms-hub/ui";
+import { useHub, HubLogo, FormFieldComponent, useToast, StaticPhoneDemo } from "@sms-hub/ui";
 import { ArrowRight, Loader2 } from "lucide-react";
 import { SEO } from "@sms-hub/ui";
 import { contactService } from "../services/contactService";
@@ -21,62 +21,26 @@ const Landing = () => {
   const { toast } = useToast();
   const formRef = useRef<HTMLDivElement>(null);
 
-  // Static phone component for demo
-  const StaticPhone = () => (
-    <div className="flex justify-center">
-      <div className="phone-3d">
-        <div className="phone-screen">
-          {/* Phone Status Bar */}
-          <div className="phone-status-bar">
-            <span>9:41 AM</span>
-            <div className="flex items-center space-x-1">
-              <div className="w-4 h-2 border border-white rounded-sm">
-                <div className="w-3 h-1 bg-white rounded-sm"></div>
-              </div>
-            </div>
-          </div>
-          
-          {/* Messages Area */}
-          <div className="phone-messages-area">
-            <div className="phone-messages">
-              {/* Business Message */}
-              <div className="flex justify-start mb-3">
-                <div className="bg-gray-200 rounded-2xl rounded-bl-sm px-4 py-2 max-w-[85%]">
-                  <p className="text-sm text-gray-800 text-left">🎉 Big news! We're transforming Gnymble with new features and a fresh look.</p>
-                  <div className="text-xs text-gray-500 mt-1 text-left">Gnymble</div>
-                </div>
-              </div>
-              
-              {/* User Response */}
-              <div className="flex justify-end mb-3">
-                <div className="bg-blue-500 rounded-2xl rounded-br-sm px-4 py-2 max-w-[85%]">
-                  <p className="text-sm text-white text-left">Can't wait to see what's new!</p>
-                </div>
-              </div>
-              
-              {/* Follow-up Message */}
-              <div className="flex justify-start">
-                <div className="bg-gray-200 rounded-2xl rounded-bl-sm px-4 py-2 max-w-[85%]">
-                  <p className="text-sm text-gray-800 text-left">Get started today and be the first to experience our new features as they launch!</p>
-                  <div className="text-xs text-gray-500 mt-1 text-left">Gnymble</div>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          {/* Input Area */}
-          <div className="phone-input-area">
-            <div className="phone-input-field flex items-center justify-center text-gray-400 text-sm">
-              Message...
-            </div>
-            <div className="phone-send-button">
-              <ArrowRight className="w-3 h-3" />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+  // Demo messages for general Gnymble landing
+  const demoMessages = [
+    {
+      id: "demo-1",
+      text: "🎉 Big news! We're transforming Gnymble with new features and a fresh look.",
+      sender: "business" as const,
+      businessName: "Gnymble",
+    },
+    {
+      id: "demo-2",
+      text: "Can't wait to see what's new!",
+      sender: "user" as const,
+    },
+    {
+      id: "demo-3",
+      text: "Get started today and be the first to experience our new features as they launch!",
+      sender: "business" as const,
+      businessName: "Gnymble",
+    },
+  ];
 
   useEffect(() => {
     // Fade in effect
@@ -192,7 +156,7 @@ const Landing = () => {
             
             {/* Phone Demo - More Prominent */}
             <div className="mb-12 sm:mb-16 md:mb-20 lg:mb-24 scale-90 sm:scale-100 md:scale-110">
-              <StaticPhone />
+              <StaticPhoneDemo messages={demoMessages} />
             </div>
             
             {/* Real Customer Example */}

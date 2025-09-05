@@ -61,6 +61,7 @@ export * from "./components/DevAuthToggle";
 export { default as PhoneInteractive } from "./components/PhoneInteractive";
 export { default as SMSAuthModal } from "./components/SMSAuthModal";
 export { default as PlatformDemo } from "./components/PlatformDemo";
+export { default as StaticPhoneDemo } from "./components/StaticPhoneDemo";
 
 // Shared UI components
 export * from "./components/error-boundary";

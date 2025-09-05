@@ -15,6 +15,7 @@ import Privacy from "./pages/Privacy";
 import About from "./pages/About";
 import Pricing from "./pages/Pricing";
 import Landing from "./pages/Landing";
+import CigarLanding from "./pages/CigarLanding";
 
 import FAQ from "./pages/FAQ";
 import PhoneDemo from "./pages/PhoneDemo";
@@ -27,14 +28,24 @@ const AppRoutes = () => {
   // Apply scroll-to-top on route changes
   useScrollToTop();
 
+  // Check if we're on the cigar subdomain
+  const isCigarSubdomain = window.location.hostname.includes('cigar.') || 
+                          window.location.hostname === 'cigar.gnymble.com';
+
   // In production, show Landing page publicly; in dev, show Home page for development
+  // But if we're on cigar subdomain, always show CigarLanding
   const isProduction = import.meta.env.PROD;
-  const DefaultComponent = isProduction ? Landing : Home;
+  let DefaultComponent = isProduction ? Landing : Home;
+  
+  if (isCigarSubdomain) {
+    DefaultComponent = CigarLanding;
+  }
 
   return (
     <Routes>
       <Route path="/" element={<DefaultComponent />} />
       <Route path="/landing" element={<PageTransition><Landing /></PageTransition>} />
+      <Route path="/cigar" element={<PageTransition><CigarLanding /></PageTransition>} />
       <Route path="/home" element={<PageTransition><Home /></PageTransition>} />
       <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
 

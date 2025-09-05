@@ -3,13 +3,11 @@ import { PhoneDemo } from "../PhoneDemo";
 import { useHub } from "@sms-hub/ui";
 import { gnymbleProblemSolution } from "../Gnymble/problemSolution";
 import { percymdProblemSolution } from "../PercyMD/problemSolution";
-import { getHubConfig } from "@sms-hub/types";
 
 export const ProblemSolutionSection: React.FC = () => {
   const { currentHub } = useHub();
   const content =
     currentHub === "percymd" ? percymdProblemSolution : gnymbleProblemSolution;
-  const hubConfig = getHubConfig(currentHub);
 
   // Get the appropriate Tailwind color class based on hub
   const getPrimaryColorClass = () => {

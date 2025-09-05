@@ -19,41 +19,5 @@
     "forceConsistentCasingInFileNames": true
   },
   "include": ["test/**/*", "packages/*/src/**/*", "apps/*/src/**/*"],
-  "exclude": ["node_modules", "dist", "build"],
-  "files": [],
-  "references": [
-    {
-      "path": "./apps/web"
-    },
-    {
-      "path": "./apps/texting"
-    },
-    {
-      "path": "./apps/user"
-    },
-    {
-      "path": "./apps/admin"
-    },
-    {
-      "path": "./apps/demo"
-    },
-    {
-      "path": "./apps/docs"
-    },
-    {
-      "path": "./packages/ui"
-    },
-    {
-      "path": "./packages/types"
-    },
-    {
-      "path": "./packages/supabase"
-    },
-    {
-      "path": "./packages/utils"
-    },
-    {
-      "path": "./packages/hub-logic"
-    }
-  ]
+  "exclude": ["node_modules", "dist", "build"]
 }

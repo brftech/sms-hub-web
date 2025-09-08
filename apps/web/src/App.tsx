@@ -32,10 +32,9 @@ const AppRoutes = () => {
     window.location.hostname.includes("cigar.") ||
     window.location.hostname === "cigar.gnymble.com";
 
-  // In production, show Landing page publicly; in dev, show Home page for development
+  // Show Home page as default; Landing page is available at /landing
   // But if we're on cigar subdomain, always show CigarLanding
-  const isProduction = import.meta.env.PROD;
-  let DefaultComponent = isProduction ? Landing : Home;
+  let DefaultComponent = Home;
 
   if (isCigarSubdomain) {
     DefaultComponent = CigarLanding;

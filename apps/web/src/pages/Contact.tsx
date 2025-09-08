@@ -160,83 +160,10 @@ const Contact = () => {
               texting that works for your regulated business. Let's discuss how
               we can transform your customer communication.
             </p>
-
-            {/* Contact Info Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 max-w-4xl mx-auto mb-12 sm:mb-16">
-              <div className="group bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-4 sm:p-6 hover:border-orange-500/30 transition-all duration-300 hover:transform hover:scale-105">
-                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-orange-500/20 to-purple-500/20 border border-orange-500/30 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 group-hover:scale-110 transition-transform duration-300">
-                  <Mail className="w-6 h-6 sm:w-8 sm:h-8 text-orange-400" />
-                </div>
-                <h3
-                  className="text-base sm:text-lg font-semibold text-white mb-2 group-hover:text-orange-400 transition-colors"
-                  style={{ fontFamily: "Inter, system-ui, sans-serif" }}
-                >
-                  Email Support
-                </h3>
-                <p
-                  className="text-gray-400 text-xs sm:text-sm leading-relaxed"
-                  style={{ fontFamily: "Inter, system-ui, sans-serif" }}
-                >
-                  Get detailed responses within 24 hours
-                </p>
-              </div>
-
-              <div className="group bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-4 sm:p-6 hover:border-orange-500/30 transition-all duration-300 hover:transform hover:scale-105">
-                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-orange-500/20 to-purple-500/20 border border-orange-500/30 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 group-hover:scale-110 transition-transform duration-300">
-                  <Phone className="w-6 h-6 sm:w-8 sm:h-8 text-orange-400" />
-                </div>
-                <h3
-                  className="text-base sm:text-lg font-semibold text-white mb-2 group-hover:text-orange-400 transition-colors"
-                  style={{ fontFamily: "Inter, system-ui, sans-serif" }}
-                >
-                  Phone Consultation
-                </h3>
-                <p
-                  className="text-gray-400 text-xs sm:text-sm leading-relaxed"
-                  style={{ fontFamily: "Inter, system-ui, sans-serif" }}
-                >
-                  Schedule a personalized consultation call
-                </p>
-              </div>
-
-              <div className="group bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-4 sm:p-6 hover:border-orange-500/30 transition-all duration-300 hover:transform hover:scale-105 sm:col-span-2 lg:col-span-1">
-                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-orange-500/20 to-purple-500/20 border border-orange-500/30 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 group-hover:scale-110 transition-transform duration-300">
-                  <MessageSquare className="w-6 h-6 sm:w-8 sm:h-8 text-orange-400" />
-                </div>
-                <h3
-                  className="text-base sm:text-lg font-semibold text-white mb-2 group-hover:text-orange-400 transition-colors"
-                  style={{ fontFamily: "Inter, system-ui, sans-serif" }}
-                >
-                  Live Chat
-                </h3>
-                <p
-                  className="text-gray-400 text-xs sm:text-sm leading-relaxed"
-                  style={{ fontFamily: "Inter, system-ui, sans-serif" }}
-                >
-                  Instant support during business hours
-                </p>
-              </div>
-            </div>
           </div>
 
           {/* Contact Form Section */}
           <div className="mb-12 sm:mb-16 lg:mb-20">
-            <div className="text-center mb-8 sm:mb-12">
-              <h2
-                className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 sm:mb-6"
-                style={{ fontFamily: "Inter, system-ui, sans-serif" }}
-              >
-                Let's Get You Started
-              </h2>
-              <p
-                className="text-lg sm:text-xl text-gray-300 max-w-3xl mx-auto px-4"
-                style={{ fontFamily: "Inter, system-ui, sans-serif" }}
-              >
-                Tell us about your business and how we can help you get SMS that
-                actually works for your regulated industry.
-              </p>
-            </div>
-
             <div className="max-w-4xl mx-auto px-2 sm:px-0">
               <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-2xl sm:rounded-3xl border border-gray-700/50 p-4 sm:p-6 lg:p-8 shadow-2xl relative overflow-hidden">
                 {/* Background pattern */}
@@ -251,12 +178,8 @@ const Contact = () => {
                   >
                     <div className="grid md:grid-cols-2 gap-6 mb-6">
                       <div className="group">
-                        <label className="block text-sm font-medium text-gray-300 mb-2 group-hover:text-orange-400 transition-colors">
-                          <User className="w-4 h-4 inline mr-2" />
-                          First Name *
-                        </label>
                         <FormFieldComponent
-                          label="First Name"
+                          label="First Name *"
                           name="firstName"
                           type="text"
                           placeholder="John"
@@ -271,12 +194,8 @@ const Contact = () => {
                       </div>
 
                       <div className="group">
-                        <label className="block text-sm font-medium text-gray-300 mb-2 group-hover:text-orange-400 transition-colors">
-                          <User className="w-4 h-4 inline mr-2" />
-                          Last Name *
-                        </label>
                         <FormFieldComponent
-                          label="Last Name"
+                          label="Last Name *"
                           name="lastName"
                           type="text"
                           placeholder="Doe"
@@ -293,12 +212,8 @@ const Contact = () => {
 
                     <div className="grid md:grid-cols-2 gap-6 mb-6">
                       <div className="group">
-                        <label className="block text-sm font-medium text-gray-300 mb-2 group-hover:text-orange-400 transition-colors">
-                          <Mail className="w-4 h-4 inline mr-2" />
-                          Email *
-                        </label>
                         <FormFieldComponent
-                          label="Email"
+                          label="Email *"
                           name="email"
                           type="email"
                           placeholder="john@speakeasy.com"
@@ -310,12 +225,8 @@ const Contact = () => {
                       </div>
 
                       <div className="group">
-                        <label className="block text-sm font-medium text-gray-300 mb-2 group-hover:text-orange-400 transition-colors">
-                          <Phone className="w-4 h-4 inline mr-2" />
-                          Phone (Optional)
-                        </label>
                         <FormFieldComponent
-                          label="Phone"
+                          label="Phone (Optional)"
                           name="phone"
                           type="tel"
                           placeholder="(555) 123-4567"
@@ -329,12 +240,8 @@ const Contact = () => {
 
                     <div className="mb-6">
                       <div className="group">
-                        <label className="block text-sm font-medium text-gray-300 mb-2 group-hover:text-orange-400 transition-colors">
-                          <Building className="w-4 h-4 inline mr-2" />
-                          Company (Optional)
-                        </label>
                         <FormFieldComponent
-                          label="Company"
+                          label="Company (Optional)"
                           name="company"
                           type="text"
                           placeholder="Company Name"
@@ -348,12 +255,8 @@ const Contact = () => {
 
                     <div className="mb-8">
                       <div className="group">
-                        <label className="block text-sm font-medium text-gray-300 mb-2 group-hover:text-orange-400 transition-colors">
-                          <MessageSquare className="w-4 h-4 inline mr-2" />
-                          Message (Optional)
-                        </label>
                         <FormFieldComponent
-                          label="Message"
+                          label="Message (Optional)"
                           name="message"
                           type="textarea"
                           placeholder="Tell us about your venue, your needs, and how we can help elevate your customer communication..."
@@ -363,26 +266,6 @@ const Contact = () => {
                           }
                         />
                       </div>
-                    </div>
-
-                    <div className="text-center">
-                      <button
-                        type="submit"
-                        disabled={isSubmitting}
-                        className="px-8 py-4 bg-gradient-to-r from-orange-500 to-purple-600 text-white font-semibold rounded-xl hover:from-orange-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-orange-500/25 flex items-center justify-center mx-auto disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                      >
-                        {isSubmitting ? (
-                          <>
-                            <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                            Sending Message...
-                          </>
-                        ) : (
-                          <>
-                            Send Message
-                            <ArrowRight className="w-5 h-5 ml-2" />
-                          </>
-                        )}
-                      </button>
                     </div>
                   </FormContainerComponent>
                 </div>

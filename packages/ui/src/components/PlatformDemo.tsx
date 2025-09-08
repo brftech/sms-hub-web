@@ -134,21 +134,6 @@ export default function PlatformDemo() {
         isRead: true,
         phoneNumber: "+1 (555) 345-6789",
       },
-      {
-        id: "4",
-        personName: "Phone Demo User",
-        company: "SMS Hub Demo",
-        assignedAgent: "AI Assistant",
-        lastMessage:
-          state.messages.length > 0
-            ? state.messages[state.messages.length - 1].text
-            : "Start a conversation",
-        lastMessageDate: new Date().toLocaleDateString(),
-        status: "active",
-        priority: "high",
-        isRead: false,
-        phoneNumber: "+1 (555) 999-8888",
-      },
     ],
     [state.messages]
   );
@@ -243,19 +228,6 @@ export default function PlatformDemo() {
         lastContact: "08/27/2025",
         totalMessages: 31,
         optInDate: "01/10/2025",
-      },
-      {
-        id: "4",
-        firstName: "Lisa",
-        lastName: "Brown",
-        company: "Phone Demo",
-        phoneNumber: "+1 (555) 999-8888",
-        email: "demo@smshub.com",
-        status: "active",
-        tags: ["Demo", "Test"],
-        lastContact: new Date().toLocaleDateString(),
-        totalMessages: state.messages.length,
-        optInDate: "08/01/2025",
       },
       {
         id: "5",

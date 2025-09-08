@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Button, useHub, HubLogo, HubSwitcher, ThemeToggle } from "@sms-hub/ui";
+import { Button, useHub, HubLogo, HubSwitcher } from "@sms-hub/ui";
 import {
   Menu,
   X,
@@ -101,7 +101,6 @@ const Navigation = () => {
           {/* Right side - Contact button (Desktop only) */}
           <div className="hidden md:flex items-center space-x-4">
             <HubSwitcher />
-            <ThemeToggle />
             <Button
               variant="outline"
               size="sm"
@@ -130,7 +129,6 @@ const Navigation = () => {
             >
               Contact
             </Button>
-            <ThemeToggle />
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="text-white hover:text-gray-300 transition-colors p-1"

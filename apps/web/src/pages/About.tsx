@@ -130,7 +130,7 @@ const About = () => {
                     <span
                       style={{ fontFamily: "Inter, system-ui, sans-serif" }}
                     >
-                      10+ years in regulated business compliance
+                      5+ years in regulated business compliance
                     </span>
                   </div>
                 </div>
@@ -138,136 +138,7 @@ const About = () => {
             </div>
           </div>
 
-          {/* How We're Different */}
-          <div className="mb-20">
-            <div className="text-center mb-12">
-              <h2
-                className="text-3xl md:text-4xl font-bold text-white mb-6"
-                style={{ fontFamily: "Inter, system-ui, sans-serif" }}
-              >
-                How we're different
-              </h2>
-              <p
-                className="text-gray-300 max-w-3xl mx-auto text-lg leading-relaxed"
-                style={{ fontFamily: "Inter, system-ui, sans-serif" }}
-              >
-                We don't just accept regulated businesses - we specialize in
-                them.
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-8">
-              {/* Other Platforms */}
-              <div className="bg-gradient-to-br from-red-500/5 to-red-600/5 backdrop-blur-sm border border-red-500/20 rounded-2xl p-8">
-                <div className="flex items-center mb-6">
-                  <X className="w-8 h-8 text-red-400 mr-4" />
-                  <h3
-                    className="text-2xl font-bold text-white"
-                    style={{ fontFamily: "Inter, system-ui, sans-serif" }}
-                  >
-                    Other Platforms
-                  </h3>
-                </div>
-                <ul className="space-y-4 text-gray-300">
-                  <li className="flex items-center text-lg">
-                    <X className="w-5 h-5 text-red-400 mr-3 flex-shrink-0" />
-                    <span
-                      style={{ fontFamily: "Inter, system-ui, sans-serif" }}
-                    >
-                      "High-risk" business restrictions
-                    </span>
-                  </li>
-                  <li className="flex items-center text-lg">
-                    <X className="w-5 h-5 text-red-400 mr-3 flex-shrink-0" />
-                    <span
-                      style={{ fontFamily: "Inter, system-ui, sans-serif" }}
-                    >
-                      Generic compliance (doesn't fit your industry)
-                    </span>
-                  </li>
-                  <li className="flex items-center text-lg">
-                    <X className="w-5 h-5 text-red-400 mr-3 flex-shrink-0" />
-                    <span
-                      style={{ fontFamily: "Inter, system-ui, sans-serif" }}
-                    >
-                      Account suspensions and bans
-                    </span>
-                  </li>
-                  <li className="flex items-center text-lg">
-                    <X className="w-5 h-5 text-red-400 mr-3 flex-shrink-0" />
-                    <span
-                      style={{ fontFamily: "Inter, system-ui, sans-serif" }}
-                    >
-                      No understanding of regulated businesses
-                    </span>
-                  </li>
-                  <li className="flex items-center text-lg">
-                    <X className="w-5 h-5 text-red-400 mr-3 flex-shrink-0" />
-                    <span
-                      style={{ fontFamily: "Inter, system-ui, sans-serif" }}
-                    >
-                      Cookie-cutter solutions
-                    </span>
-                  </li>
-                </ul>
-              </div>
-
-              {/* Our Platform */}
-              <div className="bg-gradient-to-br from-green-500/5 to-green-600/5 backdrop-blur-sm border border-green-500/20 rounded-2xl p-8">
-                <div className="flex items-center mb-6">
-                  <CheckCircle className="w-8 h-8 text-green-400 mr-4" />
-                  <h3
-                    className="text-2xl font-bold text-white"
-                    style={{ fontFamily: "Inter, system-ui, sans-serif" }}
-                  >
-                    Our Platform
-                  </h3>
-                </div>
-                <ul className="space-y-4 text-gray-300">
-                  <li className="flex items-center text-lg">
-                    <CheckCircle className="w-5 h-5 text-green-400 mr-3 flex-shrink-0" />
-                    <span
-                      style={{ fontFamily: "Inter, system-ui, sans-serif" }}
-                    >
-                      Specializes in regulated businesses
-                    </span>
-                  </li>
-                  <li className="flex items-center text-lg">
-                    <CheckCircle className="w-5 h-5 text-green-400 mr-3 flex-shrink-0" />
-                    <span
-                      style={{ fontFamily: "Inter, system-ui, sans-serif" }}
-                    >
-                      Industry-specific compliance expertise
-                    </span>
-                  </li>
-                  <li className="flex items-center text-lg">
-                    <CheckCircle className="w-5 h-5 text-green-400 mr-3 flex-shrink-0" />
-                    <span
-                      style={{ fontFamily: "Inter, system-ui, sans-serif" }}
-                    >
-                      Never banned or suspended
-                    </span>
-                  </li>
-                  <li className="flex items-center text-lg">
-                    <CheckCircle className="w-5 h-5 text-green-400 mr-3 flex-shrink-0" />
-                    <span
-                      style={{ fontFamily: "Inter, system-ui, sans-serif" }}
-                    >
-                      Deep understanding of your challenges
-                    </span>
-                  </li>
-                  <li className="flex items-center text-lg">
-                    <CheckCircle className="w-5 h-5 text-green-400 mr-3 flex-shrink-0" />
-                    <span
-                      style={{ fontFamily: "Inter, system-ui, sans-serif" }}
-                    >
-                      Custom solutions for premium venues
-                    </span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
+          {/* How We're Different - Removed as redundant with home page */}
 
           {/* What You Get */}
           <div className="mb-20">

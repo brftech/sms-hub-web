@@ -1,6 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "./client";
-import type { Database } from "@sms-hub/types";
 
 // Helper to get supabase client with null check
 const getSupabaseClient = () => {
@@ -130,7 +129,6 @@ export const useCreateCheckoutSession = () => {
       cancelUrl: string;
       customerId?: string;
     }) => {
-      const supabase = getSupabaseClient();
       const { data, error } = await getSupabaseClient().functions.invoke(
         "create-checkout-session",
         {
@@ -161,7 +159,6 @@ export const useUpdateSubscription = () => {
       newPriceId: string;
       prorationBehavior?: "create_prorations" | "none" | "always_invoice";
     }) => {
-      const supabase = getSupabaseClient();
       const { data, error } = await getSupabaseClient().functions.invoke(
         "update-subscription",
         {
@@ -194,7 +191,6 @@ export const useCancelSubscription = () => {
       cancelAtPeriodEnd?: boolean;
       cancellationReason?: string;
     }) => {
-      const supabase = getSupabaseClient();
       const { data, error } = await getSupabaseClient().functions.invoke(
         "cancel-subscription",
         {
@@ -222,7 +218,6 @@ export const useResumeSubscription = () => {
       companyId: string;
       subscriptionId: string;
     }) => {
-      const supabase = getSupabaseClient();
       const { data, error } = await getSupabaseClient().functions.invoke(
         "resume-subscription",
         {
@@ -251,7 +246,6 @@ export const useUpdatePaymentMethod = () => {
       customerId: string;
       paymentMethodId: string;
     }) => {
-      const supabase = getSupabaseClient();
       const { data, error } = await getSupabaseClient().functions.invoke(
         "update-payment-method",
         {
@@ -363,7 +357,6 @@ export const useCreatePortalSession = () => {
       customerId: string;
       returnUrl: string;
     }) => {
-      const supabase = getSupabaseClient();
       const { data, error } = await getSupabaseClient().functions.invoke(
         "create-portal-session",
         {

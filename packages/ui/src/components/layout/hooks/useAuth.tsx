@@ -1,10 +1,12 @@
-import { useState, useEffect } from 'react';
-import type { AuthState } from '../ProtectedRoute';
+import { useState, useEffect } from "react";
+import type { AuthState } from "../ProtectedRoute";
 
 export interface UseAuthConfig {
   checkSession: () => Promise<{ session: any; user: any } | null>;
   getUserProfile?: (userId: string) => Promise<any>;
-  onAuthStateChange?: (callback: (event: string, session: any) => void) => { unsubscribe: () => void };
+  onAuthStateChange?: (callback: (event: string, session: any) => void) => {
+    unsubscribe: () => void;
+  };
   devAuthOverride?: {
     isEnabled: boolean;
     user?: any;
@@ -40,16 +42,16 @@ export function useAuth(config: UseAuthConfig): AuthState {
 
         // Check regular session
         const sessionData = await config.checkSession();
-        
+
         if (sessionData?.session) {
           let profile = null;
-          
+
           // Load user profile if available
           if (config.getUserProfile && sessionData.user?.id) {
             try {
               profile = await config.getUserProfile(sessionData.user.id);
             } catch (error) {
-              console.error('Failed to load user profile:', error);
+              console.error("Failed to load user profile:", error);
             }
           }
 
@@ -70,7 +72,7 @@ export function useAuth(config: UseAuthConfig): AuthState {
           });
         }
       } catch (error) {
-        console.error('Auth initialization error:', error);
+        console.error("Auth initialization error:", error);
         setAuthState({
           isAuthenticated: false,
           isLoading: false,
@@ -86,8 +88,8 @@ export function useAuth(config: UseAuthConfig): AuthState {
     // Subscribe to auth changes if available
     if (config.onAuthStateChange && !config.devAuthOverride?.isEnabled) {
       const subscription = config.onAuthStateChange((event, session) => {
-        console.log('Auth state changed:', event, session);
-        setAuthState(prev => ({
+        console.log("Auth state changed:", event, session);
+        setAuthState((prev) => ({
           ...prev,
           isAuthenticated: !!session,
           session,
@@ -103,6 +105,9 @@ export function useAuth(config: UseAuthConfig): AuthState {
       }
     };
   }, [
+    config.checkSession,
+    config.getUserProfile,
+    config.onAuthStateChange,
     config.devAuthOverride?.isEnabled,
     config.devAuthOverride?.user,
     config.devAuthOverride?.profile,

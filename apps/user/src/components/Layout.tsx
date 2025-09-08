@@ -91,9 +91,9 @@ export function Layout() {
       company?.subscription_status === "active", // payment
     isProfileComplete, // personal
     isBusinessInfoComplete, // business
-    brands?.some((b) => b.status === "approved"), // brand
+    brands?.some((b: any) => b.status === "approved"), // brand
     !!company?.privacy_policy_accepted_at, // privacy
-    campaigns?.some((c) => c.status === "approved"), // campaign
+    campaigns?.some((c: any) => c.status === "approved"), // campaign
     !!company?.phone_number_provisioned, // gphone
     !!company?.account_setup_completed_at, // setup
     !!company?.platform_access_granted, // platform

@@ -57,23 +57,23 @@ export const CTASection: React.FC = () => {
             >
               {content.ctaText}
             </button>
-            <button
+            {/* <button
               onClick={() => (window.location.href = "/phone-demo")}
               className="px-10 py-4 border-2 border-black text-black font-bold rounded-sm hover:bg-black hover:text-amber-400 transition-all duration-300 text-sm tracking-wide uppercase"
             >
               {content.ctaSubtext}
-            </button>
+            </button> */}
           </div>
         </div>
 
-        <p className="text-gray-500 text-sm mb-8">
+        {/* <p className="text-gray-500 text-sm mb-8">
           <span className="text-amber-400">💯 Guarantee:</span>{" "}
           {content.guaranteeText}
         </p>
 
         {content.badge && (
           <div className="flex justify-center">{content.badge}</div>
-        )}
+        )} */}
       </div>
     </div>
   );

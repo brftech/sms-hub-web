@@ -4,7 +4,6 @@ export const gnymbleHero = {
     line1: "We do it really well.",
     line2: "Others...don't do it at all.",
   },
-  description:
-    "Professional SMS solutions that deliver results. Built for businesses that need reliable, compliant messaging.",
+  description: "Built for businesses that need reliable, compliant messaging.",
   ctaText: "🔥 For business owners who demand SMS that delivers",
 };

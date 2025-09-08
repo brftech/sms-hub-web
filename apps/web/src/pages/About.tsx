@@ -7,7 +7,6 @@ import {
   Users,
   CheckCircle,
   Star,
-  X,
   Clock,
   ArrowRight,
   Target,

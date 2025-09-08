@@ -12,19 +12,7 @@ import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";
 import { contactService } from "../services/contactService";
 
-import {
-  CheckCircle,
-  Loader2,
-  MessageSquare,
-  Mail,
-  Phone,
-  Building,
-  User,
-  ArrowRight,
-  Star,
-  Shield,
-  Zap,
-} from "lucide-react";
+import { CheckCircle, Loader2, Star, Shield, Zap } from "lucide-react";
 
 const Contact = () => {
   const { hubConfig } = useHub();

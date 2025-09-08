@@ -22,6 +22,10 @@ export default [
         window: 'readonly',
         document: 'readonly',
         console: 'readonly',
+        setTimeout: 'readonly',
+        clearTimeout: 'readonly',
+        setInterval: 'readonly',
+        clearInterval: 'readonly',
         // React globals
         React: 'readonly',
         // DOM types

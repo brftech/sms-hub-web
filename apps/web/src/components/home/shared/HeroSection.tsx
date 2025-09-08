@@ -69,8 +69,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   }, [displayedBusiness, isTyping, businessTypes.length]);
 
   return (
-    <div className="min-h-screen bg-black pt-12 pb-16 relative overflow-hidden">
-      <div className="max-w-4xl mx-auto px-6 text-center py-10 md:py-16 relative">
+    <div className="min-h-screen bg-black pt-16 pb-20 relative overflow-hidden">
+      <div className="max-w-4xl mx-auto px-6 text-center py-12 md:py-20 relative">
         {/* Logo */}
         <div className="mb-16 md:mb-20">
           <HubLogo
@@ -97,32 +97,28 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           </span>
         </h1>
 
-        <p className="text-amber-200/80 text-lg md:text-xl mb-20 md:mb-24 max-w-3xl mx-auto font-light italic">
-          {content.description}
-        </p>
-
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-20 md:mb-24">
           <a
             href="/contact"
-            className="bg-amber-600 hover:bg-amber-700 text-white font-bold py-4 px-8 rounded-lg transition-colors duration-200 text-lg"
+            className="bg-orange-600 hover:bg-orange-700 text-white font-bold py-4 px-8 rounded-lg transition-colors duration-200 text-lg"
           >
             Get Started
           </a>
           <a
             href="/demo"
-            className="border-2 border-amber-600 text-amber-400 hover:bg-amber-600 hover:text-white font-bold py-4 px-8 rounded-lg transition-colors duration-200 text-lg"
+            className="border-2 border-orange-600 text-orange-400 hover:bg-orange-600 hover:text-white font-bold py-4 px-8 rounded-lg transition-colors duration-200 text-lg"
           >
             See Demo
           </a>
         </div>
 
         {/* Bold tagline - moved lower */}
-        <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-amber-400 mb-8 md:mb-10">
+        <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-amber-400 mb-12 md:mb-16">
           <div className="mb-2">{content.tagline.line1}</div>
           <div>{content.tagline.line2}</div>
         </h2>
 
-        <p className="text-gray-500 text-sm">{content.ctaText}</p>
+        <p className="text-gray-500 text-sm mt-4">{content.ctaText}</p>
       </div>
     </div>
   );

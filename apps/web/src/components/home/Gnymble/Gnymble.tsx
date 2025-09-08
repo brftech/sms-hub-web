@@ -1,6 +1,5 @@
 import { HeroSection } from "../shared/HeroSection";
 import { ProblemSolutionSection } from "../shared/ProblemSolutionSection";
-import { TestimonialsSection } from "../shared/TestimonialsSection";
 import { StatsSection } from "../shared/StatsSection";
 import { CTASection } from "../shared/CTA";
 import { gnymbleHero } from "./hero";
@@ -13,14 +12,18 @@ export const Gnymble: React.FC<GnymbleProps> = ({ businessTypes }) => {
   return (
     <>
       <HeroSection businessTypes={businessTypes} content={gnymbleHero} />
-      <ProblemSolutionSection />
+      <div className="py-8 md:py-12 lg:py-16">
+        <ProblemSolutionSection />
+      </div>
       {/* <TestimonialsSection /> */}
-      <div className="bg-black py-16 md:py-24 lg:py-32 border-t border-amber-900/30 relative">
+      <div className="bg-black py-20 md:py-28 lg:py-36 border-t border-amber-900/30 relative">
         <div className="max-w-6xl mx-auto px-6 relative">
           <StatsSection />
         </div>
       </div>
-      <CTASection />
+      <div className="py-8 md:py-12 lg:py-16">
+        <CTASection />
+      </div>
     </>
   );
 };

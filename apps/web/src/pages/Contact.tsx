@@ -8,7 +8,6 @@ import {
   useHub,
   SEO,
 } from "@sms-hub/ui";
-import { getHubColorClasses } from "@sms-hub/utils";
 import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";
 import { contactService } from "../services/contactService";
@@ -28,7 +27,7 @@ import {
 } from "lucide-react";
 
 const Contact = () => {
-  const { hubConfig, currentHub } = useHub();
+  const { hubConfig } = useHub();
   const [formData, setFormData] = useState<{
     firstName: string;
     lastName: string;

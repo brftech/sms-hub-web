@@ -1,6 +1,5 @@
 import React from "react";
 import { useHub } from "@sms-hub/ui";
-import { getHubColorClasses } from "@sms-hub/utils";
 
 interface CTAStep {
   number: string;
@@ -38,13 +37,13 @@ const CTASection: React.FC<CTASectionProps> = ({
   className = "",
 }) => {
   const { currentHub } = useHub();
-  const hubColors = getHubColorClasses(currentHub);
 
   // Default content if none provided
   const defaultContent: CTAContent = {
     title: "Ready to Find Your",
     titleHighlight: "SMS Home?",
-    description: "Experience the platform built for businesses that dare to be different.",
+    description:
+      "Experience the platform built for businesses that dare to be different.",
     descriptionHighlight: "Your success demands SMS that delivers results.",
     steps: [
       {
@@ -55,17 +54,20 @@ const CTASection: React.FC<CTASectionProps> = ({
       {
         number: "02",
         title: "GET SET UP",
-        description: "Lightning-fast 8-day deployment. Master-level compliance included.",
+        description:
+          "Lightning-fast 8-day deployment. Master-level compliance included.",
       },
       {
         number: "03",
         title: "GROW YOUR BUSINESS",
-        description: "Connect powerfully with customers, employees, and stakeholders.",
+        description:
+          "Connect powerfully with customers, employees, and stakeholders.",
       },
     ],
     ctaText: "🚀 GET STARTED NOW",
     ctaSubtext: "📱 SEE IT IN ACTION",
-    guaranteeText: "If we can't get you set up in 8 days, your $179 onboarding is free.",
+    guaranteeText:
+      "If we can't get you set up in 8 days, your $179 onboarding is free.",
   };
 
   const ctaContent = content || defaultContent;
@@ -91,7 +93,9 @@ const CTASection: React.FC<CTASectionProps> = ({
       <div className="max-w-4xl mx-auto px-6 text-center relative">
         <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-6 md:mb-8 leading-tight">
           {ctaContent.title}
-          <span className="text-amber-500 block">{ctaContent.titleHighlight}</span>
+          <span className="text-amber-500 block">
+            {ctaContent.titleHighlight}
+          </span>
         </h2>
 
         <p className="text-lg md:text-xl text-gray-300 mb-10 md:mb-12 max-w-3xl mx-auto">

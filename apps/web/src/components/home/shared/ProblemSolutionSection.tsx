@@ -1,4 +1,4 @@
-import { Shield, Zap, Users, Clock } from "lucide-react";
+import { Shield } from "lucide-react";
 import { PhoneDemo } from "../PhoneDemo";
 import { useHub } from "@sms-hub/ui";
 import { gnymbleProblemSolution } from "../Gnymble/problemSolution";

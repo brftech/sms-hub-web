@@ -11,7 +11,6 @@ To avoid port conflicts and ensure smooth development experience, the following 
 - **Admin App** (`apps/admin`): **Port 3002** - Admin dashboard
 - **Demo App** (`apps/demo`): **Port 3003** - Demo showcase
 - **Docs App** (`apps/docs`): **Port 3004** - Documentation
-- **Texting App** (`apps/texting`): **Port 3005** - SMS backend API
 
 ### **Previous Conflicts Resolved:**
 
@@ -27,7 +26,6 @@ User App:    http://localhost:3001
 Admin App:   http://localhost:3002
 Demo App:    http://localhost:3003
 Docs App:    http://localhost:3004
-Texting API: http://localhost:3005
 ```
 
 ### **Running Multiple Apps:**
@@ -50,8 +48,6 @@ cd apps/demo && npm run dev
 # Terminal 5 - Docs App
 cd apps/docs && npm run dev
 
-# Terminal 6 - Texting API
-cd apps/texting && npm run start:dev
 ```
 
 ### **Package.json Scripts:**

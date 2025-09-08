@@ -1,5 +1,4 @@
 import { PageLayout, useHub, SEO } from "@sms-hub/ui";
-import { getHubColorClasses } from "@sms-hub/utils";
 import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";
 import {
@@ -10,8 +9,6 @@ import {
   Phone,
   Mail,
   Scale,
-  Target,
-  Users,
 } from "lucide-react";
 
 const Terms = () => {

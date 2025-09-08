@@ -20,7 +20,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   businessTypes,
   content,
 }) => {
-  const [showText, setShowText] = useState(false);
   const { currentHub } = useHub();
 
   const [currentBusinessIndex, setCurrentBusinessIndex] = useState(0);
@@ -31,10 +30,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   useEffect(() => {
     // Scroll to top of page on load/refresh
     window.scrollTo(0, 0);
-
-    // Show text after a brief delay
-    const textTimer = setTimeout(() => setShowText(true), 500);
-    return () => clearTimeout(textTimer);
   }, []);
 
   // Typing animation for business types

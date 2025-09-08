@@ -11,7 +11,6 @@ import {
   Clock,
   ArrowRight,
   Target,
-  Zap,
 } from "lucide-react";
 // Import Bryan's profile image from UI assets
 import bryanProfileImage from "@sms-hub/ui/assets/bryan-profile.png";

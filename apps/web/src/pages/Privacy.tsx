@@ -1,18 +1,7 @@
 import { PageLayout, useHub, SEO } from "@sms-hub/ui";
-import { getHubColorClasses } from "@sms-hub/utils";
 import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";
-import {
-  Shield,
-  Lock,
-  Eye,
-  FileText,
-  Phone,
-  Mail,
-  MapPin,
-  CheckCircle,
-  Target,
-} from "lucide-react";
+import { Shield, Lock, Eye, FileText, Phone, Mail, MapPin } from "lucide-react";
 
 const Privacy = () => {
   const { currentHub } = useHub();

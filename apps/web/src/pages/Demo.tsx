@@ -14,22 +14,14 @@ import {
   Monitor,
   Phone,
   ArrowRightLeft,
-  Zap,
   CheckCircle,
   Target,
   Users,
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 export default function Demo() {
   const [activeTab, setActiveTab] = useState<"phone" | "platform">("phone");
-  const [showConnectionIndicator, setShowConnectionIndicator] = useState(false);
-
-  useEffect(() => {
-    // Show connection indicator after a brief delay
-    const timer = setTimeout(() => setShowConnectionIndicator(true), 1000);
-    return () => clearTimeout(timer);
-  }, []);
 
   return (
     <PageLayout

@@ -4,7 +4,6 @@ import { Button, useHub, HubLogo, HubSwitcher, ThemeToggle } from "@sms-hub/ui";
 import {
   Menu,
   X,
-  Phone,
   MessageSquare,
   Users,
   HelpCircle,

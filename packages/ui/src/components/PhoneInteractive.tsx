@@ -342,18 +342,6 @@ export default function PhoneInteractive() {
     }
   }, [phoneState.isAuthenticated, messagingState.sessionId, addMessage]);
 
-  const handleInputClick = useCallback(() => {
-    if (!phoneState.isAuthenticated) {
-      setPhoneState((prev) => ({ ...prev, showSMSAuth: true }));
-      return;
-    }
-
-    // If already authenticated but demo not active, start the demo
-    if (!phoneState.isDemoActive) {
-      startDemo();
-    }
-  }, [phoneState.isAuthenticated, phoneState.isDemoActive, startDemo]);
-
   const handleSMSAuthSuccess = useCallback(
     (phoneNumber: string) => {
       try {

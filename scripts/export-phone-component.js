@@ -63,10 +63,11 @@ async function exportPhoneComponent(scenarioIndex = 0) {
       // Since scenarios cycle every 8 seconds, wait for the desired scenario
       // We'll wait for the text content to change to match our target scenario
       const targetTexts = [
-        'Gymble Cigar Lounge', // Scenario 0 - Gnymble Event
+        'Upcoming Events Bryan', // Scenario 0 - Gnymble Events
         'Drew Estate Masterclass', // Scenario 1 - Event Announcement
         'Arturo Fuente Opus X', // Scenario 2 - New Arrivals
         'Davidoff', // Scenario 3 - Industry News
+        'LIVE MUSIC TONIGHT', // Scenario 4 - Band Event Special
       ];
       
       const targetText = targetTexts[scenarioIndex];
@@ -171,7 +172,7 @@ async function exportPhoneComponent(scenarioIndex = 0) {
 if (import.meta.url === `file://${process.argv[1]}`) {
   // Get scenario index from command line args (default to 0)
   const scenarioIndex = parseInt(process.argv[2]) || 0;
-  const scenarioNames = ['Gnymble Event', 'Event Announcement', 'New Arrivals (Opus X)', 'Industry News (Davidoff)'];
+  const scenarioNames = ['Gnymble Event', 'Event Announcement', 'New Arrivals (Opus X)', 'Industry News (Davidoff)', 'Band Event Special'];
   
   console.log(`🎬 Exporting scenario: ${scenarioNames[scenarioIndex] || 'Default'}`);
   

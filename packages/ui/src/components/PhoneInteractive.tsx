@@ -35,11 +35,11 @@ interface PhoneState {
 const DEMO_SCENARIOS: DemoScenario[] = [
   {
     id: 1,
-    title: "Gnymble Event",
+    title: "Gnymble Events",
     messages: [
       {
         id: "scenario-1-1",
-        text: "Gymble Cigar Lounge: We're coming up to our biggest event ever! Carlito Fuente will be IN THE HOUSE this upcoming Friday at 6p! Tickets only $50.",
+        text: "Upcoming Events Bryan\n\n9/7  NFL Opener Lounge Potluck\n9/8  Now OPEN Mondays at 3p for Football\n9/19 Zino Davidoff Night 4p to 8p\n10/4 Quesada Oktoberfest",
         sender: "business",
         timestamp: new Date().toISOString(),
         businessName: "",
@@ -47,14 +47,14 @@ const DEMO_SCENARIOS: DemoScenario[] = [
       },
       {
         id: "scenario-1-2",
-        text: "This is amazing! I've been waiting for this. How do I get tickets?",
+        text: "Perfect! I'll be there for the NFL opener. What should I bring for the potluck?",
         sender: "user",
         timestamp: new Date().toISOString(),
         metadata: { source: "demo-scenario" },
       },
       {
         id: "scenario-1-3",
-        text: "Tickets go on sale tomorrow at 10am! @gnymble for the link. VIP packages available with meet & greet!",
+        text: "You can get tickets, and learn more about Gnymble, on IG @gnymble! See you soon!",
         sender: "business",
         timestamp: new Date().toISOString(),
         businessName: "",
@@ -89,10 +89,10 @@ const DEMO_SCENARIOS: DemoScenario[] = [
     messages: [
       {
         id: "scenario-3-1",
-        text: "🚨 JUST ARRIVED: Limited Edition Arturo Fuente Opus X 25th Anniversary! Only 2 boxes available. These won't last long. First come, first served!",
+        text: "Just Arrived at Gnymble Cigars: 🚨 Limited Edition Arturo Fuente Opus X 25th Anniversary! Only 2 boxes available. These won't last long. First come, first served!",
         sender: "business",
         timestamp: new Date().toISOString(),
-        businessName: "Elite Tobacco Lounge",
+        businessName: "",
         metadata: { source: "demo-scenario" },
       },
       {
@@ -101,6 +101,14 @@ const DEMO_SCENARIOS: DemoScenario[] = [
         sender: "user",
         timestamp: new Date().toISOString(),
         businessName: "User",
+        metadata: { source: "demo-scenario" },
+      },
+      {
+        id: "scenario-3-3",
+        text: "Great, Bryan! You can always check us out on IG also, @gnymble",
+        sender: "business",
+        timestamp: new Date().toISOString(),
+        businessName: "",
         metadata: { source: "demo-scenario" },
       },
     ],
@@ -115,6 +123,35 @@ const DEMO_SCENARIOS: DemoScenario[] = [
         sender: "business",
         timestamp: new Date().toISOString(),
         businessName: "Premium Cigars & Co",
+        metadata: { source: "demo-scenario" },
+      },
+    ],
+  },
+  {
+    id: 5,
+    title: "Band Event Special",
+    messages: [
+      {
+        id: "scenario-5-1",
+        text: "🎵 LIVE MUSIC TONIGHT! The Blue Notes Jazz Trio performing 8-11pm at Gnymble Cigars! Special event pricing: 20% off premium cigars & craft cocktails. Reservations recommended!",
+        sender: "business",
+        timestamp: new Date().toISOString(),
+        businessName: "",
+        metadata: { source: "demo-scenario" },
+      },
+      {
+        id: "scenario-5-2",
+        text: "Sounds amazing! What's the cover charge?",
+        sender: "user",
+        timestamp: new Date().toISOString(),
+        metadata: { source: "demo-scenario" },
+      },
+      {
+        id: "scenario-5-3",
+        text: "No cover charge, Bryan! Just purchase a drink or cigar to enjoy the show. VIP seating available with bottle service. Call us at (555) 123-GNYM to reserve your spot!",
+        sender: "business",
+        timestamp: new Date().toISOString(),
+        businessName: "",
         metadata: { source: "demo-scenario" },
       },
     ],

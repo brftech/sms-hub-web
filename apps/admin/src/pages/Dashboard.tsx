@@ -214,17 +214,22 @@ const Dashboard = () => {
   const navigateToUsers = () => navigate("/users");
   const navigateToLeads = () => navigate("/leads");
   const navigateToVerifications = () => navigate("/verifications");
-  
+
   // Refresh navigation counts
   const handleRefreshCounts = async () => {
     try {
       setIsRefreshingCounts(true);
-      const hubId = currentHub === "gnymble" ? 1 
-        : currentHub === "percymd" ? 2 
-        : currentHub === "percytext" ? 3 
-        : currentHub === "percytech" ? 0 
-        : 1;
-      
+      const hubId =
+        currentHub === "gnymble"
+          ? 1
+          : currentHub === "percymd"
+            ? 2
+            : currentHub === "percytext"
+              ? 3
+              : currentHub === "percytech"
+                ? 0
+                : 1;
+
       await navigationCountsService.getCounts(hubId, isGlobalView);
       // Force a page refresh to update counts in Layout
       window.location.reload();
@@ -355,14 +360,16 @@ const Dashboard = () => {
       <div className="flex items-start justify-between">
         <div>
           <div className="flex items-center space-x-3">
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
+            <h1 className="text-xl sm:text-2xl font-bold text-foreground">
               {isGlobalView ? "Global Dashboard" : `${currentHub} Dashboard`}
             </h1>
-            <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-              isGlobalView 
-                ? "bg-blue-100 text-blue-800 border border-blue-200" 
-                : "bg-green-100 text-green-800 border border-green-200"
-            }`}>
+            <div
+              className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                isGlobalView
+                  ? "bg-blue-100 text-blue-800 border border-blue-200"
+                  : "bg-green-100 text-green-800 border border-green-200"
+              }`}
+            >
               {isGlobalView ? (
                 <>
                   <Globe className="w-3 h-3 mr-1" />
@@ -376,13 +383,13 @@ const Dashboard = () => {
               )}
             </div>
           </div>
-          <p className="mt-1 text-xs sm:text-sm text-gray-500">
+          <p className="mt-1 text-xs sm:text-sm text-muted-foreground">
             {isGlobalView
               ? "Overview of all hubs combined - see total numbers and cross-hub insights"
               : `Overview of ${currentHub} hub activity and performance - hub-specific data only`}
           </p>
         </div>
-        
+
         {/* Data Management Buttons */}
         <div className="flex items-center space-x-2">
           <button
@@ -391,9 +398,11 @@ const Dashboard = () => {
             className="inline-flex items-center px-2 py-1.5 text-xs font-medium rounded-md text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             title="Refresh navigation counts"
           >
-            <RefreshCw className={`w-3 h-3 ${isRefreshingCounts ? 'animate-spin' : ''}`} />
+            <RefreshCw
+              className={`w-3 h-3 ${isRefreshingCounts ? "animate-spin" : ""}`}
+            />
           </button>
-          
+
           <button
             onClick={handleDataCleanup}
             disabled={isCleanupRunning}
@@ -412,7 +421,7 @@ const Dashboard = () => {
               </>
             )}
           </button>
-          
+
           <button
             onClick={handleCheckDataCounts}
             className="inline-flex items-center px-2 py-1.5 text-xs font-medium rounded-md text-red-700 bg-white border border-red-300 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
@@ -425,21 +434,21 @@ const Dashboard = () => {
 
       {/* Onboarding Pipeline Overview */}
       {stats && (
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="bg-card rounded-lg shadow-sm p-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 space-y-3 sm:space-y-0">
-                      <div>
-            <h2 className="text-base sm:text-lg font-medium text-gray-900">
-              Onboarding Pipeline
-            </h2>
-            <p className="text-xs sm:text-sm text-gray-500">
-              Track companies through their onboarding journey
-            </p>
-          </div>
+            <div>
+              <h2 className="text-base sm:text-lg font-medium text-foreground">
+                Onboarding Pipeline
+              </h2>
+              <p className="text-xs sm:text-sm text-muted-foreground">
+                Track companies through their onboarding journey
+              </p>
+            </div>
             <div className="text-left sm:text-right">
-              <p className="text-xl sm:text-2xl font-bold text-gray-900">
+              <p className="text-xl sm:text-2xl font-bold text-foreground">
                 {stats.totalCompanies}
               </p>
-              <p className="text-xs sm:text-sm text-gray-500">
+              <p className="text-xs sm:text-sm text-muted-foreground">
                 Total Companies
               </p>
             </div>
@@ -473,7 +482,7 @@ const Dashboard = () => {
 
       {/* Hub Breakdown - Only show in Global View */}
       {isGlobalView && stats?.hubBreakdown && (
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="bg-card rounded-lg shadow-sm p-6">
           <h2 className="text-base sm:text-lg font-medium text-gray-900 mb-3 sm:mb-4">
             Hub Breakdown
           </h2>
@@ -525,7 +534,7 @@ const Dashboard = () => {
       {stats && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           <div
-            className="bg-white rounded-lg shadow-sm p-4 sm:p-6 cursor-pointer hover:shadow-md hover:scale-105 transition-all duration-200"
+            className="bg-card rounded-lg shadow-sm p-4 sm:p-6 cursor-pointer hover:shadow-md hover:scale-105 transition-all duration-200"
             onClick={navigateToCompanies}
           >
             <div className="flex items-center">
@@ -533,10 +542,10 @@ const Dashboard = () => {
                 <Building className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
               </div>
               <div className="ml-3 sm:ml-4 min-w-0 flex-1">
-                <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">
+                <p className="text-xs sm:text-sm font-medium text-muted-foreground truncate">
                   Active Companies
                 </p>
-                <p className="text-xl sm:text-2xl font-bold text-gray-900">
+                <p className="text-xl sm:text-2xl font-bold text-foreground">
                   {stats.activeCompanies}
                 </p>
                 <p className="text-xs text-green-600 mt-1 truncate">
@@ -547,7 +556,7 @@ const Dashboard = () => {
           </div>
 
           <div
-            className="bg-white rounded-lg shadow-sm p-4 sm:p-6 cursor-pointer hover:shadow-md hover:scale-105 transition-all duration-200"
+            className="bg-card rounded-lg shadow-sm p-4 sm:p-6 cursor-pointer hover:shadow-md hover:scale-105 transition-all duration-200"
             onClick={navigateToUsers}
           >
             <div className="flex items-center">
@@ -555,10 +564,10 @@ const Dashboard = () => {
                 <Users className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
               </div>
               <div className="ml-3 sm:ml-4 min-w-0 flex-1">
-                <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">
+                <p className="text-xs sm:text-sm font-medium text-muted-foreground truncate">
                   Total Users
                 </p>
-                <p className="text-xl sm:text-2xl font-bold text-gray-900">
+                <p className="text-xl sm:text-2xl font-bold text-foreground">
                   {stats.totalUsers.toLocaleString()}
                 </p>
                 <p className="text-xs text-green-600 mt-1 truncate">
@@ -569,7 +578,7 @@ const Dashboard = () => {
           </div>
 
           <div
-            className="bg-white rounded-lg shadow-sm p-4 sm:p-6 cursor-pointer hover:shadow-md hover:scale-105 transition-all duration-200"
+            className="bg-card rounded-lg shadow-sm p-4 sm:p-6 cursor-pointer hover:shadow-md hover:scale-105 transition-all duration-200"
             onClick={navigateToLeads}
           >
             <div className="flex items-center">
@@ -577,10 +586,10 @@ const Dashboard = () => {
                 <UserPlus className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" />
               </div>
               <div className="ml-3 sm:ml-4 min-w-0 flex-1">
-                <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">
+                <p className="text-xs sm:text-sm font-medium text-muted-foreground truncate">
                   Leads
                 </p>
-                <p className="text-xl sm:text-2xl font-bold text-gray-900">
+                <p className="text-xl sm:text-2xl font-bold text-foreground">
                   {stats.totalLeads}
                 </p>
                 <p className="text-xs text-yellow-600 mt-1 truncate">
@@ -591,7 +600,7 @@ const Dashboard = () => {
           </div>
 
           <div
-            className="bg-white rounded-lg shadow-sm p-4 sm:p-6 cursor-pointer hover:shadow-md hover:scale-105 transition-all duration-200"
+            className="bg-card rounded-lg shadow-sm p-4 sm:p-6 cursor-pointer hover:shadow-md hover:scale-105 transition-all duration-200"
             onClick={navigateToCompanies}
           >
             <div className="flex items-center">
@@ -599,10 +608,10 @@ const Dashboard = () => {
                 <Activity className="w-5 h-5 sm:w-6 sm:h-6 text-orange-600" />
               </div>
               <div className="ml-3 sm:ml-4 min-w-0 flex-1">
-                <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">
+                <p className="text-xs sm:text-sm font-medium text-muted-foreground truncate">
                   Onboarding Progress
                 </p>
-                <p className="text-xl sm:text-2xl font-bold text-gray-900">
+                <p className="text-xl sm:text-2xl font-bold text-foreground">
                   {stats.totalCompanies - stats.activeCompanies}
                 </p>
                 <p className="text-xs text-orange-600 mt-1 truncate">
@@ -616,10 +625,10 @@ const Dashboard = () => {
 
       {/* Company Onboarding Details */}
       {onboardingData.length > 0 && (
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div className="bg-card rounded-lg shadow-sm overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-200">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-medium text-gray-900">
+              <h3 className="text-lg font-medium text-foreground">
                 {isGlobalView
                   ? "Global Company Onboarding Status"
                   : "Company Onboarding Status"}
@@ -730,13 +739,13 @@ const Dashboard = () => {
       {/* Secondary Stats */}
       {stats && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
+          <div className="bg-card rounded-lg shadow-sm p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div className="min-w-0 flex-1">
-                <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">
+                <p className="text-xs sm:text-sm font-medium text-muted-foreground truncate">
                   Messages Sent
                 </p>
-                <p className="text-xl sm:text-2xl font-bold text-gray-900">
+                <p className="text-xl sm:text-2xl font-bold text-foreground">
                   {stats.totalMessages.toLocaleString()}
                 </p>
               </div>
@@ -749,13 +758,13 @@ const Dashboard = () => {
             </p>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
+          <div className="bg-card rounded-lg shadow-sm p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div className="min-w-0 flex-1">
-                <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">
+                <p className="text-xs sm:text-sm font-medium text-muted-foreground truncate">
                   Revenue
                 </p>
-                <p className="text-xl sm:text-2xl font-bold text-gray-900">
+                <p className="text-xl sm:text-2xl font-bold text-foreground">
                   ${stats.revenue.toLocaleString()}
                 </p>
               </div>
@@ -768,7 +777,7 @@ const Dashboard = () => {
             </p>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="bg-card rounded-lg shadow-sm p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">
@@ -793,10 +802,10 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent Activity */}
         {!isGlobalView && (
-          <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+          <div className="bg-card rounded-lg shadow-sm overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-200">
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-medium text-gray-900">
+                <h3 className="text-lg font-medium text-foreground">
                   Recent Onboarding Activity
                 </h3>
                 <button
@@ -851,9 +860,9 @@ const Dashboard = () => {
 
         {/* Alerts */}
         {!isGlobalView && (
-          <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+          <div className="bg-card rounded-lg shadow-sm overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-200">
-              <h3 className="text-lg font-medium text-gray-900">
+              <h3 className="text-lg font-medium text-foreground">
                 Alerts & Notifications
               </h3>
             </div>
@@ -898,8 +907,8 @@ const Dashboard = () => {
       </div>
 
       {/* Quick Actions */}
-      <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">
+      <div className="bg-card rounded-lg shadow-sm p-4 sm:p-6">
+        <h3 className="text-lg font-medium text-foreground mb-4">
           Onboarding Quick Actions
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
@@ -956,9 +965,7 @@ const Dashboard = () => {
             <div className="ml-3">
               <p
                 className={`text-sm font-medium ${
-                  cleanupResult.success
-                    ? "text-green-800"
-                    : "text-red-800"
+                  cleanupResult.success ? "text-green-800" : "text-red-800"
                 }`}
               >
                 {cleanupResult.message}
@@ -967,8 +974,10 @@ const Dashboard = () => {
                 <div className="mt-2 text-xs text-green-700">
                   <strong>Deleted:</strong>
                   <br />• Companies: {cleanupResult.details.companiesDeleted}
-                  <br />• Verifications: {cleanupResult.details.verificationsDeleted}
-                  <br />• User Profiles: {cleanupResult.details.userProfilesDeleted}
+                  <br />• Verifications:{" "}
+                  {cleanupResult.details.verificationsDeleted}
+                  <br />• User Profiles:{" "}
+                  {cleanupResult.details.userProfilesDeleted}
                   <br />• Leads: {cleanupResult.details.leadsDeleted}
                   <br />• Auth Users: {cleanupResult.details.authUsersDeleted}
                 </div>

@@ -1,12 +1,21 @@
-import { PageLayout, useHub } from "@sms-hub/ui";
+import { PageLayout, useHub, SEO } from "@sms-hub/ui";
 import { getHubColorClasses } from "@sms-hub/utils";
 import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";
-import { Shield, Lock, Eye, FileText, Phone, Mail, MapPin } from "lucide-react";
+import {
+  Shield,
+  Lock,
+  Eye,
+  FileText,
+  Phone,
+  Mail,
+  MapPin,
+  CheckCircle,
+  Target,
+} from "lucide-react";
 
 const Privacy = () => {
   const { currentHub } = useHub();
-  const hubColors = getHubColorClasses(currentHub);
 
   return (
     <PageLayout
@@ -15,33 +24,47 @@ const Privacy = () => {
       navigation={<Navigation />}
       footer={<Footer />}
     >
-      <div className="min-h-screen bg-black pt-24 pb-16 px-4 sm:px-6 lg:px-8 relative">
-        {/* Background */}
-        <div className="absolute inset-0 bg-black"></div>
+      <SEO
+        title="Privacy Policy - Your Data is Protected"
+        description="Learn how we protect your information and maintain the highest standards of data privacy. Built on trust and transparency for regulated businesses."
+        keywords="privacy policy, data protection, SMS privacy, business data security, HIPAA compliance, TCPA compliance"
+      />
 
-        <div className="relative z-10 max-w-6xl mx-auto">
-          {/* Hero Section */}
+      <div className="min-h-screen bg-black pt-20 pb-12 relative">
+        {/* Subtle background elements */}
+        <div className="absolute inset-0">
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-orange-500/5 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-orange-500/5 rounded-full blur-3xl"></div>
+        </div>
+
+        <div className="relative z-10 max-w-6xl mx-auto px-6">
+          {/* Hero Section - Matching Homepage Style */}
           <div className="text-center mb-20">
-            <div className="inline-flex items-center px-4 py-2 rounded-full bg-orange-500/10 border border-orange-500/20 mb-8">
-              <Shield className="w-5 h-5 text-orange-400 mr-2" />
-              <span className={`text-sm font-medium ${hubColors.text}`}>
-                Your Privacy Matters
+            <div className="inline-flex items-center px-4 py-2 rounded-full bg-orange-500/20 border border-orange-500/30 mb-8">
+              <Shield className="w-4 h-4 text-orange-400 mr-2" />
+              <span className="text-sm font-medium text-orange-400">
+                YOUR PRIVACY MATTERS
               </span>
             </div>
-            <h1 className="text-5xl md:text-7xl font-bold text-white mb-8 leading-tight">
-              <span className="block">Privacy Policy</span>
-              <span
-                className={`${hubColors.text} bg-gradient-to-r from-orange-400 to-purple-500 bg-clip-text text-transparent`}
-              >
-                Built on Trust
-              </span>
+            <h1
+              className="text-4xl md:text-6xl font-bold text-white mb-8 leading-tight"
+              style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+            >
+              Privacy Policy
+              <span className="gradient-text block">Built on Trust</span>
             </h1>
-            <p className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
+            <p
+              className="text-xl text-gray-300 max-w-3xl mx-auto mb-12 leading-relaxed"
+              style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+            >
               We believe transparency and security are the foundation of every
               great relationship. Learn how we protect your information and
               maintain the highest standards of data privacy.
             </p>
-            <div className="mt-8 text-sm text-gray-400">
+            <div
+              className="mt-8 text-sm text-gray-400"
+              style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+            >
               Last updated: {new Date().toLocaleDateString()}
             </div>
           </div>
@@ -52,10 +75,16 @@ const Privacy = () => {
               <div className="w-16 h-16 bg-gradient-to-br from-orange-500/20 to-purple-500/20 border border-orange-500/30 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
                 <Lock className="w-8 h-8 text-orange-400" />
               </div>
-              <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-orange-400 transition-colors">
+              <h3
+                className="text-lg font-semibold text-white mb-2 group-hover:text-orange-400 transition-colors"
+                style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+              >
                 Secure by Design
               </h3>
-              <p className="text-gray-400 text-sm leading-relaxed">
+              <p
+                className="text-gray-400 text-sm leading-relaxed"
+                style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+              >
                 Enterprise-grade encryption and security measures protect your
                 data at every level
               </p>
@@ -65,10 +94,16 @@ const Privacy = () => {
               <div className="w-16 h-16 bg-gradient-to-br from-orange-500/20 to-purple-500/20 border border-orange-500/30 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
                 <Eye className="w-8 h-8 text-orange-400" />
               </div>
-              <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-orange-400 transition-colors">
+              <h3
+                className="text-lg font-semibold text-white mb-2 group-hover:text-orange-400 transition-colors"
+                style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+              >
                 Complete Transparency
               </h3>
-              <p className="text-gray-400 text-sm leading-relaxed">
+              <p
+                className="text-gray-400 text-sm leading-relaxed"
+                style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+              >
                 Clear visibility into how we collect, use, and protect your
                 information
               </p>
@@ -78,10 +113,16 @@ const Privacy = () => {
               <div className="w-16 h-16 bg-gradient-to-br from-orange-500/20 to-purple-500/20 border border-orange-500/30 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
                 <FileText className="w-8 h-8 text-orange-400" />
               </div>
-              <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-orange-400 transition-colors">
+              <h3
+                className="text-lg font-semibold text-white mb-2 group-hover:text-orange-400 transition-colors"
+                style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+              >
                 Regulatory Compliance
               </h3>
-              <p className="text-gray-400 text-sm leading-relaxed">
+              <p
+                className="text-gray-400 text-sm leading-relaxed"
+                style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+              >
                 Built to meet and exceed industry standards including HIPAA and
                 TCPA
               </p>
@@ -91,11 +132,17 @@ const Privacy = () => {
           {/* Privacy Content */}
           <div className="space-y-12">
             <section className="bg-gradient-to-br from-gray-800/30 to-gray-900/30 backdrop-blur-sm rounded-3xl border border-gray-700/30 p-8">
-              <h2 className="text-3xl font-bold text-white mb-6 flex items-center">
+              <h2
+                className="text-3xl font-bold text-white mb-6 flex items-center"
+                style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+              >
                 <Shield className="w-8 h-8 text-orange-400 mr-3" />
                 Information We Collect
               </h2>
-              <p className="text-lg text-gray-300 mb-6 leading-relaxed">
+              <p
+                className="text-lg text-gray-300 mb-6 leading-relaxed"
+                style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+              >
                 We collect information you provide directly to us, such as when
                 you create an account, use our services, or contact us for
                 support. This includes:
@@ -104,21 +151,30 @@ const Privacy = () => {
                 <div className="space-y-3">
                   <div className="flex items-start space-x-3">
                     <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <span className="text-gray-300">
+                    <span
+                      className="text-gray-300"
+                      style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+                    >
                       Account information (name, email, phone number, company
                       name)
                     </span>
                   </div>
                   <div className="flex items-start space-x-3">
                     <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <span className="text-gray-300">
+                    <span
+                      className="text-gray-300"
+                      style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+                    >
                       Payment information (processed securely through our
                       payment providers)
                     </span>
                   </div>
                   <div className="flex items-start space-x-3">
                     <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <span className="text-gray-300">
+                    <span
+                      className="text-gray-300"
+                      style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+                    >
                       Communication data (messages sent through our platform)
                     </span>
                   </div>
@@ -126,13 +182,19 @@ const Privacy = () => {
                 <div className="space-y-3">
                   <div className="flex items-start space-x-3">
                     <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <span className="text-gray-300">
+                    <span
+                      className="text-gray-300"
+                      style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+                    >
                       Usage information (how you interact with our services)
                     </span>
                   </div>
                   <div className="flex items-start space-x-3">
                     <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <span className="text-gray-300">
+                    <span
+                      className="text-gray-300"
+                      style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+                    >
                       Device and technical information (IP address, browser
                       type, device identifiers)
                     </span>
@@ -142,11 +204,17 @@ const Privacy = () => {
             </section>
 
             <section className="bg-gradient-to-br from-gray-800/30 to-gray-900/30 backdrop-blur-sm rounded-3xl border border-gray-700/30 p-8">
-              <h2 className="text-3xl font-bold text-white mb-6 flex items-center">
+              <h2
+                className="text-3xl font-bold text-white mb-6 flex items-center"
+                style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+              >
                 <Lock className="w-8 h-8 text-orange-400 mr-3" />
                 How We Use Your Information
               </h2>
-              <p className="text-lg text-gray-300 mb-6 leading-relaxed">
+              <p
+                className="text-lg text-gray-300 mb-6 leading-relaxed"
+                style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+              >
                 We use the information we collect to provide exceptional service
                 and maintain the highest standards:
               </p>
@@ -284,10 +352,16 @@ const Privacy = () => {
 
             {/* Contact Section */}
             <section className="bg-gradient-to-br from-gray-800/30 to-gray-900/30 backdrop-blur-sm rounded-3xl border border-gray-700/30 p-8 text-center">
-              <h2 className="text-3xl font-bold text-white mb-6">
+              <h2
+                className="text-3xl font-bold text-white mb-6"
+                style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+              >
                 Questions About Privacy?
               </h2>
-              <p className="text-lg text-gray-300 mb-8 max-w-2xl mx-auto">
+              <p
+                className="text-lg text-gray-300 mb-8 max-w-2xl mx-auto"
+                style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+              >
                 We're committed to transparency and are here to answer any
                 questions about our data practices.
               </p>

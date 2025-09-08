@@ -3,6 +3,7 @@
 // =============================================================================
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { useLiveMessaging } from "../contexts/LiveMessagingContext";
 import SMSAuthModal from "./SMSAuthModal";
 import { logger, logError } from "@sms-hub/utils";
@@ -168,7 +169,7 @@ const PLACEHOLDER_TEXTS = [
 ];
 
 const DEMO_STARTER_MESSAGE =
-  "Hey there! 👋 I'm Smokey, your SMS Hub AI assistant. Want to see what I can do? Ask me anything about premium cigars, events, or our exclusive lounge experience! 🚬✨";
+  "Hey there! 👋 I'm Smokey, your SMS Hub AI assistant. This is a simulation - no real SMS will be sent. Want to see what I can do? Ask me anything about premium cigars, events, or our exclusive lounge experience! 🚬✨";
 
 // =============================================================================
 // COMPONENT
@@ -300,15 +301,6 @@ export default function PhoneInteractive() {
     [handleSendMessage]
   );
 
-  const handleDemoButtonClick = useCallback(() => {
-    if (!phoneState.isAuthenticated) {
-      setPhoneState((prev) => ({ ...prev, showSMSAuth: true }));
-      return;
-    }
-
-    startDemo();
-  }, [phoneState.isAuthenticated]);
-
   const startDemo = useCallback(() => {
     try {
       logger.info("Starting interactive demo", {
@@ -349,6 +341,18 @@ export default function PhoneInteractive() {
       });
     }
   }, [phoneState.isAuthenticated, messagingState.sessionId, addMessage]);
+
+  const handleInputClick = useCallback(() => {
+    if (!phoneState.isAuthenticated) {
+      setPhoneState((prev) => ({ ...prev, showSMSAuth: true }));
+      return;
+    }
+
+    // If already authenticated but demo not active, start the demo
+    if (!phoneState.isDemoActive) {
+      startDemo();
+    }
+  }, [phoneState.isAuthenticated, phoneState.isDemoActive, startDemo]);
 
   const handleSMSAuthSuccess = useCallback(
     (phoneNumber: string) => {
@@ -404,8 +408,7 @@ export default function PhoneInteractive() {
   const displayMessages = phoneState.isDemoActive
     ? currentMessages
     : currentScenario.messages;
-  const isInputDisabled =
-    !phoneState.isAuthenticated || messagingState.isAIProcessing;
+  const isInputDisabled = messagingState.isAIProcessing;
 
   // =============================================================================
   // RENDER
@@ -496,6 +499,7 @@ export default function PhoneInteractive() {
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyPress={handleKeyPress}
+              onClick={handleInputClick}
               onFocus={() =>
                 setPhoneState((prev) => ({ ...prev, isInputFocused: true }))
               }
@@ -508,7 +512,11 @@ export default function PhoneInteractive() {
             />
             <button
               onClick={handleSendMessage}
-              disabled={!inputValue.trim() || isInputDisabled}
+              disabled={
+                !inputValue.trim() ||
+                isInputDisabled ||
+                !phoneState.isAuthenticated
+              }
               className="phone-send-button"
             >
               ↑
@@ -517,50 +525,43 @@ export default function PhoneInteractive() {
         </div>
       </div>
 
-      {/* Demo Button - Right of Phone */}
+      {/* Status Indicator - Right of Phone */}
       <div className="ml-8 flex flex-col items-center">
-        <button
-          onClick={handleDemoButtonClick}
-          className="group relative px-6 py-4 bg-gradient-to-r from-orange-500 to-red-600 text-white font-medium text-base rounded-lg shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-xl active:scale-95 border border-orange-400/30 backdrop-blur-sm"
-        >
-          <div className="absolute inset-0 bg-gradient-to-r from-orange-400/20 to-red-500/20 rounded-lg blur-sm group-hover:blur-md transition-all duration-300"></div>
-          <div className="relative z-10 flex items-center space-x-3">
-            <div className="text-center">
-              <div className="font-medium tracking-wide">
-                {phoneState.isAuthenticated
-                  ? "Start Live Demo Now"
-                  : "Get Instant Demo Access"}
-              </div>
-              <div className="text-sm font-normal opacity-90">
-                {phoneState.isAuthenticated
-                  ? "Interactive showcase ready"
-                  : "Quick phone verification"}
-              </div>
-            </div>
-          </div>
-          <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-gradient-to-r from-orange-400 to-red-500 rotate-45 border-b border-r border-orange-300/40"></div>
-        </button>
-
-        {/* Demo Status Indicator */}
         {phoneState.isAuthenticated ? (
           phoneState.isDemoActive ? (
-            <div className="mt-4 px-3 py-2 bg-emerald-50 border border-emerald-200 rounded-md text-emerald-700 text-xs font-medium">
-              Demo Session Active
+            <div className="px-4 py-3 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-700 text-sm font-medium">
+              <div className="text-center">
+                <div className="font-semibold">Simulation Active</div>
+                <div className="text-xs opacity-75">
+                  Interactive demo running
+                </div>
+              </div>
             </div>
           ) : (
-            <div className="mt-4 px-3 py-2 bg-slate-50 border border-slate-200 rounded-md text-slate-700 text-xs font-medium">
-              Access Granted
+            <div className="px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg text-slate-700 text-sm font-medium">
+              <div className="text-center">
+                <div className="font-semibold">Access Granted</div>
+                <div className="text-xs opacity-75">
+                  Click message field to start
+                </div>
+              </div>
             </div>
           )
         ) : (
-          <button
-            onClick={() =>
-              setPhoneState((prev) => ({ ...prev, showInfo: true }))
-            }
-            className="mt-4 px-3 py-2 bg-amber-50 border border-amber-200 rounded-md text-amber-700 text-xs font-medium hover:bg-amber-100 hover:border-amber-300 transition-colors duration-200 cursor-pointer"
-          >
-            Why Phone Verification?
-          </button>
+          <div className="px-4 py-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-700 text-sm font-medium">
+            <div className="text-center">
+              <div className="font-semibold">Click Message Field</div>
+              <div className="text-xs opacity-75">to start the demo</div>
+            </div>
+            <button
+              onClick={() =>
+                setPhoneState((prev) => ({ ...prev, showInfo: true }))
+              }
+              className="mt-2 w-full px-2 py-1 bg-amber-100 border border-amber-300 rounded text-amber-800 text-xs font-medium hover:bg-amber-200 transition-colors duration-200"
+            >
+              Why phone verification?
+            </button>
+          </div>
         )}
       </div>
 
@@ -572,56 +573,74 @@ export default function PhoneInteractive() {
       />
 
       {/* Info Modal */}
-      {phoneState.showInfo && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md mx-4 shadow-xl">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">
-                About Phone Verification
-              </h3>
-              <button
-                onClick={() =>
-                  setPhoneState((prev) => ({ ...prev, showInfo: false }))
-                }
-                className="text-gray-400 hover:text-gray-600 text-xl font-bold"
-              >
-                ×
-              </button>
+      {phoneState.showInfo &&
+        createPortal(
+          <div
+            className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center"
+            style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              width: "100vw",
+              height: "100vh",
+            }}
+          >
+            <div className="bg-white rounded-lg p-6 max-w-md mx-4 shadow-xl">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  About Phone Verification
+                </h3>
+                <button
+                  onClick={() =>
+                    setPhoneState((prev) => ({ ...prev, showInfo: false }))
+                  }
+                  className="text-gray-400 hover:text-gray-600 text-xl font-bold"
+                >
+                  ×
+                </button>
+              </div>
+              <div className="text-sm text-gray-600 space-y-3">
+                <p>
+                  <strong>How to start the demo:</strong> Click on the message
+                  input field in the phone above, or use the demo button. We'll
+                  verify your phone number to show you our interactive SMS
+                  simulation.
+                </p>
+                <p>
+                  <strong>Important:</strong> This is a simulation - no real SMS
+                  messages will be sent to your phone or anyone else's phone
+                  during this demo.
+                </p>
+                <p>
+                  <strong>Why we need your phone number:</strong> We're a
+                  business SMS platform, so we need to verify you're real before
+                  showing our interactive demo.
+                </p>
+                <p>
+                  <strong>What we do with it:</strong> We only use it to send
+                  you a one-time verification code. We don't store it
+                  permanently or use it for marketing.
+                </p>
+                <p>
+                  <strong>Privacy & Control:</strong> You can text "STOP"
+                  anytime to opt out. We respect your privacy and follow strict
+                  data protection standards.
+                </p>
+              </div>
+              <div className="mt-6 flex justify-end">
+                <button
+                  onClick={() =>
+                    setPhoneState((prev) => ({ ...prev, showInfo: false }))
+                  }
+                  className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
+                >
+                  Got it
+                </button>
+              </div>
             </div>
-            <div className="text-sm text-gray-600 space-y-3">
-              <p>
-                <strong>Why we need your phone number:</strong> We're a business
-                SMS platform, so we need to verify you're real before showing
-                our demo.
-              </p>
-              <p>
-                <strong>What we do with it:</strong> We only use it to send you
-                a one-time verification code. We don't store it permanently or
-                use it for marketing.
-              </p>
-              <p>
-                <strong>Privacy & Control:</strong> You can text "STOP" anytime
-                to opt out. We respect your privacy and follow strict data
-                protection standards.
-              </p>
-              <p>
-                <strong>Security:</strong> Your information is encrypted and
-                protected. We're committed to keeping your data safe and secure.
-              </p>
-            </div>
-            <div className="mt-6 flex justify-end">
-              <button
-                onClick={() =>
-                  setPhoneState((prev) => ({ ...prev, showInfo: false }))
-                }
-                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
-              >
-                Got it
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body
+        )}
     </div>
   );
 }

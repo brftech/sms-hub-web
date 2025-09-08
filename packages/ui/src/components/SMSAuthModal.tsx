@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { createPortal } from "react-dom";
 import { X, Phone, Shield, CheckCircle, AlertCircle } from "lucide-react";
 import { Button } from "./button";
 import { Input } from "./input";
@@ -53,7 +54,7 @@ const SMSAuthModal: React.FC<SMSAuthModalProps> = ({
     try {
       // Simulate SMS verification code sending
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      
+
       setStep("verification");
       setCountdown(60);
 
@@ -90,9 +91,9 @@ const SMSAuthModal: React.FC<SMSAuthModalProps> = ({
     try {
       // Simulate OTP verification
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      
+
       setStep("success");
-      
+
       // Auto-close after success
       setTimeout(() => {
         onSuccess(phoneNumber);
@@ -111,14 +112,14 @@ const SMSAuthModal: React.FC<SMSAuthModalProps> = ({
 
   const handleResendCode = async () => {
     if (countdown > 0) return;
-    
+
     setIsLoading(true);
     setError("");
 
     try {
       // Simulate resending code
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      
+
       setCountdown(60);
       const timer = setInterval(() => {
         setCountdown((prev) => {
@@ -142,11 +143,22 @@ const SMSAuthModal: React.FC<SMSAuthModalProps> = ({
 
   if (!isOpen) return null;
 
-  return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+  return createPortal(
+    <div
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        width: "100vw",
+        height: "100vh",
+      }}
+    >
       <Card className="w-full max-w-md mx-4">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-          <CardTitle className="text-lg font-semibold">Phone Verification</CardTitle>
+          <CardTitle className="text-lg font-semibold">
+            Phone Verification
+          </CardTitle>
           <Button
             variant="ghost"
             size="sm"
@@ -156,7 +168,7 @@ const SMSAuthModal: React.FC<SMSAuthModalProps> = ({
             <X className="h-4 w-4" />
           </Button>
         </CardHeader>
-        
+
         <CardContent className="space-y-4">
           {step === "phone" && (
             <>
@@ -165,7 +177,9 @@ const SMSAuthModal: React.FC<SMSAuthModalProps> = ({
                   <Phone className="h-6 w-6 text-blue-600" />
                 </div>
                 <div>
-                  <h3 className="font-medium text-gray-900">Enter your phone number</h3>
+                  <h3 className="font-medium text-gray-900">
+                    Enter your phone number
+                  </h3>
                   <p className="text-sm text-gray-500">
                     We'll send you a verification code via SMS
                   </p>
@@ -192,7 +206,9 @@ const SMSAuthModal: React.FC<SMSAuthModalProps> = ({
 
               <Button
                 onClick={handlePhoneSubmit}
-                disabled={isLoading || phoneNumber.replace(/\D/g, "").length < 10}
+                disabled={
+                  isLoading || phoneNumber.replace(/\D/g, "").length < 10
+                }
                 className="w-full"
               >
                 {isLoading ? "Sending..." : "Send Verification Code"}
@@ -207,7 +223,9 @@ const SMSAuthModal: React.FC<SMSAuthModalProps> = ({
                   <CheckCircle className="h-6 w-6 text-green-600" />
                 </div>
                 <div>
-                  <h3 className="font-medium text-gray-900">Enter verification code</h3>
+                  <h3 className="font-medium text-gray-900">
+                    Enter verification code
+                  </h3>
                   <p className="text-sm text-gray-500">
                     We sent a 6-digit code to {phoneNumber}
                   </p>
@@ -219,7 +237,9 @@ const SMSAuthModal: React.FC<SMSAuthModalProps> = ({
                   type="text"
                   placeholder="123456"
                   value={verificationCode}
-                  onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, ""))}
+                  onChange={(e) =>
+                    setVerificationCode(e.target.value.replace(/\D/g, ""))
+                  }
                   className="text-center text-2xl tracking-widest"
                   maxLength={6}
                 />
@@ -230,10 +250,7 @@ const SMSAuthModal: React.FC<SMSAuthModalProps> = ({
                     disabled={countdown > 0 || isLoading}
                     className="text-sm"
                   >
-                    {countdown > 0 
-                      ? `Resend in ${countdown}s` 
-                      : "Resend code"
-                    }
+                    {countdown > 0 ? `Resend in ${countdown}s` : "Resend code"}
                   </Button>
                 </div>
               </div>
@@ -254,7 +271,9 @@ const SMSAuthModal: React.FC<SMSAuthModalProps> = ({
                 <CheckCircle className="h-6 w-6 text-green-600" />
               </div>
               <div>
-                <h3 className="font-medium text-gray-900">Verification successful!</h3>
+                <h3 className="font-medium text-gray-900">
+                  Verification successful!
+                </h3>
                 <p className="text-sm text-gray-500">
                   Your phone number has been verified
                 </p>
@@ -270,9 +289,9 @@ const SMSAuthModal: React.FC<SMSAuthModalProps> = ({
           )}
         </CardContent>
       </Card>
-    </div>
+    </div>,
+    document.body
   );
 };
 
 export default SMSAuthModal;
-

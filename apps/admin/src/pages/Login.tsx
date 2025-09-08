@@ -1,49 +1,59 @@
-import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useHub, Card, CardContent, CardDescription, CardHeader, CardTitle, Button, Input, Label } from '@sms-hub/ui'
-import { Shield, Eye, EyeOff } from 'lucide-react'
-import { useAuth } from '@sms-hub/supabase'
-import { useDevAuth, activateDevAuth } from '../hooks/useDevAuth'
-import { DevAuthToggle } from '../components/DevAuthToggle'
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  useHub,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  Button,
+  Input,
+  Label,
+} from "@sms-hub/ui";
+import { Shield, Eye, EyeOff } from "lucide-react";
+import { useAuth } from "@sms-hub/supabase";
+import { useDevAuth, activateDevAuth } from "../hooks/useDevAuth";
+import { DevAuthToggle } from "../components/DevAuthToggle";
 
 export function Login() {
-  const { hubConfig } = useHub()
-  const { signIn } = useAuth()
-  const navigate = useNavigate()
-  const devAuth = useDevAuth()
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState('')
-  
+  const { hubConfig } = useHub();
+  const { signIn } = useAuth();
+  const navigate = useNavigate();
+  const devAuth = useDevAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+
   // Check for dev superadmin mode and redirect
   useEffect(() => {
     if (devAuth.isInitialized && devAuth.isSuperadmin) {
-      console.log('Dev superadmin mode active - redirecting from admin login')
-      navigate('/', { replace: true })
+      console.log("Dev superadmin mode active - redirecting from admin login");
+      navigate("/", { replace: true });
     }
-  }, [devAuth.isInitialized, devAuth.isSuperadmin, navigate])
+  }, [devAuth.isInitialized, devAuth.isSuperadmin, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!email || !password) return
+    e.preventDefault();
+    if (!email || !password) return;
 
-    setIsLoading(true)
-    setError('')
+    setIsLoading(true);
+    setError("");
 
     try {
-      await signIn({ email, password })
-      navigate('/')
+      await signIn({ email, password });
+      navigate("/");
     } catch (err: any) {
-      setError(err.message || 'An unexpected error occurred')
+      setError(err.message || "An unexpected error occurred");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-background py-12 px-4 sm:px-6 lg:px-8">
       <DevAuthToggle onActivate={() => activateDevAuth()} />
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
@@ -55,7 +65,7 @@ export function Login() {
           <h2 className="text-3xl font-extrabold hub-text-primary">
             Admin Portal
           </h2>
-          <p className="mt-2 text-sm text-gray-600">
+          <p className="mt-2 text-sm text-muted-foreground">
             {hubConfig.displayName} platform administration
           </p>
         </div>
@@ -74,7 +84,7 @@ export function Login() {
                   {error}
                 </div>
               )}
-              
+
               <div className="space-y-2">
                 <Label htmlFor="email">Admin Email</Label>
                 <Input
@@ -92,7 +102,7 @@ export function Login() {
                 <div className="relative">
                   <Input
                     id="password"
-                    type={showPassword ? 'text' : 'password'}
+                    type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter password"
@@ -104,9 +114,9 @@ export function Login() {
                     onClick={() => setShowPassword(!showPassword)}
                   >
                     {showPassword ? (
-                      <EyeOff className="h-4 w-4 text-gray-400" />
+                      <EyeOff className="h-4 w-4 text-muted-foreground" />
                     ) : (
-                      <Eye className="h-4 w-4 text-gray-400" />
+                      <Eye className="h-4 w-4 text-muted-foreground" />
                     )}
                   </button>
                 </div>
@@ -117,18 +127,18 @@ export function Login() {
                 className="w-full hub-bg-primary"
                 disabled={isLoading}
               >
-                {isLoading ? 'Signing in...' : 'Access Admin Portal'}
+                {isLoading ? "Signing in..." : "Access Admin Portal"}
               </Button>
             </form>
           </CardContent>
         </Card>
 
         <div className="text-center">
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-muted-foreground">
             This portal is restricted to authorized administrators only
           </p>
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -1,4 +1,4 @@
-import { PageLayout, useHub } from "@sms-hub/ui";
+import { PageLayout, useHub, SEO } from "@sms-hub/ui";
 import { getHubColorClasses } from "@sms-hub/utils";
 import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";
@@ -10,11 +10,12 @@ import {
   Phone,
   Mail,
   Scale,
+  Target,
+  Users,
 } from "lucide-react";
 
 const Terms = () => {
   const { currentHub } = useHub();
-  const hubColors = getHubColorClasses(currentHub);
 
   return (
     <PageLayout
@@ -23,33 +24,47 @@ const Terms = () => {
       navigation={<Navigation />}
       footer={<Footer />}
     >
-      <div className="min-h-screen bg-black pt-24 pb-16 px-4 sm:px-6 lg:px-8 relative">
-        {/* Background */}
-        <div className="absolute inset-0 bg-black"></div>
+      <SEO
+        title="Terms of Service - Clear & Fair Terms"
+        description="Transparent, fair terms that protect both our users and our commitment to providing exceptional SMS messaging services for regulated businesses."
+        keywords="terms of service, SMS terms, business texting terms, compliance terms, regulated business SMS"
+      />
 
-        <div className="relative z-10 max-w-6xl mx-auto">
-          {/* Hero Section */}
+      <div className="min-h-screen bg-black pt-20 pb-12 relative">
+        {/* Subtle background elements */}
+        <div className="absolute inset-0">
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-orange-500/5 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-orange-500/5 rounded-full blur-3xl"></div>
+        </div>
+
+        <div className="relative z-10 max-w-6xl mx-auto px-6">
+          {/* Hero Section - Matching Homepage Style */}
           <div className="text-center mb-20">
-            <div className="inline-flex items-center px-4 py-2 rounded-full bg-orange-500/10 border border-orange-500/20 mb-8">
-              <FileText className="w-5 h-5 text-orange-400 mr-2" />
-              <span className={`text-sm font-medium ${hubColors.text}`}>
-                Terms of Service
+            <div className="inline-flex items-center px-4 py-2 rounded-full bg-orange-500/20 border border-orange-500/30 mb-8">
+              <FileText className="w-4 h-4 text-orange-400 mr-2" />
+              <span className="text-sm font-medium text-orange-400">
+                TERMS OF SERVICE
               </span>
             </div>
-            <h1 className="text-5xl md:text-7xl font-bold text-white mb-8 leading-tight">
-              <span className="block">Terms of Service</span>
-              <span
-                className={`${hubColors.text} bg-gradient-to-r from-orange-400 to-purple-500 bg-clip-text text-transparent`}
-              >
-                Clear & Fair
-              </span>
+            <h1
+              className="text-4xl md:text-6xl font-bold text-white mb-8 leading-tight"
+              style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+            >
+              Terms of Service
+              <span className="gradient-text block">Clear & Fair</span>
             </h1>
-            <p className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
+            <p
+              className="text-xl text-gray-300 max-w-3xl mx-auto mb-12 leading-relaxed"
+              style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+            >
               We believe in transparent, fair terms that protect both our users
               and our commitment to providing exceptional SMS messaging
               services.
             </p>
-            <div className="mt-8 text-sm text-gray-400">
+            <div
+              className="mt-8 text-sm text-gray-400"
+              style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+            >
               Last updated: {new Date().toLocaleDateString()}
             </div>
           </div>
@@ -60,10 +75,16 @@ const Terms = () => {
               <div className="w-16 h-16 bg-gradient-to-br from-orange-500/20 to-purple-500/20 border border-orange-500/30 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
                 <Shield className="w-8 h-8 text-orange-400" />
               </div>
-              <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-orange-400 transition-colors">
+              <h3
+                className="text-lg font-semibold text-white mb-2 group-hover:text-orange-400 transition-colors"
+                style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+              >
                 Regulatory Excellence
               </h3>
-              <p className="text-gray-400 text-sm leading-relaxed">
+              <p
+                className="text-gray-400 text-sm leading-relaxed"
+                style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+              >
                 Built to exceed TCPA, HIPAA, and industry compliance standards
               </p>
             </div>
@@ -72,10 +93,16 @@ const Terms = () => {
               <div className="w-16 h-16 bg-gradient-to-br from-orange-500/20 to-purple-500/20 border border-orange-500/30 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
                 <CheckCircle className="w-8 h-8 text-orange-400" />
               </div>
-              <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-orange-400 transition-colors">
+              <h3
+                className="text-lg font-semibold text-white mb-2 group-hover:text-orange-400 transition-colors"
+                style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+              >
                 Clear Expectations
               </h3>
-              <p className="text-gray-400 text-sm leading-relaxed">
+              <p
+                className="text-gray-400 text-sm leading-relaxed"
+                style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+              >
                 Transparent terms that protect your business and our partnership
               </p>
             </div>
@@ -84,10 +111,16 @@ const Terms = () => {
               <div className="w-16 h-16 bg-gradient-to-br from-orange-500/20 to-purple-500/20 border border-orange-500/30 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
                 <Scale className="w-8 h-8 text-orange-400" />
               </div>
-              <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-orange-400 transition-colors">
+              <h3
+                className="text-lg font-semibold text-white mb-2 group-hover:text-orange-400 transition-colors"
+                style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+              >
                 Fair & Balanced
               </h3>
-              <p className="text-gray-400 text-sm leading-relaxed">
+              <p
+                className="text-gray-400 text-sm leading-relaxed"
+                style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+              >
                 Terms designed to benefit both parties and ensure long-term
                 success
               </p>
@@ -97,11 +130,17 @@ const Terms = () => {
           {/* Terms Content */}
           <div className="space-y-12">
             <section className="bg-gradient-to-br from-gray-800/30 to-gray-900/30 backdrop-blur-sm rounded-3xl border border-gray-700/30 p-8">
-              <h2 className="text-3xl font-bold text-white mb-6 flex items-center">
+              <h2
+                className="text-3xl font-bold text-white mb-6 flex items-center"
+                style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+              >
                 <FileText className="w-8 h-8 text-orange-400 mr-3" />
                 Acceptance of Terms
               </h2>
-              <p className="text-lg text-gray-300 leading-relaxed">
+              <p
+                className="text-lg text-gray-300 leading-relaxed"
+                style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+              >
                 By accessing and using{" "}
                 {currentHub === "gnymble"
                   ? "Gnymble"
@@ -339,10 +378,16 @@ const Terms = () => {
 
             {/* Contact Section */}
             <section className="bg-gradient-to-br from-gray-800/30 to-gray-900/30 backdrop-blur-sm rounded-3xl border border-gray-700/30 p-8 text-center">
-              <h2 className="text-3xl font-bold text-white mb-6">
+              <h2
+                className="text-3xl font-bold text-white mb-6"
+                style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+              >
                 Questions About Terms?
               </h2>
-              <p className="text-lg text-gray-300 mb-8 max-w-2xl mx-auto">
+              <p
+                className="text-lg text-gray-300 mb-8 max-w-2xl mx-auto"
+                style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+              >
                 We're here to clarify any questions about our terms of service
                 and ensure you have a complete understanding.
               </p>

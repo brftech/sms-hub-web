@@ -15,9 +15,9 @@ export const ProblemSolutionSection: React.FC = () => {
       case "percymd":
         return "text-blue-500"; // PercyMD blue
       case "gnymble":
-        return "text-amber-600"; // Gnymble amber
+        return "text-orange-600"; // Gnymble orange (matching button color)
       default:
-        return "text-amber-600";
+        return "text-orange-600";
     }
   };
 

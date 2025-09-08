@@ -16,10 +16,7 @@ import {
   Filter,
   Shield,
 } from "lucide-react";
-import {
-  usersService,
-  UserProfile,
-} from "../services/usersService";
+import { usersService, UserProfile } from "../services/usersService";
 
 const Users = () => {
   const { currentHub } = useHub();
@@ -37,12 +34,14 @@ const Users = () => {
   const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
-  
+
   // Filtering states
-  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
+  const [statusFilter, setStatusFilter] = useState<
+    "all" | "active" | "inactive"
+  >("all");
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [paymentFilter, setPaymentFilter] = useState<string>("all");
-  
+
   // Sorting states
   const [sortField, setSortField] = useState<keyof UserProfile>("created_at");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
@@ -67,10 +66,7 @@ const Users = () => {
 
       console.log("Users: Current hub:", currentHub);
       console.log("Users: Global view:", isGlobalView);
-      console.log(
-        "Users: Using hub_id:",
-        isGlobalView ? "ALL HUBS" : hubId
-      );
+      console.log("Users: Using hub_id:", isGlobalView ? "ALL HUBS" : hubId);
 
       // Build filter options
       const filterOptions: any = {
@@ -118,12 +114,12 @@ const Users = () => {
 
   const handleUpdateUser = async () => {
     if (!editingUser) return;
-    
+
     try {
       setIsUpdating(true);
       // TODO: Implement user update in service
       // const result = await usersService.updateUser(editingUser.id, editingUser);
-      
+
       // if (result.success) {
       await fetchData();
       handleCloseEditModal();
@@ -140,11 +136,11 @@ const Users = () => {
 
   const handleDeleteUser = async () => {
     if (!deletingUserId) return;
-    
+
     try {
       // TODO: Implement user deletion in service
       // const result = await usersService.deleteUser(deletingUserId);
-      
+
       // if (result.success) {
       await fetchData();
       setShowDeleteConfirm(false);
@@ -163,7 +159,7 @@ const Users = () => {
       setIsUpdating(true);
       // TODO: Implement user creation in service
       // const result = await usersService.createUser(newUser);
-      
+
       // if (result.success) {
       await fetchData();
       setIsCreateModalOpen(false);
@@ -186,44 +182,50 @@ const Users = () => {
   // Filter users when search query or global view changes
   useEffect(() => {
     fetchData();
-  }, [
-    searchQuery,
-    isGlobalView,
-  ]);
+  }, [searchQuery, isGlobalView]);
 
   // Apply filters and sorting to users
   useEffect(() => {
     let filtered = [...users];
-    
+
     // Apply status filter
     if (statusFilter !== "all") {
-      filtered = filtered.filter(u => statusFilter === "active" ? u.is_active : !u.is_active);
+      filtered = filtered.filter((u) =>
+        statusFilter === "active" ? u.is_active : !u.is_active
+      );
     }
-    
+
     // Apply role filter
     if (roleFilter !== "all") {
-      filtered = filtered.filter(u => u.role === roleFilter);
+      filtered = filtered.filter((u) => u.role === roleFilter);
     }
-    
+
     // Apply payment filter
     if (paymentFilter !== "all") {
-      filtered = filtered.filter(u => u.payment_status === paymentFilter);
+      filtered = filtered.filter((u) => u.payment_status === paymentFilter);
     }
-    
+
     // Apply sorting
     filtered.sort((a, b) => {
       const aVal = a[sortField] || "";
       const bVal = b[sortField] || "";
-      
+
       if (sortDirection === "asc") {
         return aVal > bVal ? 1 : -1;
       } else {
         return aVal < bVal ? 1 : -1;
       }
     });
-    
+
     setFilteredUsers(filtered);
-  }, [users, statusFilter, roleFilter, paymentFilter, sortField, sortDirection]);
+  }, [
+    users,
+    statusFilter,
+    roleFilter,
+    paymentFilter,
+    sortField,
+    sortDirection,
+  ]);
 
   const handleSort = (field: keyof UserProfile) => {
     if (field === sortField) {
@@ -239,7 +241,9 @@ const Users = () => {
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading users from database...</p>
+          <p className="mt-4 text-muted-foreground">
+            Loading users from database...
+          </p>
         </div>
       </div>
     );
@@ -252,10 +256,10 @@ const Users = () => {
           <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
             <Shield className="h-6 w-6 text-red-600" />
           </div>
-          <h3 className="mt-4 text-lg font-medium text-gray-900">
+          <h3 className="mt-4 text-lg font-medium text-foreground">
             Error Loading Data
           </h3>
-          <p className="mt-2 text-sm text-gray-500">{error}</p>
+          <p className="mt-2 text-sm text-muted-foreground">{error}</p>
           <div className="mt-6">
             <button
               onClick={fetchData}
@@ -275,10 +279,10 @@ const Users = () => {
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="text-2xl font-bold text-foreground">
             {isGlobalView ? "Global Users" : "Users"}
           </h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-sm text-muted-foreground">
             {isGlobalView
               ? "Manage users from all hubs"
               : `Manage users from ${currentHub} hub`}
@@ -286,7 +290,7 @@ const Users = () => {
         </div>
         <div className="flex items-center space-x-3">
           <div className="relative max-w-xs">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
             <input
               type="text"
               placeholder="Search users..."
@@ -321,21 +325,25 @@ const Users = () => {
           <h3 className="text-base font-medium text-gray-900">
             Users ({filteredUsers.length})
           </h3>
-          
+
           {/* Filters */}
           <div className="flex items-center space-x-3">
             <div className="flex items-center space-x-2">
               <Filter className="w-4 h-4 text-gray-400" />
               <select
                 value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value as "all" | "active" | "inactive")}
+                onChange={(e) =>
+                  setStatusFilter(
+                    e.target.value as "all" | "active" | "inactive"
+                  )
+                }
                 className="text-xs border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="all">All Status</option>
                 <option value="active">Active</option>
                 <option value="inactive">Inactive</option>
               </select>
-              
+
               <select
                 value={roleFilter}
                 onChange={(e) => setRoleFilter(e.target.value)}
@@ -346,7 +354,7 @@ const Users = () => {
                 <option value="manager">Manager</option>
                 <option value="user">User</option>
               </select>
-              
+
               <select
                 value={paymentFilter}
                 onChange={(e) => setPaymentFilter(e.target.value)}
@@ -365,72 +373,90 @@ const Users = () => {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50 sticky top-0 z-10">
               <tr>
-                <th 
+                <th
                   className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                   onClick={() => handleSort("first_name")}
                 >
                   <div className="flex items-center space-x-1">
                     <span>User</span>
-                    {sortField === "first_name" && (
-                      sortDirection === "asc" ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />
-                    )}
+                    {sortField === "first_name" &&
+                      (sortDirection === "asc" ? (
+                        <ChevronUp className="w-3 h-3" />
+                      ) : (
+                        <ChevronDown className="w-3 h-3" />
+                      ))}
                   </div>
                 </th>
                 {isGlobalView && (
-                  <th 
+                  <th
                     className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                     onClick={() => handleSort("hub_id")}
                   >
                     <div className="flex items-center space-x-1">
                       <span>Hub</span>
-                      {sortField === "hub_id" && (
-                        sortDirection === "asc" ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />
-                      )}
+                      {sortField === "hub_id" &&
+                        (sortDirection === "asc" ? (
+                          <ChevronUp className="w-3 h-3" />
+                        ) : (
+                          <ChevronDown className="w-3 h-3" />
+                        ))}
                     </div>
                   </th>
                 )}
-                <th 
+                <th
                   className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                   onClick={() => handleSort("email")}
                 >
                   <div className="flex items-center space-x-1">
                     <span>Email</span>
-                    {sortField === "email" && (
-                      sortDirection === "asc" ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />
-                    )}
+                    {sortField === "email" &&
+                      (sortDirection === "asc" ? (
+                        <ChevronUp className="w-3 h-3" />
+                      ) : (
+                        <ChevronDown className="w-3 h-3" />
+                      ))}
                   </div>
                 </th>
-                <th 
+                <th
                   className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                   onClick={() => handleSort("role")}
                 >
                   <div className="flex items-center space-x-1">
                     <span>Role</span>
-                    {sortField === "role" && (
-                      sortDirection === "asc" ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />
-                    )}
+                    {sortField === "role" &&
+                      (sortDirection === "asc" ? (
+                        <ChevronUp className="w-3 h-3" />
+                      ) : (
+                        <ChevronDown className="w-3 h-3" />
+                      ))}
                   </div>
                 </th>
-                <th 
+                <th
                   className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                   onClick={() => handleSort("payment_status")}
                 >
                   <div className="flex items-center space-x-1">
                     <span>Payment</span>
-                    {sortField === "payment_status" && (
-                      sortDirection === "asc" ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />
-                    )}
+                    {sortField === "payment_status" &&
+                      (sortDirection === "asc" ? (
+                        <ChevronUp className="w-3 h-3" />
+                      ) : (
+                        <ChevronDown className="w-3 h-3" />
+                      ))}
                   </div>
                 </th>
-                <th 
+                <th
                   className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                   onClick={() => handleSort("is_active")}
                 >
                   <div className="flex items-center space-x-1">
                     <span>Status</span>
-                    {sortField === "is_active" && (
-                      sortDirection === "asc" ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />
-                    )}
+                    {sortField === "is_active" &&
+                      (sortDirection === "asc" ? (
+                        <ChevronUp className="w-3 h-3" />
+                      ) : (
+                        <ChevronDown className="w-3 h-3" />
+                      ))}
                   </div>
                 </th>
                 <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -507,7 +533,7 @@ const Users = () => {
                       >
                         <Eye className="w-4 h-4" />
                       </button>
-                      <button 
+                      <button
                         onClick={() => handleEditUser(user)}
                         className="text-green-600 hover:text-green-900"
                         title="Edit User"
@@ -543,8 +569,11 @@ const Users = () => {
             <h3 className="mt-2 text-sm font-medium text-gray-900">
               No users found
             </h3>
-            <p className="mt-1 text-sm text-gray-500">
-              {searchQuery || statusFilter !== "all" || roleFilter !== "all" || paymentFilter !== "all"
+            <p className="mt-1 text-sm text-muted-foreground">
+              {searchQuery ||
+              statusFilter !== "all" ||
+              roleFilter !== "all" ||
+              paymentFilter !== "all"
                 ? "Try adjusting your search or filter criteria."
                 : "No users have been created yet."}
             </p>

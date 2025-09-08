@@ -1,48 +1,92 @@
-import { useState } from 'react'
-import { useHub } from '@sms-hub/ui'
-import { 
-  User, 
-  Building, 
-  Phone, 
-  CreditCard, 
-  Bell, 
-  Shield, 
-  Key, 
+import { useState } from "react";
+import { useHub } from "@sms-hub/ui";
+import {
+  User,
+  Building,
+  Phone,
+  CreditCard,
+  Bell,
+  Shield,
+  Key,
   ChevronRight,
   Save,
   Eye,
-  EyeOff
-} from 'lucide-react'
-import { useUserProfile, useCurrentUserCompany, useCurrentUserPhoneNumbers, useBrands, useCurrentUserCampaigns } from '@sms-hub/supabase/react'
-import { PhoneNumber } from '@sms-hub/types'
+  EyeOff,
+} from "lucide-react";
+import {
+  useUserProfile,
+  useCurrentUserCompany,
+  useCurrentUserPhoneNumbers,
+  useBrands,
+  useCurrentUserCampaigns,
+} from "@sms-hub/supabase/react";
+import { PhoneNumber } from "@sms-hub/types";
 
-type SettingsTab = 'profile' | 'company' | 'billing' | 'notifications' | 'security' | 'phone-numbers'
+type SettingsTab =
+  | "profile"
+  | "company"
+  | "billing"
+  | "notifications"
+  | "security"
+  | "phone-numbers";
 
 export function Settings() {
-  const { hubConfig, currentHub } = useHub()
-  const { data: userProfile } = useUserProfile()
-  const { data: company } = useCurrentUserCompany()
-  const { data: phoneNumbers = [] } = useCurrentUserPhoneNumbers()
-  const { data: brands = [] } = useBrands(company?.id || "")
-  const { data: campaigns = [] } = useCurrentUserCampaigns()
-  
-  const [activeTab, setActiveTab] = useState<SettingsTab>('profile')
-  const [showPassword, setShowPassword] = useState(false)
+  const { hubConfig, currentHub } = useHub();
+  const { data: userProfile } = useUserProfile();
+  const { data: company } = useCurrentUserCompany();
+  const { data: phoneNumbers = [] } = useCurrentUserPhoneNumbers();
+  const { data: brands = [] } = useBrands(company?.id || "");
+  const { data: campaigns = [] } = useCurrentUserCampaigns();
+
+  const [activeTab, setActiveTab] = useState<SettingsTab>("profile");
+  const [showPassword, setShowPassword] = useState(false);
 
   const navigation = [
-    { id: 'profile', name: 'Profile', icon: User, description: 'Personal information' },
-    { id: 'company', name: 'Company', icon: Building, description: 'Company details' },
-    { id: 'billing', name: 'Billing', icon: CreditCard, description: 'Payment methods' },
-    { id: 'notifications', name: 'Notifications', icon: Bell, description: 'Alert preferences' },
-    { id: 'security', name: 'Security', icon: Shield, description: 'Password & 2FA' },
-    { id: 'phone-numbers', name: 'Phone Numbers', icon: Phone, description: 'SMS numbers' },
-  ]
+    {
+      id: "profile",
+      name: "Profile",
+      icon: User,
+      description: "Personal information",
+    },
+    {
+      id: "company",
+      name: "Company",
+      icon: Building,
+      description: "Company details",
+    },
+    {
+      id: "billing",
+      name: "Billing",
+      icon: CreditCard,
+      description: "Payment methods",
+    },
+    {
+      id: "notifications",
+      name: "Notifications",
+      icon: Bell,
+      description: "Alert preferences",
+    },
+    {
+      id: "security",
+      name: "Security",
+      icon: Shield,
+      description: "Password & 2FA",
+    },
+    {
+      id: "phone-numbers",
+      name: "Phone Numbers",
+      icon: Phone,
+      description: "SMS numbers",
+    },
+  ];
 
   const renderProfileTab = () => (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-medium text-gray-900">Personal Information</h3>
-        <p className="mt-1 text-sm text-gray-500">
+        <h3 className="text-lg font-medium text-foreground">
+          Personal Information
+        </h3>
+        <p className="mt-1 text-sm text-muted-foreground">
           Update your personal details and contact information.
         </p>
       </div>
@@ -54,7 +98,7 @@ export function Settings() {
           </label>
           <input
             type="text"
-            defaultValue={userProfile?.first_name || ''}
+            defaultValue={userProfile?.first_name || ""}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
@@ -65,7 +109,7 @@ export function Settings() {
           </label>
           <input
             type="text"
-            defaultValue={userProfile?.last_name || ''}
+            defaultValue={userProfile?.last_name || ""}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
@@ -76,7 +120,7 @@ export function Settings() {
           </label>
           <input
             type="email"
-            defaultValue={userProfile?.email || ''}
+            defaultValue={userProfile?.email || ""}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
@@ -87,7 +131,7 @@ export function Settings() {
           </label>
           <input
             type="tel"
-            defaultValue={userProfile?.mobile_phone_number || ''}
+            defaultValue={userProfile?.mobile_phone_number || ""}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
@@ -100,13 +144,15 @@ export function Settings() {
         </button>
       </div>
     </div>
-  )
+  );
 
   const renderCompanyTab = () => (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-medium text-gray-900">Company Information</h3>
-        <p className="mt-1 text-sm text-gray-500">
+        <h3 className="text-lg font-medium text-foreground">
+          Company Information
+        </h3>
+        <p className="mt-1 text-sm text-muted-foreground">
           Manage your company details and account settings.
         </p>
       </div>
@@ -118,7 +164,7 @@ export function Settings() {
           </label>
           <input
             type="text"
-            defaultValue={company?.public_name || ''}
+            defaultValue={company?.public_name || ""}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
@@ -129,7 +175,7 @@ export function Settings() {
           </label>
           <input
             type="text"
-            defaultValue={company?.company_account_number || ''}
+            defaultValue={company?.company_account_number || ""}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             readOnly
           />
@@ -141,7 +187,7 @@ export function Settings() {
           </label>
           <input
             type="email"
-            defaultValue={company?.billing_email || ''}
+            defaultValue={company?.billing_email || ""}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
@@ -150,12 +196,14 @@ export function Settings() {
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Status
           </label>
-          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-            company?.is_active 
-              ? 'bg-green-100 text-green-800' 
-              : 'bg-red-100 text-red-800'
-          }`}>
-            {company?.is_active ? 'Active' : 'Inactive'}
+          <span
+            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+              company?.is_active
+                ? "bg-green-100 text-green-800"
+                : "bg-red-100 text-red-800"
+            }`}
+          >
+            {company?.is_active ? "Active" : "Inactive"}
           </span>
         </div>
       </div>
@@ -167,13 +215,15 @@ export function Settings() {
         </button>
       </div>
     </div>
-  )
+  );
 
   const renderBillingTab = () => (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-medium text-gray-900">Billing Information</h3>
-        <p className="mt-1 text-sm text-gray-500">
+        <h3 className="text-lg font-medium text-foreground">
+          Billing Information
+        </h3>
+        <p className="mt-1 text-sm text-muted-foreground">
           Manage your payment methods and billing preferences.
         </p>
       </div>
@@ -181,7 +231,9 @@ export function Settings() {
       <div className="bg-gray-50 rounded-lg p-6">
         <div className="flex items-center justify-between">
           <div>
-            <h4 className="text-sm font-medium text-gray-900">Current Plan</h4>
+            <h4 className="text-sm font-medium text-foreground">
+              Current Plan
+            </h4>
             <p className="text-sm text-gray-500">Professional Plan</p>
           </div>
           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
@@ -199,7 +251,9 @@ export function Settings() {
             <div className="flex items-center">
               <CreditCard className="w-5 h-5 text-gray-400 mr-3" />
               <div>
-                <p className="text-sm font-medium text-gray-900">•••• •••• •••• 4242</p>
+                <p className="text-sm font-medium text-gray-900">
+                  •••• •••• •••• 4242
+                </p>
                 <p className="text-xs text-gray-500">Expires 12/25</p>
               </div>
             </div>
@@ -225,13 +279,15 @@ export function Settings() {
         </button>
       </div>
     </div>
-  )
+  );
 
   const renderNotificationsTab = () => (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-medium text-gray-900">Notification Preferences</h3>
-        <p className="mt-1 text-sm text-gray-500">
+        <h3 className="text-lg font-medium text-foreground">
+          Notification Preferences
+        </h3>
+        <p className="mt-1 text-sm text-muted-foreground">
           Choose how you want to be notified about important events.
         </p>
       </div>
@@ -239,8 +295,12 @@ export function Settings() {
       <div className="space-y-4">
         <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
           <div>
-            <h4 className="text-sm font-medium text-gray-900">Campaign Notifications</h4>
-            <p className="text-sm text-gray-500">Get notified when campaigns are sent or completed</p>
+            <h4 className="text-sm font-medium text-foreground">
+              Campaign Notifications
+            </h4>
+            <p className="text-sm text-gray-500">
+              Get notified when campaigns are sent or completed
+            </p>
           </div>
           <label className="relative inline-flex items-center cursor-pointer">
             <input type="checkbox" defaultChecked className="sr-only peer" />
@@ -250,8 +310,12 @@ export function Settings() {
 
         <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
           <div>
-            <h4 className="text-sm font-medium text-gray-900">Billing Alerts</h4>
-            <p className="text-sm text-gray-500">Receive notifications about billing and payments</p>
+            <h4 className="text-sm font-medium text-foreground">
+              Billing Alerts
+            </h4>
+            <p className="text-sm text-gray-500">
+              Receive notifications about billing and payments
+            </p>
           </div>
           <label className="relative inline-flex items-center cursor-pointer">
             <input type="checkbox" defaultChecked className="sr-only peer" />
@@ -261,8 +325,12 @@ export function Settings() {
 
         <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
           <div>
-            <h4 className="text-sm font-medium text-gray-900">Security Alerts</h4>
-            <p className="text-sm text-gray-500">Get notified about account security events</p>
+            <h4 className="text-sm font-medium text-foreground">
+              Security Alerts
+            </h4>
+            <p className="text-sm text-gray-500">
+              Get notified about account security events
+            </p>
           </div>
           <label className="relative inline-flex items-center cursor-pointer">
             <input type="checkbox" className="sr-only peer" />
@@ -278,13 +346,15 @@ export function Settings() {
         </button>
       </div>
     </div>
-  )
+  );
 
   const renderSecurityTab = () => (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-medium text-gray-900">Security Settings</h3>
-        <p className="mt-1 text-sm text-gray-500">
+        <h3 className="text-lg font-medium text-foreground">
+          Security Settings
+        </h3>
+        <p className="mt-1 text-sm text-muted-foreground">
           Manage your password and security preferences.
         </p>
       </div>
@@ -304,7 +374,11 @@ export function Settings() {
               onClick={() => setShowPassword(!showPassword)}
               className="absolute inset-y-0 right-0 pr-3 flex items-center"
             >
-              {showPassword ? <EyeOff className="w-4 h-4 text-gray-400" /> : <Eye className="w-4 h-4 text-gray-400" />}
+              {showPassword ? (
+                <EyeOff className="w-4 h-4 text-gray-400" />
+              ) : (
+                <Eye className="w-4 h-4 text-gray-400" />
+              )}
             </button>
           </div>
         </div>
@@ -327,30 +401,36 @@ export function Settings() {
         </button>
       </div>
     </div>
-  )
+  );
 
   const renderPhoneNumbersTab = () => (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-medium text-gray-900">Phone Numbers</h3>
-        <p className="mt-1 text-sm text-gray-500">
+        <h3 className="text-lg font-medium text-foreground">Phone Numbers</h3>
+        <p className="mt-1 text-sm text-muted-foreground">
           Manage your SMS phone numbers and their settings.
         </p>
       </div>
 
       <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200">
-          <h4 className="text-sm font-medium text-gray-900">Active Phone Numbers</h4>
+          <h4 className="text-sm font-medium text-gray-900">
+            Active Phone Numbers
+          </h4>
         </div>
-        
+
         <div className="divide-y divide-gray-200">
           {phoneNumbers.length > 0 ? (
             phoneNumbers.map((phone: PhoneNumber) => (
               <div key={phone.id} className="px-6 py-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-900">{phone.phone_number}</p>
-                    <p className="text-xs text-gray-500">ID: {phone.id.slice(0, 8)}...</p>
+                    <p className="text-sm font-medium text-gray-900">
+                      {phone.phone_number}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      ID: {phone.id.slice(0, 8)}...
+                    </p>
                   </div>
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                     Active
@@ -361,8 +441,10 @@ export function Settings() {
           ) : (
             <div className="px-6 py-8 text-center">
               <Phone className="mx-auto h-12 w-12 text-gray-400" />
-              <h3 className="mt-2 text-sm font-medium text-gray-900">No phone numbers</h3>
-              <p className="mt-1 text-sm text-gray-500">
+              <h3 className="mt-2 text-sm font-medium text-gray-900">
+                No phone numbers
+              </h3>
+              <p className="mt-1 text-sm text-muted-foreground">
                 Get started by adding your first phone number.
               </p>
             </div>
@@ -377,33 +459,33 @@ export function Settings() {
         </button>
       </div>
     </div>
-  )
+  );
 
   const renderTabContent = () => {
     switch (activeTab) {
-      case 'profile':
-        return renderProfileTab()
-      case 'company':
-        return renderCompanyTab()
-      case 'billing':
-        return renderBillingTab()
-      case 'notifications':
-        return renderNotificationsTab()
-      case 'security':
-        return renderSecurityTab()
-      case 'phone-numbers':
-        return renderPhoneNumbersTab()
+      case "profile":
+        return renderProfileTab();
+      case "company":
+        return renderCompanyTab();
+      case "billing":
+        return renderBillingTab();
+      case "notifications":
+        return renderNotificationsTab();
+      case "security":
+        return renderSecurityTab();
+      case "phone-numbers":
+        return renderPhoneNumbersTab();
       default:
-        return renderProfileTab()
+        return renderProfileTab();
     }
-  }
+  };
 
   return (
     <div className="space-y-6 p-6">
       {/* Page Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-        <p className="mt-1 text-sm text-gray-500">
+        <h1 className="text-2xl font-bold text-foreground">Settings</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
           Manage your account settings and preferences in {currentHub} hub
         </p>
       </div>
@@ -420,14 +502,16 @@ export function Settings() {
                   onClick={() => setActiveTab(item.id as SettingsTab)}
                   className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
                     activeTab === item.id
-                      ? 'bg-blue-100 text-blue-700'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                      ? "bg-blue-100 text-blue-700"
+                      : "text-foreground hover:bg-accent hover:text-foreground"
                   }`}
                 >
                   <item.icon className="w-4 h-4 mr-3" />
                   <div className="text-left">
                     <div>{item.name}</div>
-                    <div className="text-xs text-gray-500">{item.description}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {item.description}
+                    </div>
                   </div>
                 </button>
               ))}

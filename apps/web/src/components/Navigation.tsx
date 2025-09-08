@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Button, useHub, HubLogo, HubSwitcher } from "@sms-hub/ui";
+import { Button, useHub, HubLogo, HubSwitcher, ThemeToggle } from "@sms-hub/ui";
 import {
   Menu,
   X,
@@ -40,8 +40,7 @@ const Navigation = () => {
     { path: "/pricing", label: "Pricing", icon: CreditCard },
     { path: "/about", label: "About", icon: Users },
     { path: "/faq", label: "FAQ", icon: HelpCircle },
-    { path: "/phone-demo", label: "Phone Demo", icon: Phone },
-    { path: "/platform-demo", label: "Platform Demo", icon: MessageSquare },
+    { path: "/demo", label: "Demo", icon: MessageSquare },
   ];
 
   return (
@@ -89,30 +88,21 @@ const Navigation = () => {
               FAQ
             </button>
             <button
-              onClick={() => handleDesktopNavClick("/phone-demo")}
+              onClick={() => handleDesktopNavClick("/demo")}
               className={`transition-colors text-sm font-medium ${
-                location.pathname === "/phone-demo"
+                location.pathname === "/demo"
                   ? `${hubColors.text} hub-text-primary`
                   : "text-white hover:text-gray-300"
               }`}
             >
-              Phone Demo
-            </button>
-            <button
-              onClick={() => handleDesktopNavClick("/platform-demo")}
-              className={`transition-colors text-sm font-medium ${
-                location.pathname === "/platform-demo"
-                  ? `${hubColors.text} hub-text-primary`
-                  : "text-white hover:text-gray-300"
-              }`}
-            >
-              Platform Demo
+              Demo
             </button>
           </div>
 
           {/* Right side - Contact button (Desktop only) */}
           <div className="hidden md:flex items-center space-x-4">
             <HubSwitcher />
+            <ThemeToggle />
             <Button
               variant="outline"
               size="sm"
@@ -141,6 +131,7 @@ const Navigation = () => {
             >
               Contact
             </Button>
+            <ThemeToggle />
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="text-white hover:text-gray-300 transition-colors p-1"

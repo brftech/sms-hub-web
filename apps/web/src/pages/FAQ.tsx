@@ -1,4 +1,4 @@
-import { PageLayout } from "@sms-hub/ui";
+import { PageLayout, SEO } from "@sms-hub/ui";
 
 import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";
@@ -10,6 +10,9 @@ import {
   Building,
   ChevronDown,
   ChevronUp,
+  ArrowRight,
+  CheckCircle,
+  Target,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -156,53 +159,91 @@ const FAQ = () => {
       navigation={<Navigation />}
       footer={<Footer />}
     >
-      <div className="min-h-screen bg-black pt-20 pb-12 px-4 sm:px-6 lg:px-8 relative">
-        {/* Minimal background */}
-        <div className="absolute inset-0 bg-black"></div>
+      <SEO
+        title="FAQ - Gnymble SMS Platform"
+        description="Common questions from regulated businesses about SMS compliance, setup, and our platform. Get answers about cigar retailers, private clubs, and premium venues."
+        keywords="SMS FAQ, business texting questions, regulated business SMS, compliance questions, cigar retailer SMS"
+      />
 
-        <div className="relative z-10 max-w-4xl mx-auto">
-          {/* Hero Section */}
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center px-3 py-1 rounded-full bg-orange-500/20 border border-orange-500/30 mb-6">
-              <HelpCircle className="w-4 h-4 text-orange-400 mr-2" />
-              <span className="text-xs font-medium text-orange-400">
+      <div className="min-h-screen bg-black pt-20 pb-12 relative">
+        {/* Subtle background elements */}
+        <div className="absolute inset-0">
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-orange-500/5 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-orange-500/5 rounded-full blur-3xl"></div>
+        </div>
+
+        <div className="relative z-10 max-w-6xl mx-auto px-6">
+          {/* Hero Section - Matching Homepage Style */}
+          <div className="text-center mb-20">
+            <div className="inline-flex items-center px-4 py-2 rounded-full bg-orange-500/20 border border-orange-500/30 mb-8">
+              <Target className="w-4 h-4 text-orange-400 mr-2" />
+              <span className="text-sm font-medium text-orange-400">
                 COMMON QUESTIONS
               </span>
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
+
+            <h1
+              className="text-4xl md:text-6xl font-bold text-white mb-8 leading-tight"
+              style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+            >
               Questions from
               <span className="gradient-text block">regulated businesses</span>
             </h1>
-            <p className="text-lg text-gray-300 max-w-2xl mx-auto">
+
+            <p
+              className="text-xl text-gray-300 max-w-3xl mx-auto mb-12 leading-relaxed"
+              style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+            >
               The most common questions we get from cigar retailers, private
               clubs, and premium venues about SMS compliance and our platform.
             </p>
+
+            <div className="flex items-center justify-center space-x-8 text-gray-400 text-sm">
+              <div className="flex items-center">
+                <CheckCircle className="w-4 h-4 text-orange-500 mr-2" />
+                <span>No rejections</span>
+              </div>
+              <div className="flex items-center">
+                <CheckCircle className="w-4 h-4 text-orange-500 mr-2" />
+                <span>Industry expertise</span>
+              </div>
+              <div className="flex items-center">
+                <CheckCircle className="w-4 h-4 text-orange-500 mr-2" />
+                <span>Real support</span>
+              </div>
+            </div>
           </div>
 
           {/* FAQ Categories */}
-          <div className="space-y-12">
+          <div className="space-y-16">
             {faqData.map((category, categoryIndex) => (
-              <div key={categoryIndex} className="space-y-6">
-                <div className="text-center mb-8">
-                  <div className="inline-flex items-center justify-center w-12 h-12 bg-orange-500/20 border border-orange-500/30 rounded-xl mb-4">
-                    <category.icon className="w-6 h-6 text-orange-400" />
+              <div key={categoryIndex} className="space-y-8">
+                <div className="text-center mb-12">
+                  <div className="inline-flex items-center justify-center w-16 h-16 bg-orange-500/20 border border-orange-500/30 rounded-xl mb-6">
+                    <category.icon className="w-8 h-8 text-orange-400" />
                   </div>
-                  <h2 className="text-2xl md:text-3xl font-bold text-white">
+                  <h2
+                    className="text-3xl md:text-4xl font-bold text-white"
+                    style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+                  >
                     {category.category}
                   </h2>
                 </div>
 
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {category.items.map((item) => (
                     <div
                       key={item.id}
-                      className="card-modern rounded-xl overflow-hidden transition-all duration-300 hover:border-orange-500/40"
+                      className="bg-gradient-to-br from-gray-800/30 to-gray-900/30 backdrop-blur-sm rounded-2xl border border-gray-700/50 overflow-hidden transition-all duration-300 hover:border-orange-500/30"
                     >
                       <button
                         onClick={() => toggleItem(item.id)}
-                        className="w-full p-6 text-left flex items-center justify-between hover:bg-gray-800/20 transition-colors duration-200"
+                        className="w-full p-8 text-left flex items-center justify-between hover:bg-gray-800/20 transition-colors duration-200"
                       >
-                        <h3 className="text-lg font-semibold text-white pr-4">
+                        <h3
+                          className="text-xl font-semibold text-white pr-6"
+                          style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+                        >
                           {item.question}
                         </h3>
                         <div className="flex-shrink-0">
@@ -215,9 +256,14 @@ const FAQ = () => {
                       </button>
 
                       {openItems.has(item.id) && (
-                        <div className="px-6 pb-6">
-                          <div className="pt-4 border-t border-gray-700/30">
-                            <p className="text-gray-300 leading-relaxed">
+                        <div className="px-8 pb-8">
+                          <div className="pt-6 border-t border-gray-700/30">
+                            <p
+                              className="text-gray-300 leading-relaxed text-lg"
+                              style={{
+                                fontFamily: "Inter, system-ui, sans-serif",
+                              }}
+                            >
                               {item.answer}
                             </p>
                           </div>
@@ -230,33 +276,41 @@ const FAQ = () => {
             ))}
           </div>
 
-          {/* Contact CTA Section */}
-          <section className="mt-20 card-modern rounded-2xl p-8 text-center">
-            <div className="max-w-2xl mx-auto">
-              <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
+          {/* Final CTA */}
+          <div className="text-center mt-20">
+            <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-3xl border border-gray-700/50 p-12 max-w-4xl mx-auto">
+              <h2
+                className="text-3xl md:text-4xl font-bold text-white mb-6"
+                style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+              >
                 Ready to get started for $179?
               </h2>
-              <p className="text-gray-300 mb-6 leading-relaxed">
+              <p
+                className="text-gray-300 mb-10 max-w-2xl mx-auto text-lg leading-relaxed"
+                style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+              >
                 No more SMS rejections. No compliance headaches. Just
                 professional texting that works for your regulated business.
               </p>
-              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <a
                   href="/contact"
-                  className="btn-modern inline-flex items-center justify-center px-8 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold rounded-lg hover:from-orange-600 hover:to-orange-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-orange-500/25"
+                  className="px-10 py-4 bg-orange-600 text-white font-bold rounded-full hover:bg-orange-700 transition-all duration-300 text-lg tracking-wide uppercase flex items-center justify-center group"
+                  style={{ fontFamily: "Inter, system-ui, sans-serif" }}
                 >
-                  <MessageSquare className="w-4 h-4 mr-2" />
                   Get Started Today
+                  <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
                 </a>
                 <a
                   href="/pricing"
-                  className="btn-modern inline-flex items-center justify-center px-8 py-3 border border-orange-500/50 text-orange-400 font-semibold rounded-lg hover:bg-orange-500/10 hover:border-orange-400 transition-all duration-300"
+                  className="px-10 py-4 border border-orange-500/50 text-orange-400 font-bold rounded-full hover:bg-orange-500/10 hover:border-orange-400 transition-all duration-300 text-lg tracking-wide uppercase flex items-center justify-center"
+                  style={{ fontFamily: "Inter, system-ui, sans-serif" }}
                 >
                   View Pricing Details
                 </a>
               </div>
             </div>
-          </section>
+          </div>
         </div>
       </div>
     </PageLayout>

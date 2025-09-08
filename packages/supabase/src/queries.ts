@@ -129,6 +129,10 @@ export const useOnboardingSubmission = (companyId: string, hubId: number) => {
   return useQuery({
     queryKey: ["onboarding-submission", companyId, hubId],
     queryFn: async () => {
+      if (!companyId) {
+        return null;
+      }
+
       const supabase = getSupabaseClient();
       const { data, error } = await supabase
         .from("onboarding_submissions")
@@ -140,6 +144,7 @@ export const useOnboardingSubmission = (companyId: string, hubId: number) => {
       if (error) throw error;
       return data;
     },
+    enabled: !!companyId, // Only run query if companyId is truthy
   });
 };
 
@@ -183,6 +188,10 @@ export const useBrands = (companyId: string) => {
   return useQuery({
     queryKey: ["brands", companyId],
     queryFn: async () => {
+      if (!companyId) {
+        return [];
+      }
+
       const supabase = getSupabaseClient();
       const { data, error } = await supabase
         .from("brands")
@@ -193,6 +202,7 @@ export const useBrands = (companyId: string) => {
       if (error) throw error;
       return data;
     },
+    enabled: !!companyId, // Only run query if companyId is truthy
   });
 };
 
@@ -499,9 +509,11 @@ export const useAdminStats = (hubId: number) => {
 
       return {
         totalCompanies: companies?.length || 0,
-        activeCompanies: companies?.filter((c: Company) => c.is_active)?.length || 0,
+        activeCompanies:
+          companies?.filter((c: Company) => c.is_active)?.length || 0,
         totalUsers: users?.length || 0,
-        activeUsers: users?.filter((u: UserProfile) => u.is_active)?.length || 0,
+        activeUsers:
+          users?.filter((u: UserProfile) => u.is_active)?.length || 0,
         messagesToday: 0,
         revenueThisMonth: 0,
         failedMessages: 0,

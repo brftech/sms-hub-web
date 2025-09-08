@@ -76,6 +76,8 @@ export { default as PageTransition } from "./components/page-transition";
 
 // Layout components
 export * from "./components/layout";
+export { default as CTASection } from "./components/cta-section";
+export { ThemeToggle } from "./components/ThemeToggle";
 
 // Providers - HubProvider is exported from contexts/HubContext
 
@@ -91,6 +93,7 @@ export * from "./theme/styled-provider";
 export * from "./theme/styled-components";
 
 // CSS files are available for import at:
+// import "@sms-hub/ui/styles/shared-design-system.css"; // Comprehensive dark/light theme system
 // import "@sms-hub/ui/styles/globals.css";
 // import "@sms-hub/ui/styles/gnymble.css";
 // import "@sms-hub/ui/styles/percytech.css";

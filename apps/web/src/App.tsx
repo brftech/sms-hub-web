@@ -18,8 +18,7 @@ import Landing from "./pages/Landing";
 import CigarLanding from "./pages/CigarLanding";
 
 import FAQ from "./pages/FAQ";
-import PhoneDemo from "./pages/PhoneDemo";
-import PlatformDemo from "./pages/PlatformDemo";
+import Demo from "./pages/Demo";
 
 const queryClient = new QueryClient();
 
@@ -29,14 +28,15 @@ const AppRoutes = () => {
   useScrollToTop();
 
   // Check if we're on the cigar subdomain
-  const isCigarSubdomain = window.location.hostname.includes('cigar.') || 
-                          window.location.hostname === 'cigar.gnymble.com';
+  const isCigarSubdomain =
+    window.location.hostname.includes("cigar.") ||
+    window.location.hostname === "cigar.gnymble.com";
 
   // In production, show Landing page publicly; in dev, show Home page for development
   // But if we're on cigar subdomain, always show CigarLanding
   const isProduction = import.meta.env.PROD;
   let DefaultComponent = isProduction ? Landing : Home;
-  
+
   if (isCigarSubdomain) {
     DefaultComponent = CigarLanding;
   }
@@ -44,20 +44,95 @@ const AppRoutes = () => {
   return (
     <Routes>
       <Route path="/" element={<DefaultComponent />} />
-      <Route path="/landing" element={<PageTransition><Landing /></PageTransition>} />
-      <Route path="/cigar" element={<PageTransition><CigarLanding /></PageTransition>} />
-      <Route path="/home" element={<PageTransition><Home /></PageTransition>} />
-      <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
+      <Route
+        path="/landing"
+        element={
+          <PageTransition>
+            <Landing />
+          </PageTransition>
+        }
+      />
+      <Route
+        path="/cigar"
+        element={
+          <PageTransition>
+            <CigarLanding />
+          </PageTransition>
+        }
+      />
+      <Route
+        path="/home"
+        element={
+          <PageTransition>
+            <Home />
+          </PageTransition>
+        }
+      />
+      <Route
+        path="/contact"
+        element={
+          <PageTransition>
+            <Contact />
+          </PageTransition>
+        }
+      />
 
-
-      <Route path="/faq" element={<PageTransition><FAQ /></PageTransition>} />
-      <Route path="/terms" element={<PageTransition><Terms /></PageTransition>} />
-      <Route path="/privacy" element={<PageTransition><Privacy /></PageTransition>} />
-      <Route path="/about" element={<PageTransition><About /></PageTransition>} />
-      <Route path="/pricing" element={<PageTransition><Pricing /></PageTransition>} />
-      <Route path="/phone-demo" element={<PageTransition><PhoneDemo /></PageTransition>} />
-      <Route path="/platform-demo" element={<PageTransition><PlatformDemo /></PageTransition>} />
-      <Route path="*" element={<PageTransition><Home /></PageTransition>} />
+      <Route
+        path="/faq"
+        element={
+          <PageTransition>
+            <FAQ />
+          </PageTransition>
+        }
+      />
+      <Route
+        path="/terms"
+        element={
+          <PageTransition>
+            <Terms />
+          </PageTransition>
+        }
+      />
+      <Route
+        path="/privacy"
+        element={
+          <PageTransition>
+            <Privacy />
+          </PageTransition>
+        }
+      />
+      <Route
+        path="/about"
+        element={
+          <PageTransition>
+            <About />
+          </PageTransition>
+        }
+      />
+      <Route
+        path="/pricing"
+        element={
+          <PageTransition>
+            <Pricing />
+          </PageTransition>
+        }
+      />
+      <Route
+        path="/demo"
+        element={
+          <PageTransition>
+            <Demo />
+          </PageTransition>
+        }
+      />
+      <Route
+        path="*"
+        element={
+          <PageTransition>
+            <Home />
+          </PageTransition>
+        }
+      />
     </Routes>
   );
 };

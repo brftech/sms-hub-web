@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useHub, HubLogo } from "@sms-hub/ui";
+import { webEnvironment } from "../../../config/webEnvironment";
 
 interface HeroContent {
   fixedText: string;
@@ -104,12 +105,14 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           >
             Get Started
           </a>
-          <a
-            href="/demo"
-            className="border-2 border-orange-600 text-orange-400 hover:bg-orange-600 hover:text-white font-bold py-4 px-8 rounded-lg transition-colors duration-200 text-lg"
-          >
-            See Demo
-          </a>
+          {webEnvironment.features.demoButtons() && (
+            <a
+              href="/demo"
+              className="border-2 border-orange-600 text-orange-400 hover:bg-orange-600 hover:text-white font-bold py-4 px-8 rounded-lg transition-colors duration-200 text-lg"
+            >
+              See Demo
+            </a>
+          )}
         </div>
 
         {/* Bold tagline - moved lower */}

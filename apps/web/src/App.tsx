@@ -116,14 +116,16 @@ const AppRoutes = () => {
           </PageTransition>
         }
       />
-      <Route
-        path="/demo"
-        element={
-          <PageTransition>
-            <Demo />
-          </PageTransition>
-        }
-      />
+      {webEnvironment.features.demoPage() && (
+        <Route
+          path="/demo"
+          element={
+            <PageTransition>
+              <Demo />
+            </PageTransition>
+          }
+        />
+      )}
       <Route
         path="*"
         element={

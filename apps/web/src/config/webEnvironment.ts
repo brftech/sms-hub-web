@@ -52,5 +52,9 @@ export const webEnvironment: EnvironmentAdapter = {
     debugMode: () => webEnvironment.isDevelopment(),
     analytics: () => webEnvironment.isProduction(),
     errorReporting: () => webEnvironment.isProduction(),
+    // Demo features - only show in development
+    demoPage: () => webEnvironment.isDevelopment(),
+    demoButtons: () => webEnvironment.isDevelopment(),
+    demoNavigation: () => webEnvironment.isDevelopment(),
   },
 };

@@ -1,6 +1,6 @@
 {
-  "buildCommand": "npm install && npm run build",
-  "installCommand": "npm install",
+  "buildCommand": "cd ../.. && pnpm install && cd apps/web && pnpm run build",
+  "installCommand": "cd ../.. && pnpm install",
   "framework": null,
   "rewrites": [
     {

@@ -39,9 +39,9 @@ export default function Demo() {
       footer={<Footer />}
     >
       <SEO
-        title="Live Demo - Gnymble SMS Platform"
-        description="Experience our SMS platform in action. See both the customer experience and business dashboard working together in real-time."
-        keywords="SMS demo, business texting demo, platform demo, customer experience, business dashboard"
+        title="Static Preview - Gnymble SMS Platform"
+        description="Preview our SMS platform interface. See both the customer experience and business dashboard in this static representation. Contact us for a live demo."
+        keywords="SMS preview, business texting preview, platform preview, customer experience, business dashboard, contact for demo"
       />
 
       <div className="min-h-screen bg-black pt-20 pb-12 relative">
@@ -57,7 +57,7 @@ export default function Demo() {
             <div className="inline-flex items-center px-4 py-2 rounded-full bg-orange-500/20 border border-orange-500/30 mb-8">
               <Target className="w-4 h-4 text-orange-400 mr-2" />
               <span className="text-sm font-medium text-orange-400">
-                LIVE DEMO
+                STATIC PREVIEW
               </span>
             </div>
 
@@ -66,22 +66,22 @@ export default function Demo() {
               style={{ fontFamily: "Inter, system-ui, sans-serif" }}
             >
               See SMS in
-              <span className="gradient-text block">simulated action</span>
+              <span className="gradient-text block">static preview</span>
             </h1>
 
             <p
               className="text-xl text-gray-300 max-w-3xl mx-auto mb-12 leading-relaxed"
               style={{ fontFamily: "Inter, system-ui, sans-serif" }}
             >
-              Experience both sides of our SMS platform through an interactive
-              simulation. See what your customers receive and how easy it is to
-              manage from your business dashboard.
+              Preview both sides of our SMS platform through this static
+              representation. See what your customers receive and how easy it is
+              to manage from your business dashboard.
             </p>
 
             <div className="flex items-center justify-center space-x-8 text-gray-400 text-sm">
               <div className="flex items-center">
                 <CheckCircle className="w-4 h-4 text-orange-500 mr-2" />
-                <span>Simulated sync</span>
+                <span>Static preview</span>
               </div>
               <div className="flex items-center">
                 <CheckCircle className="w-4 h-4 text-orange-500 mr-2" />
@@ -89,7 +89,7 @@ export default function Demo() {
               </div>
               <div className="flex items-center">
                 <CheckCircle className="w-4 h-4 text-orange-500 mr-2" />
-                <span>No real SMS sent</span>
+                <span>Contact for live demo</span>
               </div>
             </div>
           </div>
@@ -126,27 +126,15 @@ export default function Demo() {
             </div>
           </div>
 
-          {/* Live Connection Indicator */}
+          {/* Static Preview Notice */}
           <div className="text-center mb-12">
-            <div
-              className={`inline-flex items-center px-4 py-2 rounded-full border transition-all duration-500 ${
-                showConnectionIndicator
-                  ? "bg-green-500/20 border-green-500/30 text-green-400"
-                  : "bg-gray-500/20 border-gray-500/30 text-gray-400"
-              }`}
-            >
-              <div
-                className={`w-2 h-2 rounded-full mr-2 ${
-                  showConnectionIndicator
-                    ? "bg-green-400 animate-pulse"
-                    : "bg-gray-400"
-                }`}
-              ></div>
+            <div className="inline-flex items-center px-4 py-2 rounded-full border bg-blue-500/20 border-blue-500/30 text-blue-400">
+              <div className="w-2 h-2 rounded-full mr-2 bg-blue-400"></div>
               <span
                 className="text-sm font-medium"
                 style={{ fontFamily: "Inter, system-ui, sans-serif" }}
               >
-                {showConnectionIndicator ? "Simulation Active" : "Demo Ready"}
+                Static Preview - Contact us for a live demo
               </span>
             </div>
           </div>
@@ -168,7 +156,7 @@ export default function Demo() {
                       style={{ fontFamily: "Inter, system-ui, sans-serif" }}
                     >
                       Professional, engaging SMS messages that build trust and
-                      drive action. (Simulated experience)
+                      drive action. (Static preview)
                     </p>
                   </div>
                   <div className="flex justify-center">
@@ -189,7 +177,7 @@ export default function Demo() {
                       style={{ fontFamily: "Inter, system-ui, sans-serif" }}
                     >
                       Simple, powerful tools to manage conversations and grow
-                      your business. (Simulated experience)
+                      your business. (Static preview)
                     </p>
                   </div>
                   <div className="flex justify-center">
@@ -214,8 +202,8 @@ export default function Demo() {
                   className="text-gray-300 text-lg leading-relaxed max-w-3xl mx-auto"
                   style={{ fontFamily: "Inter, system-ui, sans-serif" }}
                 >
-                  Watch how messages flow between your business dashboard and
-                  your customer's phone in this interactive simulation.
+                  See how messages flow between your business dashboard and your
+                  customer's phone in this static preview.
                 </p>
               </div>
 
@@ -270,13 +258,13 @@ export default function Demo() {
                     className="text-lg font-semibold text-white mb-2"
                     style={{ fontFamily: "Inter, system-ui, sans-serif" }}
                   >
-                    Try Sending
+                    Preview Interface
                   </h3>
                   <p
                     className="text-gray-400 text-sm"
                     style={{ fontFamily: "Inter, system-ui, sans-serif" }}
                   >
-                    Switch to Business Dashboard and send a message
+                    Switch to Business Dashboard to see the interface
                   </p>
                 </div>
                 <div className="text-center">
@@ -287,13 +275,13 @@ export default function Demo() {
                     className="text-lg font-semibold text-white mb-2"
                     style={{ fontFamily: "Inter, system-ui, sans-serif" }}
                   >
-                    Watch Sync
+                    See Both Sides
                   </h3>
                   <p
                     className="text-gray-400 text-sm"
                     style={{ fontFamily: "Inter, system-ui, sans-serif" }}
                   >
-                    See messages appear instantly on both sides
+                    Preview how messages appear on both sides
                   </p>
                 </div>
                 <div className="text-center">
@@ -304,13 +292,13 @@ export default function Demo() {
                     className="text-lg font-semibold text-white mb-2"
                     style={{ fontFamily: "Inter, system-ui, sans-serif" }}
                   >
-                    Experience Both
+                    Contact for Demo
                   </h3>
                   <p
                     className="text-gray-400 text-sm"
                     style={{ fontFamily: "Inter, system-ui, sans-serif" }}
                   >
-                    Switch between tabs to see the full experience
+                    Submit our contact form to schedule a live demo
                   </p>
                 </div>
               </div>
@@ -324,17 +312,18 @@ export default function Demo() {
                 className="text-3xl md:text-4xl font-bold text-white mb-6"
                 style={{ fontFamily: "Inter, system-ui, sans-serif" }}
               >
-                Ready to get started for $179?
+                Ready to see it live?
               </h2>
               <p
                 className="text-gray-300 mb-10 max-w-2xl mx-auto text-lg leading-relaxed"
                 style={{ fontFamily: "Inter, system-ui, sans-serif" }}
               >
-                No more SMS rejections. No compliance headaches. Just
-                professional texting that works for your regulated business.
+                This was just a static preview. No more SMS rejections. No
+                compliance headaches. Just professional texting that works for
+                your regulated business.
                 <br />
                 <span className="text-orange-400 font-medium">
-                  Ready to see it in action with real SMS?
+                  Submit our contact form to schedule a live demo with real SMS.
                 </span>
               </p>
               <button
@@ -342,7 +331,7 @@ export default function Demo() {
                 className="px-10 py-4 bg-orange-600 text-white font-bold rounded-full hover:bg-orange-700 transition-all duration-300 text-lg tracking-wide uppercase flex items-center justify-center mx-auto group"
                 style={{ fontFamily: "Inter, system-ui, sans-serif" }}
               >
-                Get Started Today
+                Schedule Live Demo
                 <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
               </button>
             </div>

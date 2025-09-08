@@ -457,7 +457,7 @@ export default function PhoneInteractive() {
                     } mb-1`}
                   >
                     <div
-                      className={`max-w-[80%] px-3 py-2 rounded-[18px] text-sm leading-relaxed ${
+                      className={`max-w-[80%] px-3 py-2 rounded-[18px] text-sm leading-relaxed text-left ${
                         message.sender === "user"
                           ? "bg-blue-500 text-white"
                           : "bg-gray-200 text-black"
@@ -475,9 +475,9 @@ export default function PhoneInteractive() {
                   <div
                     className={`flex ${
                       message.sender === "user"
-                        ? "justify-end"
-                        : "justify-start"
-                    } ${message.sender === "user" ? "pr-3" : "pl-3"}`}
+                        ? "justify-end pr-3"
+                        : "justify-start pl-3"
+                    }`}
                   >
                     <span className="text-[10px] text-gray-500">
                       {new Date(message.timestamp).toLocaleTimeString([], {
@@ -499,7 +499,7 @@ export default function PhoneInteractive() {
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyPress={handleKeyPress}
-              onClick={handleInputClick}
+              // onClick={handleInputClick} // Disabled: Make message field unclickable
               onFocus={() =>
                 setPhoneState((prev) => ({ ...prev, isInputFocused: true }))
               }
@@ -547,22 +547,22 @@ export default function PhoneInteractive() {
               </div>
             </div>
           )
-        ) : (
-          <div className="px-4 py-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-700 text-sm font-medium">
-            <div className="text-center">
-              <div className="font-semibold">Click Message Field</div>
-              <div className="text-xs opacity-75">to start the demo</div>
-            </div>
-            <button
-              onClick={() =>
-                setPhoneState((prev) => ({ ...prev, showInfo: true }))
-              }
-              className="mt-2 w-full px-2 py-1 bg-amber-100 border border-amber-300 rounded text-amber-800 text-xs font-medium hover:bg-amber-200 transition-colors duration-200"
-            >
-              Why phone verification?
-            </button>
-          </div>
-        )}
+        ) : // Hidden: Click Message Field box and Why Phone Verification button
+        // <div className="px-4 py-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-700 text-sm font-medium">
+        //   <div className="text-center">
+        //     <div className="font-semibold">Click Message Field</div>
+        //     <div className="text-xs opacity-75">to start the demo</div>
+        //   </div>
+        //   <button
+        //     onClick={() =>
+        //       setPhoneState((prev) => ({ ...prev, showInfo: true }))
+        //     }
+        //     className="mt-2 w-full px-2 py-1 bg-amber-100 border border-amber-300 rounded text-amber-800 text-xs font-medium hover:bg-amber-200 transition-colors duration-200"
+        //   >
+        //     Why phone verification?
+        //   </button>
+        // </div>
+        null}
       </div>
 
       {/* SMS Authentication Modal */}

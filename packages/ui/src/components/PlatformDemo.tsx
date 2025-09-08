@@ -99,8 +99,8 @@ export default function PlatformDemo() {
     () => [
       {
         id: "1",
-        personName: "Jake Davis",
-        company: "Anstead's Cigar",
+        personName: "Carlos Rodriguez",
+        company: "Havana Dreams Cigar Lounge",
         assignedAgent: "Charles",
         lastMessage:
           "Thanks for contacting Gnymble Support! Someone will get with you ASAP. Promise :)",
@@ -112,8 +112,8 @@ export default function PlatformDemo() {
       },
       {
         id: "2",
-        personName: "Impact Workforce",
-        company: "Impact Workforce",
+        personName: "Marcus Thompson",
+        company: "Premium Cigar Emporium",
         assignedAgent: "John",
         lastMessage: "I have a question about our recent order",
         lastMessageDate: "08/28/2025",
@@ -124,8 +124,8 @@ export default function PlatformDemo() {
       },
       {
         id: "3",
-        personName: "Bucksnorts Cigar",
-        company: "Bucksnorts Cigar",
+        personName: "Diego Martinez",
+        company: "Casa del Tabaco",
         assignedAgent: "Charles",
         lastMessage: "Can you help me with my account?",
         lastMessageDate: "08/27/2025",
@@ -160,7 +160,7 @@ export default function PlatformDemo() {
         id: "1",
         title: "TEST",
         created: "08/12/2025 7:15 AM",
-        creator: "Zapier Gnymble",
+        creator: "Alejandro Fuente",
         messageType: "SMS",
         segments: 1,
         messageContent: "BlahBlahBLah",
@@ -174,7 +174,7 @@ export default function PlatformDemo() {
         id: "2",
         title: "TEST1010",
         created: "08/11/2025 2:30 PM",
-        creator: "Justin Castellat",
+        creator: "Roberto Padron",
         messageType: "SMS",
         segments: 10,
         messageContent: "Test",
@@ -207,11 +207,11 @@ export default function PlatformDemo() {
     () => [
       {
         id: "1",
-        firstName: "Jake",
-        lastName: "Davis",
-        company: "Anstead's Cigar",
+        firstName: "Carlos",
+        lastName: "Rodriguez",
+        company: "Havana Dreams Cigar Lounge",
         phoneNumber: "+1 (555) 123-4567",
-        email: "jake@ansteads.com",
+        email: "carlos@havanadreams.com",
         status: "active",
         tags: ["VIP", "Cigar"],
         lastContact: "08/29/2025",
@@ -220,24 +220,24 @@ export default function PlatformDemo() {
       },
       {
         id: "2",
-        firstName: "Sarah",
-        lastName: "Johnson",
-        company: "Impact Workforce",
+        firstName: "Marcus",
+        lastName: "Thompson",
+        company: "Premium Cigar Emporium",
         phoneNumber: "+1 (555) 234-5678",
-        email: "sarah@impactworkforce.com",
+        email: "marcus@premiumcigars.com",
         status: "active",
-        tags: ["Business", "Recruitment"],
+        tags: ["Business", "Premium"],
         lastContact: "08/28/2025",
         totalMessages: 18,
         optInDate: "02/20/2025",
       },
       {
         id: "3",
-        firstName: "Mike",
-        lastName: "Wilson",
-        company: "Bucksnorts Cigar",
+        firstName: "Diego",
+        lastName: "Martinez",
+        company: "Casa del Tabaco",
         phoneNumber: "+1 (555) 345-6789",
-        email: "mike@bucksnorts.com",
+        email: "diego@casadeltabaco.com",
         status: "active",
         tags: ["Cigar", "Regular"],
         lastContact: "08/27/2025",
@@ -259,13 +259,13 @@ export default function PlatformDemo() {
       },
       {
         id: "5",
-        firstName: "David",
-        lastName: "Miller",
-        company: "Food Truck Co",
+        firstName: "Eduardo",
+        lastName: "Santos",
+        company: "El Rey del Tabaco",
         phoneNumber: "+1 (555) 456-7890",
-        email: "david@foodtruck.com",
+        email: "eduardo@elreydeltabaco.com",
         status: "inactive",
-        tags: ["Food", "Inactive"],
+        tags: ["Cigar", "Inactive"],
         lastContact: "07/15/2025",
         totalMessages: 8,
         optInDate: "03/01/2025",
@@ -674,12 +674,12 @@ export default function PlatformDemo() {
                                 {conversation.personName.charAt(0)}
                               </div>
                             </div>
-                            <div className="ml-4">
-                              <div className="text-sm font-medium text-gray-900">
-                                {conversation.personName}
-                              </div>
-                              <div className="text-sm text-gray-500">
+                            <div className="ml-4 text-left">
+                              <div className="text-sm font-bold text-gray-900">
                                 {conversation.company}
+                              </div>
+                              <div className="text-sm font-medium text-gray-700">
+                                {conversation.personName}
                               </div>
                               <div className="flex items-center mt-1">
                                 <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
@@ -690,7 +690,7 @@ export default function PlatformDemo() {
                             </div>
                           </div>
                         </td>
-                        <td className="px-6 py-4">
+                        <td className="px-6 py-4 text-left">
                           <div className="text-sm text-gray-900 max-w-xs truncate">
                             {conversation.lastMessage}
                           </div>

@@ -114,7 +114,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             Get Started
           </a>
           <a
-            href="/phone-demo"
+            href="/demo"
             className="border-2 border-amber-600 text-amber-400 hover:bg-amber-600 hover:text-white font-bold py-4 px-8 rounded-lg transition-colors duration-200 text-lg"
           >
             See Demo

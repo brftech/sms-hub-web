@@ -29,6 +29,8 @@ export default [
         localStorage: 'readonly',
         sessionStorage: 'readonly',
         navigator: 'readonly',
+        alert: 'readonly',
+        confirm: 'readonly',
         // React globals
         React: 'readonly',
         // DOM types
@@ -57,6 +59,21 @@ export default [
         URLSearchParams: 'readonly',
         IntersectionObserver: 'readonly',
         KeyboardEvent: 'readonly',
+        Event: 'readonly',
+        Headers: 'readonly',
+        Response: 'readonly',
+        Request: 'readonly',
+        Blob: 'readonly',
+        FormData: 'readonly',
+        WebSocket: 'readonly',
+        Worker: 'readonly',
+        AbortController: 'readonly',
+        TextEncoder: 'readonly',
+        TextDecoder: 'readonly',
+        crypto: 'readonly',
+        btoa: 'readonly',
+        atob: 'readonly',
+        self: 'readonly',
         // Vite globals
         import: 'readonly',
         // Node globals
@@ -83,16 +100,19 @@ export default [
       'react-hooks/exhaustive-deps': 'off',
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
       '@typescript-eslint/no-explicit-any': 'warn',
-      '@typescript-eslint/no-unnecessary-type-constraint': 'warn', // Allow existing any constraints
-      '@typescript-eslint/no-empty-object-type': 'warn', // Allow empty interfaces for now
-      'react/react-in-jsx-scope': 'off', // Not needed with React 17+
-      'react/prop-types': 'off', // Using TypeScript for prop validation
-      'react/no-unescaped-entities': 'off', // Allow quotes and apostrophes in JSX
-      'react/no-unknown-property': 'warn', // Allow custom CSS properties
-      'react/display-name': 'warn', // Allow missing display names for now
-      'no-useless-escape': 'warn', // Allow existing regex patterns
-      'no-redeclare': 'warn', // Allow variable redeclaration for now
-      'no-case-declarations': 'warn', // Allow lexical declarations in case blocks
+      '@typescript-eslint/no-unnecessary-type-constraint': 'warn',
+      '@typescript-eslint/no-empty-object-type': 'warn',
+      'react/react-in-jsx-scope': 'off',
+      'react/prop-types': 'off',
+      'react/no-unescaped-entities': 'off',
+      'react/no-unknown-property': 'warn',
+      'react/display-name': 'warn',
+      'no-useless-escape': 'warn',
+      'no-redeclare': 'warn',
+      'no-case-declarations': 'warn',
+      'no-prototype-builtins': 'warn',
+      'require-yield': 'warn',
+      'no-empty': 'warn',
     },
     settings: {
       react: {
@@ -127,6 +147,8 @@ export default [
       '*.config.js',
       '*.config.ts',
       'packages/supabase/src/database-comprehensive.ts', // Generated file
+      'apps/*/dist/**',
+      'apps/*/build/**',
     ],
   },
 ]

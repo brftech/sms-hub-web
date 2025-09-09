@@ -4,8 +4,6 @@ import {
   Home,
   Users,
   Building,
-  MessageSquare,
-  BarChart3,
   Settings,
   Menu,
   X,
@@ -17,7 +15,6 @@ import {
   Clock,
   Zap,
   Globe,
-  RefreshCw,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useGlobalView } from "../contexts/GlobalViewContext";
@@ -42,7 +39,7 @@ const navigation = [
 ];
 
 export function Layout() {
-  const { hubConfig, currentHub } = useHub();
+  const { currentHub } = useHub();
   const location = useLocation();
   const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -53,8 +50,6 @@ export function Layout() {
     verifications: 0,
     leads: 0,
   });
-
-  const [isRefreshingCounts, setIsRefreshingCounts] = useState(false);
 
   const fetchCounts = async () => {
     const hubId =
@@ -73,12 +68,6 @@ export function Layout() {
       isGlobalView
     );
     setCounts(newCounts);
-  };
-
-  const handleRefreshCounts = async () => {
-    setIsRefreshingCounts(true);
-    await fetchCounts();
-    setIsRefreshingCounts(false);
   };
 
   // Initial fetch of counts

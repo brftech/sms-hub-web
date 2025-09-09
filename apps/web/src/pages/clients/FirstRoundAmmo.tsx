@@ -6,7 +6,6 @@ import {
   Target,
   Zap,
   Users,
-  AlertTriangle,
 } from "lucide-react";
 import ClientPageTemplate from "./ClientPageTemplate";
 import firstRoundAmmoLogo from "@sms-hub/ui/assets/1st-round-ammo-logo.png";

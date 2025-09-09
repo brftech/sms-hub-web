@@ -1,402 +1,305 @@
-import { PageLayout, useHub, SEO } from "@sms-hub/ui";
-import Navigation from "../components/Navigation";
-import Footer from "../components/Footer";
-import { Shield, Lock, Eye, FileText, Phone, Mail, MapPin } from "lucide-react";
+import { Helmet } from "react-helmet-async";
+import { Card, CardContent, CardHeader, CardTitle } from "@sms-hub/ui";
 
-const Privacy = () => {
-  const { currentHub } = useHub();
-
+export default function Privacy() {
   return (
-    <PageLayout
-      showNavigation={true}
-      showFooter={true}
-      navigation={<Navigation />}
-      footer={<Footer />}
-    >
-      <SEO
-        title="Privacy Policy - Your Data is Protected"
-        description="Learn how we protect your information and maintain the highest standards of data privacy. Built on trust and transparency for regulated businesses."
-        keywords="privacy policy, data protection, SMS privacy, business data security, HIPAA compliance, TCPA compliance"
-      />
+    <>
+      <Helmet>
+        <title>Privacy Policy - SMS Marketing & Communication</title>
+        <meta
+          name="description"
+          content="Privacy policy for SMS marketing and communication services. Learn how we protect your data and respect your privacy."
+        />
+      </Helmet>
 
-      <div className="min-h-screen bg-black pt-20 pb-12 relative">
-        {/* Subtle background elements */}
-        <div className="absolute inset-0">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-orange-500/5 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-orange-500/5 rounded-full blur-3xl"></div>
-        </div>
-
-        <div className="relative z-10 max-w-6xl mx-auto px-6">
-          {/* Hero Section - Matching Homepage Style */}
-          <div className="text-center mb-20">
-            <div className="inline-flex items-center px-4 py-2 rounded-full bg-orange-500/20 border border-orange-500/30 mb-8">
-              <Shield className="w-4 h-4 text-orange-400 mr-2" />
-              <span className="text-sm font-medium text-orange-400">
-                YOUR PRIVACY MATTERS
-              </span>
-            </div>
-            <h1
-              className="text-4xl md:text-6xl font-bold text-white mb-8 leading-tight"
-              style={{ fontFamily: "Inter, system-ui, sans-serif" }}
-            >
-              Privacy Policy
-              <span className="gradient-text block">Built on Trust</span>
-            </h1>
-            <p
-              className="text-xl text-gray-300 max-w-3xl mx-auto mb-12 leading-relaxed"
-              style={{ fontFamily: "Inter, system-ui, sans-serif" }}
-            >
-              We believe transparency and security are the foundation of every
-              great relationship. Learn how we protect your information and
-              maintain the highest standards of data privacy.
-            </p>
-            <div
-              className="mt-8 text-sm text-gray-400"
-              style={{ fontFamily: "Inter, system-ui, sans-serif" }}
-            >
-              Last updated: {new Date().toLocaleDateString()}
-            </div>
-          </div>
-
-          {/* Privacy Principles Grid */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
-            <div className="group bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-6 hover:border-orange-500/30 transition-all duration-300">
-              <div className="w-16 h-16 bg-gradient-to-br from-orange-500/20 to-purple-500/20 border border-orange-500/30 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-                <Lock className="w-8 h-8 text-orange-400" />
-              </div>
-              <h3
-                className="text-lg font-semibold text-white mb-2 group-hover:text-orange-400 transition-colors"
-                style={{ fontFamily: "Inter, system-ui, sans-serif" }}
-              >
-                Secure by Design
-              </h3>
-              <p
-                className="text-gray-400 text-sm leading-relaxed"
-                style={{ fontFamily: "Inter, system-ui, sans-serif" }}
-              >
-                Enterprise-grade encryption and security measures protect your
-                data at every level
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto px-4 py-16">
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-12">
+              <h1 className="text-4xl font-bold text-foreground mb-4">
+                Privacy Policy
+              </h1>
+              <p className="text-xl text-muted-foreground">
+                Your privacy and data protection are our top priorities
+              </p>
+              <p className="text-sm text-muted-foreground mt-2">
+                Last updated: {new Date().toLocaleDateString()}
               </p>
             </div>
 
-            <div className="group bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-6 hover:border-orange-500/30 transition-all duration-300">
-              <div className="w-16 h-16 bg-gradient-to-br from-orange-500/20 to-purple-500/20 border border-orange-500/30 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-                <Eye className="w-8 h-8 text-orange-400" />
-              </div>
-              <h3
-                className="text-lg font-semibold text-white mb-2 group-hover:text-orange-400 transition-colors"
-                style={{ fontFamily: "Inter, system-ui, sans-serif" }}
-              >
-                Complete Transparency
-              </h3>
-              <p
-                className="text-gray-400 text-sm leading-relaxed"
-                style={{ fontFamily: "Inter, system-ui, sans-serif" }}
-              >
-                Clear visibility into how we collect, use, and protect your
-                information
-              </p>
+            <div className="space-y-8">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-2xl">
+                    1. Information We Collect
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2">
+                      Personal Information
+                    </h3>
+                    <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+                      <li>Phone numbers for SMS communication</li>
+                      <li>Names and contact information</li>
+                      <li>Email addresses (when provided)</li>
+                      <li>Communication preferences</li>
+                      <li>Purchase history and preferences</li>
+                    </ul>
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2">
+                      Usage Information
+                    </h3>
+                    <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+                      <li>SMS delivery and engagement metrics</li>
+                      <li>Website interaction data</li>
+                      <li>Device and browser information</li>
+                      <li>IP addresses and location data</li>
+                    </ul>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-2xl">
+                    2. How We Use Your Information
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2">
+                      SMS Marketing
+                    </h3>
+                    <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+                      <li>Send promotional messages and offers</li>
+                      <li>Provide order updates and shipping notifications</li>
+                      <li>Send appointment reminders and confirmations</li>
+                      <li>Share important business updates</li>
+                    </ul>
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2">
+                      Service Improvement
+                    </h3>
+                    <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+                      <li>Analyze communication effectiveness</li>
+                      <li>Improve our services and customer experience</li>
+                      <li>Personalize content and offers</li>
+                      <li>Prevent fraud and ensure security</li>
+                    </ul>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-2xl">
+                    3. SMS Marketing Consent
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p className="text-muted-foreground">
+                    We only send SMS messages to customers who have explicitly
+                    opted in to receive them. You can opt in by:
+                  </p>
+                  <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+                    <li>Texting a keyword to our short code</li>
+                    <li>Checking a box during online checkout</li>
+                    <li>Providing verbal consent in-store</li>
+                    <li>Completing a sign-up form</li>
+                  </ul>
+
+                  <div className="bg-blue-50 dark:bg-blue-950 p-4 rounded-lg">
+                    <h4 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">
+                      Your Rights
+                    </h4>
+                    <ul className="list-disc list-inside space-y-1 text-blue-800 dark:text-blue-200">
+                      <li>Reply STOP to any message to opt out</li>
+                      <li>Reply HELP for assistance</li>
+                      <li>Contact us directly to update preferences</li>
+                      <li>Request data deletion at any time</li>
+                    </ul>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-2xl">
+                    4. Data Protection & Security
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2">
+                      Security Measures
+                    </h3>
+                    <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+                      <li>End-to-end encryption for all communications</li>
+                      <li>
+                        Secure data storage with industry-standard protocols
+                      </li>
+                      <li>Regular security audits and updates</li>
+                      <li>Access controls and authentication systems</li>
+                      <li>Employee training on data protection</li>
+                    </ul>
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2">
+                      Data Retention
+                    </h3>
+                    <p className="text-muted-foreground">
+                      We retain your personal information only as long as
+                      necessary to provide our services and comply with legal
+                      obligations. Typically, this means:
+                    </p>
+                    <ul className="list-disc list-inside space-y-2 text-muted-foreground mt-2">
+                      <li>
+                        Active customer data: Until you opt out or request
+                        deletion
+                      </li>
+                      <li>
+                        Communication records: 3 years for compliance purposes
+                      </li>
+                      <li>Analytics data: 2 years in anonymized form</li>
+                    </ul>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-2xl">
+                    5. Third-Party Services
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p className="text-muted-foreground">
+                    We work with trusted third-party service providers to
+                    deliver SMS messages and manage our communications. These
+                    partners are bound by strict data protection agreements and
+                    include:
+                  </p>
+                  <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+                    <li>SMS service providers (Twilio, Bandwidth, etc.)</li>
+                    <li>Customer relationship management platforms</li>
+                    <li>Analytics and reporting tools</li>
+                    <li>Payment processing services</li>
+                  </ul>
+
+                  <p className="text-muted-foreground">
+                    We never sell, rent, or share your personal information with
+                    third parties for their marketing purposes without your
+                    explicit consent.
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-2xl">
+                    6. Your Rights & Choices
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div>
+                      <h3 className="text-lg font-semibold mb-2">
+                        Access & Control
+                      </h3>
+                      <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+                        <li>View your personal data</li>
+                        <li>Update your information</li>
+                        <li>Download your data</li>
+                        <li>Delete your account</li>
+                      </ul>
+                    </div>
+
+                    <div>
+                      <h3 className="text-lg font-semibold mb-2">
+                        Communication Preferences
+                      </h3>
+                      <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+                        <li>Opt out of SMS messages</li>
+                        <li>Choose message frequency</li>
+                        <li>Select content preferences</li>
+                        <li>Update contact methods</li>
+                      </ul>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-2xl">
+                    7. Compliance & Regulations
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p className="text-muted-foreground">
+                    We comply with all applicable laws and regulations,
+                    including:
+                  </p>
+                  <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+                    <li>TCPA (Telephone Consumer Protection Act)</li>
+                    <li>CAN-SPAM Act</li>
+                    <li>CCPA (California Consumer Privacy Act)</li>
+                    <li>GDPR (General Data Protection Regulation)</li>
+                    <li>State and local privacy laws</li>
+                  </ul>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-2xl">8. Contact Us</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p className="text-muted-foreground">
+                    If you have questions about this privacy policy or want to
+                    exercise your rights, please contact us:
+                  </p>
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div>
+                      <h3 className="font-semibold mb-2">Email</h3>
+                      <p className="text-muted-foreground">
+                        privacy@gnymble.com
+                      </p>
+                    </div>
+                    <div>
+                      <h3 className="font-semibold mb-2">Phone</h3>
+                      <p className="text-muted-foreground">+1 (555) 123-4567</p>
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold mb-2">Address</h3>
+                    <p className="text-muted-foreground">
+                      Gnymble Privacy Officer
+                      <br />
+                      123 Business Street
+                      <br />
+                      San Francisco, CA 94105
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
 
-            <div className="group bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-6 hover:border-orange-500/30 transition-all duration-300">
-              <div className="w-16 h-16 bg-gradient-to-br from-orange-500/20 to-purple-500/20 border border-orange-500/30 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-                <FileText className="w-8 h-8 text-orange-400" />
-              </div>
-              <h3
-                className="text-lg font-semibold text-white mb-2 group-hover:text-orange-400 transition-colors"
-                style={{ fontFamily: "Inter, system-ui, sans-serif" }}
-              >
-                Regulatory Compliance
-              </h3>
-              <p
-                className="text-gray-400 text-sm leading-relaxed"
-                style={{ fontFamily: "Inter, system-ui, sans-serif" }}
-              >
-                Built to meet and exceed industry standards including HIPAA and
-                TCPA
+            <div className="mt-12 text-center">
+              <p className="text-sm text-muted-foreground">
+                This privacy policy may be updated periodically. We will notify
+                you of any significant changes via email or SMS.
               </p>
             </div>
-          </div>
-
-          {/* Privacy Content */}
-          <div className="space-y-12">
-            <section className="bg-gradient-to-br from-gray-800/30 to-gray-900/30 backdrop-blur-sm rounded-3xl border border-gray-700/30 p-8">
-              <h2
-                className="text-3xl font-bold text-white mb-6 flex items-center"
-                style={{ fontFamily: "Inter, system-ui, sans-serif" }}
-              >
-                <Shield className="w-8 h-8 text-orange-400 mr-3" />
-                Information We Collect
-              </h2>
-              <p
-                className="text-lg text-gray-300 mb-6 leading-relaxed"
-                style={{ fontFamily: "Inter, system-ui, sans-serif" }}
-              >
-                We collect information you provide directly to us, such as when
-                you create an account, use our services, or contact us for
-                support. This includes:
-              </p>
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="space-y-3">
-                  <div className="flex items-start space-x-3">
-                    <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <span
-                      className="text-gray-300"
-                      style={{ fontFamily: "Inter, system-ui, sans-serif" }}
-                    >
-                      Account information (name, email, phone number, company
-                      name)
-                    </span>
-                  </div>
-                  <div className="flex items-start space-x-3">
-                    <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <span
-                      className="text-gray-300"
-                      style={{ fontFamily: "Inter, system-ui, sans-serif" }}
-                    >
-                      Payment information (processed securely through our
-                      payment providers)
-                    </span>
-                  </div>
-                  <div className="flex items-start space-x-3">
-                    <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <span
-                      className="text-gray-300"
-                      style={{ fontFamily: "Inter, system-ui, sans-serif" }}
-                    >
-                      Communication data (messages sent through our platform)
-                    </span>
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  <div className="flex items-start space-x-3">
-                    <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <span
-                      className="text-gray-300"
-                      style={{ fontFamily: "Inter, system-ui, sans-serif" }}
-                    >
-                      Usage information (how you interact with our services)
-                    </span>
-                  </div>
-                  <div className="flex items-start space-x-3">
-                    <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <span
-                      className="text-gray-300"
-                      style={{ fontFamily: "Inter, system-ui, sans-serif" }}
-                    >
-                      Device and technical information (IP address, browser
-                      type, device identifiers)
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            <section className="bg-gradient-to-br from-gray-800/30 to-gray-900/30 backdrop-blur-sm rounded-3xl border border-gray-700/30 p-8">
-              <h2
-                className="text-3xl font-bold text-white mb-6 flex items-center"
-                style={{ fontFamily: "Inter, system-ui, sans-serif" }}
-              >
-                <Lock className="w-8 h-8 text-orange-400 mr-3" />
-                How We Use Your Information
-              </h2>
-              <p
-                className="text-lg text-gray-300 mb-6 leading-relaxed"
-                style={{ fontFamily: "Inter, system-ui, sans-serif" }}
-              >
-                We use the information we collect to provide exceptional service
-                and maintain the highest standards:
-              </p>
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="space-y-3">
-                  <div className="flex items-start space-x-3">
-                    <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <span className="text-gray-300">
-                      Provide, maintain, and improve our messaging services
-                    </span>
-                  </div>
-                  <div className="flex items-start space-x-3">
-                    <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <span className="text-gray-300">
-                      Process transactions and send billing-related
-                      communications
-                    </span>
-                  </div>
-                  <div className="flex items-start space-x-3">
-                    <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <span className="text-gray-300">
-                      Monitor compliance with regulatory requirements
-                    </span>
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  <div className="flex items-start space-x-3">
-                    <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <span className="text-gray-300">
-                      Provide customer support and respond to inquiries
-                    </span>
-                  </div>
-                  <div className="flex items-start space-x-3">
-                    <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <span className="text-gray-300">
-                      Send service-related announcements and updates
-                    </span>
-                  </div>
-                  <div className="flex items-start space-x-3">
-                    <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <span className="text-gray-300">
-                      Protect against fraud and unauthorized access
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            <section className="bg-gradient-to-br from-gray-800/30 to-gray-900/30 backdrop-blur-sm rounded-3xl border border-gray-700/30 p-8">
-              <h2 className="text-3xl font-bold text-white mb-6 flex items-center">
-                <Shield className="w-8 h-8 text-orange-400 mr-3" />
-                HIPAA Compliance
-              </h2>
-              <p className="text-lg text-gray-300 mb-6 leading-relaxed">
-                For healthcare communications through our Virtue platform, we
-                maintain the highest HIPAA compliance standards:
-              </p>
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="space-y-3">
-                  <div className="flex items-start space-x-3">
-                    <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <span className="text-gray-300">
-                      Business associate agreements
-                    </span>
-                  </div>
-                  <div className="flex items-start space-x-3">
-                    <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <span className="text-gray-300">
-                      Encryption of protected health information
-                    </span>
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  <div className="flex items-start space-x-3">
-                    <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <span className="text-gray-300">
-                      Comprehensive audit trails
-                    </span>
-                  </div>
-                  <div className="flex items-start space-x-3">
-                    <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <span className="text-gray-300">
-                      Secure data handling procedures
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            <section className="bg-gradient-to-br from-gray-800/30 to-gray-900/30 backdrop-blur-sm rounded-3xl border border-gray-700/30 p-8">
-              <h2 className="text-3xl font-bold text-white mb-6 flex items-center">
-                <Eye className="w-8 h-8 text-orange-400 mr-3" />
-                Your Rights
-              </h2>
-              <p className="text-lg text-gray-300 mb-6 leading-relaxed">
-                You have complete control over your data and the right to:
-              </p>
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="space-y-3">
-                  <div className="flex items-start space-x-3">
-                    <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <span className="text-gray-300">
-                      Access and update your personal information
-                    </span>
-                  </div>
-                  <div className="flex items-start space-x-3">
-                    <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <span className="text-gray-300">
-                      Request deletion of your data
-                    </span>
-                  </div>
-                  <div className="flex items-start space-x-3">
-                    <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <span className="text-gray-300">
-                      Opt out of non-essential communications
-                    </span>
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  <div className="flex items-start space-x-3">
-                    <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <span className="text-gray-300">
-                      Request a copy of your data
-                    </span>
-                  </div>
-                  <div className="flex items-start space-x-3">
-                    <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <span className="text-gray-300">
-                      File a complaint with relevant authorities
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            {/* Contact Section */}
-            <section className="bg-gradient-to-br from-gray-800/30 to-gray-900/30 backdrop-blur-sm rounded-3xl border border-gray-700/30 p-8 text-center">
-              <h2
-                className="text-3xl font-bold text-white mb-6"
-                style={{ fontFamily: "Inter, system-ui, sans-serif" }}
-              >
-                Questions About Privacy?
-              </h2>
-              <p
-                className="text-lg text-gray-300 mb-8 max-w-2xl mx-auto"
-                style={{ fontFamily: "Inter, system-ui, sans-serif" }}
-              >
-                We're committed to transparency and are here to answer any
-                questions about our data practices.
-              </p>
-              <div className="grid md:grid-cols-3 gap-6 max-w-2xl mx-auto">
-                <div className="flex items-center justify-center space-x-3 text-gray-300">
-                  <Mail className="w-5 h-5 text-orange-400" />
-                  <span>
-                    privacy@
-                    {currentHub === "gnymble"
-                      ? "gnymble"
-                      : currentHub === "percytech"
-                        ? "percytech"
-                        : currentHub === "percymd"
-                          ? "percymd"
-                          : currentHub === "percytext"
-                            ? "percytext"
-                            : "ourplatform"}
-                    .com
-                  </span>
-                </div>
-                <div className="flex items-center justify-center space-x-3 text-gray-300">
-                  <Phone className="w-5 h-5 text-orange-400" />
-                  <span>757-295-8725</span>
-                </div>
-                <div className="flex items-center justify-center space-x-3 text-gray-300">
-                  <MapPin className="w-5 h-5 text-orange-400" />
-                  <span>
-                    {currentHub === "gnymble"
-                      ? "Gnymble"
-                      : currentHub === "percytech"
-                        ? "PercyTech"
-                        : currentHub === "percymd"
-                          ? "PercyMD"
-                          : currentHub === "percytext"
-                            ? "PercyText"
-                            : "Our Platform"}{" "}
-                    Privacy Office
-                  </span>
-                </div>
-              </div>
-            </section>
           </div>
         </div>
       </div>
-    </PageLayout>
+    </>
   );
-};
-
-export default Privacy;
+}

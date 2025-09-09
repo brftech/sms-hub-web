@@ -19,6 +19,8 @@ import CigarLanding from "./pages/CigarLanding";
 
 import FAQ from "./pages/FAQ";
 import Demo from "./pages/Demo";
+import DonsBurlingame from "./pages/clients/DonsBurlingame";
+import Michaels from "./pages/clients/Michaels";
 
 const queryClient = new QueryClient();
 
@@ -97,6 +99,22 @@ const AppRoutes = () => {
         element={
           <PageTransition>
             <Privacy />
+          </PageTransition>
+        }
+      />
+      <Route
+        path="/dons-burlingame"
+        element={
+          <PageTransition>
+            <DonsBurlingame />
+          </PageTransition>
+        }
+      />
+      <Route
+        path="/michaels"
+        element={
+          <PageTransition>
+            <Michaels />
           </PageTransition>
         }
       />

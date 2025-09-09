@@ -18,10 +18,6 @@ export interface EnvironmentAdapter {
     debugMode(): boolean;
     analytics(): boolean;
     errorReporting(): boolean;
-    // Demo features - only show in development
-    demoPage(): boolean;
-    demoButtons(): boolean;
-    demoNavigation(): boolean;
   };
 }
 

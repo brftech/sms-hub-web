@@ -10,7 +10,6 @@ import {
   CreditCard,
 } from "lucide-react";
 import { getHubColorClasses } from "@sms-hub/utils";
-import { webEnvironment } from "../config/webEnvironment";
 
 const Navigation = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -40,9 +39,7 @@ const Navigation = () => {
     { path: "/pricing", label: "Pricing", icon: CreditCard },
     { path: "/about", label: "About", icon: Users },
     { path: "/faq", label: "FAQ", icon: HelpCircle },
-    ...(webEnvironment.features.demoNavigation()
-      ? [{ path: "/demo", label: "Demo", icon: MessageSquare }]
-      : []),
+    { path: "/demo", label: "Demo", icon: MessageSquare },
   ];
 
   return (
@@ -89,18 +86,16 @@ const Navigation = () => {
             >
               FAQ
             </button>
-            {webEnvironment.features.demoNavigation() && (
-              <button
-                onClick={() => handleDesktopNavClick("/demo")}
-                className={`transition-colors text-sm font-medium ${
-                  location.pathname === "/demo"
-                    ? `${hubColors.text} hub-text-primary`
-                    : "text-white hover:text-gray-300"
-                }`}
-              >
-                Demo
-              </button>
-            )}
+            <button
+              onClick={() => handleDesktopNavClick("/demo")}
+              className={`transition-colors text-sm font-medium ${
+                location.pathname === "/demo"
+                  ? `${hubColors.text} hub-text-primary`
+                  : "text-white hover:text-gray-300"
+              }`}
+            >
+              Demo
+            </button>
           </div>
 
           {/* Right side - Contact button (Desktop only) */}

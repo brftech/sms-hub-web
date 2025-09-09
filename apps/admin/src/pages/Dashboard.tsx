@@ -5,7 +5,6 @@ import {
   MessageSquare,
   Users,
   Building,
-  TrendingUp,
   AlertTriangle,
   DollarSign,
   Activity,
@@ -44,7 +43,7 @@ import { navigationCountsService } from "../components/Layout";
 const Dashboard = () => {
   const { currentHub } = useHub();
   const navigate = useNavigate();
-  const { isGlobalView, setIsGlobalView } = useGlobalView();
+  const { isGlobalView } = useGlobalView();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
   const [alerts, setAlerts] = useState<Alert[]>([]);
@@ -137,7 +136,9 @@ const Dashboard = () => {
 
   // Helper function to get icon component
   const getIconComponent = (iconName: string) => {
-    const iconMap: { [key: string]: any } = {
+    const iconMap: {
+      [key: string]: React.ComponentType<{ className?: string }>;
+    } = {
       UserPlus,
       Building,
       CheckCircle,
@@ -151,7 +152,11 @@ const Dashboard = () => {
   // Helper function to get onboarding stage icon and color
   const getStageInfo = (stage: string) => {
     const stageMap: {
-      [key: string]: { icon: any; color: string; label: string };
+      [key: string]: {
+        icon: React.ComponentType<{ className?: string }>;
+        color: string;
+        label: string;
+      };
     } = {
       authentication: {
         icon: Shield,
@@ -213,7 +218,6 @@ const Dashboard = () => {
   const navigateToCompanies = () => navigate("/companies");
   const navigateToUsers = () => navigate("/users");
   const navigateToLeads = () => navigate("/leads");
-  const navigateToVerifications = () => navigate("/verifications");
 
   // Refresh navigation counts
   const handleRefreshCounts = async () => {

@@ -24,6 +24,7 @@ interface ClientPageTemplateProps {
   }>;
   ctaText: string;
   ctaButtonText: string;
+  clientWebsite?: string;
 }
 
 export default function ClientPageTemplate({
@@ -38,6 +39,7 @@ export default function ClientPageTemplate({
   benefits,
   ctaText,
   ctaButtonText,
+  clientWebsite,
 }: ClientPageTemplateProps) {
   return (
     <>
@@ -107,11 +109,26 @@ export default function ClientPageTemplate({
             <div className="max-w-4xl mx-auto text-center">
               <div className="mb-8">
                 <div className="w-32 h-32 mx-auto mb-6 bg-orange-500 rounded-full flex items-center justify-center">
-                  <img
-                    src={clientLogo}
-                    alt={`${clientName} Logo`}
-                    className="w-24 h-24 object-contain"
-                  />
+                  {clientWebsite ? (
+                    <a
+                      href={clientWebsite}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block"
+                    >
+                      <img
+                        src={clientLogo}
+                        alt={`${clientName} Logo`}
+                        className="w-24 h-24 object-contain hover:opacity-80 transition-opacity cursor-pointer"
+                      />
+                    </a>
+                  ) : (
+                    <img
+                      src={clientLogo}
+                      alt={`${clientName} Logo`}
+                      className="w-24 h-24 object-contain"
+                    />
+                  )}
                 </div>
                 <h1 className="text-5xl font-bold text-white mb-6">
                   Join Our Exclusive SMS Community

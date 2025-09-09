@@ -21,6 +21,7 @@ import FAQ from "./pages/FAQ";
 import Demo from "./pages/Demo";
 import DonsBurlingame from "./pages/clients/DonsBurlingame";
 import MichaelsTobacco from "./pages/clients/MichaelsTobacco";
+import FirstRoundAmmo from "./pages/clients/FirstRoundAmmo";
 
 const queryClient = new QueryClient();
 
@@ -115,6 +116,14 @@ const AppRoutes = () => {
         element={
           <PageTransition>
             <MichaelsTobacco />
+          </PageTransition>
+        }
+      />
+      <Route
+        path="/1st-round-ammo"
+        element={
+          <PageTransition>
+            <FirstRoundAmmo />
           </PageTransition>
         }
       />

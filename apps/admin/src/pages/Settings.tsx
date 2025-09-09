@@ -1,44 +1,44 @@
-import { useState } from 'react'
-import { useHub } from '@sms-hub/ui'
-import { 
-  Settings as SettingsIcon, 
-  Database, 
-  Mail, 
-  Phone, 
-  Key, 
-  Shield, 
+import { useState } from "react";
+import { useHub } from "@sms-hub/ui";
+import {
+  Settings as SettingsIcon,
+  Database,
+  Mail,
+  Phone,
+  Key,
+  Shield,
   Bell,
   Save,
-  RefreshCw
-} from 'lucide-react'
+  RefreshCw,
+} from "lucide-react";
 
 const Settings = () => {
-  const { currentHub } = useHub()
-  const [activeTab, setActiveTab] = useState('general')
-  const [isLoading, setIsLoading] = useState(false)
+  const { currentHub } = useHub();
+  const [activeTab, setActiveTab] = useState("general");
+  const [isLoading, setIsLoading] = useState(false);
 
   const tabs = [
-    { id: 'general', name: 'General', icon: SettingsIcon },
-    { id: 'database', name: 'Database', icon: Database },
-    { id: 'email', name: 'Email', icon: Mail },
-    { id: 'sms', name: 'SMS', icon: Phone },
-    { id: 'security', name: 'Security', icon: Shield },
-    { id: 'notifications', name: 'Notifications', icon: Bell }
-  ]
+    { id: "general", name: "General", icon: SettingsIcon },
+    { id: "database", name: "Database", icon: Database },
+    { id: "email", name: "Email", icon: Mail },
+    { id: "sms", name: "SMS", icon: Phone },
+    { id: "security", name: "Security", icon: Shield },
+    { id: "notifications", name: "Notifications", icon: Bell },
+  ];
 
   const handleSave = async () => {
-    setIsLoading(true)
+    setIsLoading(true);
     // Simulate save operation
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    setIsLoading(false)
-  }
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    setIsLoading(false);
+  };
 
-        return (
+  return (
     <div className="space-y-6">
       {/* Page Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-        <p className="mt-1 text-sm text-gray-500">
+        <h1 className="text-2xl font-bold text-foreground">Settings</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
           Configure {currentHub} hub settings and preferences
         </p>
       </div>
@@ -47,7 +47,7 @@ const Settings = () => {
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Sidebar */}
         <div className="lg:w-64 flex-shrink-0">
-          <div className="bg-white rounded-lg shadow-sm p-4">
+          <div className="bg-card rounded-lg shadow-sm p-4">
             <nav className="space-y-1">
               {tabs.map((tab) => (
                 <button
@@ -55,8 +55,8 @@ const Settings = () => {
                   onClick={() => setActiveTab(tab.id)}
                   className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
                     activeTab === tab.id
-                      ? 'bg-blue-100 text-blue-700'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                      ? "bg-primary/10 text-primary"
+                      : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                   }`}
                 >
                   <tab.icon className="w-4 h-4 mr-3" />
@@ -69,17 +69,17 @@ const Settings = () => {
 
         {/* Main Content */}
         <div className="flex-1">
-          <div className="bg-white rounded-lg shadow-sm">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <h3 className="text-lg font-medium text-gray-900">
-                {tabs.find(tab => tab.id === activeTab)?.name} Settings
+          <div className="bg-card rounded-lg shadow-sm">
+            <div className="px-6 py-4 border-b border-border">
+              <h3 className="text-lg font-medium text-card-foreground">
+                {tabs.find((tab) => tab.id === activeTab)?.name} Settings
               </h3>
             </div>
             <div className="p-6">
-              {activeTab === 'general' && (
+              {activeTab === "general" && (
                 <div className="space-y-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-foreground mb-2">
                       Hub Name
                     </label>
                     <input
@@ -102,8 +102,12 @@ const Settings = () => {
                   </div>
                   <div className="flex items-center justify-between">
                     <div>
-                      <label className="text-sm font-medium text-gray-700">Maintenance Mode</label>
-                      <p className="text-sm text-gray-500">Temporarily disable the platform</p>
+                      <label className="text-sm font-medium text-gray-700">
+                        Maintenance Mode
+                      </label>
+                      <p className="text-sm text-gray-500">
+                        Temporarily disable the platform
+                      </p>
                     </div>
                     <button className="relative inline-flex h-6 w-11 items-center rounded-full bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
                       <span className="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-1" />
@@ -112,7 +116,7 @@ const Settings = () => {
                 </div>
               )}
 
-              {activeTab === 'database' && (
+              {activeTab === "database" && (
                 <div className="space-y-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -136,8 +140,12 @@ const Settings = () => {
                   </div>
                   <div className="flex items-center justify-between">
                     <div>
-                      <label className="text-sm font-medium text-gray-700">Auto Backup</label>
-                      <p className="text-sm text-gray-500">Automatically backup database daily</p>
+                      <label className="text-sm font-medium text-gray-700">
+                        Auto Backup
+                      </label>
+                      <p className="text-sm text-gray-500">
+                        Automatically backup database daily
+                      </p>
                     </div>
                     <button className="relative inline-flex h-6 w-11 items-center rounded-full bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
                       <span className="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-6" />
@@ -146,7 +154,7 @@ const Settings = () => {
                 </div>
               )}
 
-              {activeTab === 'email' && (
+              {activeTab === "email" && (
                 <div className="space-y-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -181,7 +189,7 @@ const Settings = () => {
                 </div>
               )}
 
-              {activeTab === 'sms' && (
+              {activeTab === "sms" && (
                 <div className="space-y-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -216,12 +224,16 @@ const Settings = () => {
                 </div>
               )}
 
-              {activeTab === 'security' && (
+              {activeTab === "security" && (
                 <div className="space-y-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <label className="text-sm font-medium text-gray-700">Two-Factor Authentication</label>
-                      <p className="text-sm text-gray-500">Require 2FA for all admin users</p>
+                      <label className="text-sm font-medium text-gray-700">
+                        Two-Factor Authentication
+                      </label>
+                      <p className="text-sm text-gray-500">
+                        Require 2FA for all admin users
+                      </p>
                     </div>
                     <button className="relative inline-flex h-6 w-11 items-center rounded-full bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
                       <span className="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-6" />
@@ -229,8 +241,12 @@ const Settings = () => {
                   </div>
                   <div className="flex items-center justify-between">
                     <div>
-                      <label className="text-sm font-medium text-gray-700">Session Timeout</label>
-                      <p className="text-sm text-gray-500">Auto-logout after inactivity</p>
+                      <label className="text-sm font-medium text-gray-700">
+                        Session Timeout
+                      </label>
+                      <p className="text-sm text-gray-500">
+                        Auto-logout after inactivity
+                      </p>
                     </div>
                     <button className="relative inline-flex h-6 w-11 items-center rounded-full bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
                       <span className="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-1" />
@@ -249,12 +265,16 @@ const Settings = () => {
                 </div>
               )}
 
-              {activeTab === 'notifications' && (
+              {activeTab === "notifications" && (
                 <div className="space-y-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <label className="text-sm font-medium text-gray-700">Email Notifications</label>
-                      <p className="text-sm text-gray-500">Send notifications via email</p>
+                      <label className="text-sm font-medium text-gray-700">
+                        Email Notifications
+                      </label>
+                      <p className="text-sm text-gray-500">
+                        Send notifications via email
+                      </p>
                     </div>
                     <button className="relative inline-flex h-6 w-11 items-center rounded-full bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
                       <span className="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-6" />
@@ -262,8 +282,12 @@ const Settings = () => {
                   </div>
                   <div className="flex items-center justify-between">
                     <div>
-                      <label className="text-sm font-medium text-gray-700">SMS Notifications</label>
-                      <p className="text-sm text-gray-500">Send notifications via SMS</p>
+                      <label className="text-sm font-medium text-gray-700">
+                        SMS Notifications
+                      </label>
+                      <p className="text-sm text-gray-500">
+                        Send notifications via SMS
+                      </p>
                     </div>
                     <button className="relative inline-flex h-6 w-11 items-center rounded-full bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
                       <span className="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-1" />
@@ -271,8 +295,12 @@ const Settings = () => {
                   </div>
                   <div className="flex items-center justify-between">
                     <div>
-                      <label className="text-sm font-medium text-gray-700">System Alerts</label>
-                      <p className="text-sm text-gray-500">Receive system health alerts</p>
+                      <label className="text-sm font-medium text-gray-700">
+                        System Alerts
+                      </label>
+                      <p className="text-sm text-gray-500">
+                        Receive system health alerts
+                      </p>
                     </div>
                     <button className="relative inline-flex h-6 w-11 items-center rounded-full bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
                       <span className="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-6" />

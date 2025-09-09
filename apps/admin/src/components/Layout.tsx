@@ -349,7 +349,7 @@ export function Layout() {
         </header>
 
         {/* Page content */}
-        <main className="p-6 h-[calc(100vh-4rem)] overflow-hidden">
+        <main className="p-6 h-[calc(100vh-4rem)] overflow-y-auto">
           <Outlet />
         </main>
       </div>

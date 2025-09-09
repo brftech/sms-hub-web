@@ -160,3 +160,54 @@ td {
 .text-yellow-800 {
   color: hsl(43 96% 56%) !important;
 }
+
+/* Additional text visibility overrides */
+.text-black {
+  color: hsl(var(--foreground)) !important;
+}
+
+.text-white {
+  color: hsl(var(--foreground)) !important;
+}
+
+/* Ensure all text elements use proper contrast */
+p,
+span,
+div,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+label,
+small {
+  color: hsl(var(--foreground)) !important;
+}
+
+/* Override any remaining hardcoded colors */
+.text-slate-900,
+.text-slate-800,
+.text-slate-700,
+.text-slate-600,
+.text-slate-500,
+.text-slate-400,
+.text-slate-300,
+.text-slate-200,
+.text-slate-100 {
+  color: hsl(var(--foreground)) !important;
+}
+
+/* Button text overrides */
+button {
+  color: hsl(var(--foreground)) !important;
+}
+
+/* Link text overrides */
+a {
+  color: hsl(var(--primary)) !important;
+}
+
+a:hover {
+  color: hsl(var(--primary) / 0.8) !important;
+}

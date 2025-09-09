@@ -137,14 +137,14 @@ export function Layout() {
                     flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-colors
                     ${
                       active
-                        ? "bg-blue-50 text-blue-600"
+                        ? "bg-orange-500 text-black"
                         : "text-foreground hover:bg-accent"
                     }
                   `}
                   onClick={() => setIsSidebarOpen(false)}
                 >
                   <item.icon
-                    className={`h-5 w-5 ${active ? "text-blue-600" : "text-muted-foreground"}`}
+                    className={`h-5 w-5 ${active ? "text-black" : "text-muted-foreground"}`}
                   />
                   <span className="font-medium text-base flex-1">
                     {item.name}

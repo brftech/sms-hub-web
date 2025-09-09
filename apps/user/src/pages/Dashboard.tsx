@@ -209,8 +209,8 @@ export function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div className="bg-card rounded-lg shadow-sm p-6">
           <div className="flex items-center">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <MessageSquare className="w-6 h-6 text-blue-600" />
+            <div className="p-2 bg-status-info rounded-lg">
+              <MessageSquare className="w-6 h-6 text-status-info" />
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-muted-foreground">
@@ -219,7 +219,7 @@ export function Dashboard() {
               <p className="text-2xl font-bold text-foreground">
                 {stats.totalMessages.toLocaleString()}
               </p>
-              <p className="text-xs text-blue-600 mt-1">
+              <p className="text-xs text-status-info mt-1">
                 {stats.messagesThisMonth.toLocaleString()} this month
               </p>
             </div>
@@ -228,8 +228,8 @@ export function Dashboard() {
 
         <div className="bg-card rounded-lg shadow-sm p-6">
           <div className="flex items-center">
-            <div className="p-2 bg-green-100 rounded-lg">
-              <Zap className="w-6 h-6 text-green-600" />
+            <div className="p-2 bg-status-success rounded-lg">
+              <Zap className="w-6 h-6 text-status-success" />
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-muted-foreground">
@@ -238,7 +238,7 @@ export function Dashboard() {
               <p className="text-2xl font-bold text-foreground">
                 {stats.totalCampaigns}
               </p>
-              <p className="text-xs text-green-600 mt-1">
+              <p className="text-xs text-status-success mt-1">
                 {stats.activeCampaigns} active
               </p>
             </div>
@@ -247,8 +247,8 @@ export function Dashboard() {
 
         <div className="bg-card rounded-lg shadow-sm p-6">
           <div className="flex items-center">
-            <div className="p-2 bg-purple-100 rounded-lg">
-              <Users className="w-6 h-6 text-purple-600" />
+            <div className="p-2 bg-status-warning rounded-lg">
+              <Users className="w-6 h-6 text-status-warning" />
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-muted-foreground">
@@ -257,7 +257,7 @@ export function Dashboard() {
               <p className="text-2xl font-bold text-foreground">
                 {stats.totalContacts.toLocaleString()}
               </p>
-              <p className="text-xs text-purple-600 mt-1">
+              <p className="text-xs text-status-warning mt-1">
                 {stats.activeContacts} active
               </p>
             </div>
@@ -266,8 +266,8 @@ export function Dashboard() {
 
         <div className="bg-card rounded-lg shadow-sm p-6">
           <div className="flex items-center">
-            <div className="p-2 bg-orange-100 rounded-lg">
-              <TrendingUp className="w-6 h-6 text-orange-600" />
+            <div className="p-2 bg-status-error rounded-lg">
+              <TrendingUp className="w-6 h-6 text-status-error" />
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-muted-foreground">
@@ -276,7 +276,7 @@ export function Dashboard() {
               <p className="text-2xl font-bold text-foreground">
                 {stats.deliveryRate}%
               </p>
-              <p className="text-xs text-orange-600 mt-1">
+              <p className="text-xs text-status-error mt-1">
                 {stats.openRate}% open rate
               </p>
             </div>

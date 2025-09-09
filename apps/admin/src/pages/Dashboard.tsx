@@ -365,9 +365,7 @@ const Dashboard = () => {
             </h1>
             <div
               className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                isGlobalView
-                  ? "bg-blue-100 text-blue-800 border border-blue-200"
-                  : "bg-green-100 text-green-800 border border-green-200"
+                isGlobalView ? "badge-info" : "badge-success"
               }`}
             >
               {isGlobalView ? (
@@ -538,8 +536,8 @@ const Dashboard = () => {
             onClick={navigateToCompanies}
           >
             <div className="flex items-center">
-              <div className="p-2 bg-green-100 rounded-lg flex-shrink-0">
-                <Building className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
+              <div className="p-2 icon-bg-success rounded-lg flex-shrink-0">
+                <Building className="w-5 h-5 sm:w-6 sm:h-6 text-status-success" />
               </div>
               <div className="ml-3 sm:ml-4 min-w-0 flex-1">
                 <p className="text-xs sm:text-sm font-medium text-muted-foreground truncate">
@@ -548,7 +546,7 @@ const Dashboard = () => {
                 <p className="text-xl sm:text-2xl font-bold text-foreground">
                   {stats.activeCompanies}
                 </p>
-                <p className="text-xs text-green-600 mt-1 truncate">
+                <p className="text-xs text-status-success mt-1 truncate">
                   of {stats.totalCompanies} total
                 </p>
               </div>
@@ -560,8 +558,8 @@ const Dashboard = () => {
             onClick={navigateToUsers}
           >
             <div className="flex items-center">
-              <div className="p-2 bg-blue-100 rounded-lg flex-shrink-0">
-                <Users className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
+              <div className="p-2 icon-bg-info rounded-lg flex-shrink-0">
+                <Users className="w-5 h-5 sm:w-6 sm:h-6 text-status-info" />
               </div>
               <div className="ml-3 sm:ml-4 min-w-0 flex-1">
                 <p className="text-xs sm:text-sm font-medium text-muted-foreground truncate">
@@ -570,7 +568,7 @@ const Dashboard = () => {
                 <p className="text-xl sm:text-2xl font-bold text-foreground">
                   {stats.totalUsers.toLocaleString()}
                 </p>
-                <p className="text-xs text-green-600 mt-1 truncate">
+                <p className="text-xs text-status-success mt-1 truncate">
                   +{stats.activeUsers} active
                 </p>
               </div>
@@ -582,8 +580,8 @@ const Dashboard = () => {
             onClick={navigateToLeads}
           >
             <div className="flex items-center">
-              <div className="p-2 bg-purple-100 rounded-lg flex-shrink-0">
-                <UserPlus className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" />
+              <div className="p-2 icon-bg-warning rounded-lg flex-shrink-0">
+                <UserPlus className="w-5 h-5 sm:w-6 sm:h-6 text-status-warning" />
               </div>
               <div className="ml-3 sm:ml-4 min-w-0 flex-1">
                 <p className="text-xs sm:text-sm font-medium text-muted-foreground truncate">
@@ -592,7 +590,7 @@ const Dashboard = () => {
                 <p className="text-xl sm:text-2xl font-bold text-foreground">
                   {stats.totalLeads}
                 </p>
-                <p className="text-xs text-yellow-600 mt-1 truncate">
+                <p className="text-xs text-status-warning mt-1 truncate">
                   {stats.pendingLeads} pending
                 </p>
               </div>
@@ -604,8 +602,8 @@ const Dashboard = () => {
             onClick={navigateToCompanies}
           >
             <div className="flex items-center">
-              <div className="p-2 bg-orange-100 rounded-lg flex-shrink-0">
-                <Activity className="w-5 h-5 sm:w-6 sm:h-6 text-orange-600" />
+              <div className="p-2 icon-bg-error rounded-lg flex-shrink-0">
+                <Activity className="w-5 h-5 sm:w-6 sm:h-6 text-status-error" />
               </div>
               <div className="ml-3 sm:ml-4 min-w-0 flex-1">
                 <p className="text-xs sm:text-sm font-medium text-muted-foreground truncate">
@@ -614,7 +612,7 @@ const Dashboard = () => {
                 <p className="text-xl sm:text-2xl font-bold text-foreground">
                   {stats.totalCompanies - stats.activeCompanies}
                 </p>
-                <p className="text-xs text-orange-600 mt-1 truncate">
+                <p className="text-xs text-status-error mt-1 truncate">
                   in progress
                 </p>
               </div>

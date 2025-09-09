@@ -1,72 +1,88 @@
-import { useState } from 'react'
-import { useHub } from '@sms-hub/ui'
-import { 
-  Search, 
-  Send, 
-  MessageSquare, 
-  Download, 
-  CheckCircle, 
-  XCircle, 
+import { useState } from "react";
+import { useHub } from "@sms-hub/ui";
+import {
+  Search,
+  Send,
+  MessageSquare,
+  Download,
+  CheckCircle,
+  XCircle,
   Clock,
   Eye,
   RefreshCw,
-} from 'lucide-react'
-import { useMessages } from '@sms-hub/supabase/react'
+} from "lucide-react";
+import { useMessages } from "@sms-hub/supabase/react";
 
 export function Messages() {
-  const { currentHub } = useHub()
-  const { data: messages = [] } = useMessages()
-  const [searchQuery, setSearchQuery] = useState("")
-  const [statusFilter, setStatusFilter] = useState("all")
-  const [typeFilter, setTypeFilter] = useState("all")
+  const { currentHub } = useHub();
+  const { data: messages = [] } = useMessages();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [typeFilter, setTypeFilter] = useState("all");
 
   // Filter messages based on search and filters
   const filteredMessages = messages.filter((message: any) => {
-    const matchesSearch = message.content?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         message.recipient_phone_number?.includes(searchQuery)
-    const matchesStatus = statusFilter === "all" || message.status === statusFilter
-    const matchesType = typeFilter === "all" || message.message_type === typeFilter
-    return matchesSearch && matchesStatus && matchesType
-  })
+    const matchesSearch =
+      message.content?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      message.recipient_phone_number?.includes(searchQuery);
+    const matchesStatus =
+      statusFilter === "all" || message.status === statusFilter;
+    const matchesType =
+      typeFilter === "all" || message.message_type === typeFilter;
+    return matchesSearch && matchesStatus && matchesType;
+  });
 
   // Calculate stats
   const stats = {
     total: messages.length,
-    sent: messages.filter((m: any) => m.status === 'sent').length,
-    delivered: messages.filter((m: any) => m.status === 'delivered').length,
-    failed: messages.filter((m: any) => m.status === 'failed').length,
-    pending: messages.filter((m: any) => m.status === 'pending').length,
-    sms: messages.filter((m: any) => m.message_type === 'sms').length,
-    mms: messages.filter((m: any) => m.message_type === 'mms').length
-  }
+    sent: messages.filter((m: any) => m.status === "sent").length,
+    delivered: messages.filter((m: any) => m.status === "delivered").length,
+    failed: messages.filter((m: any) => m.status === "failed").length,
+    pending: messages.filter((m: any) => m.status === "pending").length,
+    sms: messages.filter((m: any) => m.message_type === "sms").length,
+    mms: messages.filter((m: any) => m.message_type === "mms").length,
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'sent': return 'bg-blue-100 text-blue-800'
-      case 'delivered': return 'bg-green-100 text-green-800'
-      case 'failed': return 'bg-red-100 text-red-800'
-      case 'pending': return 'bg-yellow-100 text-yellow-800'
-      default: return 'bg-gray-100 text-gray-800'
+      case "sent":
+        return "message-sent";
+      case "delivered":
+        return "message-delivered";
+      case "failed":
+        return "message-failed";
+      case "pending":
+        return "message-pending";
+      default:
+        return "message-pending";
     }
-  }
+  };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'sent': return <Send className="w-4 h-4" />
-      case 'delivered': return <CheckCircle className="w-4 h-4" />
-      case 'failed': return <XCircle className="w-4 h-4" />
-      case 'pending': return <Clock className="w-4 h-4" />
-      default: return <Clock className="w-4 h-4" />
+      case "sent":
+        return <Send className="w-4 h-4" />;
+      case "delivered":
+        return <CheckCircle className="w-4 h-4" />;
+      case "failed":
+        return <XCircle className="w-4 h-4" />;
+      case "pending":
+        return <Clock className="w-4 h-4" />;
+      default:
+        return <Clock className="w-4 h-4" />;
     }
-  }
+  };
 
   const getTypeIcon = (type: string) => {
     switch (type) {
-      case 'sms': return <MessageSquare className="w-4 h-4" />
-      case 'mms': return <MessageSquare className="w-4 h-4" />
-      default: return <MessageSquare className="w-4 h-4" />
+      case "sms":
+        return <MessageSquare className="w-4 h-4" />;
+      case "mms":
+        return <MessageSquare className="w-4 h-4" />;
+      default:
+        return <MessageSquare className="w-4 h-4" />;
     }
-  }
+  };
 
   return (
     <div className="space-y-6 p-6">
@@ -96,50 +112,66 @@ export function Messages() {
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="bg-card rounded-lg shadow-sm p-6">
           <div className="flex items-center">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <MessageSquare className="w-6 h-6 text-blue-600" />
+            <div className="p-2 icon-bg-info rounded-lg">
+              <MessageSquare className="w-6 h-6 text-status-info" />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Total Messages</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+              <p className="text-sm font-medium text-muted-foreground">
+                Total Messages
+              </p>
+              <p className="text-2xl font-bold text-foreground">
+                {stats.total}
+              </p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="bg-card rounded-lg shadow-sm p-6">
           <div className="flex items-center">
-            <div className="p-2 bg-green-100 rounded-lg">
-              <CheckCircle className="w-6 h-6 text-green-600" />
+            <div className="p-2 icon-bg-success rounded-lg">
+              <CheckCircle className="w-6 h-6 text-status-success" />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Delivered</p>
-              <p className="text-2xl font-bold text-green-600">{stats.delivered}</p>
+              <p className="text-sm font-medium text-muted-foreground">
+                Delivered
+              </p>
+              <p className="text-2xl font-bold text-status-success">
+                {stats.delivered}
+              </p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="bg-card rounded-lg shadow-sm p-6">
           <div className="flex items-center">
-            <div className="p-2 bg-red-100 rounded-lg">
-              <XCircle className="w-6 h-6 text-red-600" />
+            <div className="p-2 icon-bg-error rounded-lg">
+              <XCircle className="w-6 h-6 text-status-error" />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Failed</p>
-              <p className="text-2xl font-bold text-red-600">{stats.failed}</p>
+              <p className="text-sm font-medium text-muted-foreground">
+                Failed
+              </p>
+              <p className="text-2xl font-bold text-status-error">
+                {stats.failed}
+              </p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="bg-card rounded-lg shadow-sm p-6">
           <div className="flex items-center">
-            <div className="p-2 bg-yellow-100 rounded-lg">
-              <Clock className="w-6 h-6 text-yellow-600" />
+            <div className="p-2 icon-bg-warning rounded-lg">
+              <Clock className="w-6 h-6 text-status-warning" />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Pending</p>
-              <p className="text-2xl font-bold text-yellow-600">{stats.pending}</p>
+              <p className="text-sm font-medium text-muted-foreground">
+                Pending
+              </p>
+              <p className="text-2xl font-bold text-status-warning">
+                {stats.pending}
+              </p>
             </div>
           </div>
         </div>
@@ -147,30 +179,38 @@ export function Messages() {
 
       {/* Secondary Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="bg-card rounded-lg shadow-sm p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">SMS Messages</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.sms}</p>
+              <p className="text-sm font-medium text-muted-foreground">
+                SMS Messages
+              </p>
+              <p className="text-2xl font-bold text-foreground">{stats.sms}</p>
             </div>
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <MessageSquare className="w-6 h-6 text-blue-600" />
+            <div className="p-2 icon-bg-info rounded-lg">
+              <MessageSquare className="w-6 h-6 text-status-info" />
             </div>
           </div>
-          <p className="text-xs text-gray-500 mt-2">Text messages sent</p>
+          <p className="text-xs text-muted-foreground mt-2">
+            Text messages sent
+          </p>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="bg-card rounded-lg shadow-sm p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">MMS Messages</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.mms}</p>
+              <p className="text-sm font-medium text-muted-foreground">
+                MMS Messages
+              </p>
+              <p className="text-2xl font-bold text-foreground">{stats.mms}</p>
             </div>
-            <div className="p-2 bg-purple-100 rounded-lg">
-              <MessageSquare className="w-6 h-6 text-purple-600" />
+            <div className="p-2 icon-bg-error rounded-lg">
+              <MessageSquare className="w-6 h-6 text-status-error" />
             </div>
           </div>
-          <p className="text-xs text-gray-500 mt-2">Multimedia messages sent</p>
+          <p className="text-xs text-muted-foreground mt-2">
+            Multimedia messages sent
+          </p>
         </div>
       </div>
 
@@ -226,56 +266,66 @@ export function Messages() {
 
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+            <thead className="bg-muted">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Message
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Recipient
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Type
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Status
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Sent
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-card divide-y divide-border">
               {filteredMessages.map((message: any) => (
-                <tr key={message.id} className="hover:bg-gray-50">
+                <tr key={message.id} className="hover:bg-muted">
                   <td className="px-6 py-4">
                     <div className="max-w-xs">
-                      <div className="text-sm text-gray-900 truncate">{message.content}</div>
-                      <div className="text-xs text-gray-500 mt-1">
+                      <div className="text-sm text-foreground truncate">
+                        {message.content}
+                      </div>
+                      <div className="text-xs text-muted-foreground mt-1">
                         ID: {message.id.slice(0, 8)}...
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
                     {message.recipient_phone_number}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                      {getTypeIcon(message.message_type || 'sms')}
-                      <span className="ml-1">{message.message_type?.toUpperCase() || 'SMS'}</span>
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-muted text-muted-foreground">
+                      {getTypeIcon(message.message_type || "sms")}
+                      <span className="ml-1">
+                        {message.message_type?.toUpperCase() || "SMS"}
+                      </span>
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(message.status || 'pending')}`}>
-                      {getStatusIcon(message.status || 'pending')}
-                      <span className="ml-1">{message.status || 'pending'}</span>
+                    <span
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(message.status || "pending")}`}
+                    >
+                      {getStatusIcon(message.status || "pending")}
+                      <span className="ml-1">
+                        {message.status || "pending"}
+                      </span>
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {message.created_at ? new Date(message.created_at).toLocaleDateString() : 'Unknown'}
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
+                    {message.created_at
+                      ? new Date(message.created_at).toLocaleDateString()
+                      : "Unknown"}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex items-center space-x-2">
@@ -296,11 +346,13 @@ export function Messages() {
         {filteredMessages.length === 0 && (
           <div className="text-center py-12">
             <MessageSquare className="mx-auto h-12 w-12 text-gray-400" />
-            <h3 className="mt-2 text-sm font-medium text-gray-900">No messages found</h3>
-            <p className="mt-1 text-sm text-gray-500">
-              {searchQuery || statusFilter !== 'all' || typeFilter !== 'all'
-                ? 'Try adjusting your search or filter criteria.'
-                : 'No messages have been sent yet.'}
+            <h3 className="mt-2 text-sm font-medium text-foreground">
+              No messages found
+            </h3>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {searchQuery || statusFilter !== "all" || typeFilter !== "all"
+                ? "Try adjusting your search or filter criteria."
+                : "No messages have been sent yet."}
             </p>
             <div className="mt-6">
               <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">

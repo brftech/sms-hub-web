@@ -1,68 +1,95 @@
-import { useState } from 'react'
-import { useHub } from '@sms-hub/ui'
-import { 
-  Search, 
-  Plus, 
-  Play, 
-  Pause, 
-  MoreHorizontal, 
-  TrendingUp, 
-  BarChart3, 
-  CheckCircle, 
+import { useState } from "react";
+import { useHub } from "@sms-hub/ui";
+import {
+  Search,
+  Plus,
+  Play,
+  Pause,
+  MoreHorizontal,
+  TrendingUp,
+  BarChart3,
+  CheckCircle,
   Clock,
   Zap,
   Eye,
-  RefreshCw
-} from 'lucide-react'
-import { useCurrentUserCampaigns, useCurrentUserCompany, useBrands } from '@sms-hub/supabase/react'
-import { Campaign } from '@sms-hub/types'
+  RefreshCw,
+} from "lucide-react";
+import {
+  useCurrentUserCampaigns,
+  useCurrentUserCompany,
+  useBrands,
+} from "@sms-hub/supabase/react";
+import { Campaign } from "@sms-hub/types";
 
 export function Campaigns() {
-  const { currentHub } = useHub()
-  const { data: company } = useCurrentUserCompany()
-  const { data: campaigns = [] } = useCurrentUserCampaigns()
-  useBrands(company?.id || "")
-  const [searchQuery, setSearchQuery] = useState("")
-  const [statusFilter, setStatusFilter] = useState("all")
+  const { currentHub } = useHub();
+  const { data: company } = useCurrentUserCompany();
+  const { data: campaigns = [] } = useCurrentUserCampaigns();
+  useBrands(company?.id || "");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
 
   // Filter campaigns based on search and status
   const filteredCampaigns = campaigns.filter((campaign: Campaign) => {
-    const matchesSearch = campaign.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         campaign.description?.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesStatus = statusFilter === "all" || campaign.status === statusFilter
-    return matchesSearch && matchesStatus
-  })
+    const matchesSearch =
+      campaign.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      campaign.description?.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesStatus =
+      statusFilter === "all" || campaign.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
 
   // Calculate stats
   const stats = {
     total: campaigns.length,
-    active: campaigns.filter((c: Campaign) => c.status === 'active').length,
-    paused: campaigns.filter((c: Campaign) => c.status === 'paused').length,
-    completed: campaigns.filter((c: Campaign) => c.status === 'completed').length,
-    totalMessages: campaigns.reduce((acc: number, c: Campaign) => acc + ((c as any).metadata?.message_count || 0), 0),
-    deliveryRate: campaigns.length > 0 ? 
-      campaigns.reduce((acc: number, c: Campaign) => acc + ((c as any).metadata?.delivery_rate || 0), 0) / campaigns.length : 0
-  }
+    active: campaigns.filter((c: Campaign) => c.status === "active").length,
+    paused: campaigns.filter((c: Campaign) => c.status === "paused").length,
+    completed: campaigns.filter((c: Campaign) => c.status === "completed")
+      .length,
+    totalMessages: campaigns.reduce(
+      (acc: number, c: Campaign) =>
+        acc + ((c as any).metadata?.message_count || 0),
+      0
+    ),
+    deliveryRate:
+      campaigns.length > 0
+        ? campaigns.reduce(
+            (acc: number, c: Campaign) =>
+              acc + ((c as any).metadata?.delivery_rate || 0),
+            0
+          ) / campaigns.length
+        : 0,
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'active': return 'bg-green-100 text-green-800'
-      case 'paused': return 'bg-yellow-100 text-yellow-800'
-      case 'completed': return 'bg-blue-100 text-blue-800'
-      case 'draft': return 'bg-gray-100 text-gray-800'
-      default: return 'bg-gray-100 text-gray-800'
+      case "active":
+        return "campaign-active";
+      case "paused":
+        return "campaign-paused";
+      case "completed":
+        return "campaign-completed";
+      case "draft":
+        return "campaign-draft";
+      default:
+        return "campaign-draft";
     }
-  }
+  };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'active': return <Play className="w-4 h-4" />
-      case 'paused': return <Pause className="w-4 h-4" />
-      case 'completed': return <CheckCircle className="w-4 h-4" />
-      case 'draft': return <Clock className="w-4 h-4" />
-      default: return <Clock className="w-4 h-4" />
+      case "active":
+        return <Play className="w-4 h-4" />;
+      case "paused":
+        return <Pause className="w-4 h-4" />;
+      case "completed":
+        return <CheckCircle className="w-4 h-4" />;
+      case "draft":
+        return <Clock className="w-4 h-4" />;
+      default:
+        return <Clock className="w-4 h-4" />;
     }
-  }
+  };
 
   return (
     <div className="space-y-6 p-6">
@@ -88,50 +115,66 @@ export function Campaigns() {
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="bg-card rounded-lg shadow-sm p-6">
           <div className="flex items-center">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <Zap className="w-6 h-6 text-blue-600" />
+            <div className="p-2 icon-bg-info rounded-lg">
+              <Zap className="w-6 h-6 text-status-info" />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Total Campaigns</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+              <p className="text-sm font-medium text-muted-foreground">
+                Total Campaigns
+              </p>
+              <p className="text-2xl font-bold text-foreground">
+                {stats.total}
+              </p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="bg-card rounded-lg shadow-sm p-6">
           <div className="flex items-center">
-            <div className="p-2 bg-green-100 rounded-lg">
-              <Play className="w-6 h-6 text-green-600" />
+            <div className="p-2 icon-bg-success rounded-lg">
+              <Play className="w-6 h-6 text-status-success" />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Active</p>
-              <p className="text-2xl font-bold text-green-600">{stats.active}</p>
+              <p className="text-sm font-medium text-muted-foreground">
+                Active
+              </p>
+              <p className="text-2xl font-bold text-status-success">
+                {stats.active}
+              </p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="bg-card rounded-lg shadow-sm p-6">
           <div className="flex items-center">
-            <div className="p-2 bg-yellow-100 rounded-lg">
-              <Pause className="w-6 h-6 text-yellow-600" />
+            <div className="p-2 icon-bg-warning rounded-lg">
+              <Pause className="w-6 h-6 text-status-warning" />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Paused</p>
-              <p className="text-2xl font-bold text-yellow-600">{stats.paused}</p>
+              <p className="text-sm font-medium text-muted-foreground">
+                Paused
+              </p>
+              <p className="text-2xl font-bold text-status-warning">
+                {stats.paused}
+              </p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="bg-card rounded-lg shadow-sm p-6">
           <div className="flex items-center">
-            <div className="p-2 bg-purple-100 rounded-lg">
-              <TrendingUp className="w-6 h-6 text-purple-600" />
+            <div className="p-2 icon-bg-error rounded-lg">
+              <TrendingUp className="w-6 h-6 text-status-error" />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Messages Sent</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.totalMessages.toLocaleString()}</p>
+              <p className="text-sm font-medium text-muted-foreground">
+                Messages Sent
+              </p>
+              <p className="text-2xl font-bold text-foreground">
+                {stats.totalMessages.toLocaleString()}
+              </p>
             </div>
           </div>
         </div>
@@ -179,51 +222,64 @@ export function Campaigns() {
 
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+            <thead className="bg-muted">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Campaign
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Status
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Messages
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Delivery Rate
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Created
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-card divide-y divide-border">
               {filteredCampaigns.map((campaign: Campaign) => (
-                <tr key={campaign.id} className="hover:bg-gray-50">
+                <tr key={campaign.id} className="hover:bg-muted">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>
-                      <div className="text-sm font-medium text-gray-900">{campaign.name}</div>
-                      <div className="text-sm text-gray-500">{campaign.description}</div>
+                      <div className="text-sm font-medium text-foreground">
+                        {campaign.name}
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        {campaign.description}
+                      </div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(campaign.status || 'draft')}`}>
-                      {getStatusIcon(campaign.status || 'draft')}
-                      <span className="ml-1">{campaign.status || 'draft'}</span>
+                    <span
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(campaign.status || "draft")}`}
+                    >
+                      {getStatusIcon(campaign.status || "draft")}
+                      <span className="ml-1">{campaign.status || "draft"}</span>
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {((campaign as any).metadata?.message_count || 0).toLocaleString()}
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
+                    {(
+                      (campaign as any).metadata?.message_count || 0
+                    ).toLocaleString()}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {((campaign as any).metadata?.delivery_rate || 0).toFixed(1)}%
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
+                    {((campaign as any).metadata?.delivery_rate || 0).toFixed(
+                      1
+                    )}
+                    %
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {campaign.created_at ? new Date(campaign.created_at).toLocaleDateString() : 'Unknown'}
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
+                    {campaign.created_at
+                      ? new Date(campaign.created_at).toLocaleDateString()
+                      : "Unknown"}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex items-center space-x-2">
@@ -247,11 +303,13 @@ export function Campaigns() {
         {filteredCampaigns.length === 0 && (
           <div className="text-center py-12">
             <Zap className="mx-auto h-12 w-12 text-gray-400" />
-            <h3 className="mt-2 text-sm font-medium text-gray-900">No campaigns found</h3>
-            <p className="mt-1 text-sm text-gray-500">
-              {searchQuery || statusFilter !== 'all'
-                ? 'Try adjusting your search or filter criteria.'
-                : 'Get started by creating your first campaign.'}
+            <h3 className="mt-2 text-sm font-medium text-foreground">
+              No campaigns found
+            </h3>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {searchQuery || statusFilter !== "all"
+                ? "Try adjusting your search or filter criteria."
+                : "Get started by creating your first campaign."}
             </p>
             <div className="mt-6">
               <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">

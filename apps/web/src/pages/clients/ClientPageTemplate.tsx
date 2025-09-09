@@ -1,7 +1,7 @@
 import { Helmet } from "react-helmet-async";
 import { Card, CardContent, CardHeader, CardTitle } from "@sms-hub/ui";
 import { Link } from "react-router-dom";
-import { Phone, MapPin, Clock, Shield, CheckCircle } from "lucide-react";
+import { Phone, MapPin, Clock } from "lucide-react";
 import gnymbleIconLogo from "@sms-hub/ui/assets/gnymble-icon-logo.svg";
 
 interface ClientPageTemplateProps {

@@ -175,6 +175,47 @@ export function Layout() {
             })}
           </nav>
 
+          {/* Client Websites Section */}
+          <div className="border-t border-border p-3">
+            <div className="mb-2">
+              <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                Client Websites
+              </h3>
+            </div>
+            <div className="space-y-1">
+              <a
+                href="http://localhost:3000/dons-burlingame"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center space-x-3 px-3 py-2 rounded-lg text-sm text-foreground hover:bg-accent transition-colors"
+                onClick={() => setIsSidebarOpen(false)}
+              >
+                <Globe className="h-4 w-4 text-muted-foreground" />
+                <span>Don's Burlingame</span>
+              </a>
+              <a
+                href="http://localhost:3000/michaels-tobacco"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center space-x-3 px-3 py-2 rounded-lg text-sm text-foreground hover:bg-accent transition-colors"
+                onClick={() => setIsSidebarOpen(false)}
+              >
+                <Globe className="h-4 w-4 text-muted-foreground" />
+                <span>Michaels Tobacco</span>
+              </a>
+              <a
+                href="http://localhost:3000/1st-round-ammo"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center space-x-3 px-3 py-2 rounded-lg text-sm text-foreground hover:bg-accent transition-colors"
+                onClick={() => setIsSidebarOpen(false)}
+              >
+                <Globe className="h-4 w-4 text-muted-foreground" />
+                <span>1st Round Ammo</span>
+              </a>
+            </div>
+          </div>
+
           {/* Settings Link - positioned above user profile */}
           <div className="border-t border-gray-200 p-3">
             <Link

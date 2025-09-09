@@ -20,7 +20,7 @@ import CigarLanding from "./pages/CigarLanding";
 import FAQ from "./pages/FAQ";
 import Demo from "./pages/Demo";
 import DonsBurlingame from "./pages/clients/DonsBurlingame";
-import Michaels from "./pages/clients/Michaels";
+import MichaelsTobacco from "./pages/clients/MichaelsTobacco";
 
 const queryClient = new QueryClient();
 
@@ -111,10 +111,10 @@ const AppRoutes = () => {
         }
       />
       <Route
-        path="/michaels"
+        path="/michaels-tobacco"
         element={
           <PageTransition>
-            <Michaels />
+            <MichaelsTobacco />
           </PageTransition>
         }
       />

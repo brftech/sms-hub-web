@@ -11,7 +11,7 @@ import {
 import ClientPageTemplate from "./ClientPageTemplate";
 import michaelsLogo from "@sms-hub/ui/assets/michaels-logo.png";
 
-export default function Michaels() {
+export default function MichaelsTobacco() {
   const features = [
     {
       icon: <Phone className="w-8 h-8 text-black" />,
@@ -74,7 +74,7 @@ export default function Michaels() {
 
   return (
     <ClientPageTemplate
-      clientName="Michaels"
+      clientName="Michaels Tobacco"
       clientDescription="Premium Cigar & Tobacco"
       clientLogo={michaelsLogo}
       clientIcon={<Cigarette className="w-5 h-5 text-black" />}

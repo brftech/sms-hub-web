@@ -213,6 +213,16 @@ export function Layout() {
                 <Globe className="h-4 w-4 text-muted-foreground" />
                 <span>1st Round Ammo</span>
               </a>
+              <a
+                href="http://localhost:3000/harlem-cigar"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center space-x-3 px-3 py-2 rounded-lg text-sm text-foreground hover:bg-accent transition-colors"
+                onClick={() => setIsSidebarOpen(false)}
+              >
+                <Globe className="h-4 w-4 text-muted-foreground" />
+                <span>Harlem Cigar</span>
+              </a>
             </div>
           </div>
 

@@ -32,13 +32,58 @@ export default defineConfig(({ mode }) => ({
     },
     rollupOptions: {
       output: {
-        manualChunks: {
-          // Vendor chunks for better caching
-          "react-vendor": ["react", "react-dom"],
+        manualChunks: (id) => {
+          // React and React ecosystem
+          if (
+            id.includes("react") ||
+            id.includes("react-dom") ||
+            id.includes("react-router")
+          ) {
+            return "react-vendor";
+          }
+
+          // UI libraries and components
+          if (
+            id.includes("@sms-hub/ui") ||
+            id.includes("lucide-react") ||
+            id.includes("radix-ui")
+          ) {
+            return "ui-vendor";
+          }
+
+          // Supabase and database related
+          if (id.includes("@supabase") || id.includes("@sms-hub/supabase")) {
+            return "supabase-vendor";
+          }
+
+          // Query and state management
+          if (id.includes("@tanstack") || id.includes("@sms-hub/utils")) {
+            return "query-vendor";
+          }
+
+          // Client pages (lazy loaded)
+          if (id.includes("/pages/clients/")) {
+            return "client-pages";
+          }
+
+          // Main pages
+          if (id.includes("/pages/") && !id.includes("/pages/clients/")) {
+            return "main-pages";
+          }
+
+          // Large images and assets
+          if (
+            id.includes(".png") ||
+            id.includes(".jpg") ||
+            id.includes(".jpeg") ||
+            id.includes(".svg")
+          ) {
+            return "assets";
+          }
         },
       },
     },
-    chunkSizeWarningLimit: 1000, // Increase limit to 1MB
+    chunkSizeWarningLimit: 500, // Reduce warning limit to 500KB
     sourcemap: mode === "development",
   },
   optimizeDeps: {

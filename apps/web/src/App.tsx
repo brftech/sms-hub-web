@@ -2,12 +2,13 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster, SonnerToaster, TooltipProvider } from "@sms-hub/ui";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
+import { Suspense, lazy } from "react";
 
 import { HubProvider, ErrorBoundary, PageTransition } from "@sms-hub/ui";
 import { useScrollToTop } from "@sms-hub/utils";
 import { webEnvironment } from "./config/webEnvironment";
 
-// Import all pages directly - no lazy loading
+// Import main pages directly (frequently accessed)
 import Home from "./pages/Home";
 import Contact from "./pages/Contact";
 import Terms from "./pages/Terms";
@@ -16,12 +17,14 @@ import About from "./pages/About";
 import Pricing from "./pages/Pricing";
 import Landing from "./pages/Landing";
 import CigarLanding from "./pages/CigarLanding";
-
 import FAQ from "./pages/FAQ";
 import Demo from "./pages/Demo";
-import DonsBurlingame from "./pages/clients/DonsBurlingame";
-import MichaelsTobacco from "./pages/clients/MichaelsTobacco";
-import FirstRoundAmmo from "./pages/clients/FirstRoundAmmo";
+
+// Lazy load client pages (less frequently accessed)
+const DonsBurlingame = lazy(() => import("./pages/clients/DonsBurlingame"));
+const MichaelsTobacco = lazy(() => import("./pages/clients/MichaelsTobacco"));
+const FirstRoundAmmo = lazy(() => import("./pages/clients/FirstRoundAmmo"));
+const HarlemCigar = lazy(() => import("./pages/clients/HarlemCigar"));
 
 const queryClient = new QueryClient();
 
@@ -107,7 +110,15 @@ const AppRoutes = () => {
         path="/dons-burlingame"
         element={
           <PageTransition>
-            <DonsBurlingame />
+            <Suspense
+              fallback={
+                <div className="min-h-screen bg-black flex items-center justify-center">
+                  <div className="text-orange-500 text-xl">Loading...</div>
+                </div>
+              }
+            >
+              <DonsBurlingame />
+            </Suspense>
           </PageTransition>
         }
       />
@@ -115,7 +126,15 @@ const AppRoutes = () => {
         path="/michaels-tobacco"
         element={
           <PageTransition>
-            <MichaelsTobacco />
+            <Suspense
+              fallback={
+                <div className="min-h-screen bg-black flex items-center justify-center">
+                  <div className="text-orange-500 text-xl">Loading...</div>
+                </div>
+              }
+            >
+              <MichaelsTobacco />
+            </Suspense>
           </PageTransition>
         }
       />
@@ -123,7 +142,31 @@ const AppRoutes = () => {
         path="/1st-round-ammo"
         element={
           <PageTransition>
-            <FirstRoundAmmo />
+            <Suspense
+              fallback={
+                <div className="min-h-screen bg-black flex items-center justify-center">
+                  <div className="text-orange-500 text-xl">Loading...</div>
+                </div>
+              }
+            >
+              <FirstRoundAmmo />
+            </Suspense>
+          </PageTransition>
+        }
+      />
+      <Route
+        path="/harlem-cigar"
+        element={
+          <PageTransition>
+            <Suspense
+              fallback={
+                <div className="min-h-screen bg-black flex items-center justify-center">
+                  <div className="text-orange-500 text-xl">Loading...</div>
+                </div>
+              }
+            >
+              <HarlemCigar />
+            </Suspense>
           </PageTransition>
         }
       />

@@ -1115,3 +1115,125 @@
     }
   }
 }
+
+/* Semantic color utilities using CSS variables */
+@layer utilities {
+  /* Status backgrounds */
+  .bg-status-info {
+    background-color: hsl(var(--accent-blue) / 0.1);
+  }
+
+  .bg-status-success {
+    background-color: hsl(142 76% 36% / 0.1);
+  }
+
+  .bg-status-warning {
+    background-color: hsl(38 92% 50% / 0.1);
+  }
+
+  .bg-status-error {
+    background-color: hsl(var(--destructive) / 0.1);
+  }
+
+  /* Status text */
+  .text-status-info {
+    color: hsl(var(--accent-blue));
+  }
+
+  .text-status-success {
+    color: hsl(142 76% 36%);
+  }
+
+  .text-status-warning {
+    color: hsl(38 92% 50%);
+  }
+
+  .text-status-error {
+    color: hsl(var(--destructive));
+  }
+
+  /* Badge variants */
+  .badge-info {
+    @apply bg-status-info text-status-info border border-border;
+  }
+
+  .badge-success {
+    @apply bg-status-success text-status-success border border-border;
+  }
+
+  .badge-warning {
+    @apply bg-status-warning text-status-warning border border-border;
+  }
+
+  .badge-error {
+    @apply bg-status-error text-status-error border border-border;
+  }
+
+  /* Icon backgrounds */
+  .icon-bg-info {
+    @apply bg-status-info;
+  }
+
+  .icon-bg-success {
+    @apply bg-status-success;
+  }
+
+  .icon-bg-warning {
+    @apply bg-status-warning;
+  }
+
+  .icon-bg-error {
+    @apply bg-status-error;
+  }
+
+  /* Campaign status colors */
+  .campaign-active {
+    @apply bg-status-success text-status-success;
+  }
+
+  .campaign-paused {
+    @apply bg-status-warning text-status-warning;
+  }
+
+  .campaign-completed {
+    @apply bg-status-info text-status-info;
+  }
+
+  .campaign-draft {
+    @apply bg-muted text-muted-foreground;
+  }
+
+  /* Message status colors */
+  .message-sent {
+    @apply bg-status-info text-status-info;
+  }
+
+  .message-delivered {
+    @apply bg-status-success text-status-success;
+  }
+
+  .message-failed {
+    @apply bg-status-error text-status-error;
+  }
+
+  .message-pending {
+    @apply bg-status-warning text-status-warning;
+  }
+
+  /* Priority colors */
+  .priority-urgent {
+    @apply bg-status-error text-status-error;
+  }
+
+  .priority-high {
+    @apply bg-status-warning text-status-warning;
+  }
+
+  .priority-medium {
+    @apply bg-status-info text-status-info;
+  }
+
+  .priority-low {
+    @apply bg-status-success text-status-success;
+  }
+}

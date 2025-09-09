@@ -3,7 +3,7 @@ import { Button } from "./button";
 import { HubLogo } from "./hub-logo";
 import { useHub } from "../contexts/HubContext";
 import { getHubColorClasses } from "@sms-hub/utils";
-import { ArrowLeft, ExternalLink, Github, Globe } from "lucide-react";
+import { ArrowLeft, ExternalLink, Github } from "lucide-react";
 
 interface DemoHeaderProps {
   title: string;
@@ -45,11 +45,9 @@ export default function DemoHeader({
         <div className="flex items-center justify-between py-3">
           <div className="flex items-center space-x-4">
             <HubLogo hubType={currentHub} variant="icon" size="lg" />
-            <div className="text-white/70 text-sm">
-              SMS Hub Platform Demo
-            </div>
+            <div className="text-white/70 text-sm">SMS Hub Platform Demo</div>
           </div>
-          
+
           <div className="flex items-center space-x-3">
             {externalLinks.map((link, index) => (
               <Button
@@ -57,18 +55,23 @@ export default function DemoHeader({
                 variant="ghost"
                 size="sm"
                 className="text-white/70 hover:text-white hover:bg-white/10"
-                onClick={() => window.open(link.url, '_blank')}
+                onClick={() => window.open(link.url, "_blank")}
               >
                 {link.icon || <ExternalLink className="h-4 w-4" />}
                 <span className="ml-2">{link.label}</span>
               </Button>
             ))}
-            
+
             <Button
               variant="ghost"
               size="sm"
               className="text-white/70 hover:text-white hover:bg-white/10"
-              onClick={() => window.open('https://github.com/brftech/sms-hub-monorepo', '_blank')}
+              onClick={() =>
+                window.open(
+                  "https://github.com/brftech/sms-hub-monorepo",
+                  "_blank"
+                )
+              }
             >
               <Github className="h-4 w-4" />
               <span className="ml-2">GitHub</span>
@@ -91,23 +94,23 @@ export default function DemoHeader({
                   Back to {backUrl === "/" ? "Home" : "Previous"}
                 </Button>
               )}
-              
+
               <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
                 {title}
               </h1>
-              
-              <p className="text-xl text-gray-300 max-w-3xl">
-                {description}
-              </p>
+
+              <p className="text-xl text-gray-300 max-w-3xl">{description}</p>
             </div>
 
             {/* Demo Status */}
             <div className="hidden lg:flex flex-col items-end space-y-3">
               <div className="flex items-center space-x-2 px-3 py-2 bg-green-500/20 border border-green-500/30 rounded-lg">
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                <span className="text-green-400 text-sm font-medium">Demo Active</span>
+                <span className="text-green-400 text-sm font-medium">
+                  Demo Active
+                </span>
               </div>
-              
+
               <div className="text-right">
                 <div className="text-white/70 text-sm">Current Hub</div>
                 <div className={`text-lg font-semibold ${hubColors.text}`}>

@@ -1,7 +1,10 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from "react";
 
 export interface NavigationCountsConfig {
-  fetchCounts: (hubId: number, isGlobalView: boolean) => Promise<Record<string, number>>;
+  fetchCounts: (
+    hubId: number,
+    isGlobalView: boolean
+  ) => Promise<Record<string, number>>;
   hubId: number;
   isGlobalView?: boolean;
   refreshInterval?: number; // in milliseconds
@@ -15,15 +18,20 @@ export function useNavigationCounts(config: NavigationCountsConfig) {
 
   const fetchCounts = useCallback(async () => {
     if (!config.enabled) return;
-    
+
     try {
       setIsRefreshing(true);
       setError(null);
-      const newCounts = await config.fetchCounts(config.hubId, config.isGlobalView || false);
+      const newCounts = await config.fetchCounts(
+        config.hubId,
+        config.isGlobalView || false
+      );
       setCounts(newCounts);
     } catch (err) {
-      console.error('Failed to fetch navigation counts:', err);
-      setError(err instanceof Error ? err : new Error('Failed to fetch counts'));
+      console.error("Failed to fetch navigation counts:", err);
+      setError(
+        err instanceof Error ? err : new Error("Failed to fetch counts")
+      );
     } finally {
       setIsRefreshing(false);
     }
@@ -51,7 +59,7 @@ export function useNavigationCounts(config: NavigationCountsConfig) {
     if (config.enabled) {
       fetchCounts();
     }
-  }, [config.hubId, config.isGlobalView]);
+  }, [config.hubId, config.isGlobalView, fetchCounts]);
 
   return {
     counts,

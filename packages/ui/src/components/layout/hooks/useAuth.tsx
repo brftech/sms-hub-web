@@ -105,9 +105,6 @@ export function useAuth(config: UseAuthConfig): AuthState {
       }
     };
   }, [
-    config.checkSession,
-    config.getUserProfile,
-    config.onAuthStateChange,
     config.devAuthOverride?.isEnabled,
     config.devAuthOverride?.user,
     config.devAuthOverride?.profile,

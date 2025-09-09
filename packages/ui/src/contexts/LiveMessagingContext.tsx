@@ -155,13 +155,15 @@ function messagingReducer(
         },
       };
 
-    case "REMOVE_MESSAGE":
-      const { [action.id]: removed, ...remainingMessageStates } = state.messageStates;
+    case "REMOVE_MESSAGE": {
+      const remainingMessageStates = { ...state.messageStates };
+      delete remainingMessageStates[action.id];
       return {
         ...state,
         messages: state.messages.filter((msg) => msg.id !== action.id),
         messageStates: remainingMessageStates,
       };
+    }
 
     case "CLEAR_MESSAGES":
       return {
@@ -219,9 +221,9 @@ function messagingReducer(
 // CONTEXT CREATION
 // =============================================================================
 
-const LiveMessagingContext = createContext<LiveMessagingContextType | undefined>(
-  undefined
-);
+const LiveMessagingContext = createContext<
+  LiveMessagingContextType | undefined
+>(undefined);
 
 // =============================================================================
 // PROVIDER COMPONENT
@@ -231,7 +233,9 @@ interface LiveMessagingProviderProps {
   children: ReactNode;
 }
 
-export function LiveMessagingProvider({ children }: LiveMessagingProviderProps) {
+export function LiveMessagingProvider({
+  children,
+}: LiveMessagingProviderProps) {
   const [state, dispatch] = useReducer(messagingReducer, {
     connectionState: MessagingState.IDLE,
     isConnected: false,
@@ -264,11 +268,14 @@ export function LiveMessagingProvider({ children }: LiveMessagingProviderProps) 
         // Simulate AI processing for business messages
         if (messageData.sender === "business") {
           dispatch({ type: "SET_AI_PROCESSING", isProcessing: true });
-          
+
           // Simulate processing delay
-          setTimeout(() => {
-            dispatch({ type: "SET_AI_PROCESSING", isProcessing: false });
-          }, 1000 + Math.random() * 2000);
+          setTimeout(
+            () => {
+              dispatch({ type: "SET_AI_PROCESSING", isProcessing: false });
+            },
+            1000 + Math.random() * 2000
+          );
         }
 
         logger.info("Message added successfully", {
@@ -305,12 +312,12 @@ export function LiveMessagingProvider({ children }: LiveMessagingProviderProps) 
   const connect = useCallback(async () => {
     try {
       dispatch({ type: "CONNECT_START" });
-      
+
       // Simulate connection delay
       await new Promise((resolve) => setTimeout(resolve, 500));
-      
+
       dispatch({ type: "CONNECT_SUCCESS" });
-      
+
       logger.info("Connected to messaging service", {
         sessionId: state.sessionId,
       });

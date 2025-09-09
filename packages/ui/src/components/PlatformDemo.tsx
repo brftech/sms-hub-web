@@ -70,7 +70,7 @@ interface Broadcast {
   status: "sent" | "scheduled" | "draft";
 }
 
-interface Contact {
+interface ContactData {
   id: string;
   firstName: string;
   lastName: string;
@@ -85,7 +85,7 @@ interface Contact {
 }
 
 export default function PlatformDemo() {
-  const { state } = useLiveMessaging();
+  useLiveMessaging();
   const [currentView, setCurrentView] = useState<
     "conversations" | "broadcasts" | "contacts"
   >("conversations");
@@ -135,7 +135,7 @@ export default function PlatformDemo() {
         phoneNumber: "+1 (555) 345-6789",
       },
     ],
-    [state.messages]
+    []
   );
 
   // Mock broadcast data
@@ -188,7 +188,7 @@ export default function PlatformDemo() {
   );
 
   // Mock contact data
-  const contacts: Contact[] = useMemo(
+  const contacts: ContactData[] = useMemo(
     () => [
       {
         id: "1",
@@ -243,7 +243,7 @@ export default function PlatformDemo() {
         optInDate: "03/01/2025",
       },
     ],
-    [state.messages]
+    []
   );
 
   // Filter conversations based on search and status

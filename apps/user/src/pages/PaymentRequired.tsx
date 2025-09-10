@@ -103,8 +103,8 @@ export function PaymentRequired() {
           userId: userProfile?.id,
           companyId: company?.id,
           hubId: hubConfig.hubNumber,
-          successUrl: `${window.location.origin}/payment-success`,
-          cancelUrl: `${window.location.origin}/payment-required`
+          successUrl: `http://localhost:3001/payment-success`,
+          cancelUrl: `http://localhost:3001/payment-required`
         }),
       })
       

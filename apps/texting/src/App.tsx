@@ -1,24 +1,24 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import { useEffect } from "react";
 import { Dashboard } from "./pages/Dashboard";
-import { Onboarding } from "./pages/onboarding/Onboarding";
-import { OnboardingProgress } from "./pages/OnboardingProgress";
-import { PaymentCallback } from "./pages/onboarding/PaymentCallback";
-import { BusinessInfoStep } from "./pages/onboarding/steps/BusinessInfoStep";
-import { AccountDetails } from "./pages/AccountDetails";
 import { Campaigns } from "./pages/Campaigns";
 import { Messages } from "./pages/Messages";
 import { Settings } from "./pages/Settings";
-import { PaymentRequired } from "./pages/PaymentRequired";
-import { PaymentSuccess } from "./pages/PaymentSuccess";
 import { Layout } from "./components/Layout";
 import { ProtectedRoute } from "./components/ProtectedRoute";
-import { getWebAppUrl } from "@sms-hub/utils";
+import { getWebAppUrl, getUserAppUrl } from "@sms-hub/utils";
 
 // Redirect components that use window.location.href for cross-app redirects
 const WebAppRedirect = ({ path }: { path: string }) => {
   useEffect(() => {
     window.location.href = getWebAppUrl(path);
+  }, [path]);
+  return null;
+};
+
+const UserAppRedirect = ({ path }: { path: string }) => {
+  useEffect(() => {
+    window.location.href = getUserAppUrl(path);
   }, [path]);
   return null;
 };
@@ -33,20 +33,20 @@ function App() {
         <Route path="/verify-otp" element={<WebAppRedirect path="/verify-otp" />} />
         <Route path="/login" element={<WebAppRedirect path="/login" />} />
         
-        {/* Keep account details and payment flows in user app */}
-        <Route path="/account-details" element={<AccountDetails />} />
-        <Route path="/payment-required" element={<PaymentRequired />} />
-        <Route path="/payment-success" element={<PaymentSuccess />} />
-        <Route path="/payment-callback" element={<PaymentCallback />} />
-        <Route path="/onboarding" element={<Onboarding />} />
-        <Route path="/onboarding/business" element={<BusinessInfoStep />} />
+        {/* Redirect onboarding to user app */}
+        <Route path="/onboarding" element={<UserAppRedirect path="/onboarding" />} />
+        <Route path="/onboarding-progress" element={<UserAppRedirect path="/onboarding-progress" />} />
+        <Route path="/account-details" element={<UserAppRedirect path="/account-details" />} />
+        <Route path="/payment-required" element={<UserAppRedirect path="/payment-required" />} />
+        <Route path="/payment-success" element={<UserAppRedirect path="/payment-success" />} />
+        
+        {/* SMS-focused routes for onboarded users */}
         <Route path="/" element={
           <ProtectedRoute>
             <Layout />
           </ProtectedRoute>
         }>
           <Route index element={<Dashboard />} />
-          <Route path="onboarding-progress" element={<OnboardingProgress />} />
           <Route path="campaigns" element={<Campaigns />} />
           <Route path="messages" element={<Messages />} />
           <Route path="settings" element={<Settings />} />

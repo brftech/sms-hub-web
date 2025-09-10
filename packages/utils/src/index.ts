@@ -6,6 +6,7 @@ export * from "./errors";
 export * from "./validation-advanced";
 export * from "./logger";
 export * from "./tcr-validation";
+export * from "./crossAppRedirects";
 
 // React hooks
 export * from "./useScrollToTop";

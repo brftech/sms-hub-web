@@ -20,6 +20,12 @@ import CigarLanding from "./pages/CigarLanding";
 import FAQ from "./pages/FAQ";
 import Demo from "./pages/Demo";
 
+// Import auth pages
+import { Login } from "./pages/Login";
+import { Signup } from "./pages/Signup";
+import { VerifyOtp } from "./pages/VerifyOtp";
+import { VerifyCode } from "./pages/VerifyCode";
+
 // Lazy load client pages (less frequently accessed)
 const DonsBurlingame = lazy(() => import("./pages/clients/DonsBurlingame"));
 const MichaelsTobacco = lazy(() => import("./pages/clients/MichaelsTobacco"));
@@ -194,6 +200,41 @@ const AppRoutes = () => {
           </PageTransition>
         }
       />
+      
+      {/* Auth routes */}
+      <Route
+        path="/login"
+        element={
+          <PageTransition>
+            <Login />
+          </PageTransition>
+        }
+      />
+      <Route
+        path="/signup"
+        element={
+          <PageTransition>
+            <Signup />
+          </PageTransition>
+        }
+      />
+      <Route
+        path="/verify-otp"
+        element={
+          <PageTransition>
+            <VerifyOtp />
+          </PageTransition>
+        }
+      />
+      <Route
+        path="/verify"
+        element={
+          <PageTransition>
+            <VerifyCode />
+          </PageTransition>
+        }
+      />
+      
       <Route
         path="*"
         element={

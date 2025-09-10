@@ -12,15 +12,19 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
+    "@sms-hub/dev-auth": "workspace:*",
     "@sms-hub/supabase": "workspace:*",
     "@sms-hub/ui": "workspace:*",
     "@sms-hub/utils": "workspace:*",
     "@tanstack/react-query": "^5.56.2",
+    "@types/styled-components": "^5.1.34",
     "lucide-react": "^0.462.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-helmet-async": "^2.0.5",
-    "react-router-dom": "^6.26.2"
+    "react-router-dom": "^6.26.2",
+    "styled-components": "^6.1.19",
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
     "@types/react": "^19.1.0",

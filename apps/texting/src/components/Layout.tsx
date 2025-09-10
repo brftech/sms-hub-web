@@ -23,13 +23,12 @@ import {
 } from "@sms-hub/supabase/react";
 import { createSupabaseClient } from "@sms-hub/supabase";
 import { DevAdminBanner } from "./DevAdminBanner";
-import { useDevAuth } from "@sms-hub/dev-auth";
+import { useDevAuth } from "../hooks/useDevAuth";
 import { useIsAdmin, getAdminDashboardUrl } from "../hooks/useIsAdmin";
-import { userEnvironment } from "../config/userEnvironment";
 import { useState } from "react";
 
 const navigation = [
-  { name: "Dashboard", href: "/", icon: Home },
+  { name: "SMS Dashboard", href: "/", icon: Home },
   { name: "Campaigns", href: "/campaigns", icon: Zap },
   { name: "Messages", href: "/messages", icon: MessageSquare },
   { name: "Settings", href: "/settings", icon: Settings },
@@ -43,7 +42,7 @@ export function Layout() {
   const { data: campaigns } = useCurrentUserCampaigns();
   const location = useLocation();
   const navigate = useNavigate();
-  const devAuth = useDevAuth(userEnvironment);
+  const devAuth = useDevAuth();
   const { isAdmin, isSuperAdmin } = useIsAdmin();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 

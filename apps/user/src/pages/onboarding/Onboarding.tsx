@@ -18,10 +18,12 @@ import {
   useCreateCompany,
 } from "@sms-hub/supabase/react";
 import { ONBOARDING_STEPS, OnboardingStepName } from "@sms-hub/types";
+import { redirectToWebApp } from "@sms-hub/utils";
 import { toast } from "sonner";
 import { ChevronLeft } from "lucide-react";
-import { useDevAuth } from "../../hooks/useDevAuth";
+import { useDevAuth } from "@sms-hub/dev-auth";
 import { DevAdminBanner } from "../../components/DevAdminBanner";
+import { userEnvironment } from "../../config/userEnvironment";
 
 // Import step components (to be created)
 import { PaymentStep } from "./steps/PaymentStep";
@@ -34,7 +36,7 @@ import { ActivationStep } from "./steps/ActivationStep";
 export function Onboarding() {
   const { hubConfig, currentHub } = useHub();
   const navigate = useNavigate();
-  const devAuth = useDevAuth();
+  const devAuth = useDevAuth(userEnvironment);
   const { data: user, isLoading: userLoading } = useAuth();
   const [currentStep, setCurrentStep] = useState<OnboardingStepName>("payment");
   const [companyId, setCompanyId] = useState<string>("");
@@ -49,7 +51,7 @@ export function Onboarding() {
   // Redirect if not authenticated (but allow dev superadmin)
   useEffect(() => {
     if (!userLoading && !user && !devAuth.isSuperadmin) {
-      navigate("/signup");
+      redirectToWebApp('/signup');
     }
   }, [user, userLoading, navigate, devAuth.isSuperadmin]);
 

@@ -23,7 +23,8 @@ import styled from "styled-components";
 import logoIcon from "@sms-hub/ui/assets/gnymble-icon-logo.svg";
 import { createSupabaseClient } from "@sms-hub/supabase";
 import { useDevAuth, activateDevAuth } from '../hooks/useDevAuth';
-import { DevAuthToggle } from '../components/DevAuthToggle';
+import { DevAuthToggle } from '@sms-hub/ui';
+import { webEnvironment } from '../config/webEnvironment';
 
 const SignupContainer = styled.div`
   min-height: 100vh;
@@ -401,7 +402,7 @@ export function Signup() {
   if (success) {
     return (
       <SignupContainer>
-        <DevAuthToggle onActivate={() => activateDevAuth()} />
+        <DevAuthToggle environment={webEnvironment} onActivate={() => activateDevAuth()} />
         <SignupCard>
           <CardContent className="text-center py-12">
             <CheckCircle className="w-16 h-16 text-green-600 mx-auto mb-4" />
@@ -421,7 +422,7 @@ export function Signup() {
 
   return (
     <SignupContainer>
-      <DevAuthToggle onActivate={() => activateDevAuth()} />
+      <DevAuthToggle environment={webEnvironment} onActivate={() => activateDevAuth()} />
       <SignupCard>
         <CardHeader>
           <LogoSection>

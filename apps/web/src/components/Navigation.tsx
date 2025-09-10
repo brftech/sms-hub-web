@@ -98,9 +98,19 @@ const Navigation = () => {
             </button>
           </div>
 
-          {/* Right side - Contact button (Desktop only) */}
+          {/* Right side - SignUp and Contact buttons (Desktop only) */}
           <div className="hidden md:flex items-center space-x-4">
             <HubSwitcher />
+            <Button
+              variant="default"
+              size="sm"
+              onClick={() => handleDesktopNavClick("/signup")}
+              className={`transition-all duration-300 backdrop-blur-sm px-4 py-1.5 text-xs ${
+                hubColors.bg
+              } hover:${hubColors.bgHover} text-white font-medium`}
+            >
+              Sign Up
+            </Button>
             <Button
               variant="outline"
               size="sm"
@@ -168,13 +178,20 @@ const Navigation = () => {
                 );
               })}
 
-              {/* Mobile-specific CTA */}
-              <div className="pt-4 border-t border-white/10">
+              {/* Mobile-specific CTAs */}
+              <div className="pt-4 border-t border-white/10 space-y-3">
                 <Button
-                  onClick={() => handleNavClick("/contact")}
+                  onClick={() => handleNavClick("/signup")}
                   className={`w-full ${hubColors.bg} hover:${hubColors.bgHover} text-white font-semibold py-3 text-base`}
                 >
-                  Get Started Today
+                  Sign Up
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => handleNavClick("/contact")}
+                  className="w-full bg-black/50 text-white border border-orange-500/50 hover:bg-orange-500/10 hover:border-orange-400 font-medium py-3 text-base"
+                >
+                  Contact Us
                 </Button>
               </div>
             </div>
@@ -186,3 +203,4 @@ const Navigation = () => {
 };
 
 export default Navigation;
+

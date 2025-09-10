@@ -4,6 +4,7 @@ import { useHub, Button, Card, CardContent, CardDescription, CardHeader, CardTit
 import { Input, Label, Alert, AlertDescription } from "@sms-hub/ui";
 import { Building, User, Key, AlertCircle, CheckCircle2 } from "lucide-react";
 import styled from "styled-components";
+import { redirectToWebApp, getWebAppUrl } from "@sms-hub/utils";
 
 const Container = styled.div`
   min-height: 100vh;
@@ -53,7 +54,7 @@ export function AccountDetails() {
     
     if (!verificationId) {
       setError("Session expired. Please start over.");
-      setTimeout(() => navigate("/signup"), 2000);
+      setTimeout(() => redirectToWebApp('/signup'), 2000);
       return;
     }
     
@@ -173,7 +174,7 @@ export function AccountDetails() {
             hubId: accountData.hub_id,
             customerType: accountData.customer_type || signupData.customer_type,
             successUrl: `${window.location.origin}/payment-callback?session_id={CHECKOUT_SESSION_ID}`,
-            cancelUrl: `${window.location.origin}/signup`,
+            cancelUrl: getWebAppUrl('/signup'),
           }),
         });
 

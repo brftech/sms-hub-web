@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { useHub } from "@sms-hub/ui";
 import Dashboard from "./pages/Dashboard";
 import Users from "./pages/Users";
@@ -24,6 +24,8 @@ function App() {
       <GlobalViewProvider>
         <Routes>
           <Route path="/login" element={<Login />} />
+          {/* Redirect signup to web app */}
+          <Route path="/signup" element={<Navigate to="http://localhost:3000/signup" replace />} />
           <Route path="/" element={<Layout />}>
             <Route index element={<Dashboard />} />
             <Route path="users" element={<Users />} />

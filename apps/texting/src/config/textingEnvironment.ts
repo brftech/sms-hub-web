@@ -1,7 +1,7 @@
 import { EnvironmentAdapter } from "@sms-hub/ui";
 
-// Web app environment configuration that implements the shared EnvironmentAdapter interface
-export const webEnvironment: EnvironmentAdapter = {
+// Texting app environment configuration that implements the shared EnvironmentAdapter interface
+export const textingEnvironment: EnvironmentAdapter = {
   // Development environment detection
   isDevelopment: () => {
     return (
@@ -40,17 +40,17 @@ export const webEnvironment: EnvironmentAdapter = {
 
   // Get current environment name
   getCurrent: () => {
-    if (webEnvironment.isDevelopment()) return "development";
-    if (webEnvironment.isStaging()) return "staging";
-    if (webEnvironment.isProduction()) return "production";
+    if (textingEnvironment.isDevelopment()) return "development";
+    if (textingEnvironment.isStaging()) return "staging";
+    if (textingEnvironment.isProduction()) return "production";
     return "unknown";
   },
 
   // Feature flags based on environment
   features: {
-    hubSwitcher: () => webEnvironment.isDevelopment(),
-    debugMode: () => webEnvironment.isDevelopment(),
-    analytics: () => webEnvironment.isProduction(),
-    errorReporting: () => webEnvironment.isProduction(),
+    hubSwitcher: () => textingEnvironment.isDevelopment(),
+    debugMode: () => textingEnvironment.isDevelopment(),
+    analytics: () => textingEnvironment.isProduction(),
+    errorReporting: () => textingEnvironment.isProduction(),
   },
 };

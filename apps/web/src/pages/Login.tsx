@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react'
-import { useNavigate, Link, useLocation } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { useHub, Button, Card, CardContent, CardDescription, CardHeader, CardTitle, HubLogo } from '@sms-hub/ui'
 import { Input, Label, Alert, AlertDescription } from '@sms-hub/ui'
 import { Mail, Phone, CheckCircle, Shield, Lock } from 'lucide-react'
 import styled from 'styled-components'
 import { createSupabaseClient } from '@sms-hub/supabase'
 import { useDevAuth, activateDevAuth } from '../hooks/useDevAuth'
-import { DevAuthToggle } from '../components/DevAuthToggle'
+import { DevAuthToggle } from '@sms-hub/ui'
+import { webEnvironment } from '../config/webEnvironment'
 
 const LoginContainer = styled.div`
   min-height: 100vh;
@@ -52,7 +53,6 @@ const VerificationMethod = styled.div`
 export function Login() {
   const { hubConfig } = useHub()
   const navigate = useNavigate()
-  const location = useLocation()
   const devAuth = useDevAuth()
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
@@ -64,15 +64,14 @@ export function Login() {
   const [success, setSuccess] = useState(false)
   const [showLegacyOption, setShowLegacyOption] = useState(false)
   
-  const from = location.state?.from?.pathname || '/'
   
   // Check for dev superadmin mode and redirect
   useEffect(() => {
     if (devAuth.isInitialized && devAuth.isSuperadmin) {
       console.log('Dev superadmin mode active - redirecting from login')
-      navigate(from, { replace: true })
+      window.location.href = 'http://localhost:3001/';
     }
-  }, [devAuth.isInitialized, devAuth.isSuperadmin, from, navigate])
+  }, [devAuth.isInitialized, devAuth.isSuperadmin])
 
   const formatPhoneNumber = (value: string) => {
     const cleaned = value.replace(/\D/g, '')
@@ -151,8 +150,8 @@ export function Login() {
             .eq('id', data.user.id)
         }
         
-        // Navigate to dashboard
-        navigate(from, { replace: true })
+        // Redirect to user app dashboard
+        window.location.href = 'http://localhost:3001/';
         
       } catch (err: any) {
         console.error('Password login error:', err)
@@ -212,7 +211,6 @@ export function Login() {
           authMethod,
           verificationId: result.id,
           isLogin: true,
-          from,
         }))
         
         // Redirect to verification page
@@ -250,7 +248,7 @@ export function Login() {
   
   return (
     <LoginContainer>
-      <DevAuthToggle onActivate={() => activateDevAuth()} />
+      <DevAuthToggle environment={webEnvironment} onActivate={() => activateDevAuth()} />
       <Card className="w-full max-w-md">
         <CardHeader>
           <div className="text-center mb-6">

@@ -4,7 +4,6 @@ import { useHub, Button, Card, CardContent, CardDescription, CardHeader, CardTit
 import { Input, Label, Alert, AlertDescription } from "@sms-hub/ui";
 import { Shield, AlertCircle, CheckCircle2, RefreshCw } from "lucide-react";
 import styled from "styled-components";
-import { createSupabaseClient } from "@sms-hub/supabase";
 
 const VerificationContainer = styled.div`
   min-height: 100vh;
@@ -33,18 +32,12 @@ export function VerifyCode() {
   const { hubConfig } = useHub();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const supabase = createSupabaseClient(
-    import.meta.env.VITE_SUPABASE_URL,
-    import.meta.env.VITE_SUPABASE_ANON_KEY
-  );
-  
   const verificationId = searchParams.get("id");
   const authMethod = searchParams.get("method") || "sms";
   const isExistingUser = searchParams.get("existing") === "true";
   
   // Get signup data from session storage
   const signupData = JSON.parse(sessionStorage.getItem('signup_data') || '{}');
-  const [password, setPassword] = useState("");
   
   const [code, setCode] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
@@ -146,14 +139,15 @@ export function VerifyCode() {
         throw new Error(verifyData.error || "Verification failed");
       }
 
-      // Code is verified! Now redirect to account details
+      // Code is verified! Now redirect to user app
       setSuccess(true);
       
       // Store the verification_id for the next step
       sessionStorage.setItem('verified_verification_id', verifyData.verification_id);
       
       setTimeout(() => {
-        navigate(`/account-details?id=${verifyData.verification_id}`);
+        // Redirect to user app for account details
+        window.location.href = `http://localhost:3001/account-details?id=${verifyData.verification_id}`;
       }, 1500);
       
     } catch (err: any) {

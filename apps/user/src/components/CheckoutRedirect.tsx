@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSupabase } from "../providers/SupabaseProvider";
+import { redirectToWebApp, getWebAppUrl } from "@sms-hub/utils";
 
 export function CheckoutRedirect() {
   const navigate = useNavigate();
@@ -13,7 +14,7 @@ export function CheckoutRedirect() {
       
       if (!session) {
         console.error("No session found after login");
-        navigate("/login");
+        redirectToWebApp('/login');
         return;
       }
 
@@ -43,7 +44,7 @@ export function CheckoutRedirect() {
             hubId: checkoutData.hubId,
             customerType: checkoutData.customerType,
             successUrl: `${window.location.origin}/payment-callback?session_id={CHECKOUT_SESSION_ID}`,
-            cancelUrl: `${window.location.origin}/`
+            cancelUrl: getWebAppUrl('/')
           }),
         });
 

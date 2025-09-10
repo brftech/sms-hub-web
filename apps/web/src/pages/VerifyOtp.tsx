@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { useHub, Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sms-hub/ui'
+import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sms-hub/ui'
 import { Input, Label, Alert, AlertDescription } from '@sms-hub/ui'
 import { Shield, CheckCircle, RefreshCw } from 'lucide-react'
 import { createSupabaseClient } from '@sms-hub/supabase'
@@ -23,7 +23,6 @@ const CodeInput = styled(Input)`
 `
 
 export function VerifyOtp() {
-  const { hubConfig } = useHub()
   const navigate = useNavigate()
   const location = useLocation()
   const [code, setCode] = useState('')
@@ -32,7 +31,6 @@ export function VerifyOtp() {
   const [success, setSuccess] = useState(false)
   
   const email = location.state?.email || sessionStorage.getItem('login_email')
-  const from = location.state?.from || '/'
   
   const supabase = createSupabaseClient(
     import.meta.env.VITE_SUPABASE_URL,
@@ -66,7 +64,7 @@ export function VerifyOtp() {
     setError('')
     
     try {
-      const { data, error: verifyError } = await supabase.auth.verifyOtp({
+      const { error: verifyError } = await supabase.auth.verifyOtp({
         email,
         token: verificationCode,
         type: 'email'
@@ -83,9 +81,9 @@ export function VerifyOtp() {
       // Clear stored email
       sessionStorage.removeItem('login_email')
       
-      // Redirect to dashboard or intended page
+      // Redirect to user app dashboard
       setTimeout(() => {
-        navigate(from)
+        window.location.href = 'http://localhost:3001/';
       }, 1500)
       
     } catch (err: any) {

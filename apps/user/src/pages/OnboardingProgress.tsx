@@ -7,7 +7,8 @@ import {
   useUserProfile,
 } from "@sms-hub/supabase/react";
 import { useCustomerByCompany } from "@sms-hub/supabase";
-import { useDevAuth } from "../hooks/useDevAuth";
+import { useDevAuth } from "@sms-hub/dev-auth";
+import { userEnvironment } from "../config/userEnvironment";
 import {
   CheckCircle2,
   ArrowRight,
@@ -333,7 +334,7 @@ export function OnboardingProgress() {
   const { data: brands } = useBrands(company?.id || "");
   const { data: campaigns } = useCurrentUserCampaigns();
   const { data: customer } = useCustomerByCompany(company?.id || null);
-  const devAuth = useDevAuth();
+  const devAuth = useDevAuth(userEnvironment);
 
   // Check completion status (matching OnboardingTracker logic)
   const isProfileComplete = !!(

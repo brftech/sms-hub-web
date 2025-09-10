@@ -1,5 +1,5 @@
 {
-  "name": "@sms-hub/user",
+  "name": "@sms-hub/texting",
   "version": "0.1.0",
   "private": true,
   "type": "module",

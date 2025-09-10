@@ -14,6 +14,7 @@ import { CheckCircle, ArrowLeft } from "lucide-react";
 import styled from "styled-components";
 import logoIcon from "@sms-hub/ui/assets/gnymble-icon-logo.svg";
 import { createSupabaseClient } from "@sms-hub/supabase";
+import { redirectToWebApp } from "@sms-hub/utils";
 
 const VerifyContainer = styled.div`
   min-height: 100vh;
@@ -108,7 +109,7 @@ export function Verify() {
 
   useEffect(() => {
     if (!verificationId) {
-      navigate("/signup");
+      redirectToWebApp('/signup');
       return;
     }
 
@@ -286,7 +287,7 @@ export function Verify() {
         </CardHeader>
 
         <CardContent>
-          <BackButton onClick={() => navigate("/signup")}>
+          <BackButton onClick={() => redirectToWebApp('/signup')}>
             <ArrowLeft className="w-3 h-3 mr-1" />
             Back to Signup
           </BackButton>

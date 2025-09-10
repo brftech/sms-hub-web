@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
 import { createSupabaseClient } from '@sms-hub/supabase'
-import { CheckoutRedirect } from './CheckoutRedirect'
+// import { CheckoutRedirect } from './CheckoutRedirect'
 import { useDevAuth } from '@sms-hub/dev-auth'
-import { userEnvironment } from '../config/userEnvironment'
+import { textingEnvironment } from '../config/textingEnvironment'
 import { redirectToWebApp } from '@sms-hub/utils'
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -11,7 +11,7 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [userProfile, setUserProfile] = useState<any>(null)
   const location = useLocation()
-  const devAuth = useDevAuth(userEnvironment)
+  const devAuth = useDevAuth(textingEnvironment)
   
   const supabase = createSupabaseClient(
     import.meta.env.VITE_SUPABASE_URL,
@@ -95,7 +95,7 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   if (pendingCheckout && location.pathname === '/') {
     // Only redirect to CheckoutRedirect if they're not trying to access onboarding
     if (!location.pathname.includes('onboarding')) {
-      return <CheckoutRedirect />
+      return <Navigate to="/payment-required" replace />
     }
   }
   

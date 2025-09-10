@@ -25,7 +25,6 @@ import { Login } from "./pages/Login";
 import { Signup } from "./pages/Signup";
 import { VerifyOtp } from "./pages/VerifyOtp";
 import { VerifyCode } from "./pages/VerifyCode";
-import { SuperadminLogin } from "./pages/SuperadminLogin";
 
 // Lazy load client pages (less frequently accessed)
 const DonsBurlingame = lazy(() => import("./pages/clients/DonsBurlingame"));
@@ -232,14 +231,6 @@ const AppRoutes = () => {
         element={
           <PageTransition>
             <VerifyCode />
-          </PageTransition>
-        }
-      />
-      <Route
-        path="/superadmin"
-        element={
-          <PageTransition>
-            <SuperadminLogin />
           </PageTransition>
         }
       />

@@ -1,0 +1,42 @@
+{
+  "name": "@sms-hub/unified",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@sms-hub/dev-auth": "workspace:*",
+    "@sms-hub/hub-logic": "workspace:*",
+    "@sms-hub/supabase": "workspace:*",
+    "@sms-hub/types": "workspace:*",
+    "@sms-hub/ui": "workspace:*",
+    "@sms-hub/utils": "workspace:*",
+    "@supabase/supabase-js": "^2.57.2",
+    "@tanstack/react-query": "^5.0.0",
+    "@types/canvas-confetti": "^1.9.0",
+    "canvas-confetti": "^1.9.3",
+    "lucide-react": "^0.543.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-helmet-async": "^2.0.5",
+    "react-hook-form": "^7.62.0",
+    "react-router-dom": "^6.8.1",
+    "sonner": "^2.0.7",
+    "styled-components": "^6.1.6"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.43",
+    "@types/react-dom": "^18.2.17",
+    "@types/styled-components": "^5.1.34",
+    "@vitejs/plugin-react": "^4.2.1",
+    "autoprefixer": "^10.4.14",
+    "postcss": "^8.4.24",
+    "tailwindcss": "^3.3.0",
+    "typescript": "^5.2.2",
+    "vite": "^5.0.8"
+  }
+}

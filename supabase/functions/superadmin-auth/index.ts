@@ -1,110 +1,95 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { corsHeaders } from "../_shared/cors.ts";
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+interface SuperadminAuthRequest {
+  email: string;
+  password: string;
 }
 
 serve(async (req) => {
-  // Handle CORS preflight requests
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+  if (req.method === "OPTIONS") {
+    return new Response("ok", { headers: corsHeaders });
   }
 
   try {
-    const { email, password } = await req.json()
+    const { email, password }: SuperadminAuthRequest = await req.json();
 
-    // Check if this is the superadmin email
-    if (email !== 'superadmin@sms-hub.com') {
-      return new Response(
-        JSON.stringify({ error: 'Invalid superadmin credentials' }),
-        { 
-          status: 401, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      )
+    // Create Supabase admin client
+    const supabaseAdmin = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+      { auth: { persistSession: false } }
+    );
+
+    console.log("🔐 Superadmin authentication attempt:", email);
+
+    // Authenticate with Supabase Auth
+    const { data: authData, error: authError } = await supabaseAdmin.auth.signInWithPassword({
+      email,
+      password
+    });
+
+    if (authError) {
+      console.error("❌ Authentication failed:", authError);
+      throw new Error("Invalid superadmin credentials");
     }
 
-    // For superadmin, we'll use a special password check
-    // In production, this should be a secure password stored in environment variables
-    const superadminPassword = Deno.env.get('SUPERADMIN_PASSWORD') || 'superadmin123!'
-    
-    if (password !== superadminPassword) {
-      return new Response(
-        JSON.stringify({ error: 'Invalid superadmin credentials' }),
-        { 
-          status: 401, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      )
+    // Get user profile from database
+    const { data: userProfile, error: profileError } = await supabaseAdmin
+      .from('user_profiles')
+      .select('*')
+      .eq('id', authData.user.id)
+      .eq('role', 'SUPERADMIN')
+      .single();
+
+    if (profileError || !userProfile) {
+      console.error("❌ Superadmin profile not found:", profileError);
+      throw new Error("Superadmin profile not found");
     }
 
-    // Create a mock superadmin user profile
-    // In production, this would come from the database
-    const superadminUser = {
-      id: 'superadmin-001',
-      email: 'superadmin@sms-hub.com',
-      phone: '+15551234567',
-      first_name: 'Super',
-      last_name: 'Admin',
-      company_id: null,
-      hub_id: 1, // PercyTech hub
-      role: 'SUPERADMIN',
-      signup_type: 'superadmin',
-      company_admin: true,
-      company_admin_since: new Date().toISOString(),
-      payment_status: 'completed',
-      subscription_status: 'active',
-      account_onboarding_step: 'completed',
-      platform_onboarding_step: 'completed',
-      verification_setup_completed: true,
-      verification_setup_completed_at: new Date().toISOString(),
-      last_login_method: 'password',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    }
+    console.log("✅ Superadmin authenticated successfully:", userProfile.email);
 
-    // Create a simple token for the superadmin user
-    const token = createSuperadminToken(superadminUser.id)
-
+    // Return superadmin user data and session
     return new Response(
-      JSON.stringify({ 
+      JSON.stringify({
         success: true,
-        user: superadminUser,
-        token: token,
-        message: 'Superadmin authentication successful'
+        user: {
+          id: userProfile.id,
+          email: userProfile.email,
+          role: userProfile.role,
+          first_name: userProfile.first_name,
+          last_name: userProfile.last_name,
+          company_admin: userProfile.company_admin,
+          verification_setup_completed: userProfile.verification_setup_completed,
+          payment_status: userProfile.payment_status,
+          onboarding_completed: userProfile.onboarding_completed,
+          permissions: userProfile.permissions
+        },
+        session: {
+          access_token: authData.session.access_token,
+          refresh_token: authData.session.refresh_token,
+          expires_at: authData.session.expires_at,
+          token_type: authData.session.token_type
+        },
+        message: "Superadmin authentication successful"
       }),
-      { 
-        status: 200, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
       }
-    )
+    );
 
   } catch (error) {
-    console.error('Superadmin auth error:', error)
+    console.error("❌ Error in superadmin-auth:", error);
     return new Response(
-      JSON.stringify({ error: 'Internal server error' }),
-      { 
-        status: 500, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      JSON.stringify({
+        success: false,
+        error: error.message
+      }),
+      {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
       }
-    )
+    );
   }
-})
-
-// Helper function to create a superadmin token
-function createSuperadminToken(userId: string) {
-  // For now, we'll return a simple token
-  // In production, you'd want to use Supabase's JWT creation
-  const tokenData = {
-    sub: userId,
-    role: 'SUPERADMIN',
-    aud: 'authenticated',
-    exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60), // 24 hours
-    iat: Math.floor(Date.now() / 1000),
-    iss: 'supabase'
-  }
-  
-  // This is a simplified approach - in production you'd use proper JWT signing
-  return btoa(JSON.stringify(tokenData))
-}
+});

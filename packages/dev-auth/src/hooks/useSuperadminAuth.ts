@@ -81,7 +81,7 @@ export const clearSuperadminAuth = () => {
 }
 
 // Helper to check if user has superadmin access to a specific app
-export const hasSuperadminAccess = (app: 'user' | 'texting' | 'admin'): boolean => {
+export const hasSuperadminAccess = (_app: 'user' | 'texting' | 'admin'): boolean => {
   const superadminSession = sessionStorage.getItem('superadmin_session')
   
   if (!superadminSession) return false

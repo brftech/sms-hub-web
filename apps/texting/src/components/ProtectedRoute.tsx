@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
 import { createSupabaseClient } from '@sms-hub/supabase'
 // import { CheckoutRedirect } from './CheckoutRedirect'
-import { useDevAuth } from '@sms-hub/dev-auth'
+import { useDevAuth, useSuperadminAuth } from '@sms-hub/dev-auth'
 import { textingEnvironment } from '../config/textingEnvironment'
 import { redirectToWebApp } from '@sms-hub/utils'
 
@@ -12,6 +12,7 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const [userProfile, setUserProfile] = useState<any>(null)
   const location = useLocation()
   const devAuth = useDevAuth(textingEnvironment)
+  const superadminAuth = useSuperadminAuth()
   
   const supabase = createSupabaseClient(
     import.meta.env.VITE_SUPABASE_URL,
@@ -29,6 +30,15 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
       console.log('Dev superadmin mode active')
       setIsAuthenticated(true)
       setUserProfile(devAuth.devUserProfile)
+      setIsLoading(false)
+      return
+    }
+    
+    // Check for real superadmin authentication
+    if (superadminAuth.isAuthenticated && superadminAuth.isSuperadmin) {
+      console.log('Superadmin authentication active')
+      setIsAuthenticated(true)
+      setUserProfile(superadminAuth.superadminUser)
       setIsLoading(false)
       return
     }
@@ -70,7 +80,7 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
     })
     
     return () => subscription.unsubscribe()
-  }, [devAuth.isInitialized, devAuth.isSuperadmin, devAuth.devUserProfile])
+  }, [devAuth.isInitialized, devAuth.isSuperadmin, devAuth.devUserProfile, superadminAuth.isAuthenticated, superadminAuth.isSuperadmin, superadminAuth.superadminUser])
   
   if (isLoading) {
     return (

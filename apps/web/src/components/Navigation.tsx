@@ -101,6 +101,12 @@ const Navigation = () => {
           {/* Right side - SignUp and Contact buttons (Desktop only) */}
           <div className="hidden md:flex items-center space-x-4">
             <HubSwitcher />
+            <button
+              onClick={() => handleDesktopNavClick("/superadmin")}
+              className="text-xs text-gray-400 hover:text-white transition-colors"
+            >
+              Superadmin
+            </button>
             <Button
               variant="default"
               size="sm"

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 import { Shield, X, ArrowRight, CheckCircle, AlertCircle } from 'lucide-react'
 import { Card, CardContent, Button } from '@sms-hub/ui'
-import { createSupabaseClient } from '@sms-hub/supabase'
+import { useSupabase } from '../providers/SupabaseProvider'
 
 const RecommendationCard = styled(Card)`
   background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
@@ -99,6 +99,7 @@ interface VerificationRecommendationProps {
 
 export function VerificationRecommendation({ userProfile, onDismiss }: VerificationRecommendationProps) {
   const navigate = useNavigate()
+  const supabase = useSupabase()
   const [isDismissing, setIsDismissing] = useState(false)
   
   // Don't show if user has already completed verification setup
@@ -120,10 +121,6 @@ export function VerificationRecommendation({ userProfile, onDismiss }: Verificat
     
     try {
       // Track that recommendation was shown
-      const supabase = createSupabaseClient(
-        import.meta.env.VITE_SUPABASE_URL,
-        import.meta.env.VITE_SUPABASE_ANON_KEY
-      )
       
       if (supabase) {
         await supabase

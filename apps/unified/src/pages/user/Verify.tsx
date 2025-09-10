@@ -13,7 +13,7 @@ import { Input, Label, Alert, AlertDescription } from "@sms-hub/ui";
 import { CheckCircle, ArrowLeft } from "lucide-react";
 import styled from "styled-components";
 // import logoIcon from "@sms-hub/ui/assets/gnymble-icon-logo.svg";
-import { createSupabaseClient } from "@sms-hub/supabase";
+import { useSupabase } from "../../providers/SupabaseProvider";
 import { redirectToWebApp } from "@sms-hub/utils";
 
 const VerifyContainer = styled.div`
@@ -100,6 +100,7 @@ export function Verify() {
   // const { hubConfig } = useHub();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const supabase = useSupabase();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
@@ -162,10 +163,6 @@ export function Verify() {
 
       // Handle session if provided
       if (result.session || result.session_url) {
-        const supabase = createSupabaseClient(
-          import.meta.env.VITE_SUPABASE_URL,
-          import.meta.env.VITE_SUPABASE_ANON_KEY
-        );
 
         // For login flow, we might get a session URL
         if (result.session_url) {

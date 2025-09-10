@@ -1,10 +1,9 @@
 import { useHub } from "@sms-hub/ui";
-import { gnymbleStats } from "../Gnymble/stats";
-import { percymdStats } from "../PercyMD/stats";
+import { getHubStatsContent } from "@sms-hub/hub-logic";
 
 export const StatsSection: React.FC = () => {
   const { currentHub } = useHub();
-  const content = currentHub === "percymd" ? percymdStats : gnymbleStats;
+  const content = getHubStatsContent(currentHub);
 
   return (
     <div className="bg-black rounded-lg p-12">

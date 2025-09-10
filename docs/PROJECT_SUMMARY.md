@@ -10,14 +10,11 @@ SMS Hub Monorepo is a multi-tenant B2B SaaS platform for SMS/text messaging serv
 ```
 sms-hub-monorepo/
 ├── apps/
-│   ├── web/          # Vite React - Marketing & lead capture (port 3000)
-│   ├── user/         # Vite React - User dashboard & auth (port 3001)
-│   ├── admin/        # Vite React - Admin panel (port 3002)
-│   ├── demo/         # Vite React - Demo environment (port 3003)
-│   ├── docs/         # Vite React - Documentation (port 3004)
-│   └── texting/      # Nest.js - SMS API backend (port 3005)
+│   ├── web/          # Vite React - Marketing site & authentication gateway (port 3000)
+│   ├── unified/      # Vite React - Main authenticated dashboard for all user types (port 3001)
+│   └── api/          # Vite React - API documentation (basic Vite app)
 ├── packages/
-│   ├── ui/           # Shared React components (shadcn/ui based)
+│   ├── ui/           # Shared React components (styled-components)
 │   ├── types/        # TypeScript types & database types
 │   ├── config/       # Shared ESLint, TypeScript configs
 │   ├── supabase/     # Supabase client & queries
@@ -31,12 +28,12 @@ sms-hub-monorepo/
 
 ### Technology Stack
 - **Frontend**: React 19.1.0, Vite 5.4.19, TypeScript 5.9.2
-- **Styling**: Tailwind CSS 3.4.11, styled-components 6.1.13 (CSS-in-JS)
-- **Backend**: Nest.js 10.0.0, Supabase (PostgreSQL)
-- **Authentication**: Supabase Auth with SMS OTP
+- **Styling**: styled-components 6.1.13 (CSS-in-JS) - NO CSS file imports
+- **Backend**: Supabase (PostgreSQL + Auth + Edge Functions)
+- **Authentication**: Supabase Auth with SMS OTP + real PostgreSQL credentials
 - **State Management**: React Query (TanStack Query 5.56.2)
 - **Build System**: Turbo, pnpm workspaces
-- **UI Components**: shadcn/ui components, Radix UI primitives
+- **UI Components**: styled-components based components
 
 ## Database Schema
 
@@ -120,44 +117,34 @@ type HubType = 'percytech' | 'gnymble' | 'percymd' | 'percytext';
 
 ## Applications Details
 
-### 1. Web App (`apps/web`)
-- **Purpose**: Marketing website and lead capture
+### 1. Web App (`apps/web`) - Port 3000
+- **Purpose**: Marketing website and authentication gateway (login/signup)
 - **Framework**: Vite + React + TypeScript
 - **Key Features**:
   - Multi-hub support with dynamic branding
   - Contact form with Supabase Edge Function integration
   - Interactive phone demo component
   - Hub selector for switching between brands
-  - Responsive design with Tailwind CSS
+  - Authentication forms (login/signup) that redirect to unified app
+  - Responsive design with styled-components
 
-### 2. User App (`apps/user`)
-- **Purpose**: User authentication and dashboard
+### 2. Unified App (`apps/unified`) - Port 3001
+- **Purpose**: Main authenticated dashboard for ALL user types (user, admin, superadmin)
 - **Framework**: Vite + React + TypeScript
 - **Key Features**:
+  - Consolidated dashboard for all user roles
   - SMS OTP authentication flow
   - Multi-step onboarding process
-  - User dashboard with messaging features
   - Company management
-  - Integration with SMS auth package
+  - Message monitoring and analytics
+  - Admin panels (integrated, not separate app)
+  - Superadmin functionality
+  - Role-based access control
 
-### 3. Admin App (`apps/admin`)
-- **Purpose**: Administrative interface
-- **Status**: Placeholder implementation
-- **Planned Features**:
-  - User management
-  - Company administration
-  - Message monitoring
-  - Analytics dashboard
-
-### 4. Texting App (`apps/texting`)
-- **Purpose**: Backend API for SMS operations
-- **Framework**: Nest.js
-- **Key Features**:
-  - RESTful API endpoints
-  - SMS sending/receiving logic
-  - Integration with SMS providers
-  - Message queue management
-  - Webhook handling
+### 3. API App (`apps/api`)
+- **Purpose**: API documentation
+- **Framework**: Basic Vite app
+- **Status**: Simple documentation site
 
 ## Shared Packages
 
@@ -229,20 +216,27 @@ pnpm dev --filter=@sms-hub/web
 
 ## Authentication Flow
 
-1. User enters phone number
-2. System sends OTP via Supabase Auth
-3. User enters 6-digit code
-4. Verification creates/updates user record
-5. Session persists via Supabase Auth
-6. Role-based access control per hub
+1. User visits Web app (port 3000) for login/signup
+2. Authentication handled via Supabase with credentials stored in PostgreSQL
+3. Successful authentication redirects to Unified app (port 3001)
+4. Session persists via Supabase localStorage across apps
+5. Unified app handles all authenticated user functionality
+6. Role-based access control (user, admin, superadmin)
+
+### Authentication Methods
+- **Real Auth**: Supabase with PostgreSQL credentials
+- **Superadmin**: superadmin@sms-hub.com / SuperAdmin123!
+- **Dev/Mock Auth**: Add ?superadmin=dev123 to URL (no persistence)
+- **SMS OTP**: Available for additional verification
 
 ## Deployment Architecture
 
 ### Current State
-- Database: Supabase hosted PostgreSQL
+- Database: Supabase hosted PostgreSQL with real credential authentication
 - Edge Functions: Deployed to Supabase
 - Frontend apps: Ready for Vercel/Netlify deployment
-- Backend API: Ready for containerization
+- Unified architecture: Single authenticated app handles all user types
+- Session management: Supabase localStorage persistence across apps
 
 ### Environment Variables
 ```
@@ -257,11 +251,12 @@ SUPABASE_SERVICE_ROLE_KEY=[service-role-key]
 
 ## Recent Major Changes
 
-1. **Web App Migration**: Converted from Next.js to Vite for consistency
-2. **SMS Auth Extraction**: Created dedicated package for SMS authentication
-3. **CSS-in-JS Migration**: Moved from CSS modules to styled-components
-4. **Edge Functions Deployment**: All functions deployed and operational
-5. **Multi-tenant Support**: Full hub-based data isolation
+1. **App Consolidation**: Merged user, admin, texting apps into single unified app
+2. **Authentication Redesign**: Web app became gateway, unified app handles all authenticated functionality
+3. **CSS-in-JS Migration**: Moved from CSS modules to styled-components (NO CSS file imports)
+4. **Role-Based Dashboard**: Single unified dashboard with role-based views
+5. **Simplified Architecture**: Reduced from 6 apps to 3 apps (web, unified, api)
+6. **Superadmin System**: Cross-app authentication with persistent sessions
 
 ## Known Issues & Solutions
 

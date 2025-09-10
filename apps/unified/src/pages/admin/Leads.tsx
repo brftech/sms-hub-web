@@ -86,7 +86,7 @@ const Leads = () => {
       }
 
       // Fetch leads with filters
-      const fetchedLeads = await leadsService.getLeads(filterOptions);
+      const fetchedLeads = await leadsService.instance.getLeads(filterOptions);
 
       console.log("Leads: Fetched leads:", fetchedLeads);
       console.log("Leads: Count:", fetchedLeads.length);

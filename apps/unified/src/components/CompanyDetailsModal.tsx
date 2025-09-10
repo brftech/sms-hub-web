@@ -1,6 +1,15 @@
 import { useState, useEffect } from "react";
 import { X, Users, Building, Globe, Mail, Phone, MapPin, Calendar, UserPlus } from "lucide-react";
-import { Company, companiesService } from "../services/companiesService";
+import { Company } from "../services/companiesService";
+
+// Lazy import for service to avoid early instantiation
+let companiesService: any = null;
+const getCompaniesService = () => {
+  if (!companiesService) {
+    companiesService = require("../services/companiesService").companiesService;
+  }
+  return companiesService;
+};
 
 interface CompanyDetailsModalProps {
   company: Company;
@@ -14,7 +23,7 @@ export function CompanyDetailsModal({ company, onClose }: CompanyDetailsModalPro
   useEffect(() => {
     const fetchUsers = async () => {
       setLoadingUsers(true);
-      const companyUsers = await companiesService.getCompanyUsers(company.id);
+      const companyUsers = await getCompaniesService().instance.getCompanyUsers(company.id);
       setUsers(companyUsers);
       setLoadingUsers(false);
     };

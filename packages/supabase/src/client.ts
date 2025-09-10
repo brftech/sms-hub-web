@@ -20,7 +20,9 @@ export const createSupabaseClient = (url: string, anonKey: string) => {
 // For server-side usage (Nest.js)
 let supabase: ReturnType<typeof createSupabaseClient> | null = null
 
-if (typeof process !== 'undefined' && process.env) {
+// Only create client on server side, not in browser
+// This should never run in browser environments
+if (typeof process !== 'undefined' && process.env && typeof window === 'undefined' && typeof global !== 'undefined') {
   const url = process.env.SUPABASE_URL || ''
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || ''
   

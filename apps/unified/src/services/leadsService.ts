@@ -1,4 +1,5 @@
-import { getSupabaseClient } from '@sms-hub/supabase'
+import { getSupabaseClient } from '../lib/supabaseSingleton'
+import type { SupabaseClient } from '@sms-hub/supabase'
 
 export interface Lead {
   id: string
@@ -54,13 +55,10 @@ export interface LeadStats {
 }
 
 class LeadsService {
-  private supabase: ReturnType<typeof getSupabaseClient>
+  private supabase: SupabaseClient
 
   constructor() {
-    this.supabase = getSupabaseClient(
-      import.meta.env.VITE_SUPABASE_URL,
-      import.meta.env.VITE_SUPABASE_ANON_KEY
-    )
+    this.supabase = getSupabaseClient()
   }
 
   // Test database connection
@@ -287,4 +285,14 @@ class LeadsService {
   }
 }
 
-export const leadsService = new LeadsService()
+// Lazy-loaded service instance
+let _leadsService: LeadsService | null = null;
+
+export const leadsService = {
+  get instance() {
+    if (!_leadsService) {
+      _leadsService = new LeadsService();
+    }
+    return _leadsService;
+  }
+};

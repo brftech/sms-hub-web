@@ -2,7 +2,7 @@ import { HeroSection } from "../shared/HeroSection";
 import { ProblemSolutionSection } from "../shared/ProblemSolutionSection";
 import { StatsSection } from "../shared/StatsSection";
 import { CTASection } from "../shared/CTA";
-import { gnymbleHero } from "./hero";
+import { gnymbleHero } from "@sms-hub/hub-logic";
 
 interface GnymbleProps {
   businessTypes: string[];

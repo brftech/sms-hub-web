@@ -78,67 +78,6 @@ importers:
         specifier: ^5.9.2
         version: 5.9.2
 
-  apps/admin:
-    dependencies:
-      '@sms-hub/dev-auth':
-        specifier: workspace:*
-        version: link:../../packages/dev-auth
-      '@sms-hub/supabase':
-        specifier: workspace:*
-        version: link:../../packages/supabase
-      '@sms-hub/types':
-        specifier: workspace:*
-        version: link:../../packages/types
-      '@sms-hub/ui':
-        specifier: workspace:*
-        version: link:../../packages/ui
-      '@supabase/supabase-js':
-        specifier: ^2.39.0
-        version: 2.57.2
-      '@tanstack/react-query':
-        specifier: ^5.17.0
-        version: 5.87.1(react@19.1.1)
-      lucide-react:
-        specifier: ^0.294.0
-        version: 0.294.0(react@19.1.1)
-      react:
-        specifier: ^19.1.0
-        version: 19.1.1
-      react-dom:
-        specifier: ^19.1.0
-        version: 19.1.1(react@19.1.1)
-      react-router-dom:
-        specifier: ^6.20.1
-        version: 6.30.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
-      sonner:
-        specifier: ^1.3.1
-        version: 1.7.4(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
-    devDependencies:
-      '@types/react':
-        specifier: ^19.1.0
-        version: 19.1.12
-      '@types/react-dom':
-        specifier: ^19.1.1
-        version: 19.1.9(@types/react@19.1.12)
-      '@vitejs/plugin-react':
-        specifier: ^4.2.1
-        version: 4.7.0(vite@5.4.19(@types/node@22.18.1)(terser@5.44.0))
-      autoprefixer:
-        specifier: ^10.4.21
-        version: 10.4.21(postcss@8.5.6)
-      postcss:
-        specifier: ^8.5.6
-        version: 8.5.6
-      tailwindcss:
-        specifier: ^3.4.17
-        version: 3.4.17(ts-node@10.9.2(@swc/core@1.13.5)(@types/node@22.18.1)(typescript@5.9.2))
-      typescript:
-        specifier: ^5.9.2
-        version: 5.9.2
-      vite:
-        specifier: ^5.0.8
-        version: 5.4.19(@types/node@22.18.1)(terser@5.44.0)
-
   apps/api:
     dependencies:
       '@sms-hub/dev-auth':
@@ -178,85 +117,6 @@ importers:
       '@vitejs/plugin-react':
         specifier: ^4.2.1
         version: 4.7.0(vite@5.4.19(@types/node@22.18.1)(terser@5.44.0))
-      typescript:
-        specifier: ^5.9.2
-        version: 5.9.2
-      vite:
-        specifier: ^5.0.8
-        version: 5.4.19(@types/node@22.18.1)(terser@5.44.0)
-
-  apps/texting:
-    dependencies:
-      '@sms-hub/dev-auth':
-        specifier: workspace:*
-        version: link:../../packages/dev-auth
-      '@sms-hub/supabase':
-        specifier: workspace:*
-        version: link:../../packages/supabase
-      '@sms-hub/types':
-        specifier: workspace:*
-        version: link:../../packages/types
-      '@sms-hub/ui':
-        specifier: workspace:*
-        version: link:../../packages/ui
-      '@sms-hub/utils':
-        specifier: workspace:*
-        version: link:../../packages/utils
-      '@supabase/supabase-js':
-        specifier: ^2.39.0
-        version: 2.57.2
-      '@tanstack/react-query':
-        specifier: ^5.17.0
-        version: 5.87.1(react@19.1.1)
-      '@types/canvas-confetti':
-        specifier: ^1.9.0
-        version: 1.9.0
-      canvas-confetti:
-        specifier: ^1.9.3
-        version: 1.9.3
-      lucide-react:
-        specifier: ^0.294.0
-        version: 0.294.0(react@19.1.1)
-      react:
-        specifier: ^19.1.0
-        version: 19.1.1
-      react-dom:
-        specifier: ^19.1.0
-        version: 19.1.1(react@19.1.1)
-      react-hook-form:
-        specifier: ^7.62.0
-        version: 7.62.0(react@19.1.1)
-      react-router-dom:
-        specifier: ^6.20.1
-        version: 6.30.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
-      sonner:
-        specifier: ^1.3.1
-        version: 1.7.4(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
-      styled-components:
-        specifier: ^6.1.13
-        version: 6.1.19(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
-    devDependencies:
-      '@types/react':
-        specifier: ^19.1.0
-        version: 19.1.12
-      '@types/react-dom':
-        specifier: ^19.1.1
-        version: 19.1.9(@types/react@19.1.12)
-      '@types/styled-components':
-        specifier: ^5.1.34
-        version: 5.1.34
-      '@vitejs/plugin-react':
-        specifier: ^4.2.1
-        version: 4.7.0(vite@5.4.19(@types/node@22.18.1)(terser@5.44.0))
-      autoprefixer:
-        specifier: ^10.4.21
-        version: 10.4.21(postcss@8.5.6)
-      postcss:
-        specifier: ^8.5.6
-        version: 8.5.6
-      tailwindcss:
-        specifier: ^3.4.17
-        version: 3.4.17(ts-node@10.9.2(@swc/core@1.13.5)(@types/node@22.18.1)(typescript@5.9.2))
       typescript:
         specifier: ^5.9.2
         version: 5.9.2
@@ -349,90 +209,17 @@ importers:
         specifier: ^5.0.8
         version: 5.4.19(@types/node@22.18.1)(terser@5.44.0)
 
-  apps/user:
-    dependencies:
-      '@sms-hub/dev-auth':
-        specifier: workspace:*
-        version: link:../../packages/dev-auth
-      '@sms-hub/supabase':
-        specifier: workspace:*
-        version: link:../../packages/supabase
-      '@sms-hub/types':
-        specifier: workspace:*
-        version: link:../../packages/types
-      '@sms-hub/ui':
-        specifier: workspace:*
-        version: link:../../packages/ui
-      '@sms-hub/utils':
-        specifier: workspace:*
-        version: link:../../packages/utils
-      '@supabase/supabase-js':
-        specifier: ^2.39.0
-        version: 2.57.2
-      '@tanstack/react-query':
-        specifier: ^5.17.0
-        version: 5.87.1(react@19.1.1)
-      '@types/canvas-confetti':
-        specifier: ^1.9.0
-        version: 1.9.0
-      canvas-confetti:
-        specifier: ^1.9.3
-        version: 1.9.3
-      lucide-react:
-        specifier: ^0.294.0
-        version: 0.294.0(react@19.1.1)
-      react:
-        specifier: ^19.1.0
-        version: 19.1.1
-      react-dom:
-        specifier: ^19.1.0
-        version: 19.1.1(react@19.1.1)
-      react-hook-form:
-        specifier: ^7.62.0
-        version: 7.62.0(react@19.1.1)
-      react-router-dom:
-        specifier: ^6.20.1
-        version: 6.30.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
-      sonner:
-        specifier: ^1.3.1
-        version: 1.7.4(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
-      styled-components:
-        specifier: ^6.1.13
-        version: 6.1.19(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
-    devDependencies:
-      '@types/react':
-        specifier: ^19.1.0
-        version: 19.1.12
-      '@types/react-dom':
-        specifier: ^19.1.1
-        version: 19.1.9(@types/react@19.1.12)
-      '@types/styled-components':
-        specifier: ^5.1.34
-        version: 5.1.34
-      '@vitejs/plugin-react':
-        specifier: ^4.2.1
-        version: 4.7.0(vite@5.4.19(@types/node@22.18.1)(terser@5.44.0))
-      autoprefixer:
-        specifier: ^10.4.21
-        version: 10.4.21(postcss@8.5.6)
-      postcss:
-        specifier: ^8.5.6
-        version: 8.5.6
-      tailwindcss:
-        specifier: ^3.4.17
-        version: 3.4.17(ts-node@10.9.2(@swc/core@1.13.5)(@types/node@22.18.1)(typescript@5.9.2))
-      typescript:
-        specifier: ^5.9.2
-        version: 5.9.2
-      vite:
-        specifier: ^5.0.8
-        version: 5.4.19(@types/node@22.18.1)(terser@5.44.0)
-
   apps/web:
     dependencies:
       '@sms-hub/dev-auth':
         specifier: workspace:*
         version: link:../../packages/dev-auth
+      '@sms-hub/hub-logic':
+        specifier: workspace:*
+        version: link:../../packages/hub-logic
+      '@sms-hub/services':
+        specifier: workspace:*
+        version: link:../../packages/services
       '@sms-hub/supabase':
         specifier: workspace:*
         version: link:../../packages/supabase
@@ -560,6 +347,19 @@ importers:
       eslint:
         specifier: ^9.34.0
         version: 9.35.0(jiti@1.21.7)
+      typescript:
+        specifier: ^5.9.2
+        version: 5.9.2
+
+  packages/services:
+    dependencies:
+      '@sms-hub/supabase':
+        specifier: workspace:*
+        version: link:../supabase
+      '@sms-hub/types':
+        specifier: workspace:*
+        version: link:../types
+    devDependencies:
       typescript:
         specifier: ^5.9.2
         version: 5.9.2
@@ -4607,11 +4407,6 @@ packages:
   lru-cache@7.18.3:
     resolution: {integrity: sha512-jumlc0BIUrS3qJGgIkWZsyfAM7NCWiBcCDhnd+3NNM5KbBmLTgHVfWBcg6W+rLUsIpzpERPsvwUP7CckAQSOoA==}
     engines: {node: '>=12'}
-
-  lucide-react@0.294.0:
-    resolution: {integrity: sha512-V7o0/VECSGbLHn3/1O67FUgBwWB+hmzshrgDVRJQhMh8uj5D3HBuIvhuAmQTtlupILSplwIZg5FTc4tTKMA2SA==}
-    peerDependencies:
-      react: ^19.1.0
 
   lucide-react@0.460.0:
     resolution: {integrity: sha512-BVtq/DykVeIvRTJvRAgCsOwaGL8Un3Bxh8MbDxMhEWlZay3T4IpEKDEpwt5KZ0KJMHzgm6jrltxlT5eXOWXDHg==}
@@ -10512,10 +10307,6 @@ snapshots:
       yallist: 3.1.1
 
   lru-cache@7.18.3: {}
-
-  lucide-react@0.294.0(react@19.1.1):
-    dependencies:
-      react: 19.1.1
 
   lucide-react@0.460.0(react@19.1.1):
     dependencies:

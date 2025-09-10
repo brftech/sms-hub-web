@@ -1,13 +1,11 @@
 import { Shield } from "lucide-react";
 import { PhoneDemo } from "../PhoneDemo";
 import { useHub } from "@sms-hub/ui";
-import { gnymbleProblemSolution } from "../Gnymble/problemSolution";
-import { percymdProblemSolution } from "../PercyMD/problemSolution";
+import { getHubProblemSolutionContent } from "@sms-hub/hub-logic";
 
 export const ProblemSolutionSection: React.FC = () => {
   const { currentHub } = useHub();
-  const content =
-    currentHub === "percymd" ? percymdProblemSolution : gnymbleProblemSolution;
+  const content = getHubProblemSolutionContent(currentHub);
 
   // Get the appropriate Tailwind color class based on hub
   const getPrimaryColorClass = () => {

@@ -40,24 +40,31 @@ export const useDevAuth = (environment: EnvironmentAdapter): DevAuthState => {
       (typeof process !== 'undefined' && process.env?.DEV_SUPERADMIN === 'true')
     
     // Enable superadmin if query param matches or env var is set
+    // Removed auto-enable - now requires explicit ?superadmin=dev123 param
     const isSuperadmin = superadminKey === 'dev123' || envSuperadmin
     
     if (isSuperadmin) {
-      // Create mock dev user ID
-      const devUserId = devUserParam || 'dev-superadmin-001'
+      // Use the actual superadmin user ID from the database
+      const devUserId = '00000000-0000-0000-0000-000000000001'
       
-      // Create mock user profile
+      // Create user profile that matches the database superadmin
       const devUserProfile = {
         id: devUserId,
-        email: 'superadmin@dev.local',
+        email: 'superadmin@sms-hub.com',
         phone: '+15551234567',
-        first_name: 'Dev',
-        last_name: 'Superadmin',
-        company: 'Development Testing',
-        hub_id: 1, // Default to PercyTech
+        mobile_phone_number: '+15551234567',
+        first_name: 'Super',
+        last_name: 'Admin',
+        company_id: '00000000-0000-0000-0000-000000000002',
+        company_name: 'SMS Hub System',
+        customer_id: '00000000-0000-0000-0000-000000000003',
+        hub_id: 1, // PercyTech
         payment_status: 'completed',
         onboarding_completed: true,
-        role: 'SUPERADMIN', // Give superadmin role
+        verification_setup_completed: true,
+        is_active: true,
+        role: 'SUPERADMIN',
+        account_number: 'PERCY-SA001',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       }
@@ -70,27 +77,15 @@ export const useDevAuth = (environment: EnvironmentAdapter): DevAuthState => {
         isInitialized: true
       })
       
-      // Store in sessionStorage for persistence during dev session
-      sessionStorage.setItem('dev_superadmin', 'true')
-      sessionStorage.setItem('dev_user_id', devUserId)
-      sessionStorage.setItem('dev_user_profile', JSON.stringify(devUserProfile))
+      // DO NOT store in sessionStorage - auth should only last for this page load
+      // This prevents auth from persisting across refreshes
+      // sessionStorage.setItem('dev_superadmin', 'true')
+      // sessionStorage.setItem('dev_user_id', devUserId)
+      // sessionStorage.setItem('dev_user_profile', JSON.stringify(devUserProfile))
     } else {
-      // Check sessionStorage for existing dev session
-      const storedSuperadmin = sessionStorage.getItem('dev_superadmin') === 'true'
-      const storedUserId = sessionStorage.getItem('dev_user_id')
-      const storedProfile = sessionStorage.getItem('dev_user_profile')
-      
-      if (storedSuperadmin && storedUserId && storedProfile) {
-        setDevAuthState({
-          isDevMode: true,
-          isSuperadmin: true,
-          devUserId: storedUserId,
-          devUserProfile: JSON.parse(storedProfile),
-          isInitialized: true
-        })
-      } else {
-        setDevAuthState(prev => ({ ...prev, isInitialized: true }))
-      }
+      // DO NOT check sessionStorage - we want auth to be explicit each time
+      // This prevents dev auth from persisting across page refreshes
+      setDevAuthState(prev => ({ ...prev, isInitialized: true }))
     }
   }, [searchParams, environment])
 
@@ -98,7 +93,7 @@ export const useDevAuth = (environment: EnvironmentAdapter): DevAuthState => {
 }
 
 // Helper to activate dev auth programmatically
-export const activateDevAuth = (environment: EnvironmentAdapter, userId?: string) => {
+export const activateDevAuth = (environment: EnvironmentAdapter, _userId?: string) => {
   console.log('activateDevAuth called', { isDev: environment.isDevelopment() })
   
   if (!environment.isDevelopment()) {
@@ -106,36 +101,19 @@ export const activateDevAuth = (environment: EnvironmentAdapter, userId?: string
     return
   }
   
-  console.log('Activating dev auth...')
-  const devUserId = userId || 'dev-superadmin-001'
-  const devUserProfile = {
-    id: devUserId,
-    email: 'superadmin@dev.local',
-    phone: '+15551234567',
-    first_name: 'Dev',
-    last_name: 'Superadmin',
-    company: 'Development Testing',
-    hub_id: 1, // Default to PercyTech
-    payment_status: 'completed',
-    onboarding_completed: true,
-    role: 'SUPERADMIN', // Give superadmin role
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
-  }
-  
-  // Store in sessionStorage
-  sessionStorage.setItem('dev_superadmin', 'true')
-  sessionStorage.setItem('dev_user_id', devUserId)
-  sessionStorage.setItem('dev_user_profile', JSON.stringify(devUserProfile))
-  
-  // Reload to apply changes
-  window.location.reload()
+  // Since we're not storing in sessionStorage anymore,
+  // this function now just adds the query param and reloads
+  const url = new URL(window.location.href)
+  url.searchParams.set('superadmin', 'dev123')
+  window.location.href = url.toString()
 }
 
 // Helper to clear dev auth session
 export const clearDevAuth = () => {
-  sessionStorage.removeItem('dev_superadmin')
-  sessionStorage.removeItem('dev_user_id')
-  sessionStorage.removeItem('dev_user_profile')
-  window.location.reload()
+  // Since we're not storing in sessionStorage anymore,
+  // just remove the query param and reload
+  const url = new URL(window.location.href)
+  url.searchParams.delete('superadmin')
+  url.searchParams.delete('devuser')
+  window.location.href = url.toString()
 }

@@ -33,10 +33,20 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     )
   }
 
-  // Redirect to web app login if not authenticated
+  // Show login prompt if not authenticated
   if (!isAuthenticated || !user) {
+    // Redirect to web app login page
     redirectToWebApp('/login')
-    return null
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="max-w-md w-full bg-white shadow-lg rounded-lg p-6 text-center">
+          <h3 className="text-lg font-medium text-gray-900">Redirecting to Login...</h3>
+          <p className="mt-2 text-sm text-gray-500">
+            You will be redirected to the login page.
+          </p>
+        </div>
+      </div>
+    )
   }
 
   // Check if user can access this specific route

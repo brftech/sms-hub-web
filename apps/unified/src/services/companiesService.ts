@@ -1,4 +1,5 @@
-import { getSupabaseClient } from "@sms-hub/supabase";
+import { getSupabaseClient } from "../lib/supabaseSingleton";
+import type { SupabaseClient } from "@sms-hub/supabase";
 
 export interface Company {
   id: string;
@@ -43,18 +44,10 @@ export interface CompanyStats {
 }
 
 class CompaniesService {
-  private supabase: ReturnType<typeof getSupabaseClient>;
+  private supabase: SupabaseClient;
 
   constructor() {
-    // Get environment variables
-    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-    const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-    if (!supabaseUrl || !supabaseAnonKey) {
-      throw new Error("Missing Supabase environment variables");
-    }
-
-    this.supabase = getSupabaseClient(supabaseUrl, supabaseAnonKey);
+    this.supabase = getSupabaseClient();
   }
 
   // Test database connection
@@ -512,4 +505,14 @@ class CompaniesService {
   }
 }
 
-export const companiesService = new CompaniesService();
+// Lazy-loaded service instance
+let _companiesService: CompaniesService | null = null;
+
+export const companiesService = {
+  get instance() {
+    if (!_companiesService) {
+      _companiesService = new CompaniesService();
+    }
+    return _companiesService;
+  }
+};

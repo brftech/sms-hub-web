@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
-import { createSupabaseClient } from '@sms-hub/supabase'
+import { useSupabase } from '../providers/SupabaseProvider'
 // import { CheckoutRedirect } from './CheckoutRedirect'
 import { useDevAuth, useSuperadminAuth } from '@sms-hub/dev-auth'
-import { textingEnvironment } from '../config/textingEnvironment'
+import { unifiedEnvironment } from '../config/unifiedEnvironment'
 import { redirectToWebApp } from '@sms-hub/utils'
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -11,13 +11,9 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [userProfile, setUserProfile] = useState<any>(null)
   const location = useLocation()
-  const devAuth = useDevAuth(textingEnvironment)
+  const devAuth = useDevAuth(unifiedEnvironment)
   const superadminAuth = useSuperadminAuth()
-  
-  const supabase = createSupabaseClient(
-    import.meta.env.VITE_SUPABASE_URL,
-    import.meta.env.VITE_SUPABASE_ANON_KEY
-  )
+  const supabase = useSupabase()
   
   useEffect(() => {
     // Wait for dev auth to initialize
@@ -94,9 +90,24 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   }
   
   if (!isAuthenticated) {
-    // Redirect to web app login page
-    redirectToWebApp('/login');
-    return null; // Component will unmount due to redirect
+    // For now, show a login prompt instead of redirecting
+    // TODO: Uncomment redirect when login flow is set up
+    // redirectToWebApp('/login');
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="max-w-md w-full bg-white shadow-lg rounded-lg p-6 text-center">
+          <h3 className="text-lg font-medium text-gray-900">Authentication Required</h3>
+          <p className="mt-2 text-sm text-gray-500">
+            Please log in to access this page.
+          </p>
+          <div className="mt-6 space-y-2">
+            <p className="text-xs text-gray-400">
+              Dev mode: Add ?superadmin=dev123 to URL to enable superadmin mode
+            </p>
+          </div>
+        </div>
+      </div>
+    )
   }
   
   // Check if there's a pending checkout from signup

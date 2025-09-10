@@ -2,7 +2,7 @@ import { HeroSection } from "../shared/HeroSection";
 import { ProblemSolutionSection } from "../shared/ProblemSolutionSection";
 import { StatsSection } from "../shared/StatsSection";
 import { CTASection } from "../shared/CTA";
-import { percymdHero } from "./hero";
+import { percymdHero } from "@sms-hub/hub-logic";
 
 interface PercyMDProps {
   businessTypes: string[];

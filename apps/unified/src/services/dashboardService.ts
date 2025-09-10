@@ -1,4 +1,5 @@
-import { getSupabaseClient } from "@sms-hub/supabase";
+import { getSupabaseClient } from "../lib/supabaseSingleton";
+import type { SupabaseClient } from "@sms-hub/supabase";
 
 export interface DashboardStats {
   totalUsers: number;
@@ -78,18 +79,11 @@ export interface SystemHealth {
 }
 
 class DashboardService {
-  private supabase: ReturnType<typeof getSupabaseClient>;
+  private supabase: SupabaseClient;
 
   constructor() {
-    // Get environment variables
-    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-    const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-    if (!supabaseUrl || !supabaseAnonKey) {
-      throw new Error("Missing Supabase environment variables");
-    }
-
-    this.supabase = getSupabaseClient(supabaseUrl, supabaseAnonKey);
+    // Use the singleton client
+    this.supabase = getSupabaseClient();
   }
 
   async getDashboardStats(hubId: number): Promise<DashboardStats> {
@@ -836,4 +830,14 @@ class DashboardService {
   }
 }
 
-export const dashboardService = new DashboardService();
+// Lazy-loaded service instance
+let _dashboardService: DashboardService | null = null;
+
+export const dashboardService = {
+  get instance() {
+    if (!_dashboardService) {
+      _dashboardService = new DashboardService();
+    }
+    return _dashboardService;
+  }
+};

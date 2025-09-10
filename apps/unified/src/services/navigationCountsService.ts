@@ -1,4 +1,5 @@
-import { getSupabaseClient } from '@sms-hub/supabase'
+import { getSupabaseClient } from '../lib/supabaseSingleton'
+import type { SupabaseClient } from '@sms-hub/supabase'
 
 export interface NavigationCounts {
   companies: number;
@@ -8,13 +9,10 @@ export interface NavigationCounts {
 }
 
 class NavigationCountsService {
-  private supabase: ReturnType<typeof getSupabaseClient>
+  private supabase: SupabaseClient
 
   constructor() {
-    this.supabase = getSupabaseClient(
-      import.meta.env.VITE_SUPABASE_URL,
-      import.meta.env.VITE_SUPABASE_ANON_KEY
-    )
+    this.supabase = getSupabaseClient()
   }
 
   async getCounts(hubId?: number, isGlobalView?: boolean): Promise<NavigationCounts> {
@@ -70,4 +68,14 @@ class NavigationCountsService {
   }
 }
 
-export const navigationCountsService = new NavigationCountsService()
+// Lazy-loaded service instance
+let _navigationCountsService: NavigationCountsService | null = null;
+
+export const navigationCountsService = {
+  get instance() {
+    if (!_navigationCountsService) {
+      _navigationCountsService = new NavigationCountsService();
+    }
+    return _navigationCountsService;
+  }
+};

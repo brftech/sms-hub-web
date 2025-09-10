@@ -5,7 +5,7 @@ import { StepComponentProps } from '@sms-hub/types'
 import { useForm } from 'react-hook-form'
 import { CreditCard, Shield, CheckCircle, ChevronRight, AlertCircle } from 'lucide-react'
 import { useCreateCustomerCheckout } from '@sms-hub/supabase'
-import { createSupabaseClient } from '@sms-hub/supabase'
+import { useSupabase } from '../../../../providers/SupabaseProvider'
 
 interface PaymentFormData {
   payment_method: 'stripe'
@@ -23,6 +23,7 @@ export function PaymentStep({ submission, onComplete, hubId, userId }: StepCompo
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const createCheckoutSession = useCreateCustomerCheckout()
+  const supabase = useSupabase()
 
   const form = useForm<PaymentFormData>({
     defaultValues: {
@@ -88,10 +89,6 @@ export function PaymentStep({ submission, onComplete, hubId, userId }: StepCompo
       }
 
       // Get current user session
-      const supabase = createSupabaseClient(
-        import.meta.env.VITE_SUPABASE_URL,
-        import.meta.env.VITE_SUPABASE_ANON_KEY
-      )
       
       if (!supabase) {
         throw new Error('Failed to initialize Supabase client')

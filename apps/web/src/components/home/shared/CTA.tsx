@@ -1,12 +1,11 @@
 import React from "react";
 import { useHub } from "@sms-hub/ui";
-import { gnymbleCTA } from "../Gnymble/cta";
-import { percymdCTA } from "../PercyMD/cta";
+import { getHubCTAContent } from "@sms-hub/hub-logic";
 
 export const CTASection: React.FC = () => {
   const { currentHub } = useHub();
 
-  const content = currentHub === "percymd" ? percymdCTA : gnymbleCTA;
+  const content = getHubCTAContent(currentHub);
   return (
     <div className="bg-black py-16 md:py-24 lg:py-32 relative">
       <div className="max-w-4xl mx-auto px-6 text-center relative">

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { createSupabaseClient } from '@sms-hub/supabase'
+import { useSupabase } from '../providers/SupabaseProvider'
 import { useDevAuth } from '@sms-hub/dev-auth'
 import { useSuperadminAuth } from '@sms-hub/dev-auth'
 import { UserProfile } from '../types/roles'
@@ -22,15 +22,12 @@ export const useAuth = (): AuthState => {
 
   const devAuth = useDevAuth(unifiedEnvironment)
   const superadminAuth = useSuperadminAuth()
-
-  const supabase = createSupabaseClient(
-    'https://vgpovgpwqkjnpnrjelyg.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZncG92Z3B3cWtqbnBucmplbHlnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzYxNDQ4MDAsImV4cCI6MjA1MTcyMDgwMH0.8QZ8QZ8QZ8QZ8QZ8QZ8QZ8QZ8QZ8QZ8QZ8QZ8QZ8QZ8'
-  )
+  const supabase = useSupabase()
 
   useEffect(() => {
     // Wait for dev auth to initialize
     if (!devAuth.isInitialized) {
+      console.log('Waiting for dev auth to initialize...')
       return
     }
 
@@ -138,7 +135,8 @@ export const useAuth = (): AuthState => {
     })
 
     return () => subscription.unsubscribe()
-  }, [devAuth.isInitialized, devAuth.isSuperadmin, superadminAuth.isAuthenticated, superadminAuth.isSuperadmin])
+  }, [devAuth.isInitialized, devAuth.isSuperadmin, devAuth.devUserProfile, superadminAuth.isAuthenticated, superadminAuth.isSuperadmin, superadminAuth.superadminUser, supabase])
 
+  console.log('useAuth returning state:', authState)
   return authState
 }

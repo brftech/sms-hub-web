@@ -20,12 +20,20 @@ import { useState, useEffect } from "react";
 import { useGlobalView } from "../contexts/GlobalViewContext";
 import { DevAdminBanner } from "./DevAdminBanner";
 import {
-  navigationCountsService,
   NavigationCounts,
 } from "../services/navigationCountsService";
 
+// Lazy import for service to avoid early instantiation
+let navigationCountsService: any = null;
+const getNavigationCountsService = () => {
+  if (!navigationCountsService) {
+    navigationCountsService = require("../services/navigationCountsService").navigationCountsService;
+  }
+  return navigationCountsService;
+};
+
 // Export for use in Dashboard
-export { navigationCountsService };
+export { getNavigationCountsService as navigationCountsService };
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: Home },
@@ -63,7 +71,7 @@ export function Layout() {
               ? 0
               : 1;
 
-    const newCounts = await navigationCountsService.getCounts(
+    const newCounts = await getNavigationCountsService().instance.getCounts(
       hubId,
       isGlobalView
     );

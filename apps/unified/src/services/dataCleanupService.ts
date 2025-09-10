@@ -1,4 +1,5 @@
-import { getSupabaseClient } from "@sms-hub/supabase";
+import { getSupabaseClient } from "../lib/supabaseSingleton";
+import type { SupabaseClient } from "@sms-hub/supabase";
 
 export interface CleanupResult {
   success: boolean;
@@ -15,17 +16,10 @@ export interface CleanupResult {
 }
 
 class DataCleanupService {
-  private supabase: ReturnType<typeof getSupabaseClient>;
+  private supabase: SupabaseClient;
 
   constructor() {
-    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-    const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-    if (!supabaseUrl || !supabaseAnonKey) {
-      throw new Error("Missing Supabase environment variables");
-    }
-
-    this.supabase = getSupabaseClient(supabaseUrl, supabaseAnonKey);
+    this.supabase = getSupabaseClient();
   }
 
   // Get current data counts for safety check
@@ -314,4 +308,14 @@ class DataCleanupService {
   }
 }
 
-export const dataCleanupService = new DataCleanupService();
+// Lazy-loaded service instance
+let _dataCleanupService: DataCleanupService | null = null;
+
+export const dataCleanupService = {
+  get instance() {
+    if (!_dataCleanupService) {
+      _dataCleanupService = new DataCleanupService();
+    }
+    return _dataCleanupService;
+  }
+};

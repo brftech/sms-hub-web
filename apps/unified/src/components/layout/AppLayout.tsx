@@ -1,12 +1,14 @@
 import React, { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
+import { useSupabase } from '../../providers/SupabaseProvider'
 import { getAvailableNavigationItems, getUserDisplayName, getRoleDisplayName, getRoleColor } from '../../utils/roleUtils'
 import { redirectToWebApp } from '@sms-hub/utils'
 
 const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const { user, isAuthenticated } = useAuth()
+  const supabase = useSupabase()
   const location = useLocation()
   const navigate = useNavigate()
 
@@ -20,12 +22,16 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const roleColor = getRoleColor(user.role)
 
   const handleLogout = async () => {
-    // Clear local storage
+    // Sign out from Supabase (this clears the session from localStorage)
+    await supabase.auth.signOut()
+    
+    // Clear any additional local storage items
     localStorage.removeItem('superadmin_session')
     localStorage.removeItem('superadmin_user')
+    sessionStorage.clear()
     
-    // Redirect to web app
-    redirectToWebApp('/')
+    // Redirect to web app login
+    redirectToWebApp('/login')
   }
 
   const handleNavClick = (path: string) => {

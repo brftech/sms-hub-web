@@ -79,7 +79,7 @@ const Verifications = () => {
       }
 
       // Fetch verifications with filters
-      const fetchedVerifications = await verificationsService.getVerifications(filterOptions);
+      const fetchedVerifications = await verificationsService.instance.getVerifications(filterOptions);
 
       console.log("Verifications: Fetched verifications:", fetchedVerifications);
       console.log("Verifications: Count:", fetchedVerifications.length);
@@ -104,7 +104,7 @@ const Verifications = () => {
     if (!deletingVerificationId) return;
     
     try {
-      await verificationsService.deleteVerification(deletingVerificationId);
+      await verificationsService.instance.deleteVerification(deletingVerificationId);
       await fetchData();
       setShowDeleteConfirm(false);
       setDeletingVerificationId(null);

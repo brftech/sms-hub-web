@@ -27,7 +27,6 @@ import {
 import { useGlobalView } from "../../contexts/GlobalViewContext";
 
 import {
-  dashboardService,
   DashboardStats,
   RecentActivity,
   Alert,
@@ -35,9 +34,25 @@ import {
   CompanyOnboardingData,
 } from "../../services/dashboardService";
 import {
-  dataCleanupService,
   CleanupResult,
 } from "../../services/dataCleanupService";
+
+// Lazy imports for services to avoid early instantiation
+let dashboardService: any = null;
+const getDashboardService = () => {
+  if (!dashboardService) {
+    dashboardService = require("../../services/dashboardService").dashboardService;
+  }
+  return dashboardService;
+};
+
+let dataCleanupService: any = null;
+const getDataCleanupService = () => {
+  if (!dataCleanupService) {
+    dataCleanupService = require("../../services/dataCleanupService").dataCleanupService;
+  }
+  return dataCleanupService;
+};
 import { navigationCountsService } from "../../components/Layout";
 
 const Dashboard = () => {
@@ -69,9 +84,9 @@ const Dashboard = () => {
         // Fetch global data across all hubs
         const [statsData, healthData, globalOnboardingData] = await Promise.all(
           [
-            dashboardService.getGlobalDashboardStats(),
-            dashboardService.getSystemHealth(),
-            dashboardService.getGlobalCompanyOnboardingData(), // New method we'll create
+            getDashboardService().instance.getGlobalDashboardStats(),
+            getDashboardService().instance.getSystemHealth(),
+            getDashboardService().instance.getGlobalCompanyOnboardingData(), // New method we'll create
           ]
         );
 
@@ -104,11 +119,11 @@ const Dashboard = () => {
           healthData,
           onboardingData,
         ] = await Promise.all([
-          dashboardService.getDashboardStats(hubId),
-          dashboardService.getRecentActivity(hubId),
-          dashboardService.getAlerts(hubId),
-          dashboardService.getSystemHealth(),
-          dashboardService.getCompanyOnboardingData(hubId),
+          getDashboardService().instance.getDashboardStats(hubId),
+          getDashboardService().instance.getRecentActivity(hubId),
+          getDashboardService().instance.getAlerts(hubId),
+          getDashboardService().instance.getSystemHealth(),
+          getDashboardService().instance.getCompanyOnboardingData(hubId),
         ]);
 
         setStats(statsData);
@@ -234,7 +249,7 @@ const Dashboard = () => {
                 ? 0
                 : 1;
 
-      await navigationCountsService.getCounts(hubId, isGlobalView);
+      await navigationCountsService().instance.getCounts(hubId, isGlobalView);
       // Force a page refresh to update counts in Layout
       window.location.reload();
     } catch (error) {
@@ -268,18 +283,18 @@ const Dashboard = () => {
 
       // Try the FK-aware method first
       console.log("Attempting FK-aware verification cleanup...");
-      let result = await dataCleanupService.performDataCleanupWithFKHandling();
+      let result = await getDataCleanupService().instance.performDataCleanupWithFKHandling();
 
       // If that fails, try the regular method
       if (!result.success) {
         console.log("FK-aware cleanup failed, trying regular method...");
-        result = await dataCleanupService.performDataCleanup();
+        result = await getDataCleanupService().instance.performDataCleanup();
       }
 
       // If that also fails, try the direct method
       if (!result.success) {
         console.log("Regular cleanup failed, trying direct method...");
-        result = await dataCleanupService.performDataCleanupDirect();
+        result = await getDataCleanupService().instance.performDataCleanupDirect();
       }
 
       console.log("Final cleanup result:", result);
@@ -306,7 +321,7 @@ const Dashboard = () => {
 
   const handleCheckDataCounts = async () => {
     try {
-      const counts = await dataCleanupService.getCurrentDataCounts();
+      const counts = await getDataCleanupService().instance.getCurrentDataCounts();
       alert(
         `Current Data Counts:\n\n` +
           `• Companies: ${counts.companies}\n` +

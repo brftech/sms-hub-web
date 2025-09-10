@@ -1,11 +1,9 @@
 import { useHub } from "@sms-hub/ui";
-import { gnymbleTestimonials } from "../Gnymble/testimonials";
-import { percymdTestimonials } from "../PercyMD/testimonials";
+import { getHubTestimonialsContent } from "@sms-hub/hub-logic";
 
 export const TestimonialsSection: React.FC = () => {
   const { currentHub } = useHub();
-  const content =
-    currentHub === "percymd" ? percymdTestimonials : gnymbleTestimonials;
+  const content = getHubTestimonialsContent(currentHub);
 
   return (
     <div className="bg-black py-16 md:py-24 lg:py-32 border-t border-amber-900/30 relative">

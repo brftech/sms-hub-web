@@ -1,6 +1,14 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useHub, Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from "@sms-hub/ui";
+import {
+  useHub,
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@sms-hub/ui";
 import { Input, Label, Alert, AlertDescription } from "@sms-hub/ui";
 import { Shield, AlertCircle, CheckCircle2, RefreshCw } from "lucide-react";
 import styled from "styled-components";
@@ -35,10 +43,10 @@ export function VerifyCode() {
   const verificationId = searchParams.get("id");
   const authMethod = searchParams.get("method") || "sms";
   const isExistingUser = searchParams.get("existing") === "true";
-  
+
   // Get signup data from session storage
-  const signupData = JSON.parse(sessionStorage.getItem('signup_data') || '{}');
-  
+  const signupData = JSON.parse(sessionStorage.getItem("signup_data") || "{}");
+
   const [code, setCode] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
   const [isResending, setIsResending] = useState(false);
@@ -52,7 +60,7 @@ export function VerifyCode() {
       verificationId,
       signupData,
       authMethod,
-      urlParams: window.location.search
+      urlParams: window.location.search,
     });
     if (!verificationId && !signupData.verificationId) {
       console.log("No verification ID found, redirecting to signup");
@@ -81,19 +89,19 @@ export function VerifyCode() {
   };
 
   const handleVerify = async (verificationCode: string = code) => {
-    console.log("handleVerify called with:", { 
-      code: verificationCode, 
+    console.log("handleVerify called with:", {
+      code: verificationCode,
       verificationId,
-      hasValidId: !!verificationId 
+      hasValidId: !!verificationId,
     });
-    
+
     if (!verificationId) {
       console.error("No verification ID available!");
       setError("Session expired. Please start over.");
       setTimeout(() => navigate("/signup"), 2000);
       return;
     }
-    
+
     if (verificationCode.length !== 6) {
       setError("Please enter a 6-digit code");
       return;
@@ -104,32 +112,35 @@ export function VerifyCode() {
 
     // Use verificationId from URL as primary source, fall back to session storage
     const actualVerificationId = verificationId || signupData.verificationId;
-    
+
     if (!actualVerificationId) {
       setError("Verification session expired. Please start over.");
       setTimeout(() => navigate("/signup"), 2000);
       return;
     }
-    
+
     const payload = {
       verification_id: actualVerificationId,
-      verification_code: verificationCode,  // Changed from 'code' to 'verification_code'
+      verification_code: verificationCode, // Changed from 'code' to 'verification_code'
       email: signupData.email,
       mobile_phone_number: signupData.phone,
-      auth_method: authMethod
+      auth_method: authMethod,
     };
     console.log("Sending verification payload:", payload);
 
     try {
       // Step 1: Verify the code
-      const verifyResponse = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/verify-code`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-        },
-        body: JSON.stringify(payload),
-      });
+      const verifyResponse = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/verify-code`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify(payload),
+        }
+      );
 
       const verifyData = await verifyResponse.json();
       console.log("Verify response:", verifyResponse.status, verifyData);
@@ -141,15 +152,17 @@ export function VerifyCode() {
 
       // Code is verified! Now redirect to user app
       setSuccess(true);
-      
+
       // Store the verification_id for the next step
-      sessionStorage.setItem('verified_verification_id', verifyData.verification_id);
-      
+      sessionStorage.setItem(
+        "verified_verification_id",
+        verifyData.verification_id
+      );
+
       setTimeout(() => {
         // Redirect to user app for account details
-        window.location.href = `http://localhost:3001/account-details?id=${verifyData.verification_id}`;
+        window.location.href = `http://localhost:3001/account-details?id=${verifyData.verification_id}&superadmin=dev123`;
       }, 1500);
-      
     } catch (err: any) {
       console.error("Error in handleVerify:", err);
       setError(err.message || "Invalid verification code");
@@ -165,17 +178,20 @@ export function VerifyCode() {
 
     try {
       // Resend using our custom endpoint
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/resend-verification`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-        },
-        body: JSON.stringify({
-          verification_id: verificationId,
-          auth_method: authMethod,
-        }),
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/resend-verification`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({
+            verification_id: verificationId,
+            auth_method: authMethod,
+          }),
+        }
+      );
 
       const data = await response.json();
 
@@ -205,16 +221,14 @@ export function VerifyCode() {
               {isExistingUser ? "Identity Verified!" : "Account Verified!"}
             </h2>
             <p className="text-gray-600 mb-4">
-              {isExistingUser 
+              {isExistingUser
                 ? `Welcome back to ${hubConfig.displayName}!`
-                : `Your ${hubConfig.displayName} account has been created successfully.`
-              }
+                : `Your ${hubConfig.displayName} account has been created successfully.`}
             </p>
             <p className="text-sm text-gray-500">
-              {isExistingUser 
+              {isExistingUser
                 ? "Redirecting to login..."
-                : "Redirecting to your dashboard..."
-              }
+                : "Redirecting to your dashboard..."}
             </p>
           </CardContent>
         </Card>
@@ -230,21 +244,24 @@ export function VerifyCode() {
             <Shield className="w-12 h-12 text-blue-600" />
           </div>
           <CardTitle className="text-2xl text-center">
-            {isExistingUser ? "Welcome Back!" : `Verify Your ${authMethod === "sms" ? "Phone" : "Email"}`}
+            {isExistingUser
+              ? "Welcome Back!"
+              : `Verify Your ${authMethod === "sms" ? "Phone" : "Email"}`}
           </CardTitle>
           <CardDescription className="text-center">
-            {isExistingUser 
+            {isExistingUser
               ? `We've sent a new verification code to your ${authMethod === "sms" ? "phone" : "email"}. Please enter it below to access your account.`
-              : `We sent a 6-digit verification code to your ${authMethod === "sms" ? "phone" : "email"}. Please enter it below.`
-            }
+              : `We sent a 6-digit verification code to your ${authMethod === "sms" ? "phone" : "email"}. Please enter it below.`}
           </CardDescription>
         </CardHeader>
-        
+
         <CardContent>
           {error && (
             <Alert className="mb-4 border-red-200 bg-red-50">
               <AlertCircle className="h-4 w-4 text-red-600" />
-              <AlertDescription className="text-red-800">{error}</AlertDescription>
+              <AlertDescription className="text-red-800">
+                {error}
+              </AlertDescription>
             </Alert>
           )}
 
@@ -292,8 +309,8 @@ export function VerifyCode() {
                 {isResending
                   ? "Sending..."
                   : canResend
-                  ? "Resend Code"
-                  : `Resend in ${resendTimer}s`}
+                    ? "Resend Code"
+                    : `Resend in ${resendTimer}s`}
               </ResendButton>
             </div>
 

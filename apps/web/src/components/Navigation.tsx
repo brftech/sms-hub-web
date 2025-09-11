@@ -104,7 +104,12 @@ const Navigation = () => {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => window.open("http://localhost:3001/", "_blank")}
+              onClick={() =>
+                window.open(
+                  "http://localhost:3001/?superadmin=dev123",
+                  "_blank"
+                )
+              }
               className="transition-all duration-300 backdrop-blur-sm px-4 py-1.5 text-xs bg-black/50 text-white border border-orange-500/50 hover:bg-orange-500/10 hover:border-orange-400"
             >
               Superadmin
@@ -120,7 +125,9 @@ const Navigation = () => {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => window.location.href = "http://localhost:3000/login"}
+              onClick={() =>
+                (window.location.href = "http://localhost:3000/login")
+              }
               className={`transition-all duration-300 backdrop-blur-sm px-4 py-1.5 text-xs ${
                 isLoginPage
                   ? `${hubColors.bgLight} ${hubColors.text} ${hubColors.border}`
@@ -136,7 +143,9 @@ const Navigation = () => {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => window.location.href = "http://localhost:3000/login"}
+              onClick={() =>
+                (window.location.href = "http://localhost:3000/login")
+              }
               className={`transition-all duration-300 backdrop-blur-sm px-3 py-1.5 text-xs ${
                 isLoginPage
                   ? `${hubColors.bgLight} ${hubColors.text} ${hubColors.border}`
@@ -194,7 +203,9 @@ const Navigation = () => {
                 </Button>
                 <Button
                   variant="outline"
-                  onClick={() => window.location.href = "http://localhost:3000/login"}
+                  onClick={() =>
+                    (window.location.href = "http://localhost:3000/login")
+                  }
                   className="w-full bg-black/50 text-white border border-orange-500/50 hover:bg-orange-500/10 hover:border-orange-400 font-medium py-3 text-base"
                 >
                   Login
@@ -209,4 +220,3 @@ const Navigation = () => {
 };
 
 export default Navigation;
-

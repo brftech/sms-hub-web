@@ -5,6 +5,7 @@
 You are working on a **multi-tenant B2B SMS SaaS platform** built as a Turbo monorepo. This is a production-ready platform that provides SMS messaging services to multiple business hubs with distinct branding and features.
 
 ### Core Architecture
+
 - **Monorepo Structure**: Turbo + pnpm workspaces for efficient builds and dependency management
 - **Database**: Supabase (PostgreSQL) with Row Level Security (RLS)
 - **Authentication**: Dual-mode system (SMS OTP for production, dev auth for testing)
@@ -41,6 +42,7 @@ sms-hub-monorepo/
 ## 🏗️ Current Architecture & Status
 
 ### Application Flow
+
 1. **Web App (port 3000)**: Public-facing marketing site
    - Landing pages for each hub (Gnymble, PercyMD)
    - Lead capture forms
@@ -59,6 +61,7 @@ sms-hub-monorepo/
    ```
 
 ### Recent Consolidation Efforts
+
 - ✅ Migrated from Next.js to Vite for better performance
 - ✅ Consolidated user/admin apps into Unified app
 - ✅ Extracted reusable components to packages
@@ -69,60 +72,74 @@ sms-hub-monorepo/
 ## 🔑 Critical Implementation Details
 
 ### 1. Multi-Tenancy (ALWAYS Required)
+
 ```typescript
 // WRONG - Missing hub_id
-await supabase.from('contacts').insert({ name: 'John' })
+await supabase.from("contacts").insert({ name: "John" });
 
 // CORRECT - Always include hub_id
-await supabase.from('contacts').insert({ 
-  name: 'John',
-  hub_id: hubConfig.id  // Required for RLS
-})
+await supabase.from("contacts").insert({
+  name: "John",
+  hub_id: hubConfig.id, // Required for RLS
+});
 ```
 
 ### 2. Hub IDs Reference
-- **PercyTech**: 1
-- **Gnymble**: 2
-- **PercyMD**: 3
-- **PercyText**: 4
+
+- **PercyTech**: 0
+- **Gnymble**: 1
+- **PercyMD**: 2
+- **PercyText**: 3
 
 ### 3. Styling Rules (STRICT)
+
 ```typescript
 // ❌ NEVER do this
-import './styles.css'
-import styles from './Component.module.css'
+import "./styles.css";
+import styles from "./Component.module.css";
 
 // ✅ ALWAYS use styled-components
-import styled from 'styled-components'
+import styled from "styled-components";
 const Button = styled.button`
   background: var(--hub-primary);
   padding: 12px 24px;
-`
+`;
 ```
 
 ### 4. Environment Variables
+
 ```typescript
 // ❌ WRONG in Vite apps
-process.env.VITE_SUPABASE_URL
+process.env.VITE_SUPABASE_URL;
 
 // ✅ CORRECT in Vite apps
-import.meta.env.VITE_SUPABASE_URL
+import.meta.env.VITE_SUPABASE_URL;
 ```
 
 ### 5. Supabase Client Usage
+
 ```typescript
 // In Unified app - use singleton
-import { getSupabaseClient } from '../lib/supabaseSingleton'
-const supabase = getSupabaseClient()
+import { getSupabaseClient } from "../lib/supabaseSingleton";
+const supabase = getSupabaseClient();
 
 // In packages - use factory
-import { createSupabaseClient } from '@sms-hub/supabase'
-const supabase = createSupabaseClient(url, key)
+import { createSupabaseClient } from "@sms-hub/supabase";
+const supabase = createSupabaseClient(url, key);
 ```
 
 ## 🛠️ Development Workflow
 
+### Port Assignments
+
+- **Web App**: 3000 (marketing, auth gateway, client pages)
+- **Unified App**: 3001 (main authenticated application)
+- **API**: 3002 (Nest.js backend server)
+- **Admin**: 3003 (legacy admin dashboard - being migrated)
+- **User**: 3004 (legacy user app - being migrated)
+
 ### Starting the Development Environment
+
 ```bash
 # Install dependencies
 pnpm install
@@ -144,6 +161,7 @@ pnpm build
 ```
 
 ### Database Operations
+
 ```bash
 # Generate TypeScript types from database
 npm run db:types
@@ -156,6 +174,7 @@ npx supabase migration new <migration_name>
 ```
 
 ### Testing Authentication
+
 1. **Development Mode**: Use dev auth toggle in Web app
    - Pre-configured test users available
    - No SMS required
@@ -167,32 +186,40 @@ npx supabase migration new <migration_name>
 ## 🐛 Common Issues & Solutions
 
 ### "Multiple GoTrueClient instances detected"
+
 **Solution**: Use the singleton pattern in Unified app
+
 ```typescript
-import { getSupabaseClient } from '../lib/supabaseSingleton'
+import { getSupabaseClient } from "../lib/supabaseSingleton";
 ```
 
 ### "Process is not defined" Error
+
 **Solution**: Use `import.meta.env` in Vite apps, not `process.env`
 
 ### "Foreign key constraint" Database Errors
+
 **Solution**: Ensure proper order of operations and all required fields
 
 ### Blank "Loading..." Page
+
 **Solution**: Check authentication state and route configuration
 
 ### CSS Import Errors
+
 **Solution**: Convert to styled-components - NO CSS files allowed
 
 ## 📋 Current Tasks & Priorities
 
 ### Immediate Focus
+
 1. Complete migration from legacy apps to Unified app
 2. Implement remaining admin features in Unified app
 3. Optimize bundle size and performance
 4. Add comprehensive error handling
 
 ### Technical Debt
+
 - Remove legacy user/admin apps after full migration
 - Consolidate duplicate components
 - Standardize API response formats
@@ -201,6 +228,7 @@ import { getSupabaseClient } from '../lib/supabaseSingleton'
 ## 🚦 Testing & Quality Assurance
 
 ### Before Committing Code
+
 1. Run type checking: `pnpm type-check`
 2. Run linting: `pnpm lint`
 3. Test authentication flow
@@ -208,13 +236,17 @@ import { getSupabaseClient } from '../lib/supabaseSingleton'
 5. Check responsive design
 
 ### Superadmin Testing
-- Email: bryan@gnymble.com
-- Access: Full system access
-- Use for testing admin features
+
+- **Email**: superadmin@sms-hub.com
+- **Access**: Full system access via Supabase Auth
+- **Authentication**: Real Supabase authentication (not dev bypass)
+- **Use for**: Testing admin features, verifying auth flow
+- **Login**: Use "Superadmin Login" button on web app or direct login form
 
 ## 📚 Important Resources
 
 ### Key Files
+
 - `/packages/types/src/database.types.ts` - Database schema
 - `/packages/hub-logic/src/index.ts` - Hub configurations
 - `/apps/unified/src/App.tsx` - Main routing
@@ -222,6 +254,7 @@ import { getSupabaseClient } from '../lib/supabaseSingleton'
 - `/.env.local` - Environment variables (create from .env.example)
 
 ### Documentation
+
 - `PROJECT_SUMMARY.md` - Detailed project documentation
 - `supabase/migrations/` - Database schema evolution
 - `packages/ui/src/` - Component library examples
@@ -261,7 +294,7 @@ import { getSupabaseClient } from '../lib/supabaseSingleton'
 ## 🔄 Recent Changes (Last Updated: 2025-01-11)
 
 1. **Fixed ESM/CommonJS Issues**: Converted all require() to proper ESM imports in admin pages
-2. **Authentication Improvements**: 
+2. **Authentication Improvements**:
    - Dev bypass with `?superadmin=dev123` persists in localStorage
    - Email/password is now default login method (was SMS)
    - Added password visibility toggle on login page
@@ -274,14 +307,19 @@ import { getSupabaseClient } from '../lib/supabaseSingleton'
 5. **Environment Standardization**: All apps now use `.env.local` consistently
 
 ### Known Issues
-- **Superadmin Password Login**: User exists in database but lacks Supabase Auth user
-  - Workaround: Use dev bypass `?superadmin=dev123`
-  - Fix requires creating auth user in Supabase dashboard
+
+- **Legacy Apps**: Admin and User apps are being migrated to Unified app
+  - Workaround: Use Unified app at port 3001
+  - Legacy apps will be removed after migration completion
 
 ### Quick Access for Development
+
 ```bash
-# Dev Superadmin Access (persists in localStorage)
+# Dev Superadmin Access (bypasses Supabase)
 http://localhost:3001/?superadmin=dev123
+
+# Real Supabase Authentication
+http://localhost:3000/login (use Superadmin Login button)
 
 # Test Authentication
 node test-auth.mjs

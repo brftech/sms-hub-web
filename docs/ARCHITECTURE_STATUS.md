@@ -43,10 +43,13 @@ sms-hub-monorepo/
 - ❌ `apps/docs` - Documentation
 - ❌ `apps/texting` - SMS API backend
 
-### After: 3 Streamlined Apps
+### After: Production Apps + Legacy/Dev
 - ✅ **`apps/web`** (Port 3000) - Marketing site + authentication gateway
 - ✅ **`apps/unified`** (Port 3001) - **ALL authenticated functionality**
+- 🚧 **`apps/texting`** (Port 3002) - Nest.js backend API (in development)
 - ✅ **`apps/api`** - Simple API documentation
+- 📛 **`apps/admin`** - Legacy admin (being migrated)
+- 📛 **`apps/user`** - Legacy user (being migrated)
 
 ## 🔐 Unified Authentication Flow
 

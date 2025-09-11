@@ -12,7 +12,10 @@ sms-hub-monorepo/
 ├── apps/
 │   ├── web/          # Vite React - Marketing site & authentication gateway (port 3000)
 │   ├── unified/      # Vite React - Main authenticated dashboard for all user types (port 3001)
-│   └── api/          # Vite React - API documentation (basic Vite app)
+│   ├── api/          # Vite React - API documentation (basic Vite app)
+│   ├── texting/      # Nest.js - Backend API server (port 3002)
+│   ├── admin/        # Legacy admin app - DEPRECATED, being migrated to unified
+│   └── user/         # Legacy user app - DEPRECATED, being migrated to unified
 ├── packages/
 │   ├── ui/           # Shared React components (styled-components)
 │   ├── types/        # TypeScript types & database types
@@ -20,7 +23,9 @@ sms-hub-monorepo/
 │   ├── supabase/     # Supabase client & queries
 │   ├── utils/        # Shared utilities
 │   ├── hub-logic/    # Hub configuration & business logic
-│   └── sms-auth/     # SMS authentication components/services
+│   ├── sms-auth/     # SMS authentication components/services
+│   ├── services/     # Shared service layer
+│   └── dev-auth/     # Dev authentication utilities
 ├── supabase/
 │   ├── migrations/   # Database schema migrations
 │   └── functions/    # Edge Functions (serverless)
@@ -29,8 +34,8 @@ sms-hub-monorepo/
 ### Technology Stack
 - **Frontend**: React 19.1.0, Vite 5.4.19, TypeScript 5.9.2
 - **Styling**: styled-components 6.1.13 (CSS-in-JS) - NO CSS file imports
-- **Backend**: Supabase (PostgreSQL + Auth + Edge Functions)
-- **Authentication**: Supabase Auth with SMS OTP + real PostgreSQL credentials
+- **Backend**: Supabase (PostgreSQL + Auth + Edge Functions), Nest.js API (port 3002)
+- **Authentication**: Dual-mode - Supabase Auth (email/password + SMS OTP) for production, dev bypass for development
 - **State Management**: React Query (TanStack Query 5.56.2)
 - **Build System**: Turbo, pnpm workspaces
 - **UI Components**: styled-components based components
@@ -41,49 +46,73 @@ sms-hub-monorepo/
 ```sql
 -- Hubs (multi-tenant organizations)
 hubs (
-  id: bigint PRIMARY KEY,
+  hub_number: integer PRIMARY KEY,
   name: text NOT NULL,
-  status: hub_status DEFAULT 'active',
-  settings: jsonb
+  domain: text,
+  is_active: boolean DEFAULT true,
+  created_at: timestamptz,
+  updated_at: timestamptz
 )
 
--- Users (authentication via Supabase Auth)
-users (
+-- User Profiles (linked to Supabase auth.users)
+user_profiles (
   id: uuid PRIMARY KEY REFERENCES auth.users,
-  email: text,
-  phone: text,
-  role: user_role DEFAULT 'user',
-  metadata: jsonb
+  email: text NOT NULL UNIQUE,
+  account_number: text UNIQUE,
+  hub_id: integer REFERENCES hubs(hub_number) NOT NULL,
+  first_name: text,
+  last_name: text,
+  mobile_phone_number: text,
+  role: text DEFAULT 'MEMBER', -- MEMBER, ONBOARDED, ADMIN, SUPERADMIN
+  company_id: uuid REFERENCES companies,
+  customer_id: uuid REFERENCES customers,
+  is_active: boolean DEFAULT true
 )
 
 -- Companies (businesses using the platform)
 companies (
-  id: bigint PRIMARY KEY,
-  hub_id: bigint REFERENCES hubs NOT NULL,
-  name: text NOT NULL,
-  status: company_status DEFAULT 'active'
+  id: uuid PRIMARY KEY,
+  hub_id: integer REFERENCES hubs(hub_number) NOT NULL,
+  public_name: text NOT NULL,
+  legal_name: text,
+  company_account_number: text,
+  customer_id: uuid REFERENCES customers,
+  is_active: boolean DEFAULT true
 )
 
 -- Messages (SMS messages)
 messages (
-  id: bigint PRIMARY KEY,
-  hub_id: bigint REFERENCES hubs NOT NULL,
-  company_id: bigint REFERENCES companies,
-  user_id: uuid REFERENCES users,
-  message_text: text NOT NULL,
-  status: message_status DEFAULT 'pending'
+  id: uuid PRIMARY KEY,
+  hub_id: integer REFERENCES hubs(hub_number) NOT NULL,
+  company_id: uuid REFERENCES companies,
+  campaign_id: uuid REFERENCES campaigns,
+  to_number: text NOT NULL,
+  from_number: text NOT NULL,
+  message_content: text NOT NULL,
+  status: text DEFAULT 'pending'
+)
+
+-- Customers (Stripe integration)
+customers (
+  id: uuid PRIMARY KEY,
+  company_id: uuid REFERENCES companies,
+  user_id: uuid REFERENCES user_profiles,
+  billing_email: text NOT NULL,
+  customer_type: text DEFAULT 'company',
+  hub_id: integer REFERENCES hubs(hub_number) NOT NULL,
+  stripe_customer_id: text UNIQUE
 )
 
 -- Leads (marketing/sales leads)
 leads (
   id: uuid PRIMARY KEY,
-  hub_id: bigint REFERENCES hubs NOT NULL,
-  email: text NOT NULL,
+  hub_id: integer REFERENCES hubs(hub_number) NOT NULL,
+  email: text,
   first_name: text,
   last_name: text,
   company_name: text,
   phone: text,
-  status: lead_status DEFAULT 'new'
+  status: text DEFAULT 'new'
 )
 ```
 

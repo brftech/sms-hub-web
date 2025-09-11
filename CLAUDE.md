@@ -209,6 +209,29 @@ import { getSupabaseClient } from "../lib/supabaseSingleton";
 
 **Solution**: Convert to styled-components - NO CSS files allowed
 
+## 🔐 Security Guidelines
+
+### Frontend Security (CRITICAL)
+
+1. **NEVER expose service role key in frontend**
+   ```typescript
+   // ❌ WRONG - Security breach!
+   const supabase = createClient(url, SERVICE_ROLE_KEY);
+   
+   // ✅ CORRECT - Use anon key only
+   const supabase = createClient(url, ANON_KEY);
+   ```
+
+2. **Admin operations must use backend**
+   - User management → Edge Functions
+   - Role updates → Edge Functions
+   - Cross-hub queries → Edge Functions
+
+3. **Current Security Status**
+   - RLS is currently DISABLED (allows anon key full CRUD)
+   - Manual hub_id filtering required
+   - Service role operations moving to backend
+
 ## 📋 Current Tasks & Priorities
 
 ### Immediate Focus
@@ -325,8 +348,39 @@ http://localhost:3000/login (use Superadmin Login button)
 node test-auth.mjs
 
 # Dev Credentials (auto-populated in dev mode)
-Email: superadmin@sms-hub.com
+Email: superadmin@gnymble.com
 Password: SuperAdmin123!
 ```
+
+## 🔄 Recent Changes (Last Updated: 2025-09-11)
+
+1. **Security Architecture Overhaul**:
+   - Removed `getSupabaseAdminClient` from frontend (security risk)
+   - Frontend now uses ONLY anon key via `getSupabaseClient`
+   - Admin operations being moved to Edge Functions
+   - Service role key never exposed in frontend
+
+2. **Authentication Updates**:
+   - Superadmin email changed to superadmin@gnymble.com
+   - Password login is now the default method
+   - SMS verification available as alternative
+   - Dev bypass persists in localStorage
+
+3. **Database Reset**:
+   - Fresh migration with all 4 hubs (IDs 0-3)
+   - New superadmin user in Gnymble hub
+   - All legacy data cleared
+
+4. **Documentation**:
+   - Added AUTHENTICATION_ARCHITECTURE.md
+   - Updated all docs to reflect current state
+   - Clarified security best practices
+
+### Security Reminders
+
+- **Frontend = Anon Key ONLY**
+- **Admin Operations = Edge Functions/API**
+- **RLS Currently Disabled** (manual hub_id required)
+- **Always Include hub_id** in queries
 
 Remember: You're working on a **production system**. Every change should maintain or improve stability, performance, and user experience. When in doubt, analyze thoroughly before making changes.

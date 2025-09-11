@@ -8,6 +8,7 @@ interface AuthState {
   isLoading: boolean;
   user: UserProfile | null;
   session: any;
+  logout: () => Promise<void>;
 }
 
 export const useAuth = (): AuthState => {
@@ -16,10 +17,32 @@ export const useAuth = (): AuthState => {
     isLoading: true,
     user: null,
     session: null,
+    logout: async () => {},
   });
 
   const supabase = useSupabase();
   const [searchParams] = useSearchParams();
+
+  const logout = async () => {
+    try {
+      // Clear dev bypass if it exists
+      localStorage.removeItem("dev_bypass");
+
+      // Sign out from Supabase
+      await supabase.auth.signOut();
+
+      // Reset auth state
+      setAuthState({
+        isAuthenticated: false,
+        isLoading: false,
+        user: null,
+        session: null,
+        logout,
+      });
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -41,7 +64,7 @@ export const useAuth = (): AuthState => {
             first_name: "Super",
             last_name: "Admin",
             company_id: "00000000-0000-0000-0000-000000000002",
-            company_name: "SMS Hub System",
+            // company_name: "SMS Hub System", // Not in UserProfile interface
             customer_id: "00000000-0000-0000-0000-000000000003",
             hub_id: 1, // PercyTech
             payment_status: "completed",
@@ -73,6 +96,7 @@ export const useAuth = (): AuthState => {
               },
               access_token: "dev-superadmin-token",
             },
+            logout,
           });
           return;
         }
@@ -90,6 +114,7 @@ export const useAuth = (): AuthState => {
             isLoading: false,
             user: null,
             session: null,
+            logout,
           });
           return;
         }
@@ -101,6 +126,7 @@ export const useAuth = (): AuthState => {
             isLoading: false,
             user: null,
             session: null,
+            logout,
           });
           return;
         }
@@ -130,6 +156,7 @@ export const useAuth = (): AuthState => {
               permissions: {},
             } as UserProfile,
             session,
+            logout,
           });
           return;
         }
@@ -141,6 +168,7 @@ export const useAuth = (): AuthState => {
           isLoading: false,
           user: profile as UserProfile,
           session,
+          logout,
         });
       } catch (error) {
         console.error("Auth check error:", error);
@@ -149,6 +177,7 @@ export const useAuth = (): AuthState => {
           isLoading: false,
           user: null,
           session: null,
+          logout,
         });
       }
     };
@@ -184,6 +213,7 @@ export const useAuth = (): AuthState => {
               permissions: {},
             } as UserProfile),
           session,
+          logout,
         });
       } else if (event === "SIGNED_OUT") {
         setAuthState({
@@ -191,6 +221,7 @@ export const useAuth = (): AuthState => {
           isLoading: false,
           user: null,
           session: null,
+          logout,
         });
       }
     });
@@ -200,5 +231,8 @@ export const useAuth = (): AuthState => {
     };
   }, [supabase, searchParams]);
 
-  return authState;
+  return {
+    ...authState,
+    logout,
+  };
 };

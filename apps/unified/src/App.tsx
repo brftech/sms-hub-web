@@ -3,6 +3,7 @@ import { HubProvider, ErrorBoundary } from "@sms-hub/ui";
 import { unifiedEnvironment } from "./config/unifiedEnvironment";
 import SidebarLayout from "./components/layout/SidebarLayout";
 import AdminLayout from "./components/layout/AdminLayout";
+import UserLayout from "./components/layout/UserLayout";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { UserRole } from "./types/roles";
 import ClearAuth from "./pages/ClearAuth";
@@ -172,7 +173,9 @@ function App() {
                             UserRole.SUPERADMIN,
                           ]}
                         >
-                          <UserConversations />
+                          <UserLayout>
+                            <UserConversations />
+                          </UserLayout>
                         </ProtectedRoute>
                       }
                     />
@@ -186,7 +189,9 @@ function App() {
                             UserRole.SUPERADMIN,
                           ]}
                         >
-                          <UserBroadcasts />
+                          <UserLayout>
+                            <UserBroadcasts />
+                          </UserLayout>
                         </ProtectedRoute>
                       }
                     />
@@ -200,7 +205,9 @@ function App() {
                             UserRole.SUPERADMIN,
                           ]}
                         >
-                          <UserPersons />
+                          <UserLayout>
+                            <UserPersons />
+                          </UserLayout>
                         </ProtectedRoute>
                       }
                     />
@@ -214,7 +221,9 @@ function App() {
                             UserRole.SUPERADMIN,
                           ]}
                         >
-                          <UserStatistics />
+                          <UserLayout>
+                            <UserStatistics />
+                          </UserLayout>
                         </ProtectedRoute>
                       }
                     />
@@ -228,7 +237,9 @@ function App() {
                             UserRole.SUPERADMIN,
                           ]}
                         >
-                          <UserSettings />
+                          <UserLayout>
+                            <UserSettings />
+                          </UserLayout>
                         </ProtectedRoute>
                       }
                     />
@@ -242,7 +253,9 @@ function App() {
                             UserRole.SUPERADMIN,
                           ]}
                         >
-                          <UserAccountDetails />
+                          <UserLayout>
+                            <UserAccountDetails />
+                          </UserLayout>
                         </ProtectedRoute>
                       }
                     />

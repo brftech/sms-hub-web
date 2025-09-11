@@ -1,11 +1,5 @@
 import { useState, useEffect } from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@sms-hub/ui";
+import { Card, CardContent } from "@sms-hub/ui";
 import { Button } from "@sms-hub/ui";
 import { Input } from "@sms-hub/ui";
 import { Badge } from "@sms-hub/ui";
@@ -16,17 +10,13 @@ import {
   Plus,
   MoreVertical,
   Building2,
-  User,
   MessageSquare,
   Calendar,
   CheckCircle2,
-  AlertCircle,
   Clock,
   Edit,
-  Trash2,
   Eye,
   ChevronDown,
-  MapPin,
   Zap,
 } from "lucide-react";
 
@@ -198,6 +188,10 @@ export function PhoneNumbers() {
     .sort((a, b) => {
       let aValue = a[sortBy as keyof PhoneNumber];
       let bValue = b[sortBy as keyof PhoneNumber];
+
+      if (aValue === undefined || bValue === undefined) {
+        return 0;
+      }
 
       if (typeof aValue === "string") {
         aValue = aValue.toLowerCase();

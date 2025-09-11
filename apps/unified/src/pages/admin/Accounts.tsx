@@ -1,11 +1,5 @@
 import { useState, useEffect } from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@sms-hub/ui";
+import { Card, CardContent } from "@sms-hub/ui";
 import { Button } from "@sms-hub/ui";
 import { Input } from "@sms-hub/ui";
 import { Badge } from "@sms-hub/ui";
@@ -22,10 +16,7 @@ import {
   MessageSquare,
   Calendar,
   CheckCircle2,
-  AlertCircle,
-  Clock,
   Edit,
-  Trash2,
   Eye,
   ChevronDown,
 } from "lucide-react";

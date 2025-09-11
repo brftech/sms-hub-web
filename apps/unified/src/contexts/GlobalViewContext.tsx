@@ -1,27 +1,38 @@
 // GlobalViewContext for Unified App
-import React, { createContext, useContext, useState, ReactNode } from 'react'
+import React, { createContext, useContext, useState, ReactNode } from "react";
 
 interface GlobalViewContextType {
-  isGlobalView: boolean
-  setIsGlobalView: (value: boolean) => void
+  isGlobalView: boolean;
+  setIsGlobalView: (value: boolean) => void;
+  toggleGlobalView: () => void;
 }
 
-const GlobalViewContext = createContext<GlobalViewContextType | undefined>(undefined)
+const GlobalViewContext = createContext<GlobalViewContextType | undefined>(
+  undefined
+);
 
-export const GlobalViewProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [isGlobalView, setIsGlobalView] = useState(false)
+export const GlobalViewProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
+  const [isGlobalView, setIsGlobalView] = useState(false);
+
+  const toggleGlobalView = () => {
+    setIsGlobalView(!isGlobalView);
+  };
 
   return (
-    <GlobalViewContext.Provider value={{ isGlobalView, setIsGlobalView }}>
+    <GlobalViewContext.Provider
+      value={{ isGlobalView, setIsGlobalView, toggleGlobalView }}
+    >
       {children}
     </GlobalViewContext.Provider>
-  )
-}
+  );
+};
 
 export const useGlobalView = () => {
-  const context = useContext(GlobalViewContext)
+  const context = useContext(GlobalViewContext);
   if (!context) {
-    throw new Error('useGlobalView must be used within a GlobalViewProvider')
+    throw new Error("useGlobalView must be used within a GlobalViewProvider");
   }
-  return context
-}
+  return context;
+};

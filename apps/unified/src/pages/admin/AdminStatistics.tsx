@@ -19,10 +19,8 @@ import {
   Mic,
   Clock,
   CheckCircle2,
-  AlertCircle,
   Download,
   Filter,
-  Calendar,
   Globe,
   DollarSign,
 } from "lucide-react";
@@ -74,7 +72,7 @@ export function AdminStatistics() {
     }, 1000);
 
     return () => clearTimeout(timer);
-  }, [timeRange]);
+  }, []);
 
   const statCards: AdminStatCard[] = [
     {

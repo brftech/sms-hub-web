@@ -1,25 +1,17 @@
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@sms-hub/ui";
+import { Card, CardContent } from "@sms-hub/ui";
 import { Button } from "@sms-hub/ui";
 import { Badge } from "@sms-hub/ui";
 import {
   Mic,
   Phone,
-  Headphones,
-  Volume2,
   Settings,
   Play,
-  Pause,
-  Square,
-  Record,
   Users,
   Clock,
   CheckCircle2,
-  AlertCircle,
   Plus,
   MoreVertical,
-  Edit,
-  Trash2,
   Eye,
 } from "lucide-react";
 
@@ -58,7 +50,12 @@ export function Voice() {
         call_count: 1250,
         duration_minutes: 18750,
         success_rate: 94.2,
-        features: ["Multi-level menu", "Call routing", "Queue management", "Call recording"],
+        features: [
+          "Multi-level menu",
+          "Call routing",
+          "Queue management",
+          "Call recording",
+        ],
         assigned_accounts: 5,
       },
       {
@@ -103,7 +100,11 @@ export function Voice() {
         call_count: 320,
         duration_minutes: 4800,
         success_rate: 98.7,
-        features: ["Voicemail transcription", "Email notifications", "Playback controls"],
+        features: [
+          "Voicemail transcription",
+          "Email notifications",
+          "Playback controls",
+        ],
         assigned_accounts: 12,
       },
     ];
@@ -165,8 +166,12 @@ export function Voice() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Voice Applications</h1>
-            <p className="text-gray-600">Manage voice applications and call systems</p>
+            <h1 className="text-2xl font-bold text-gray-900">
+              Voice Applications
+            </h1>
+            <p className="text-gray-600">
+              Manage voice applications and call systems
+            </p>
           </div>
         </div>
         <div className="flex items-center justify-center h-64">
@@ -181,8 +186,12 @@ export function Voice() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Voice Applications</h1>
-          <p className="text-gray-600">Manage voice applications and call systems</p>
+          <h1 className="text-2xl font-bold text-gray-900">
+            Voice Applications
+          </h1>
+          <p className="text-gray-600">
+            Manage voice applications and call systems
+          </p>
         </div>
         <Button className="bg-orange-500 hover:bg-orange-600 text-white">
           <Plus className="w-4 h-4 mr-2" />
@@ -225,7 +234,9 @@ export function Voice() {
               <div>
                 <p className="text-sm text-gray-600">Total Calls</p>
                 <p className="text-2xl font-bold">
-                  {voiceApps.reduce((sum, app) => sum + app.call_count, 0).toLocaleString()}
+                  {voiceApps
+                    .reduce((sum, app) => sum + app.call_count, 0)
+                    .toLocaleString()}
                 </p>
               </div>
             </div>
@@ -239,7 +250,12 @@ export function Voice() {
               <div>
                 <p className="text-sm text-gray-600">Total Duration</p>
                 <p className="text-2xl font-bold">
-                  {formatDuration(voiceApps.reduce((sum, app) => sum + app.duration_minutes, 0))}
+                  {formatDuration(
+                    voiceApps.reduce(
+                      (sum, app) => sum + app.duration_minutes,
+                      0
+                    )
+                  )}
                 </p>
               </div>
             </div>
@@ -282,15 +298,23 @@ export function Voice() {
                         <h3 className="font-semibold text-gray-900 truncate">
                           {app.name}
                         </h3>
-                        <Badge variant="outline" className={getStatusColor(app.status)}>
+                        <Badge
+                          variant="outline"
+                          className={getStatusColor(app.status)}
+                        >
                           {app.status}
                         </Badge>
-                        <Badge variant="outline" className={getTypeColor(app.type)}>
+                        <Badge
+                          variant="outline"
+                          className={getTypeColor(app.type)}
+                        >
                           {app.type.replace("_", " ").toUpperCase()}
                         </Badge>
                       </div>
 
-                      <p className="text-sm text-gray-600 mb-2">{app.description}</p>
+                      <p className="text-sm text-gray-600 mb-2">
+                        {app.description}
+                      </p>
 
                       <div className="flex items-center space-x-4 text-sm text-gray-500 mb-2">
                         <div className="flex items-center space-x-1">
@@ -314,7 +338,9 @@ export function Voice() {
                         </div>
                         <div className="flex items-center space-x-1">
                           <Clock className="w-4 h-4" />
-                          <span>{formatDuration(app.duration_minutes)} total</span>
+                          <span>
+                            {formatDuration(app.duration_minutes)} total
+                          </span>
                         </div>
                         <div className="flex items-center space-x-1">
                           <CheckCircle2 className="w-4 h-4" />
@@ -324,7 +350,11 @@ export function Voice() {
 
                       <div className="flex items-center space-x-2 mt-2">
                         {app.features.map((feature, index) => (
-                          <Badge key={index} variant="secondary" className="text-xs">
+                          <Badge
+                            key={index}
+                            variant="secondary"
+                            className="text-xs"
+                          >
                             {feature}
                           </Badge>
                         ))}
@@ -361,10 +391,13 @@ export function Voice() {
               <Mic className="w-5 h-5 text-orange-600" />
             </div>
             <div>
-              <h3 className="font-semibold text-orange-900">Voice Applications Coming Soon</h3>
+              <h3 className="font-semibold text-orange-900">
+                Voice Applications Coming Soon
+              </h3>
               <p className="text-sm text-orange-700">
-                Advanced voice management features are currently in development. 
-                This includes IVR systems, call routing, voicemail management, and more.
+                Advanced voice management features are currently in development.
+                This includes IVR systems, call routing, voicemail management,
+                and more.
               </p>
             </div>
           </div>

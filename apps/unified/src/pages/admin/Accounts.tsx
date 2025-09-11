@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@sms-hub/ui";
 import { Button } from "@sms-hub/ui";
-import { Input } from "@sms-hub/ui";
 import { Badge } from "@sms-hub/ui";
 import { useHub } from "@sms-hub/ui";
 import { useGlobalView } from "../../contexts/GlobalViewContext";
@@ -413,10 +412,12 @@ export function Accounts() {
                             <Badge
                               variant="outline"
                               className={getBillingStatusColor(
-                                customer.subscription_status
+                                customer.subscription_status || "unknown"
                               )}
                             >
-                              {customer.subscription_status.replace("_", " ")}
+                              {(
+                                customer.subscription_status || "unknown"
+                              ).replace("_", " ")}
                             </Badge>
                             {customer.subscription_tier && (
                               <Badge
@@ -471,7 +472,10 @@ export function Accounts() {
                             <div className="flex items-center space-x-1">
                               <Calendar className="w-4 h-4" />
                               <span>
-                                Created {getRelativeTime(customer.created_at)}
+                                Created{" "}
+                                {customer.created_at
+                                  ? getRelativeTime(customer.created_at)
+                                  : "Unknown"}
                               </span>
                             </div>
                           </div>

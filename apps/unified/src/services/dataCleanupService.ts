@@ -65,10 +65,7 @@ class DataCleanupService {
 
       const cleanupResults = await Promise.allSettled([
         // Keep companies created before Sept 1, 2025 (delete those created after)
-        this.supabase
-          .from("companies")
-          .delete()
-          .gt("created_at", "2025-09-01"),
+        this.supabase.from("companies").delete().gt("created_at", "2025-09-01"),
 
         this.supabase.from("verifications").delete(),
         this.supabase.from("verification_attempts").delete(),
@@ -148,10 +145,7 @@ class DataCleanupService {
 
       const cleanupResults = await Promise.allSettled([
         // Keep companies created before Sept 1, 2025 (delete those created after)
-        this.supabase
-          .from("companies")
-          .delete()
-          .gt("created_at", "2025-09-01"),
+        this.supabase.from("companies").delete().gt("created_at", "2025-09-01"),
 
         this.supabase.from("verifications").delete(),
         this.supabase.from("verification_attempts").delete(),
@@ -265,7 +259,9 @@ class DataCleanupService {
             }
           } else {
             // Delete all records from other tables
-            const { error } = await this.supabase.from(tableName).delete();
+            const { error } = await this.supabase
+              .from(tableName as any)
+              .delete();
 
             if (error) {
               console.error(`Failed to delete from ${tableName}:`, error);
@@ -317,5 +313,5 @@ export const dataCleanupService = {
       _dataCleanupService = new DataCleanupService();
     }
     return _dataCleanupService;
-  }
+  },
 };

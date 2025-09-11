@@ -45,7 +45,7 @@ export function Broadcasts() {
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [timeRange, setTimeRange] = useState<string>("30d");
+  const [timeRange] = useState<string>("30d");
 
   // Mock data for now - will be replaced with actual API calls
   useEffect(() => {

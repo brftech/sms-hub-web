@@ -98,9 +98,7 @@ const messageColumns = [
   {
     accessorKey: "cost",
     header: "Cost",
-    cell: ({ row }: { row: { original: Message } }) => (
-      <div className="text-sm font-mono">'--'</div>
-    ),
+    cell: () => <div className="text-sm font-mono">'--'</div>,
   },
 ];
 

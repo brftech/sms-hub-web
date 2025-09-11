@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback } from "react";
 import { UserProfile, UserRole } from "../types/roles";
 import { useSupabase } from "../providers/SupabaseProvider";
 import { useSearchParams } from "react-router-dom";
-import { getAuthConfig, validateDevAuthConfig } from "@sms-hub/dev-auth";
 import { logger } from "../utils/logger";
 
 interface AuthState {
@@ -35,7 +34,7 @@ export const useAuth = (): AuthState => {
       await supabase.auth.signOut();
 
       // Reset auth state
-      setAuthState(prevState => ({
+      setAuthState((prevState) => ({
         ...prevState,
         isAuthenticated: false,
         isLoading: false,
@@ -50,65 +49,66 @@ export const useAuth = (): AuthState => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        // Get auth configuration
-        const authConfig = getAuthConfig();
-        const isDevelopment = import.meta.env.MODE === 'development';
-        
+        const isDevelopment = import.meta.env.MODE === "development";
+
         // Check for dev bypass only in development
         if (isDevelopment) {
           // Quick hardcoded check for immediate use
-          const devBypass = superadminParam || localStorage.getItem("dev_bypass");
-          
+          const devBypass =
+            superadminParam || localStorage.getItem("dev_bypass");
+
           // Accept either the old dev123 or the new secure token
-          if (devBypass === "dev123" || devBypass === "ZT6LyVWLAWNSSqJgkaqTKj/orJ0i9pZHNm7d0qyL3l") {
+          if (
+            devBypass === "dev123" ||
+            devBypass === "ZT6LyVWLAWNSSqJgkaqTKj/orJ0i9pZHNm7d0qyL3l"
+          ) {
             logger.auth("Dev superadmin bypass activated");
-            
+
             // Store in localStorage for persistence
             localStorage.setItem("dev_bypass", devBypass);
 
             // Create mock superadmin user
             const mockSuperadmin: UserProfile = {
-            id: "00000000-0000-0000-0000-000000000001",
-            email: "superadmin@sms-hub.com",
-            mobile_phone_number: "+15551234567",
-            first_name: "Super",
-            last_name: "Admin",
-            company_id: "00000000-0000-0000-0000-000000000002",
-            // company_name: "SMS Hub System", // Not in UserProfile interface
-            customer_id: "00000000-0000-0000-0000-000000000003",
-            hub_id: 1, // PercyTech
-            payment_status: "completed",
-            onboarding_completed: true,
-            verification_setup_completed: true,
-            is_active: true,
-            role: UserRole.SUPERADMIN,
-            account_number: "PERCY-SA001",
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-            signup_type: "email",
-            permissions: {
-              can_manage_users: true,
-              can_manage_companies: true,
-              can_manage_billing: true,
-              can_view_analytics: true,
-              can_manage_system: true,
-            },
-          };
+              id: "00000000-0000-0000-0000-000000000001",
+              email: "superadmin@sms-hub.com",
+              mobile_phone_number: "+15551234567",
+              first_name: "Super",
+              last_name: "Admin",
+              company_id: "00000000-0000-0000-0000-000000000002",
+              // company_name: "SMS Hub System", // Not in UserProfile interface
+              company_admin: true,
+              hub_id: 1, // PercyTech
+              payment_status: "completed",
+              onboarding_completed: true,
+              verification_setup_completed: true,
+              role: UserRole.SUPERADMIN,
+              account_number: "PERCY-SA001",
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+              signup_type: "email",
+              permissions: {
+                can_manage_users: true,
+                can_manage_companies: true,
+                can_manage_billing: true,
+                can_view_analytics: true,
+                can_manage_system: true,
+              },
+            };
 
-              setAuthState({
-                isAuthenticated: true,
-                isLoading: false,
-                user: mockSuperadmin,
-                session: {
-                  user: {
-                    id: mockSuperadmin.id,
-                    email: mockSuperadmin.email,
-                  },
-                  access_token: "dev-superadmin-token",
+            setAuthState({
+              isAuthenticated: true,
+              isLoading: false,
+              user: mockSuperadmin,
+              session: {
+                user: {
+                  id: mockSuperadmin.id,
+                  email: mockSuperadmin.email,
                 },
-                logout,
-              });
-              return;
+                access_token: "dev-superadmin-token",
+              },
+              logout,
+            });
+            return;
           }
         }
 
@@ -183,7 +183,7 @@ export const useAuth = (): AuthState => {
         });
       } catch (error) {
         logger.error("Auth check error:", error);
-        setAuthState(prevState => ({
+        setAuthState((prevState) => ({
           ...prevState,
           isAuthenticated: false,
           isLoading: false,
@@ -209,7 +209,7 @@ export const useAuth = (): AuthState => {
           .eq("id", session.user.id)
           .single();
 
-        setAuthState(prevState => ({
+        setAuthState((prevState) => ({
           ...prevState,
           isAuthenticated: true,
           isLoading: false,
@@ -227,7 +227,7 @@ export const useAuth = (): AuthState => {
           session,
         }));
       } else if (event === "SIGNED_OUT") {
-        setAuthState(prevState => ({
+        setAuthState((prevState) => ({
           ...prevState,
           isAuthenticated: false,
           isLoading: false,

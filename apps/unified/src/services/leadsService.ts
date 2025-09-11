@@ -85,8 +85,8 @@ class LeadsService {
         full_name: this.getFullName(lead),
         contact_info: this.getContactInfo(lead),
         lead_age: this.getLeadAge(lead),
-        status_color: this.getStatusColor(lead.status),
-        priority_color: this.getPriorityColor(lead.priority),
+        status_color: this.getStatusColor(lead.status || "new"),
+        priority_color: this.getPriorityColor(lead.priority || "medium"),
       })) as unknown as Lead[];
 
       // Apply search filter after fetching
@@ -135,8 +135,8 @@ class LeadsService {
         full_name: this.getFullName(data),
         contact_info: this.getContactInfo(data),
         lead_age: this.getLeadAge(data),
-        status_color: this.getStatusColor(data.status),
-        priority_color: this.getPriorityColor(data.priority),
+        status_color: this.getStatusColor(data.status || "new"),
+        priority_color: this.getPriorityColor(data.priority || "medium"),
       } as unknown as Lead;
     } catch (error) {
       console.error("Error in getLeadById:", error);
@@ -170,8 +170,8 @@ class LeadsService {
         full_name: this.getFullName(data),
         contact_info: this.getContactInfo(data),
         lead_age: this.getLeadAge(data),
-        status_color: this.getStatusColor(data.status),
-        priority_color: this.getPriorityColor(data.priority),
+        status_color: this.getStatusColor(data.status || "new"),
+        priority_color: this.getPriorityColor(data.priority || "medium"),
       } as unknown as Lead;
     } catch (error) {
       console.error("Error in createLead:", error);
@@ -206,8 +206,8 @@ class LeadsService {
         full_name: this.getFullName(data),
         contact_info: this.getContactInfo(data),
         lead_age: this.getLeadAge(data),
-        status_color: this.getStatusColor(data.status),
-        priority_color: this.getPriorityColor(data.priority),
+        status_color: this.getStatusColor(data.status || "new"),
+        priority_color: this.getPriorityColor(data.priority || "medium"),
       } as unknown as Lead;
     } catch (error) {
       console.error("Error in updateLead:", error);

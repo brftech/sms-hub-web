@@ -3,28 +3,28 @@ import { getSupabaseClient } from "../lib/supabaseSingleton";
 export interface PhoneNumber {
   id: string;
   hub_id: number;
-  company_id?: string;
+  company_id: string | null;
   phone_number: string;
-  assigned_to_campaign: boolean;
+  assigned_to_campaign: string | null;
   campaign_id?: string;
-  created_at: string;
-  updated_at: string;
+  created_at: string | null;
+  updated_at: string | null;
   // Joined data
-  company?: {
+  company: {
     id: string;
     public_name: string;
-    legal_name?: string;
-    company_account_number?: string;
-  };
+    legal_name: string | null;
+    company_account_number: string;
+  } | null;
   hub?: {
     hub_number: number;
     name: string;
   };
-  campaign?: {
+  campaign: {
     id: string;
     name: string;
-    status?: string;
-  };
+    status: string | null;
+  } | null;
   // Computed fields for display
   formatted_number?: string;
   status?: "available" | "assigned" | "reserved" | "suspended";
@@ -45,8 +45,8 @@ export interface PhoneNumber {
 export interface PhoneNumberFilters {
   search?: string;
   hub_id?: number;
-  company_id?: string;
-  assigned_to_campaign?: boolean;
+  company_id?: string | null;
+  assigned_to_campaign?: string | null;
   campaign_id?: string;
   limit?: number;
 }
@@ -87,7 +87,14 @@ class PhoneNumbersService {
       }
 
       if (filters.assigned_to_campaign !== undefined) {
-        query = query.eq("assigned_to_campaign", filters.assigned_to_campaign);
+        if (filters.assigned_to_campaign === null) {
+          query = query.is("assigned_to_campaign", null);
+        } else {
+          query = query.eq(
+            "assigned_to_campaign",
+            filters.assigned_to_campaign
+          );
+        }
       }
 
       if (filters.campaign_id) {
@@ -119,7 +126,10 @@ class PhoneNumbersService {
         country: "US", // Default for now
         assigned_to: phone.company?.public_name,
         assigned_account: phone.company?.company_account_number,
-        assigned_at: phone.assigned_to_campaign ? phone.created_at : undefined,
+        assigned_at:
+          phone.assigned_to_campaign && phone.created_at
+            ? phone.created_at
+            : undefined,
         last_used: undefined, // TODO: Calculate from messages
         message_count: 0, // TODO: Calculate from messages table
         capabilities: ["SMS", "Voice", "MMS"], // Default capabilities
@@ -189,7 +199,10 @@ class PhoneNumbersService {
         country: "US",
         assigned_to: data.company?.public_name,
         assigned_account: data.company?.company_account_number,
-        assigned_at: data.assigned_to_campaign ? data.created_at : undefined,
+        assigned_at:
+          data.assigned_to_campaign && data.created_at
+            ? data.created_at
+            : undefined,
         last_used: undefined,
         message_count: 0,
         capabilities: ["SMS", "Voice", "MMS"],
@@ -208,7 +221,14 @@ class PhoneNumbersService {
     try {
       const { data, error } = await this.supabase
         .from("phone_numbers")
-        .insert([phoneData])
+        .insert([
+          {
+            id: phoneData.id || crypto.randomUUID(),
+            hub_id: phoneData.hub_id || 1,
+            phone_number: phoneData.phone_number || "",
+            ...phoneData,
+          },
+        ])
         .select(
           `
           *,
@@ -246,7 +266,10 @@ class PhoneNumbersService {
         country: "US",
         assigned_to: data.company?.public_name,
         assigned_account: data.company?.company_account_number,
-        assigned_at: data.assigned_to_campaign ? data.created_at : undefined,
+        assigned_at:
+          data.assigned_to_campaign && data.created_at
+            ? data.created_at
+            : undefined,
         last_used: undefined,
         message_count: 0,
         capabilities: ["SMS", "Voice", "MMS"],
@@ -305,7 +328,10 @@ class PhoneNumbersService {
         country: "US",
         assigned_to: data.company?.public_name,
         assigned_account: data.company?.company_account_number,
-        assigned_at: data.assigned_to_campaign ? data.created_at : undefined,
+        assigned_at:
+          data.assigned_to_campaign && data.created_at
+            ? data.created_at
+            : undefined,
         last_used: undefined,
         message_count: 0,
         capabilities: ["SMS", "Voice", "MMS"],

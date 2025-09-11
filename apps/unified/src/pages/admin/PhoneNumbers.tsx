@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@sms-hub/ui";
 import { Button, Badge, useHub } from "@sms-hub/ui";
-import { Input } from "@sms-hub/ui";
 import { useGlobalView } from "../../contexts/GlobalViewContext";
 import {
   phoneNumbersService,

@@ -5,18 +5,18 @@ import { logger } from "./logger";
  * Tables that require hub_id for multi-tenant isolation
  */
 const HUB_ISOLATED_TABLES = [
-  'companies',
-  'user_profiles',
-  'verifications',
-  'leads',
-  'contacts',
-  'messages',
-  'conversations',
-  'gphone_numbers',
-  'inbox_assignments',
+  "companies",
+  "user_profiles",
+  "verifications",
+  "leads",
+  "contacts",
+  "messages",
+  "conversations",
+  "gphone_numbers",
+  "inbox_assignments",
 ] as const;
 
-type HubIsolatedTable = typeof HUB_ISOLATED_TABLES[number];
+type HubIsolatedTable = (typeof HUB_ISOLATED_TABLES)[number];
 
 /**
  * Check if a table requires hub_id isolation
@@ -39,54 +39,57 @@ export function createSecureQuery<T extends Record<string, any>>(
   }
 ) {
   const { requireHub = true, isGlobalQuery = false } = options || {};
-  
+
   // Start the query
-  let query = supabase.from(table);
-  
+  let query = supabase.from(table as any);
+
   // Check if this table requires hub isolation
   if (requiresHubId(table) && !isGlobalQuery) {
     if (hubId === undefined && requireHub) {
-      logger.error(`Security Warning: Query to "${table}" table missing hub_id!`, {
-        table,
-        stack: new Error().stack
-      });
+      logger.error(
+        `Security Warning: Query to "${table}" table missing hub_id!`,
+        {
+          table,
+          stack: new Error().stack,
+        }
+      );
       throw new Error(`Hub ID is required for queries to ${table} table`);
     }
-    
+
     if (hubId !== undefined) {
       // Apply hub filter for SELECT queries
       query = query as any;
       return {
         select: (...args: any[]) => {
           const selectQuery = (query as any).select(...args);
-          return selectQuery.eq('hub_id', hubId);
+          return selectQuery.eq("hub_id", hubId);
         },
         insert: (data: T | T[]) => {
           // Ensure hub_id is included in insert data
-          const dataWithHub = Array.isArray(data) 
-            ? data.map(item => ({ ...item, hub_id: hubId }))
+          const dataWithHub = Array.isArray(data)
+            ? data.map((item) => ({ ...item, hub_id: hubId }))
             : { ...data, hub_id: hubId };
           return (query as any).insert(dataWithHub);
         },
         update: (data: Partial<T>) => {
           // For updates, we need to filter by hub_id
-          return (query as any).update(data).eq('hub_id', hubId);
+          return (query as any).update(data).eq("hub_id", hubId);
         },
         delete: () => {
           // For deletes, we need to filter by hub_id
-          return (query as any).delete().eq('hub_id', hubId);
+          return (query as any).delete().eq("hub_id", hubId);
         },
         upsert: (data: T | T[]) => {
           // Ensure hub_id is included in upsert data
           const dataWithHub = Array.isArray(data)
-            ? data.map(item => ({ ...item, hub_id: hubId }))
+            ? data.map((item) => ({ ...item, hub_id: hubId }))
             : { ...data, hub_id: hubId };
           return (query as any).upsert(dataWithHub);
-        }
+        },
       };
     }
   }
-  
+
   // Return normal query for non-hub-isolated tables or global queries
   return query;
 }
@@ -111,7 +114,7 @@ export function ensureHubId<T extends Record<string, any>>(
   hubId: number,
   table: string
 ): T & { hub_id?: number } {
-  if (requiresHubId(table) && !('hub_id' in data)) {
+  if (requiresHubId(table) && !("hub_id" in data)) {
     return { ...data, hub_id: hubId };
   }
   return data;
@@ -119,14 +122,14 @@ export function ensureHubId<T extends Record<string, any>>(
 
 /**
  * Example usage:
- * 
+ *
  * // In a service:
  * const query = createSecureQuery(supabase, 'companies', userHubId);
  * const companies = await query.select('*').eq('is_active', true);
- * 
+ *
  * // For inserts:
  * await query.insert({ name: 'New Company', ... }); // hub_id automatically added
- * 
+ *
  * // For global queries (superadmin only):
  * const globalQuery = createSecureQuery(supabase, 'companies', undefined, { isGlobalQuery: true });
  * const allCompanies = await globalQuery.select('*');

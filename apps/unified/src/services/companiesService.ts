@@ -26,7 +26,6 @@ export interface Company {
   billing_address?: any | null;
   stripe_customer_id?: string | null;
   subscription_status?: string | null;
-  subscription_tier?: string | null;
   is_active?: boolean | null;
   account_onboarding_step?: string | null;
   created_by_profile_id?: string | null;
@@ -79,7 +78,6 @@ class CompaniesService {
     is_active?: boolean;
     industry?: string;
     size?: string;
-    subscription_tier?: string;
     search?: string;
     limit?: number;
     offset?: number;
@@ -104,10 +102,6 @@ class CompaniesService {
 
     if (options?.size && options.size !== "all") {
       query = query.eq("size", options.size);
-    }
-
-    if (options?.subscription_tier && options.subscription_tier !== "all") {
-      query = query.eq("subscription_tier", options.subscription_tier);
     }
 
     if (options?.search) {
@@ -178,11 +172,9 @@ class CompaniesService {
     });
 
     // Calculate subscription tier distribution
-    companies.forEach((company) => {
-      const tier = company.subscription_tier || "Unknown";
-      stats.bySubscriptionTier[tier] =
-        (stats.bySubscriptionTier[tier] || 0) + 1;
-    });
+    // Note: subscription_tier is in customers table, not companies table
+    // All companies are marked as "Unknown" for subscription tier
+    stats.bySubscriptionTier["Unknown"] = companies.length;
 
     return stats;
   }
@@ -258,23 +250,7 @@ class CompaniesService {
     return [...new Set(sizes)]; // Remove duplicates
   }
 
-  async getUniqueSubscriptionTiers(): Promise<string[]> {
-    const { data, error } = await this.supabase
-      .from("companies")
-      .select("subscription_tier")
-      .not("subscription_tier", "is", null);
-
-    if (error) {
-      console.error("Error fetching subscription tiers:", error);
-      return [];
-    }
-
-    const tiers =
-      data
-        ?.map((item) => item.subscription_tier)
-        .filter((tier): tier is string => tier !== null) || [];
-    return [...new Set(tiers)]; // Remove duplicates
-  }
+  // Note: subscription_tier is in customers table, not companies table
 
   // Global methods for fetching data across all hubs
   async getGlobalCompanyStats(): Promise<CompanyStats> {
@@ -310,11 +286,9 @@ class CompaniesService {
       });
 
       // Calculate subscription tier distribution
-      companies?.forEach((company) => {
-        const tier = company.subscription_tier || "Unknown";
-        stats.bySubscriptionTier[tier] =
-          (stats.bySubscriptionTier[tier] || 0) + 1;
-      });
+      // Note: subscription_tier is in customers table, not companies table
+      // All companies are marked as "Unknown" for subscription tier
+      stats.bySubscriptionTier["Unknown"] = companies?.length || 0;
 
       return stats;
     } catch (error) {
@@ -359,23 +333,7 @@ class CompaniesService {
     return [...new Set(sizes)]; // Remove duplicates
   }
 
-  async getGlobalUniqueSubscriptionTiers(): Promise<string[]> {
-    const { data, error } = await this.supabase
-      .from("companies")
-      .select("subscription_tier")
-      .not("subscription_tier", "is", null);
-
-    if (error) {
-      console.error("Error fetching global subscription tiers:", error);
-      return [];
-    }
-
-    const tiers =
-      data
-        ?.map((item) => item.subscription_tier)
-        .filter((tier): tier is string => tier !== null) || [];
-    return [...new Set(tiers)]; // Remove duplicates
-  }
+  // Note: subscription_tier is in customers table, not companies table
 
   // Update company onboarding step
   async updateCompanyOnboardingStep(
@@ -396,23 +354,33 @@ class CompaniesService {
       return { success: true };
     } catch (error) {
       console.error("Error updating company onboarding step:", error);
-      return { 
-        success: false, 
-        error: error instanceof Error ? error.message : "Unknown error" 
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
       };
     }
   }
 
   // Create a new company
-  async createCompany(company: Partial<Company>): Promise<{ success: boolean; data?: Company; error?: string }> {
+  async createCompany(
+    company: Partial<Company>
+  ): Promise<{ success: boolean; data?: Company; error?: string }> {
     try {
       const { data, error } = await this.supabase
         .from("companies")
-        .insert([{
-          ...company,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        }])
+        .insert([
+          {
+            id: company.id || crypto.randomUUID(),
+            hub_id: company.hub_id || 1,
+            public_name: company.public_name || "Unnamed Company",
+            company_account_number:
+              company.company_account_number || `COMP-${Date.now()}`,
+            billing_email: company.billing_email || "billing@example.com",
+            ...company,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          },
+        ])
         .select()
         .single();
 
@@ -424,9 +392,9 @@ class CompaniesService {
       return { success: true, data: data as Company };
     } catch (error) {
       console.error("Error creating company:", error);
-      return { 
-        success: false, 
-        error: error instanceof Error ? error.message : "Unknown error" 
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
       };
     }
   }
@@ -453,15 +421,17 @@ class CompaniesService {
       return { success: true };
     } catch (error) {
       console.error("Error updating company:", error);
-      return { 
-        success: false, 
-        error: error instanceof Error ? error.message : "Unknown error" 
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
       };
     }
   }
 
   // Delete a company
-  async deleteCompany(companyId: string): Promise<{ success: boolean; error?: string }> {
+  async deleteCompany(
+    companyId: string
+  ): Promise<{ success: boolean; error?: string }> {
     try {
       const { error } = await this.supabase
         .from("companies")
@@ -476,9 +446,9 @@ class CompaniesService {
       return { success: true };
     } catch (error) {
       console.error("Error deleting company:", error);
-      return { 
-        success: false, 
-        error: error instanceof Error ? error.message : "Unknown error" 
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
       };
     }
   }
@@ -514,5 +484,5 @@ export const companiesService = {
       _companiesService = new CompaniesService();
     }
     return _companiesService;
-  }
+  },
 };

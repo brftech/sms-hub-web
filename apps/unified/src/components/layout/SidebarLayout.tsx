@@ -13,7 +13,6 @@ import {
   hasAnyRole,
 } from "../../utils/roleUtils";
 import { UserRole } from "../../types/roles";
-import { navigationCountsService } from "../../services/navigationCountsService";
 import {
   Users,
   MessageSquare,
@@ -29,23 +28,10 @@ import {
   BarChart3,
 } from "lucide-react";
 
-interface NavigationCounts {
-  companies: number;
-  users: number;
-  verifications: number;
-  leads: number;
-}
-
 const SidebarLayout: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [counts, setCounts] = useState<NavigationCounts>({
-    companies: 0,
-    users: 0,
-    verifications: 0,
-    leads: 0,
-  });
   const [searchQuery, setSearchQuery] = useState("");
 
   const { user, isAuthenticated } = useAuth();
@@ -126,23 +112,7 @@ const SidebarLayout: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     if (!isAdmin) return;
 
-    const fetchCounts = async () => {
-      try {
-        const hubId = typeof hubConfig?.id === "number" ? hubConfig.id : 1;
-        const newCounts = await navigationCountsService.getCounts(
-          hubId,
-          isGlobalView
-        );
-        setCounts(newCounts);
-      } catch (error) {
-        console.error("Error fetching navigation counts:", error);
-      }
-    };
-
-    fetchCounts();
-    // Refresh counts every 30 seconds
-    const interval = setInterval(fetchCounts, 30000);
-    return () => clearInterval(interval);
+    // TODO: Implement navigation counts functionality
   }, [isAdmin, hubConfig, isGlobalView]);
 
   const handleLogout = async () => {

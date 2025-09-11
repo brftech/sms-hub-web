@@ -2,25 +2,25 @@ import { getSupabaseClient } from "../lib/supabaseSingleton";
 
 export interface Customer {
   id: string;
-  company_id: string;
-  user_id?: string;
+  company_id: string | null;
+  user_id: string | null;
   billing_email: string;
   customer_type: string;
   hub_id: number;
-  stripe_customer_id?: string;
-  subscription_status: string;
-  subscription_tier?: string;
-  is_active: boolean;
-  trial_ends_at?: string;
-  created_at: string;
-  updated_at: string;
+  stripe_customer_id: string | null;
+  subscription_status: string | null;
+  subscription_tier: string | null;
+  is_active: boolean | null;
+  trial_ends_at: string | null;
+  created_at: string | null;
+  updated_at: string | null;
   // Joined data
-  company?: {
+  company: {
     id: string;
     public_name: string;
-    legal_name?: string;
-    company_account_number?: string;
-  };
+    legal_name: string | null;
+    company_account_number: string;
+  } | null;
   hub?: {
     hub_number: number;
     name: string;
@@ -159,7 +159,15 @@ class CustomersService {
     try {
       const { data, error } = await this.supabase
         .from("customers")
-        .insert([customerData])
+        .insert([
+          {
+            id: customerData.id || crypto.randomUUID(),
+            hub_id: customerData.hub_id || 1,
+            billing_email: customerData.billing_email || "billing@example.com",
+            customer_type: customerData.customer_type || "individual",
+            ...customerData,
+          },
+        ])
         .select(
           `
           *,

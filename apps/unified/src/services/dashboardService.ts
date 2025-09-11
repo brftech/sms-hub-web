@@ -136,8 +136,9 @@ class DashboardService {
       const totalVerifications = verificationsData?.length || 0;
       // Count verifications that haven't been verified (no associated user created)
       const pendingVerifications =
-        verificationsData?.filter((verification) => !verification.verification_sent_at)
-          .length || 0;
+        verificationsData?.filter(
+          (verification) => !verification.verification_sent_at
+        ).length || 0;
 
       // Get messages stats (mock for now since we don't have a messages table)
       const totalMessages = 15420; // Mock data
@@ -272,7 +273,9 @@ class DashboardService {
             type: "user_signup",
             title: "New user signed up",
             description: `${user.first_name || "User"} ${user.last_name || ""} joined the platform`,
-            time: this.getTimeAgo(user.created_at),
+            time: user.created_at
+              ? this.getTimeAgo(user.created_at)
+              : "Unknown",
             icon: "UserPlus",
             color: "text-blue-600",
           });
@@ -295,7 +298,9 @@ class DashboardService {
             type: "company_created",
             title: "New company created",
             description: `${company.public_name} was added`,
-            time: this.getTimeAgo(company.created_at),
+            time: company.created_at
+              ? this.getTimeAgo(company.created_at)
+              : "Unknown",
             icon: "Building",
             color: "text-green-600",
           });
@@ -318,7 +323,9 @@ class DashboardService {
               type: "lead_converted",
               title: "Lead converted",
               description: `Lead ${lead.first_name} ${lead.last_name} converted to user`,
-              time: this.getTimeAgo(lead.created_at),
+              time: lead.created_at
+                ? this.getTimeAgo(lead.created_at)
+                : "Unknown",
               icon: "CheckCircle",
               color: "text-purple-600",
             });
@@ -504,9 +511,9 @@ class DashboardService {
 
       // Since account_onboarding_step doesn't exist, we'll estimate based on payment_status
       companies?.forEach((company) => {
-        if (company.payment_status === 'completed') {
+        if (company.payment_status === "completed") {
           stageCounts.completed++;
-        } else if (company.payment_status === 'processing') {
+        } else if (company.payment_status === "processing") {
           stageCounts.payment++;
         } else {
           stageCounts.authentication++;
@@ -557,9 +564,9 @@ class DashboardService {
         companies?.map((company) => {
           // Estimate stage based on payment_status
           let stage = "authentication";
-          if (company.payment_status === 'completed') {
+          if (company.payment_status === "completed") {
             stage = "completed";
-          } else if (company.payment_status === 'processing') {
+          } else if (company.payment_status === "processing") {
             stage = "payment";
           }
           const stageOrder = [
@@ -600,9 +607,10 @@ class DashboardService {
             name: company.public_name || "Unnamed Company",
             currentStage: stage,
             stageProgress: progress,
-            lastActivity: this.getTimeAgo(
+            lastActivity:
               company.updated_at || company.created_at
-            ),
+                ? this.getTimeAgo(company.updated_at || company.created_at!)
+                : "Unknown",
             status,
             nextAction,
           };
@@ -637,9 +645,9 @@ class DashboardService {
         companies?.map((company) => {
           // Estimate stage based on payment_status
           let stage = "authentication";
-          if (company.payment_status === 'completed') {
+          if (company.payment_status === "completed") {
             stage = "completed";
-          } else if (company.payment_status === 'processing') {
+          } else if (company.payment_status === "processing") {
             stage = "payment";
           }
           const stageOrder = [
@@ -689,9 +697,10 @@ class DashboardService {
             name: `${company.public_name || "Unnamed Company"} (${hubName})`,
             currentStage: stage,
             stageProgress: progress,
-            lastActivity: this.getTimeAgo(
+            lastActivity:
               company.updated_at || company.created_at
-            ),
+                ? this.getTimeAgo(company.updated_at || company.created_at!)
+                : "Unknown",
             status,
             nextAction,
           };
@@ -726,9 +735,9 @@ class DashboardService {
 
       // Since account_onboarding_step doesn't exist, we'll estimate based on payment_status
       companies?.forEach((company) => {
-        if (company.payment_status === 'completed') {
+        if (company.payment_status === "completed") {
           stageCounts.completed++;
-        } else if (company.payment_status === 'processing') {
+        } else if (company.payment_status === "processing") {
           stageCounts.payment++;
         } else {
           stageCounts.authentication++;
@@ -816,7 +825,9 @@ class DashboardService {
 
       // Get verifications count by hub
       const { data: verificationsData, error: verificationsError } =
-        await this.supabase.from("verifications").select("hub_id, verification_sent_at");
+        await this.supabase
+          .from("verifications")
+          .select("hub_id, verification_sent_at");
 
       if (!verificationsError && verificationsData) {
         verificationsData.forEach((verification) => {
@@ -845,5 +856,5 @@ export const dashboardService = {
       _dashboardService = new DashboardService();
     }
     return _dashboardService;
-  }
+  },
 };

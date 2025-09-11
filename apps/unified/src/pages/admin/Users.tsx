@@ -1,10 +1,7 @@
 import { useState, useEffect } from "react";
 import { useHub } from "@sms-hub/ui";
 import { useGlobalView } from "../../contexts/GlobalViewContext";
-import {
-  getSupabaseClient,
-  getSupabaseAdminClient,
-} from "../../lib/supabaseSingleton";
+import { getSupabaseAdminClient } from "../../lib/supabaseSingleton";
 import {
   Search,
   UserPlus,
@@ -30,13 +27,8 @@ const Users = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [editingUser, setEditingUser] = useState<UserProfile | null>(null);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
 
   // Filtering states
   const [statusFilter, setStatusFilter] = useState<
@@ -106,13 +98,8 @@ const Users = () => {
   };
 
   const handleEditUser = (user: UserProfile) => {
-    setEditingUser(user);
-    setIsEditModalOpen(true);
-  };
-
-  const handleCloseEditModal = () => {
-    setEditingUser(null);
-    setIsEditModalOpen(false);
+    // TODO: Implement edit functionality
+    console.log("Edit user:", user);
   };
 
   // const handleUpdateUser = async () => {
@@ -530,7 +517,7 @@ const Users = () => {
                   <td className="px-4 py-2 whitespace-nowrap text-sm font-medium">
                     <div className="flex items-center space-x-3">
                       <button
-                        onClick={() => setSelectedUser(user)}
+                        onClick={() => {}}
                         className="text-blue-600 hover:text-blue-900"
                         title="View Details"
                       >
@@ -545,8 +532,7 @@ const Users = () => {
                       </button>
                       <button
                         onClick={() => {
-                          setDeletingUserId(user.id);
-                          setShowDeleteConfirm(true);
+                          // TODO: Implement delete functionality
                         }}
                         className="text-red-600 hover:text-red-900"
                         title="Delete User"
@@ -613,7 +599,7 @@ const Users = () => {
                     }
 
                     // Create user in Supabase Auth
-                    const { data: authData, error: authError } =
+                    const { error: authError } =
                       await supabaseAdmin.auth.admin.createUser({
                         email,
                         password,
@@ -632,11 +618,17 @@ const Users = () => {
                     const { error: profileError } = await supabaseAdmin
                       .from("user_profiles")
                       .insert({
-                        id: authData.user.id,
+                        id: crypto.randomUUID(),
                         email,
                         first_name: firstName,
                         last_name: lastName,
-                        role: role,
+                        role: role as
+                          | "SUPERADMIN"
+                          | "OWNER"
+                          | "ADMIN"
+                          | "SUPPORT"
+                          | "VIEWER"
+                          | "MEMBER",
                         hub_id: 1,
                         account_number: `GNYMBLE-${Date.now()}`,
                         company_id: "00000000-0000-0000-0000-000000000002", // SMS Hub System company

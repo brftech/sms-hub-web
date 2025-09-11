@@ -117,8 +117,7 @@ export function Login() {
     if (devAuth.isInitialized && devAuth.isSuperadmin) {
       console.log("Dev superadmin mode active - redirecting from login");
       const redirectUrl =
-        searchParams.get("redirect") ||
-        "http://localhost:3001/dashboard";
+        searchParams.get("redirect") || "http://localhost:3001/dashboard";
       window.location.href = redirectUrl;
     }
   }, [devAuth.isInitialized, devAuth.isSuperadmin, searchParams]);
@@ -188,6 +187,16 @@ export function Login() {
           throw new Error("Failed to initialize Supabase client");
         }
 
+        console.log("Attempting login with:", {
+          email,
+          password: password.substring(0, 3) + "***",
+        });
+        console.log("Supabase URL:", import.meta.env.VITE_SUPABASE_URL);
+        console.log(
+          "Supabase Key (first 20 chars):",
+          import.meta.env.VITE_SUPABASE_ANON_KEY?.substring(0, 20)
+        );
+
         const { data, error: signInError } =
           await supabase.auth.signInWithPassword({
             email,
@@ -196,15 +205,25 @@ export function Login() {
 
         if (signInError) throw signInError;
 
-        // Update last login method
+        // Update last login method (with error handling)
         if (data.user) {
-          await supabase
-            .from("user_profiles")
-            .update({
-              last_login_method: "password",
-              updated_at: new Date().toISOString(),
-            })
-            .eq("id", data.user.id);
+          try {
+            const { error: updateError } = await supabase
+              .from("user_profiles")
+              .update({
+                last_login_method: "password",
+                updated_at: new Date().toISOString(),
+              })
+              .eq("id", data.user.id);
+
+            if (updateError) {
+              console.warn("Failed to update user profile:", updateError);
+              // Don't throw here - just log the warning and continue
+            }
+          } catch (err) {
+            console.warn("Error updating user profile:", err);
+            // Don't throw here - just log the warning and continue
+          }
         }
 
         // Redirect to user app dashboard or specified redirect URL
@@ -214,6 +233,14 @@ export function Login() {
         window.location.href = redirectUrl;
       } catch (err: any) {
         console.error("Password login error:", err);
+        console.error("Error details:", {
+          message: err.message,
+          status: err.status,
+          statusText: err.statusText,
+          details: err.details,
+          hint: err.hint,
+          code: err.code,
+        });
         setError(err.message || "Invalid email or password");
 
         // If error suggests no account, show helpful message
@@ -506,7 +533,8 @@ export function Login() {
                   Superadmin Login
                 </Button>
                 <p className="text-xs text-gray-500 text-center mt-2">
-                  Dev mode: Opens unified app with ?superadmin=dev123 (bypasses Supabase)
+                  Dev mode: Opens unified app with ?superadmin=dev123 (bypasses
+                  Supabase)
                 </p>
               </div>
             )}

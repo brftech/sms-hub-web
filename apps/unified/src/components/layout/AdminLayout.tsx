@@ -3,10 +3,8 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { useGlobalView } from "../../contexts/GlobalViewContext";
 import { useHub, HubSwitcher, HubLogo } from "@sms-hub/ui";
-import { HUB_CONFIGS } from "@sms-hub/types";
 import { useCompany } from "../../hooks/useCompany";
 import { DevAdminBanner } from "../DevAdminBanner";
-import { UserRole } from "../../types/roles";
 import {
   getUserDisplayName,
   getInitials,
@@ -27,6 +25,8 @@ import {
   Globe,
   ArrowLeft,
   LayoutDashboard,
+  Shield,
+  UserPlus,
 } from "lucide-react";
 
 interface AdminLayoutProps {
@@ -73,6 +73,22 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       description: "Manage phone number inventory",
       color: "text-green-500",
       bgColor: "bg-green-100",
+    },
+    {
+      name: "Verifications",
+      href: "/admin/verifications",
+      icon: Shield,
+      description: "Manage user verifications",
+      color: "text-cyan-500",
+      bgColor: "bg-cyan-100",
+    },
+    {
+      name: "Leads",
+      href: "/admin/leads",
+      icon: UserPlus,
+      description: "Manage sales leads",
+      color: "text-emerald-500",
+      bgColor: "bg-emerald-100",
     },
     {
       name: "Voice",
@@ -131,11 +147,13 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             >
               <Menu className="w-5 h-5" />
             </button>
-            
+
             {/* Company Name */}
             {company && (
               <div className="hidden lg:block">
-                <h3 className="text-lg font-semibold text-gray-900">{company.public_name}</h3>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  {company.public_name}
+                </h3>
               </div>
             )}
           </div>
@@ -150,7 +168,6 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 className="pl-10 pr-4 py-2 w-80 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
               />
             </div>
-
 
             {/* User Profile Dropdown */}
             <div className="relative">
@@ -195,7 +212,9 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                   </button>
                   {/* Hub Switcher - always show for admin users */}
                   <div className="px-4 py-2 border-b border-gray-200">
-                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Hub Selection</p>
+                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
+                      Hub Selection
+                    </p>
                     <HubSwitcher />
                   </div>
                   <button
@@ -240,24 +259,27 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       <div
         className={`fixed top-0 bottom-0 left-0 z-40 bg-slate-900 text-white transform transition-all duration-300 ease-in-out lg:translate-x-0 ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } ${
-          isSidebarExpanded ? "w-80" : "w-16"
-        }`}
+        } ${isSidebarExpanded ? "w-80" : "w-16"}`}
       >
         <div className="flex flex-col h-full">
           {/* Hub Logo - Links to Accounts */}
           <div className="flex items-center justify-center h-[73px] border-b border-slate-700">
-            <Link 
-              to="/admin/accounts" 
+            <Link
+              to="/admin/accounts"
               className="flex items-center justify-center w-full group"
               title="Go to Accounts"
             >
               <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center transition-transform group-hover:scale-110">
-                <HubLogo hubType={currentHub} variant="icon" size="sm" className="w-full h-full" />
+                <HubLogo
+                  hubType={currentHub}
+                  variant="icon"
+                  size="sm"
+                  className="w-full h-full"
+                />
               </div>
             </Link>
           </div>
-          
+
           {/* Mobile close button */}
           <div className="lg:hidden absolute top-4 right-4">
             <button
@@ -285,11 +307,11 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                   {active && (
                     <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-orange-500 rounded-r-full animate-pulse" />
                   )}
-                  
+
                   <div
                     className={`p-2 rounded-xl transition-all duration-200 ${
-                      active 
-                        ? "bg-orange-500/20 scale-110" 
+                      active
+                        ? "bg-orange-500/20 scale-110"
                         : "bg-slate-800 hover:bg-slate-700 hover:scale-105"
                     }`}
                   >
@@ -299,7 +321,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                       }`}
                     />
                   </div>
-                  
+
                   {/* Tooltip on hover */}
                   <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-sm rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50">
                     {item.name}
@@ -318,7 +340,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               <div className="p-2 rounded-xl bg-slate-800 transition-all duration-200 hover:bg-orange-500/20 hover:scale-105">
                 <ArrowLeft className="w-6 h-6 text-slate-300 group-hover:text-orange-400 transition-colors duration-200" />
               </div>
-              
+
               {/* Tooltip on hover */}
               <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-sm rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50">
                 Back to User View

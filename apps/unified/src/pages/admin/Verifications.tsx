@@ -1,49 +1,47 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
+import { Card, CardContent } from "@sms-hub/ui";
+import { Button } from "@sms-hub/ui";
+import { Input } from "@sms-hub/ui";
+import { Badge } from "@sms-hub/ui";
 import { useHub } from "@sms-hub/ui";
 import { useGlobalView } from "../../contexts/GlobalViewContext";
-import {
-  Search,
-  Clock,
-  RefreshCw,
-  Eye,
-  Trash2,
-  MoreVertical,
-  ChevronUp,
-  ChevronDown,
-  Filter,
-  CheckCircle,
-  XCircle,
-  AlertTriangle,
-  Mail,
-  Phone,
-} from "lucide-react";
 import {
   verificationsService,
   Verification,
 } from "../../services/verificationsService";
+import {
+  Shield,
+  Search,
+  Filter,
+  Plus,
+  MoreVertical,
+  Calendar,
+  CheckCircle2,
+  Clock,
+  Edit,
+  Eye,
+  ChevronDown,
+  RefreshCw,
+  User,
+  AlertCircle,
+  Building2,
+} from "lucide-react";
 
-const Verifications = () => {
+export function Verifications() {
   const { currentHub } = useHub();
   const { isGlobalView } = useGlobalView();
   const [verifications, setVerifications] = useState<Verification[]>([]);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredVerifications, setFilteredVerifications] = useState<
+    Verification[]
+  >([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [selectedVerification, setSelectedVerification] =
-    useState<Verification | null>(null);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [deletingVerificationId, setDeletingVerificationId] = useState<
-    string | null
-  >(null);
-
-  // Filtering states
+  const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [methodFilter, setMethodFilter] = useState<string>("all");
-
-  // Sorting states
-  const [sortField, setSortField] = useState<keyof Verification>("created_at");
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
+  const [sortBy, setSortBy] = useState<string>("created_at");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
   // Fetch verifications from database
   const fetchData = async () => {
@@ -92,6 +90,7 @@ const Verifications = () => {
       console.log("Verifications: Count:", fetchedVerifications.length);
 
       setVerifications(fetchedVerifications);
+      setFilteredVerifications(fetchedVerifications);
     } catch (err) {
       console.error("Error fetching data:", err);
       setError(err instanceof Error ? err.message : "Failed to fetch data");
@@ -107,22 +106,6 @@ const Verifications = () => {
     setIsRefreshing(false);
   };
 
-  const handleDeleteVerification = async () => {
-    if (!deletingVerificationId) return;
-
-    try {
-      await verificationsService.instance.deleteVerification(
-        deletingVerificationId
-      );
-      await fetchData();
-      setShowDeleteConfirm(false);
-      setDeletingVerificationId(null);
-    } catch (error) {
-      console.error("Error deleting verification:", error);
-      alert("Failed to delete verification");
-    }
-  };
-
   // Initial data fetch
   useEffect(() => {
     fetchData();
@@ -133,96 +116,100 @@ const Verifications = () => {
     fetchData();
   }, [searchQuery, isGlobalView]);
 
-  // Compute filtered and sorted verifications using useMemo to prevent flicker
-  const filteredVerifications = useMemo(() => {
+  // Apply filters and sorting to verifications
+  useEffect(() => {
     let filtered = [...verifications];
 
     // Apply status filter
     if (statusFilter !== "all") {
-      filtered = filtered.filter((v) => {
-        if (statusFilter === "verified") return v.verification_code !== null;
-        if (statusFilter === "unverified") return v.verification_code === null;
-        if (statusFilter === "expired")
-          return v.expires_at && new Date(v.expires_at) < new Date();
-        return true;
-      });
+      filtered = filtered.filter(
+        (verification) => verification.status === statusFilter
+      );
     }
 
     // Apply method filter
     if (methodFilter !== "all") {
-      filtered = filtered.filter((v) => v.auth_method === methodFilter);
+      filtered = filtered.filter(
+        (verification) =>
+          verification.preferred_verification_method === methodFilter
+      );
     }
 
     // Apply sorting
     filtered.sort((a, b) => {
-      const aVal = a[sortField] || "";
-      const bVal = b[sortField] || "";
+      let aVal: any = a[sortBy as keyof Verification];
+      let bVal: any = b[sortBy as keyof Verification];
 
-      if (sortDirection === "asc") {
+      if (typeof aVal === "string") {
+        aVal = aVal.toLowerCase();
+        bVal = (bVal as string).toLowerCase();
+      }
+
+      if (sortOrder === "asc") {
         return aVal > bVal ? 1 : -1;
       } else {
         return aVal < bVal ? 1 : -1;
       }
     });
 
-    return filtered;
-  }, [verifications, statusFilter, methodFilter, sortField, sortDirection]);
+    setFilteredVerifications(filtered);
+  }, [verifications, statusFilter, methodFilter, sortBy, sortOrder]);
 
-  const handleSort = (field: keyof Verification) => {
-    if (field === sortField) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
-    } else {
-      setSortField(field);
-      setSortDirection("asc");
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "completed":
+        return "bg-green-100 text-green-800";
+      case "pending":
+        return "bg-yellow-100 text-yellow-800";
+      case "expired":
+        return "bg-red-100 text-red-800";
+      case "failed":
+        return "bg-gray-100 text-gray-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
-  const getVerificationStatus = (verification: Verification) => {
-    if (verification.verification_code) {
-      return {
-        label: "Verified",
-        icon: CheckCircle,
-        color: "text-green-600",
-        bg: "bg-green-100",
-      };
+  const getMethodColor = (method: string) => {
+    switch (method) {
+      case "sms":
+        return "bg-blue-100 text-blue-800";
+      case "email":
+        return "bg-purple-100 text-purple-800";
+      case "call":
+        return "bg-orange-100 text-orange-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
-    if (
-      verification.expires_at &&
-      new Date(verification.expires_at) < new Date()
-    ) {
-      return {
-        label: "Expired",
-        icon: AlertTriangle,
-        color: "text-orange-600",
-        bg: "bg-orange-100",
-      };
-    }
-    if (
-      verification.verification_attempts &&
-      verification.max_attempts &&
-      verification.verification_attempts >= parseInt(verification.max_attempts)
-    ) {
-      return {
-        label: "Max Attempts",
-        icon: XCircle,
-        color: "text-red-600",
-        bg: "bg-red-100",
-      };
-    }
-    return {
-      label: "Pending",
-      icon: Clock,
-      color: "text-yellow-600",
-      bg: "bg-yellow-100",
-    };
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  };
+
+  const getRelativeTime = (dateString: string) => {
+    const now = new Date();
+    const date = new Date(dateString);
+    const diffInHours = Math.floor(
+      (now.getTime() - date.getTime()) / (1000 * 60 * 60)
+    );
+
+    if (diffInHours < 1) return "Just now";
+    if (diffInHours < 24) return `${diffInHours}h ago`;
+    if (diffInHours < 168) return `${Math.floor(diffInHours / 24)}d ago`;
+    return formatDate(dateString);
   };
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto"></div>
+          <p className="mt-4 text-muted-foreground">
             Loading verifications from database...
           </p>
         </div>
@@ -235,16 +222,16 @@ const Verifications = () => {
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
-            <XCircle className="h-6 w-6 text-red-600" />
+            <AlertCircle className="h-6 w-6 text-red-600" />
           </div>
-          <h3 className="mt-4 text-lg font-medium text-gray-900">
+          <h3 className="mt-4 text-lg font-medium text-foreground">
             Error Loading Data
           </h3>
-          <p className="mt-2 text-sm text-gray-500">{error}</p>
+          <p className="mt-2 text-sm text-muted-foreground">{error}</p>
           <div className="mt-6">
             <button
               onClick={fetchData}
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
             >
               <RefreshCw className="w-4 h-4 mr-2" />
               Try Again
@@ -260,30 +247,39 @@ const Verifications = () => {
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="text-2xl font-bold text-foreground">
             {isGlobalView ? "Global Verifications" : "Verifications"}
           </h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-sm text-muted-foreground">
             {isGlobalView
-              ? "Manage verifications from all hubs"
-              : `Manage verifications from ${currentHub} hub`}
+              ? "Manage user verifications from all hubs"
+              : `Manage user verifications from ${currentHub} hub`}
           </p>
         </div>
         <div className="flex items-center space-x-3">
           <div className="relative max-w-xs">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
             <input
               type="text"
               placeholder="Search verifications..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm"
             />
           </div>
           <button
+            onClick={() => {
+              /* Add verification functionality */
+            }}
+            className="inline-flex items-center px-3 py-2 border border-transparent shadow-sm text-sm leading-4 font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Add Verification
+          </button>
+          <button
             onClick={handleRefresh}
             disabled={isRefreshing}
-            className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <RefreshCw
               className={`w-4 h-4 mr-2 ${isRefreshing ? "animate-spin" : ""}`}
@@ -293,7 +289,7 @@ const Verifications = () => {
         </div>
       </div>
 
-      {/* Verifications Table */}
+      {/* Verifications List */}
       <div className="bg-white rounded-lg shadow-sm overflow-hidden flex flex-col flex-1">
         <div className="px-4 py-3 border-b border-gray-200 flex items-center justify-between">
           <h3 className="text-base font-medium text-gray-900">
@@ -307,273 +303,190 @@ const Verifications = () => {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="text-xs border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="text-xs border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-orange-500 focus:border-transparent"
               >
                 <option value="all">All Status</option>
-                <option value="verified">Verified</option>
-                <option value="unverified">Unverified</option>
+                <option value="pending">Pending</option>
+                <option value="completed">Completed</option>
                 <option value="expired">Expired</option>
+                <option value="failed">Failed</option>
               </select>
 
               <select
                 value={methodFilter}
                 onChange={(e) => setMethodFilter(e.target.value)}
-                className="text-xs border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="text-xs border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-orange-500 focus:border-transparent"
               >
                 <option value="all">All Methods</option>
-                <option value="email">Email</option>
                 <option value="sms">SMS</option>
+                <option value="email">Email</option>
+                <option value="call">Call</option>
               </select>
+
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="text-xs border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              >
+                <option value="created_at">Sort by Date</option>
+                <option value="email">Sort by Email</option>
+                <option value="status">Sort by Status</option>
+                <option value="preferred_verification_method">
+                  Sort by Method
+                </option>
+              </select>
+
+              <button
+                onClick={() =>
+                  setSortOrder(sortOrder === "asc" ? "desc" : "asc")
+                }
+                className="p-1 hover:bg-gray-100 rounded"
+              >
+                <ChevronDown
+                  className={`w-4 h-4 ${sortOrder === "desc" ? "rotate-180" : ""}`}
+                />
+              </button>
             </div>
           </div>
         </div>
 
         <div className="overflow-x-auto overflow-y-auto flex-1">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50 sticky top-0 z-10">
-              <tr>
-                <th
-                  className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                  onClick={() => handleSort("first_name")}
+          <div className="space-y-2 p-4">
+            {filteredVerifications.length === 0 ? (
+              <Card>
+                <CardContent className="p-8 text-center">
+                  <Shield className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    No verifications found
+                  </h3>
+                  <p className="text-gray-600 mb-4">
+                    {searchQuery
+                      ? "Try adjusting your search criteria"
+                      : "No verifications have been created yet"}
+                  </p>
+                  <Button className="bg-orange-500 hover:bg-orange-600 text-white">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add Verification
+                  </Button>
+                </CardContent>
+              </Card>
+            ) : (
+              filteredVerifications.map((verification) => (
+                <Card
+                  key={verification.id}
+                  className="hover:shadow-md transition-shadow"
                 >
-                  <div className="flex items-center space-x-1">
-                    <span>User</span>
-                    {sortField === "first_name" &&
-                      (sortDirection === "asc" ? (
-                        <ChevronUp className="w-3 h-3" />
-                      ) : (
-                        <ChevronDown className="w-3 h-3" />
-                      ))}
-                  </div>
-                </th>
-                {isGlobalView && (
-                  <th
-                    className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                    onClick={() => handleSort("hub_id")}
-                  >
-                    <div className="flex items-center space-x-1">
-                      <span>Hub</span>
-                      {sortField === "hub_id" &&
-                        (sortDirection === "asc" ? (
-                          <ChevronUp className="w-3 h-3" />
-                        ) : (
-                          <ChevronDown className="w-3 h-3" />
-                        ))}
-                    </div>
-                  </th>
-                )}
-                <th
-                  className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                  onClick={() => handleSort("auth_method")}
-                >
-                  <div className="flex items-center space-x-1">
-                    <span>Method</span>
-                    {sortField === "auth_method" &&
-                      (sortDirection === "asc" ? (
-                        <ChevronUp className="w-3 h-3" />
-                      ) : (
-                        <ChevronDown className="w-3 h-3" />
-                      ))}
-                  </div>
-                </th>
-                <th
-                  className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                  onClick={() => handleSort("verification_code")}
-                >
-                  <div className="flex items-center space-x-1">
-                    <span>Code</span>
-                    {sortField === "verification_code" &&
-                      (sortDirection === "asc" ? (
-                        <ChevronUp className="w-3 h-3" />
-                      ) : (
-                        <ChevronDown className="w-3 h-3" />
-                      ))}
-                  </div>
-                </th>
-                <th
-                  className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                  onClick={() => handleSort("verification_code")}
-                >
-                  <div className="flex items-center space-x-1">
-                    <span>Status</span>
-                    {sortField === "verification_code" &&
-                      (sortDirection === "asc" ? (
-                        <ChevronUp className="w-3 h-3" />
-                      ) : (
-                        <ChevronDown className="w-3 h-3" />
-                      ))}
-                  </div>
-                </th>
-                <th
-                  className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                  onClick={() => handleSort("created_at")}
-                >
-                  <div className="flex items-center space-x-1">
-                    <span>Created</span>
-                    {sortField === "created_at" &&
-                      (sortDirection === "asc" ? (
-                        <ChevronUp className="w-3 h-3" />
-                      ) : (
-                        <ChevronDown className="w-3 h-3" />
-                      ))}
-                  </div>
-                </th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {filteredVerifications.map((verification) => {
-                const status = getVerificationStatus(verification);
-                return (
-                  <tr key={verification.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-2 whitespace-nowrap">
-                      <div>
-                        <div className="text-sm font-medium text-gray-900">
-                          {verification.first_name} {verification.last_name}
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-4 flex-1">
+                        <div className="flex-shrink-0">
+                          <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                            <Shield className="w-6 h-6 text-orange-600" />
+                          </div>
                         </div>
-                        <div className="text-xs text-gray-500">
-                          {verification.email ||
-                            verification.mobile_phone_number}
+
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center space-x-2 mb-1">
+                            <h3 className="font-semibold text-gray-900 truncate">
+                              {verification.full_name || "Unknown User"}
+                            </h3>
+                            <Badge
+                              variant="outline"
+                              className={getStatusColor(
+                                verification.status || "pending"
+                              )}
+                            >
+                              {verification.status || "pending"}
+                            </Badge>
+                            <Badge
+                              variant="outline"
+                              className={getMethodColor(
+                                verification.preferred_verification_method
+                              )}
+                            >
+                              {verification.preferred_verification_method.toUpperCase()}
+                            </Badge>
+                          </div>
+
+                          <p className="text-sm text-gray-600 mb-2">
+                            {verification.contact_info || "No contact info"}
+                          </p>
+
+                          <div className="flex items-center space-x-4 text-sm text-gray-500 mb-2">
+                            <div className="flex items-center space-x-1">
+                              <User className="w-4 h-4" />
+                              <span>Step: {verification.onboarding_step}</span>
+                            </div>
+                            <div className="flex items-center space-x-1">
+                              <Building2 className="w-4 h-4" />
+                              <span>
+                                {verification.hub?.name ||
+                                  `Hub ${verification.hub_id}`}
+                              </span>
+                            </div>
+                            {verification.is_existing_user && (
+                              <div className="flex items-center space-x-1">
+                                <CheckCircle2 className="w-4 h-4" />
+                                <span>Existing User</span>
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="flex items-center space-x-6 text-sm text-gray-500">
+                            <div className="flex items-center space-x-1">
+                              <Calendar className="w-4 h-4" />
+                              <span>
+                                Created{" "}
+                                {getRelativeTime(verification.created_at)}
+                              </span>
+                            </div>
+                            {verification.verification_sent_at && (
+                              <div className="flex items-center space-x-1">
+                                <Clock className="w-4 h-4" />
+                                <span>
+                                  Sent{" "}
+                                  {getRelativeTime(
+                                    verification.verification_sent_at
+                                  )}
+                                </span>
+                              </div>
+                            )}
+                            {verification.verification_completed_at && (
+                              <div className="flex items-center space-x-1">
+                                <CheckCircle2 className="w-4 h-4" />
+                                <span>
+                                  Completed{" "}
+                                  {getRelativeTime(
+                                    verification.verification_completed_at
+                                  )}
+                                </span>
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </td>
-                    {isGlobalView && (
-                      <td className="px-4 py-2 whitespace-nowrap">
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                          {verification.hub_id === 0
-                            ? "PercyTech"
-                            : verification.hub_id === 1
-                              ? "Gnymble"
-                              : verification.hub_id === 2
-                                ? "PercyMD"
-                                : verification.hub_id === 3
-                                  ? "PercyText"
-                                  : "Unknown"}
-                        </span>
-                      </td>
-                    )}
-                    <td className="px-4 py-2 whitespace-nowrap">
-                      <div className="flex items-center space-x-1">
-                        {verification.auth_method === "email" ? (
-                          <Mail className="w-4 h-4 text-gray-400" />
-                        ) : (
-                          <Phone className="w-4 h-4 text-gray-400" />
-                        )}
-                        <span className="text-xs text-gray-600 capitalize">
-                          {verification.auth_method}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-4 py-2 whitespace-nowrap">
-                      <span className="text-xs font-mono text-gray-600">
-                        {verification.verification_code || "-"}
-                      </span>
-                    </td>
-                    <td className="px-4 py-2 whitespace-nowrap">
-                      <span
-                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${status.bg} ${status.color}`}
-                      >
-                        <status.icon className="w-3 h-3 mr-1" />
-                        {status.label}
-                      </span>
-                    </td>
-                    <td className="px-4 py-2 whitespace-nowrap text-xs text-gray-600">
-                      {verification.created_at
-                        ? new Date(verification.created_at).toLocaleDateString()
-                        : "-"}
-                    </td>
-                    <td className="px-4 py-2 whitespace-nowrap text-sm font-medium">
-                      <div className="flex items-center space-x-3">
-                        <button
-                          onClick={() => setSelectedVerification(verification)}
-                          className="text-blue-600 hover:text-blue-900"
-                          title="View Details"
-                        >
+
+                      <div className="flex items-center space-x-2">
+                        <Button variant="ghost" size="sm">
                           <Eye className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => {
-                            setDeletingVerificationId(verification.id);
-                            setShowDeleteConfirm(true);
-                          }}
-                          className="text-red-600 hover:text-red-900"
-                          title="Delete Verification"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                        <div className="relative inline-block text-left">
-                          <button className="text-gray-400 hover:text-gray-600">
-                            <MoreVertical className="w-4 h-4" />
-                          </button>
-                        </div>
+                        </Button>
+                        <Button variant="ghost" size="sm">
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button variant="ghost" size="sm">
+                          <MoreVertical className="w-4 h-4" />
+                        </Button>
                       </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-
-        {filteredVerifications.length === 0 && (
-          <div className="text-center py-12">
-            <Clock className="mx-auto h-12 w-12 text-gray-400" />
-            <h3 className="mt-2 text-sm font-medium text-gray-900">
-              No verifications found
-            </h3>
-            <p className="mt-1 text-sm text-gray-500">
-              {searchQuery || statusFilter !== "all" || methodFilter !== "all"
-                ? "Try adjusting your search or filter criteria."
-                : "No verifications have been created yet."}
-            </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            )}
           </div>
-        )}
+        </div>
       </div>
-
-      {/* Delete Confirmation Modal */}
-      {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <div className="flex items-center space-x-3 mb-4">
-              <div className="p-3 bg-red-100 rounded-full">
-                <AlertTriangle className="w-6 h-6 text-red-600" />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900">
-                Delete Verification
-              </h3>
-            </div>
-
-            <p className="text-gray-600 mb-6">
-              Are you sure you want to delete this verification? This action
-              cannot be undone.
-            </p>
-
-            <div className="flex justify-end space-x-3">
-              <button
-                onClick={() => {
-                  setShowDeleteConfirm(false);
-                  setDeletingVerificationId(null);
-                }}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleDeleteVerification}
-                className="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-              >
-                Delete Verification
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* TODO: Add verification details modal */}
     </div>
   );
-};
+}
 
 export default Verifications;

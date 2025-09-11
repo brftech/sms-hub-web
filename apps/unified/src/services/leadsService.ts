@@ -1,298 +1,298 @@
-import { getSupabaseClient } from '../lib/supabaseSingleton'
-import type { SupabaseClient } from '@sms-hub/supabase'
+import { getSupabaseClient } from "../lib/supabaseSingleton";
 
 export interface Lead {
-  id: string
-  hub_id: number
-  email: string
-  name?: string | null
-  lead_phone_number?: string | null
-  company_name?: string | null
-  platform_interest?: string | null
-  source?: string | null
-  message?: string | null
-  ip_address?: string | null
-  interaction_count: number | null
-  last_interaction_at: string | null
-  created_at: string | null
-  first_name?: string | null
-  last_name?: string | null
-  phone?: string | null
-  status: 'new' | 'contacted' | 'qualified' | 'converted' | 'lost'
-  updated_at: string | null
-  lead_score: number | null
-  priority?: 'low' | 'medium' | 'high' | 'urgent' | null
-  source_type?: string | null
-  user_agent?: string | null
+  id: string;
+  hub_id: number;
+  company_name?: string | null;
+  first_name?: string | null;
+  last_name?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  status: string;
+  priority: string;
+  source_type?: string | null;
+  created_at: string | null;
+  updated_at: string | null;
+  // Joined data
+  hub?: {
+    hub_number: number;
+    name: string;
+  };
+  // Computed fields for display
+  full_name?: string;
+  contact_info?: string;
+  lead_age?: string;
+  status_color?: string;
+  priority_color?: string;
 }
 
-export interface LeadActivity {
-  id: string
-  hub_id: number
-  lead_id: string
-  activity_type: string
-  activity_data: any
-  ip_address?: string | null
-  user_agent?: string | null
-  created_at: string | null
-  description?: string | null
-}
-
-export interface LeadStats {
-  total: number
-  new: number
-  contacted: number
-  qualified: number
-  converted: number
-  lost: number
-  byPriority: {
-    low: number
-    medium: number
-    high: number
-    urgent: number
-  }
-  bySource: Record<string, number>
+export interface LeadFilters {
+  search?: string;
+  hub_id?: number;
+  status?: string;
+  priority?: string;
+  source_type?: string;
+  limit?: number;
 }
 
 class LeadsService {
-  private supabase: SupabaseClient
+  private supabase = getSupabaseClient();
 
-  constructor() {
-    this.supabase = getSupabaseClient()
-  }
-
-  // Test database connection
-  async testConnection(): Promise<boolean> {
+  async getLeads(filters: LeadFilters = {}): Promise<Lead[]> {
     try {
-      console.log('LeadsService: Testing database connection...');
-      
-      // Try a simple query to test connection
-      const { error } = await this.supabase
-        .from('leads')
-        .select('count')
-        .limit(1);
+      let query = this.supabase.from("leads").select(`
+        *,
+        hub:hubs(
+          hub_number,
+          name
+        )
+      `);
 
-      if (error) {
-        console.error('LeadsService: Connection test failed:', error);
-        return false;
+      // Apply filters
+      if (filters.hub_id !== undefined) {
+        query = query.eq("hub_id", filters.hub_id);
       }
 
-      console.log('LeadsService: Connection test successful');
-      return true;
-    } catch (err) {
-      console.error('LeadsService: Connection test error:', err);
-      return false;
+      if (filters.status) {
+        query = query.eq("status", filters.status);
+      }
+
+      if (filters.priority) {
+        query = query.eq("priority", filters.priority);
+      }
+
+      if (filters.source_type) {
+        query = query.eq("source_type", filters.source_type);
+      }
+
+      if (filters.limit) {
+        query = query.limit(filters.limit);
+      }
+
+      const { data, error } = await query.order("created_at", {
+        ascending: false,
+      });
+
+      if (error) {
+        console.error("Error fetching leads:", error);
+        throw error;
+      }
+
+      // Process the data to add computed fields
+      const leads = (data || []).map((lead) => ({
+        ...lead,
+        // Add computed fields for display
+        full_name: this.getFullName(lead),
+        contact_info: this.getContactInfo(lead),
+        lead_age: this.getLeadAge(lead),
+        status_color: this.getStatusColor(lead.status),
+        priority_color: this.getPriorityColor(lead.priority),
+      })) as unknown as Lead[];
+
+      // Apply search filter after fetching
+      if (filters.search) {
+        const searchTerm = filters.search.toLowerCase();
+        return leads.filter(
+          (lead) =>
+            lead.email?.toLowerCase().includes(searchTerm) ||
+            lead.phone?.toLowerCase().includes(searchTerm) ||
+            lead.full_name?.toLowerCase().includes(searchTerm) ||
+            lead.company_name?.toLowerCase().includes(searchTerm) ||
+            lead.hub?.name?.toLowerCase().includes(searchTerm)
+        );
+      }
+
+      return leads;
+    } catch (error) {
+      console.error("Error in getLeads:", error);
+      throw error;
     }
-  }
-
-  async getLeads(options?: {
-    hub_id?: number
-    status?: string
-    priority?: string
-    source?: string
-    search?: string
-    limit?: number
-    offset?: number
-  }): Promise<Lead[]> {
-    let query = this.supabase
-      .from('leads')
-      .select('*')
-      .order('created_at', { ascending: false })
-
-    // Apply filters
-    if (options?.hub_id) {
-      query = query.eq('hub_id', options.hub_id)
-    }
-
-    if (options?.status && options.status !== 'all') {
-      query = query.eq('status', options.status)
-    }
-
-    if (options?.priority && options.priority !== 'all') {
-      query = query.eq('priority', options.priority)
-    }
-
-    if (options?.source && options.source !== 'all') {
-      query = query.eq('source', options.source)
-    }
-
-    if (options?.search) {
-      query = query.or(`first_name.ilike.%${options.search}%,last_name.ilike.%${options.search}%,email.ilike.%${options.search}%,company_name.ilike.%${options.search}%`)
-    }
-
-    if (options?.limit) {
-      query = query.limit(options.limit)
-    }
-
-    if (options?.offset) {
-      query = query.range(options.offset, options.offset + (options.limit || 100) - 1)
-    }
-
-    const { data, error } = await query
-
-    if (error) {
-      console.error('Error fetching leads:', error)
-      throw new Error('Failed to fetch leads')
-    }
-
-    // Transform data to handle null values properly
-    return (data || []).map(lead => ({
-      ...lead,
-      status: lead.status || 'new',
-      email: lead.email || '',
-      hub_id: lead.hub_id || 0,
-      interaction_count: lead.interaction_count || 0,
-      lead_score: lead.lead_score || 0
-    })) as Lead[]
   }
 
   async getLeadById(id: string): Promise<Lead | null> {
-    const { data, error } = await this.supabase
-      .from('leads')
-      .select('*')
-      .eq('id', id)
-      .single()
+    try {
+      const { data, error } = await this.supabase
+        .from("leads")
+        .select(
+          `
+          *,
+          hub:hubs(
+            hub_number,
+            name
+          )
+        `
+        )
+        .eq("id", id)
+        .single();
 
-    if (error) {
-      console.error('Error fetching lead:', error)
-      throw new Error('Failed to fetch lead')
-    }
+      if (error) {
+        console.error("Error fetching lead:", error);
+        return null;
+      }
 
-    if (!data) return null
-
-    // Transform data to handle null values properly
-    return {
-      ...data,
-      status: data.status || 'new',
-      email: data.email || '',
-      hub_id: data.hub_id || 0,
-      interaction_count: data.interaction_count || 0,
-      lead_score: data.lead_score || 0
-    } as Lead
-  }
-
-  async getLeadActivities(leadId: string): Promise<LeadActivity[]> {
-    const { data, error } = await this.supabase
-      .from('lead_activities')
-      .select('*')
-      .eq('lead_id', leadId)
-      .order('created_at', { ascending: false })
-
-    if (error) {
-      console.error('Error fetching lead activities:', error)
-      throw new Error('Failed to fetch lead activities')
-    }
-
-    // Transform data to handle null values properly
-    return (data || []).map(activity => ({
-      ...activity,
-      hub_id: activity.hub_id || 0,
-      lead_id: activity.lead_id || '',
-      activity_type: activity.activity_type || '',
-      activity_data: activity.activity_data || {}
-    })) as LeadActivity[]
-  }
-
-  async getLeadStats(hub_id?: number): Promise<LeadStats> {
-    // Get all leads for stats calculation
-    const leads = await this.getLeads({ hub_id })
-
-    const stats: LeadStats = {
-      total: leads.length,
-      new: leads.filter(lead => lead.status === 'new').length,
-      contacted: leads.filter(lead => lead.status === 'contacted').length,
-      qualified: leads.filter(lead => lead.status === 'qualified').length,
-      converted: leads.filter(lead => lead.status === 'converted').length,
-      lost: leads.filter(lead => lead.status === 'lost').length,
-      byPriority: {
-        low: leads.filter(lead => lead.priority === 'low').length,
-        medium: leads.filter(lead => lead.priority === 'medium').length,
-        high: leads.filter(lead => lead.priority === 'high').length,
-        urgent: leads.filter(lead => lead.priority === 'urgent').length,
-      },
-      bySource: {}
-    }
-
-    // Calculate source distribution
-    leads.forEach(lead => {
-      const source = lead.source || 'Unknown'
-      stats.bySource[source] = (stats.bySource[source] || 0) + 1
-    })
-
-    return stats
-  }
-
-  async updateLeadStatus(id: string, status: string): Promise<void> {
-    const { error } = await this.supabase
-      .from('leads')
-      .update({ 
-        status,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', id)
-
-    if (error) {
-      console.error('Error updating lead status:', error)
-      throw new Error('Failed to update lead status')
+      return {
+        ...data,
+        full_name: this.getFullName(data),
+        contact_info: this.getContactInfo(data),
+        lead_age: this.getLeadAge(data),
+        status_color: this.getStatusColor(data.status),
+        priority_color: this.getPriorityColor(data.priority),
+      } as unknown as Lead;
+    } catch (error) {
+      console.error("Error in getLeadById:", error);
+      return null;
     }
   }
 
-  async updateLeadPriority(id: string, priority: string): Promise<void> {
-    const { error } = await this.supabase
-      .from('leads')
-      .update({ 
-        priority,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', id)
+  async createLead(leadData: any): Promise<Lead> {
+    try {
+      const { data, error } = await this.supabase
+        .from("leads")
+        .insert([leadData])
+        .select(
+          `
+          *,
+          hub:hubs(
+            hub_number,
+            name
+          )
+        `
+        )
+        .single();
 
-    if (error) {
-      console.error('Error updating lead priority:', error)
-      throw new Error('Failed to update lead priority')
+      if (error) {
+        console.error("Error creating lead:", error);
+        throw error;
+      }
+
+      return {
+        ...data,
+        full_name: this.getFullName(data),
+        contact_info: this.getContactInfo(data),
+        lead_age: this.getLeadAge(data),
+        status_color: this.getStatusColor(data.status),
+        priority_color: this.getPriorityColor(data.priority),
+      } as unknown as Lead;
+    } catch (error) {
+      console.error("Error in createLead:", error);
+      throw error;
     }
   }
 
-  async addLeadActivity(leadId: string, activityType: string, description?: string, activityData?: any): Promise<void> {
-    const { error } = await this.supabase
-      .from('lead_activities')
-      .insert({
-        lead_id: leadId,
-        activity_type: activityType,
-        description,
-        activity_data: activityData || {},
-        hub_id: 2 // Default to Gnymble hub for now
-      })
+  async updateLead(id: string, updates: any): Promise<Lead> {
+    try {
+      const { data, error } = await this.supabase
+        .from("leads")
+        .update(updates)
+        .eq("id", id)
+        .select(
+          `
+          *,
+          hub:hubs(
+            hub_number,
+            name
+          )
+        `
+        )
+        .single();
 
-    if (error) {
-      console.error('Error adding lead activity:', error)
-      throw new Error('Failed to add lead activity')
+      if (error) {
+        console.error("Error updating lead:", error);
+        throw error;
+      }
+
+      return {
+        ...data,
+        full_name: this.getFullName(data),
+        contact_info: this.getContactInfo(data),
+        lead_age: this.getLeadAge(data),
+        status_color: this.getStatusColor(data.status),
+        priority_color: this.getPriorityColor(data.priority),
+      } as unknown as Lead;
+    } catch (error) {
+      console.error("Error in updateLead:", error);
+      throw error;
     }
   }
 
-  async getUniqueSources(): Promise<string[]> {
-    const { data, error } = await this.supabase
-      .from('leads')
-      .select('source')
-      .not('source', 'is', null)
+  async deleteLead(id: string): Promise<boolean> {
+    try {
+      const { error } = await this.supabase.from("leads").delete().eq("id", id);
 
-    if (error) {
-      console.error('Error fetching sources:', error)
-      return []
+      if (error) {
+        console.error("Error deleting lead:", error);
+        throw error;
+      }
+
+      return true;
+    } catch (error) {
+      console.error("Error in deleteLead:", error);
+      throw error;
     }
+  }
 
-    const sources = data?.map(item => item.source).filter((source): source is string => source !== null) || []
-    return [...new Set(sources)] // Remove duplicates
+  // Helper methods for computed fields
+  private getFullName(lead: any): string {
+    if (lead.first_name && lead.last_name) {
+      return `${lead.first_name} ${lead.last_name}`;
+    }
+    if (lead.first_name) return lead.first_name;
+    if (lead.last_name) return lead.last_name;
+    return "Unknown Lead";
+  }
+
+  private getContactInfo(lead: any): string {
+    const parts = [];
+    if (lead.email) parts.push(lead.email);
+    if (lead.phone) parts.push(lead.phone);
+    return parts.join(" • ");
+  }
+
+  private getLeadAge(lead: any): string {
+    if (!lead.created_at) return "Unknown";
+    const createdAt = new Date(lead.created_at);
+    const now = new Date();
+    const diffInHours = Math.floor(
+      (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60)
+    );
+
+    if (diffInHours < 1) return "Just now";
+    if (diffInHours < 24) return `${diffInHours}h ago`;
+    if (diffInHours < 168) return `${Math.floor(diffInHours / 24)}d ago`;
+    return createdAt.toLocaleDateString();
+  }
+
+  private getStatusColor(status: string): string {
+    switch (status) {
+      case "new":
+        return "bg-blue-100 text-blue-800";
+      case "contacted":
+        return "bg-yellow-100 text-yellow-800";
+      case "qualified":
+        return "bg-green-100 text-green-800";
+      case "converted":
+        return "bg-purple-100 text-purple-800";
+      case "closed":
+        return "bg-gray-100 text-gray-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  }
+
+  private getPriorityColor(priority: string): string {
+    switch (priority) {
+      case "high":
+        return "bg-red-100 text-red-800";
+      case "medium":
+        return "bg-yellow-100 text-yellow-800";
+      case "low":
+        return "bg-green-100 text-green-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
   }
 }
 
-// Lazy-loaded service instance
-let _leadsService: LeadsService | null = null;
-
 export const leadsService = {
-  get instance() {
-    if (!_leadsService) {
-      _leadsService = new LeadsService();
-    }
-    return _leadsService;
-  }
+  instance: new LeadsService(),
 };

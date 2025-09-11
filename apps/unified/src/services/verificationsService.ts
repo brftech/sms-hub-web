@@ -1,360 +1,340 @@
 import { getSupabaseClient } from "../lib/supabaseSingleton";
-import type { SupabaseClient } from "@sms-hub/supabase";
 
 export interface Verification {
   id: string;
   hub_id: number;
-  email: string;
-  first_name: string;
-  last_name: string;
-  company_name: string;
-  mobile_phone_number: string;
-  auth_method: string;
-  verification_code?: string | null;
-  verification_attempts?: number | null;
-  max_attempts?: string | null;
-  stripe_customer_id?: string | null;
-  created_at?: string | null;
-  expires_at: string;
-  verification_sent_at?: string | null;
-  last_verification_attempt_at?: string | null;
+  email?: string;
+  mobile_phone?: string;
+  verification_code?: string;
+  verification_sent_at?: string;
+  last_verification_attempt_at?: string;
+  preferred_verification_method: string;
+  onboarding_step: string;
+  step_data: any;
+  marketing_consent: boolean;
+  terms_accepted_at?: string;
+  privacy_policy_accepted_at?: string;
+  is_existing_user: boolean;
+  existing_user_id?: string;
+  verification_completed_at?: string;
+  user_created_at?: string;
+  created_at: string;
+  updated_at: string;
+  // Joined data
+  hub?: {
+    hub_number: number;
+    name: string;
+  };
+  existing_user?: {
+    id: string;
+    email: string;
+    first_name?: string;
+    last_name?: string;
+  };
+  // Computed fields for display
+  status?: "pending" | "completed" | "expired" | "failed";
+  full_name?: string;
+  contact_info?: string;
+  verification_age?: string;
 }
 
-export interface VerificationStats {
-  total: number;
-  verified: number;
-  unverified: number;
-  expired: number;
-  byAuthMethod: Record<string, number>;
-  byHub: Record<string, number>;
+export interface VerificationFilters {
+  search?: string;
+  hub_id?: number;
+  status?: string;
+  preferred_verification_method?: string;
+  onboarding_step?: string;
+  is_existing_user?: boolean;
+  limit?: number;
 }
 
 class VerificationsService {
-  private supabase: SupabaseClient;
+  private supabase = getSupabaseClient();
 
-  constructor() {
-    this.supabase = getSupabaseClient();
-  }
-
-  // Test database connection
-  async testConnection(): Promise<boolean> {
+  async getVerifications(
+    filters: VerificationFilters = {}
+  ): Promise<Verification[]> {
     try {
-      console.log("VerificationsService: Testing database connection...");
+      let query = this.supabase.from("verifications").select(`
+        *,
+        hub:hubs(
+          hub_number,
+          name
+        ),
+        existing_user:user_profiles(
+          id,
+          email,
+          first_name,
+          last_name
+        )
+      `);
 
-      // Try a simple query to test connection
-      const { error } = await this.supabase
-        .from("verifications")
-        .select("count")
-        .limit(1);
+      // Apply filters
+      if (filters.hub_id !== undefined) {
+        query = query.eq("hub_id", filters.hub_id);
+      }
+
+      if (filters.preferred_verification_method) {
+        query = query.eq(
+          "preferred_verification_method",
+          filters.preferred_verification_method
+        );
+      }
+
+      if (filters.onboarding_step) {
+        query = query.eq("onboarding_step", filters.onboarding_step);
+      }
+
+      if (filters.is_existing_user !== undefined) {
+        query = query.eq("is_existing_user", filters.is_existing_user);
+      }
+
+      if (filters.limit) {
+        query = query.limit(filters.limit);
+      }
+
+      const { data, error } = await query.order("created_at", {
+        ascending: false,
+      });
 
       if (error) {
-        console.error("VerificationsService: Connection test failed:", error);
-        return false;
+        console.error("Error fetching verifications:", error);
+        throw error;
       }
 
-      console.log("VerificationsService: Connection test successful");
-      return true;
-    } catch (err) {
-      console.error("VerificationsService: Connection test error:", err);
-      return false;
-    }
-  }
+      // Process the data to add computed fields
+      const verifications = (data || []).map((verification) => ({
+        ...verification,
+        // Add computed fields for display
+        status: this.getStatus(verification),
+        full_name: this.getFullName(verification),
+        contact_info: this.getContactInfo(verification),
+        verification_age: this.getVerificationAge(verification),
+      })) as unknown as Verification[];
 
-  async getVerifications(options?: {
-    hub_id?: number;
-    auth_method?: string;
-    is_expired?: boolean;
-    is_pending?: boolean;
-    search?: string;
-    limit?: number;
-    offset?: number;
-  }): Promise<Verification[]> {
-    let query = this.supabase
-      .from("verifications")
-      .select("*")
-      .order("created_at", { ascending: false });
-
-    // Apply filters
-    if (options?.hub_id) {
-      query = query.eq("hub_id", options.hub_id);
-    }
-
-    if (options?.auth_method && options.auth_method !== "all") {
-      query = query.eq("auth_method", options.auth_method);
-    }
-
-    if (options?.is_expired !== undefined) {
-      const now = new Date().toISOString();
-      if (options.is_expired) {
-        query = query.lt("expires_at", now);
-      } else {
-        query = query.gte("expires_at", now);
+      // Apply search filter after fetching
+      if (filters.search) {
+        const searchTerm = filters.search.toLowerCase();
+        return verifications.filter(
+          (verification) =>
+            verification.email?.toLowerCase().includes(searchTerm) ||
+            verification.mobile_phone?.toLowerCase().includes(searchTerm) ||
+            verification.full_name?.toLowerCase().includes(searchTerm) ||
+            verification.hub?.name?.toLowerCase().includes(searchTerm)
+        );
       }
-    }
 
-    if (options?.is_pending !== undefined) {
-      // Consider pending if no verification has been sent
-      if (options.is_pending) {
-        query = query.is("verification_sent_at", null);
-      } else {
-        query = query.not("verification_sent_at", "is", null);
+      // Apply status filter
+      if (filters.status) {
+        return verifications.filter(
+          (verification) => verification.status === filters.status
+        );
       }
+
+      return verifications;
+    } catch (error) {
+      console.error("Error in getVerifications:", error);
+      throw error;
     }
-
-    if (options?.search) {
-      query = query.or(
-        `first_name.ilike.%${options.search}%,last_name.ilike.%${options.search}%,email.ilike.%${options.search}%,company_name.ilike.%${options.search}%`
-      );
-    }
-
-    if (options?.limit) {
-      query = query.limit(options.limit);
-    }
-
-    if (options?.offset) {
-      query = query.range(
-        options.offset,
-        options.offset + (options.limit || 100) - 1
-      );
-    }
-
-    const { data, error } = await query;
-
-    if (error) {
-      console.error("Error fetching verifications:", error);
-      console.error("Error details:", error.message, error.details, error.hint);
-      throw new Error("Failed to fetch verifications");
-    }
-
-    return (data || []) as Verification[];
   }
 
   async getVerificationById(id: string): Promise<Verification | null> {
-    const { data, error } = await this.supabase
-      .from("verifications")
-      .select("*")
-      .eq("id", id)
-      .single();
-
-    if (error) {
-      console.error("Error fetching verification:", error);
-      throw new Error("Failed to fetch verification");
-    }
-
-    return data as Verification;
-  }
-
-  async getVerificationStats(hub_id?: number): Promise<VerificationStats> {
-    // Get all verifications for stats calculation
-    const verifications = await this.getVerifications({ hub_id });
-
-    const now = new Date();
-    const stats: VerificationStats = {
-      total: verifications.length,
-      verified: verifications.filter((signup) => signup.verification_sent_at !== null)
-        .length,
-      unverified: verifications.filter((signup) => signup.verification_sent_at === null)
-        .length,
-      expired: verifications.filter(
-        (signup) => new Date(signup.expires_at) < now
-      ).length,
-      byAuthMethod: {},
-      byHub: {},
-    };
-
-    // Calculate auth method distribution
-    verifications.forEach((signup) => {
-      const method = signup.auth_method || "Unknown";
-      stats.byAuthMethod[method] = (stats.byAuthMethod[method] || 0) + 1;
-    });
-
-    // Calculate hub distribution
-    verifications.forEach((signup) => {
-      const hub = signup.hub_id.toString();
-      stats.byHub[hub] = (stats.byHub[hub] || 0) + 1;
-    });
-
-    return stats;
-  }
-
-  async deleteVerification(id: string): Promise<void> {
-    const { error } = await this.supabase
-      .from("verifications")
-      .delete()
-      .eq("id", id);
-
-    if (error) {
-      console.error("Error deleting verification:", error);
-      throw new Error("Failed to delete verification");
-    }
-  }
-
-  async updateVerificationAttempts(
-    id: string,
-    attempts: number
-  ): Promise<void> {
-    const { error } = await this.supabase
-      .from("verifications")
-      .update({
-        verification_attempts: attempts,
-      })
-      .eq("id", id);
-
-    if (error) {
-      console.error("Error updating verification attempts:", error);
-      throw new Error("Failed to update verification attempts");
-    }
-  }
-
-  async getUniqueAuthMethods(): Promise<string[]> {
-    const { data, error } = await this.supabase
-      .from("verifications")
-      .select("auth_method")
-      .not("auth_method", "is", null);
-
-    if (error) {
-      console.error("Error fetching auth methods:", error);
-      return [];
-    }
-
-    const methods =
-      data
-        ?.map((item) => item.auth_method)
-        .filter((method): method is string => method !== null) || [];
-    return [...new Set(methods)]; // Remove duplicates
-  }
-
-  async getExpiredSignups(): Promise<Verification[]> {
-    const now = new Date().toISOString();
-    const { data, error } = await this.supabase
-      .from("verifications")
-      .select("*")
-      .lt("expires_at", now)
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      console.error("Error fetching expired signups:", error);
-      throw new Error("Failed to fetch expired signups");
-    }
-
-    return (data || []) as Verification[];
-  }
-
-  async cleanupExpiredSignups(): Promise<number> {
-    const now = new Date().toISOString();
-    const { data, error } = await this.supabase
-      .from("verifications")
-      .delete()
-      .lt("expires_at", now)
-      .select();
-
-    if (error) {
-      console.error("Error cleaning up expired signups:", error);
-      throw new Error("Failed to cleanup expired signups");
-    }
-
-    return data?.length || 0;
-  }
-
-  // Global methods for fetching data across all hubs
-  async getGlobalVerificationStats(): Promise<VerificationStats> {
     try {
-      const { data: verifications, error } = await this.supabase
+      const { data, error } = await this.supabase
         .from("verifications")
-        .select("*");
+        .select(
+          `
+          *,
+          hub:hubs(
+            hub_number,
+            name
+          ),
+          existing_user:user_profiles(
+            id,
+            email,
+            first_name,
+            last_name
+          )
+        `
+        )
+        .eq("id", id)
+        .single();
 
       if (error) {
-        console.error("Error fetching global verification stats:", error);
-        throw new Error("Failed to fetch global verification stats");
+        console.error("Error fetching verification:", error);
+        return null;
       }
 
-      const now = new Date();
-      const stats: VerificationStats = {
-        total: verifications?.length || 0,
-        verified:
-          verifications?.filter((signup) => signup.verification_sent_at !== null)
-            .length || 0,
-        unverified:
-          verifications?.filter((signup) => signup.verification_sent_at === null)
-            .length || 0,
-        expired:
-          verifications?.filter((signup) => new Date(signup.expires_at) < now)
-            .length || 0,
-        byAuthMethod: {},
-        byHub: {},
-      };
-
-      // Calculate auth method distribution
-      verifications?.forEach((signup) => {
-        const method = signup.auth_method || "Unknown";
-        stats.byAuthMethod[method] = (stats.byAuthMethod[method] || 0) + 1;
-      });
-
-      // Calculate hub distribution
-      verifications?.forEach((signup) => {
-        const hub = signup.hub_id.toString();
-        stats.byHub[hub] = (stats.byHub[hub] || 0) + 1;
-      });
-
-      return stats;
+      return {
+        ...data,
+        status: this.getStatus(data),
+        full_name: this.getFullName(data),
+        contact_info: this.getContactInfo(data),
+        verification_age: this.getVerificationAge(data),
+      } as unknown as Verification;
     } catch (error) {
-      console.error("Error in getGlobalVerificationStats:", error);
-      throw error;
+      console.error("Error in getVerificationById:", error);
+      return null;
     }
   }
 
-  async getGlobalUniqueAuthMethods(): Promise<string[]> {
-    const { data, error } = await this.supabase
-      .from("verifications")
-      .select("auth_method")
-      .not("auth_method", "is", null);
-
-    if (error) {
-      console.error("Error fetching global auth methods:", error);
-      return [];
-    }
-
-    const methods =
-      data
-        ?.map((item) => item.auth_method)
-        .filter((method): method is string => method !== null) || [];
-    return [...new Set(methods)]; // Remove duplicates
-  }
-
-  async verifyCode(verificationData: {
-    verification_id: string;
-    verification_code: string;
-    email: string;
-    mobile_phone_number: string;
-    auth_method: string;
-  }): Promise<any> {
+  async createVerification(verificationData: any): Promise<Verification> {
     try {
-      const { data, error } = await this.supabase.functions.invoke(
-        "verify-code",
-        { body: verificationData }
-      );
+      const { data, error } = await this.supabase
+        .from("verifications")
+        .insert([verificationData])
+        .select(
+          `
+          *,
+          hub:hubs(
+            hub_number,
+            name
+          ),
+          existing_user:user_profiles(
+            id,
+            email,
+            first_name,
+            last_name
+          )
+        `
+        )
+        .single();
 
       if (error) {
-        console.error("Error verifying code:", error);
-        throw new Error("Failed to verify code");
+        console.error("Error creating verification:", error);
+        throw error;
       }
 
-      return data;
+      return {
+        ...data,
+        status: this.getStatus(data),
+        full_name: this.getFullName(data),
+        contact_info: this.getContactInfo(data),
+        verification_age: this.getVerificationAge(data),
+      } as unknown as Verification;
     } catch (error) {
-      console.error("Error in verifyCode:", error);
+      console.error("Error in createVerification:", error);
       throw error;
     }
+  }
+
+  async updateVerification(id: string, updates: any): Promise<Verification> {
+    try {
+      const { data, error } = await this.supabase
+        .from("verifications")
+        .update(updates)
+        .eq("id", id)
+        .select(
+          `
+          *,
+          hub:hubs(
+            hub_number,
+            name
+          ),
+          existing_user:user_profiles(
+            id,
+            email,
+            first_name,
+            last_name
+          )
+        `
+        )
+        .single();
+
+      if (error) {
+        console.error("Error updating verification:", error);
+        throw error;
+      }
+
+      return {
+        ...data,
+        status: this.getStatus(data),
+        full_name: this.getFullName(data),
+        contact_info: this.getContactInfo(data),
+        verification_age: this.getVerificationAge(data),
+      } as unknown as Verification;
+    } catch (error) {
+      console.error("Error in updateVerification:", error);
+      throw error;
+    }
+  }
+
+  async deleteVerification(id: string): Promise<boolean> {
+    try {
+      const { error } = await this.supabase
+        .from("verifications")
+        .delete()
+        .eq("id", id);
+
+      if (error) {
+        console.error("Error deleting verification:", error);
+        throw error;
+      }
+
+      return true;
+    } catch (error) {
+      console.error("Error in deleteVerification:", error);
+      throw error;
+    }
+  }
+
+  // Helper methods for computed fields
+  private getStatus(
+    verification: any
+  ): "pending" | "completed" | "expired" | "failed" {
+    if (verification.verification_completed_at) return "completed";
+    if (verification.user_created_at) return "completed";
+
+    // Check if verification is expired (older than 24 hours)
+    const createdAt = new Date(verification.created_at);
+    const now = new Date();
+    const hoursDiff = (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60);
+
+    if (hoursDiff > 24) return "expired";
+
+    return "pending";
+  }
+
+  private getFullName(verification: any): string {
+    if (
+      verification.existing_user?.first_name &&
+      verification.existing_user?.last_name
+    ) {
+      return `${verification.existing_user.first_name} ${verification.existing_user.last_name}`;
+    }
+
+    // Try to get name from step_data
+    if (
+      verification.step_data?.first_name &&
+      verification.step_data?.last_name
+    ) {
+      return `${verification.step_data.first_name} ${verification.step_data.last_name}`;
+    }
+
+    return "Unknown User";
+  }
+
+  private getContactInfo(verification: any): string {
+    const parts = [];
+    if (verification.email) parts.push(verification.email);
+    if (verification.mobile_phone) parts.push(verification.mobile_phone);
+    return parts.join(" • ");
+  }
+
+  private getVerificationAge(verification: any): string {
+    const createdAt = new Date(verification.created_at);
+    const now = new Date();
+    const diffInHours = Math.floor(
+      (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60)
+    );
+
+    if (diffInHours < 1) return "Just now";
+    if (diffInHours < 24) return `${diffInHours}h ago`;
+    if (diffInHours < 168) return `${Math.floor(diffInHours / 24)}d ago`;
+    return createdAt.toLocaleDateString();
   }
 }
 
-// Lazy-loaded service instance
-let _verificationsService: VerificationsService | null = null;
-
 export const verificationsService = {
-  get instance() {
-    if (!_verificationsService) {
-      _verificationsService = new VerificationsService();
-    }
-    return _verificationsService;
-  }
+  instance: new VerificationsService(),
 };

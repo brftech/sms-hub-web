@@ -2,6 +2,10 @@ import { useState, useEffect } from "react";
 import { useHub } from "@sms-hub/ui";
 import { useGlobalView } from "../../contexts/GlobalViewContext";
 import {
+  getSupabaseClient,
+  getSupabaseAdminClient,
+} from "../../lib/supabaseSingleton";
+import {
   Search,
   UserPlus,
   Users as UsersIcon,
@@ -580,7 +584,165 @@ const Users = () => {
         )}
       </div>
 
-      {/* TODO: Add modals for edit, create, delete, and view details */}
+      {/* Create User Modal */}
+      {isCreateModalOpen && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div className="mt-3">
+              <h3 className="text-lg font-medium text-gray-900 mb-4">
+                Create New User
+              </h3>
+              <form
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  const formData = new FormData(e.target as HTMLFormElement);
+                  const email = formData.get("email") as string;
+                  const password = formData.get("password") as string;
+                  const firstName = formData.get("firstName") as string;
+                  const lastName = formData.get("lastName") as string;
+                  const role = formData.get("role") as string;
+
+                  try {
+                    setIsUpdating(true);
+
+                    const supabaseAdmin = getSupabaseAdminClient();
+                    if (!supabaseAdmin) {
+                      throw new Error(
+                        "Failed to initialize Supabase admin client"
+                      );
+                    }
+
+                    // Create user in Supabase Auth
+                    const { data: authData, error: authError } =
+                      await supabaseAdmin.auth.admin.createUser({
+                        email,
+                        password,
+                        email_confirm: true,
+                        user_metadata: {
+                          first_name: firstName,
+                          last_name: lastName,
+                          full_name: `${firstName} ${lastName}`,
+                          hub_id: 1,
+                        },
+                      });
+
+                    if (authError) throw authError;
+
+                    // Create user profile
+                    const { error: profileError } = await supabaseAdmin
+                      .from("user_profiles")
+                      .insert({
+                        id: authData.user.id,
+                        email,
+                        first_name: firstName,
+                        last_name: lastName,
+                        role: role,
+                        hub_id: 1,
+                        account_number: `GNYMBLE-${Date.now()}`,
+                        company_id: "00000000-0000-0000-0000-000000000002", // SMS Hub System company
+                        customer_id: "00000000-0000-0000-0000-000000000003",
+                        is_active: true,
+                        verification_setup_completed: true,
+                        payment_status: "completed",
+                      });
+
+                    if (profileError) throw profileError;
+
+                    await fetchData();
+                    setIsCreateModalOpen(false);
+                    alert("User created successfully!");
+                  } catch (error: any) {
+                    console.error("Error creating user:", error);
+                    alert(`Failed to create user: ${error.message}`);
+                  } finally {
+                    setIsUpdating(false);
+                  }
+                }}
+              >
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Email
+                    </label>
+                    <input
+                      type="email"
+                      name="email"
+                      required
+                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Password
+                    </label>
+                    <input
+                      type="password"
+                      name="password"
+                      required
+                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        First Name
+                      </label>
+                      <input
+                        type="text"
+                        name="firstName"
+                        required
+                        className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Last Name
+                      </label>
+                      <input
+                        type="text"
+                        name="lastName"
+                        required
+                        className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Role
+                    </label>
+                    <select
+                      name="role"
+                      required
+                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+                    >
+                      <option value="SUPERADMIN">Super Admin</option>
+                      <option value="ADMIN">Admin</option>
+                      <option value="SUPPORT">Support</option>
+                      <option value="VIEWER">Viewer</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="flex justify-end space-x-3 mt-6">
+                  <button
+                    type="button"
+                    onClick={() => setIsCreateModalOpen(false)}
+                    className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isUpdating}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+                  >
+                    {isUpdating ? "Creating..." : "Create User"}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -111,7 +111,6 @@ export function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
-  const [showLegacyOption, setShowLegacyOption] = useState(false);
 
   // Check for dev superadmin mode and redirect
   useEffect(() => {
@@ -217,10 +216,7 @@ export function Login() {
       setError("");
 
       try {
-        const supabase = createSupabaseClient(
-          import.meta.env.VITE_SUPABASE_URL,
-          import.meta.env.VITE_SUPABASE_ANON_KEY
-        );
+        const supabase = getSupabaseClient();
 
         if (!supabase) {
           throw new Error("Failed to initialize Supabase client");
@@ -300,7 +296,6 @@ export function Login() {
             setError(
               "No account found. Are you a returning user? Try password login below."
             );
-            setShowLegacyOption(true);
             return;
           }
           throw new Error(result.error || "Failed to send verification");

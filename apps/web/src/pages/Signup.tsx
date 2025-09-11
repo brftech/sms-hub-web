@@ -22,9 +22,9 @@ import {
 import styled from "styled-components";
 import logoIcon from "@sms-hub/ui/assets/gnymble-icon-logo.svg";
 import { createSupabaseClient } from "@sms-hub/supabase";
-import { useDevAuth, activateDevAuth } from '../hooks/useDevAuth';
-import { DevAuthToggle } from '@sms-hub/ui';
-import { webEnvironment } from '../config/webEnvironment';
+import { useDevAuth, activateDevAuth } from "../hooks/useDevAuth";
+import { DevAuthToggle } from "@sms-hub/ui";
+import { webEnvironment } from "../config/webEnvironment";
 
 const SignupContainer = styled.div`
   min-height: 100vh;
@@ -207,8 +207,8 @@ export function Signup() {
   // Check for dev superadmin mode and redirect
   useEffect(() => {
     if (devAuth.isInitialized && devAuth.isSuperadmin) {
-      console.log('Dev superadmin mode active - redirecting from signup')
-      navigate('/', { replace: true })
+      console.log("Dev superadmin mode active - redirecting from signup");
+      navigate("/", { replace: true });
     }
   }, [devAuth.isInitialized, devAuth.isSuperadmin, navigate]);
 
@@ -402,7 +402,10 @@ export function Signup() {
   if (success) {
     return (
       <SignupContainer>
-        <DevAuthToggle environment={webEnvironment} onActivate={() => activateDevAuth()} />
+        <DevAuthToggle
+          environment={webEnvironment}
+          onActivate={() => activateDevAuth()}
+        />
         <SignupCard>
           <CardContent className="text-center py-12">
             <CheckCircle className="w-16 h-16 text-green-600 mx-auto mb-4" />
@@ -422,7 +425,10 @@ export function Signup() {
 
   return (
     <SignupContainer>
-      <DevAuthToggle environment={webEnvironment} onActivate={() => activateDevAuth()} />
+      <DevAuthToggle
+        environment={webEnvironment}
+        onActivate={() => activateDevAuth()}
+      />
       <SignupCard>
         <CardHeader>
           <LogoSection>
@@ -488,7 +494,7 @@ export function Signup() {
           )}
 
           {/* Show pathway selection if no invitation - HIDDEN FOR NOW */}
-          {false && !invitationToken && (
+          {!invitationToken && (
             <PathwaySelection>
               <PathwayCard
                 $selected={signupType === "new_company"}
@@ -520,7 +526,7 @@ export function Signup() {
           )}
 
           {/* Show invitation input if user selected invited_user but has no token - HIDDEN SINCE PATHWAYS ARE HIDDEN */}
-          {false && signupType === "invited_user" && !invitationToken && (
+          {signupType === "invited_user" && !invitationToken && (
             <FormGroup style={{ marginBottom: "1.5rem" }}>
               <StyledLabel htmlFor="invitation_code">
                 Invitation Code

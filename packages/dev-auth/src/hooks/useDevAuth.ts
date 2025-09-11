@@ -24,15 +24,20 @@ export const useDevAuth = (environment: EnvironmentAdapter): DevAuthState => {
   })
 
   useEffect(() => {
+    console.log('useDevAuth useEffect - environment check:', {
+      isDevelopment: environment.isDevelopment(),
+      searchParams: Object.fromEntries(searchParams.entries())
+    })
+    
     // Only enable dev auth in development environment
     if (!environment.isDevelopment()) {
+      console.log('Not in development environment, initializing as non-dev')
       setDevAuthState(prev => ({ ...prev, isInitialized: true }))
       return
     }
 
     // Check for superadmin query parameter
     const superadminKey = searchParams.get('superadmin')
-    const devUserParam = searchParams.get('devuser')
     
     // Also check environment variable (both Vite and standard)
     const envSuperadmin = 
@@ -42,6 +47,14 @@ export const useDevAuth = (environment: EnvironmentAdapter): DevAuthState => {
     // Enable superadmin if query param matches or env var is set
     // Removed auto-enable - now requires explicit ?superadmin=dev123 param
     const isSuperadmin = superadminKey === 'dev123' || envSuperadmin
+    
+    console.log('useDevAuth - superadmin check:', {
+      superadminKey,
+      envSuperadmin,
+      isSuperadmin,
+      currentUrl: window.location.href,
+      searchParams: Object.fromEntries(searchParams.entries())
+    })
     
     if (isSuperadmin) {
       // Use the actual superadmin user ID from the database
@@ -63,7 +76,7 @@ export const useDevAuth = (environment: EnvironmentAdapter): DevAuthState => {
         onboarding_completed: true,
         verification_setup_completed: true,
         is_active: true,
-        role: 'SUPERADMIN',
+        role: 'superadmin', // Use lowercase to match UserRole enum
         account_number: 'PERCY-SA001',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
@@ -85,6 +98,7 @@ export const useDevAuth = (environment: EnvironmentAdapter): DevAuthState => {
     } else {
       // DO NOT check sessionStorage - we want auth to be explicit each time
       // This prevents dev auth from persisting across page refreshes
+      console.log('useDevAuth - no superadmin detected, initializing as regular user')
       setDevAuthState(prev => ({ ...prev, isInitialized: true }))
     }
   }, [searchParams, environment])

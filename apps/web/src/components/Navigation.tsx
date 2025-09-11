@@ -102,7 +102,7 @@ const Navigation = () => {
           <div className="hidden md:flex items-center space-x-4">
             <HubSwitcher />
             <a
-              href="http://localhost:3004/login"
+              href="http://localhost:3001/"
               target="_blank"
               rel="noopener noreferrer"
               className="text-xs text-gray-400 hover:text-white transition-colors"

@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate, Link, useSearchParams } from 'react-router-dom'
 import { useHub, Button, Card, CardContent, CardDescription, CardHeader, CardTitle, HubLogo } from '@sms-hub/ui'
 import { Input, Label, Alert, AlertDescription } from '@sms-hub/ui'
 import { Mail, Phone, CheckCircle, Shield, Lock } from 'lucide-react'
 import styled from 'styled-components'
-import { createSupabaseClient } from '@sms-hub/supabase'
+import { getSupabaseClient } from '../lib/supabaseSingleton'
 import { useDevAuth, activateDevAuth } from '../hooks/useDevAuth'
 import { DevAuthToggle } from '@sms-hub/ui'
 import { webEnvironment } from '../config/webEnvironment'
@@ -53,6 +53,7 @@ const VerificationMethod = styled.div`
 export function Login() {
   const { hubConfig } = useHub()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const devAuth = useDevAuth()
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
@@ -69,9 +70,10 @@ export function Login() {
   useEffect(() => {
     if (devAuth.isInitialized && devAuth.isSuperadmin) {
       console.log('Dev superadmin mode active - redirecting from login')
-      window.location.href = 'http://localhost:3001/';
+      const redirectUrl = searchParams.get('redirect') || 'http://localhost:3001/'
+      window.location.href = redirectUrl
     }
-  }, [devAuth.isInitialized, devAuth.isSuperadmin])
+  }, [devAuth.isInitialized, devAuth.isSuperadmin, searchParams])
 
   const formatPhoneNumber = (value: string) => {
     const cleaned = value.replace(/\D/g, '')
@@ -109,6 +111,43 @@ export function Login() {
     return `+1${withoutCountryCode}`
   }
   
+  const handleSuperadminLogin = async () => {
+    setIsLoading(true)
+    setError('')
+    
+    try {
+      const supabase = getSupabaseClient()
+      
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+        email: 'superadmin@sms-hub.com',
+        password: 'SuperAdmin123!',
+      })
+      
+      if (signInError) throw signInError
+      
+      // Update last login method
+      if (data.user) {
+        await supabase
+          .from('user_profiles')
+          .update({ 
+            last_login_method: 'password',
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', data.user.id)
+      }
+      
+      // Redirect to user app dashboard or specified redirect URL
+      const redirectUrl = searchParams.get('redirect') || 'http://localhost:3001/'
+      window.location.href = redirectUrl
+      
+    } catch (err: any) {
+      console.error('Superadmin login error:', err)
+      setError(err.message || 'Superadmin login failed')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
@@ -150,8 +189,9 @@ export function Login() {
             .eq('id', data.user.id)
         }
         
-        // Redirect to user app dashboard
-        window.location.href = 'http://localhost:3001/';
+        // Redirect to user app dashboard or specified redirect URL
+        const redirectUrl = searchParams.get('redirect') || 'http://localhost:3001/'
+        window.location.href = redirectUrl
         
       } catch (err: any) {
         console.error('Password login error:', err)
@@ -325,6 +365,22 @@ export function Login() {
                     disabled={isLoading}
                   />
                 </FormGroup>
+                
+                {/* Superadmin Login Button */}
+                <div className="mt-4 pt-4 border-t border-gray-200">
+                  <Button
+                    type="button"
+                    onClick={handleSuperadminLogin}
+                    disabled={isLoading}
+                    className="w-full bg-red-600 hover:bg-red-700 text-white"
+                  >
+                    <Shield className="w-4 h-4 mr-2" />
+                    Superadmin Login
+                  </Button>
+                  <p className="text-xs text-gray-500 text-center mt-2">
+                    Quick access for system administrators
+                  </p>
+                </div>
               </>
             )}
 

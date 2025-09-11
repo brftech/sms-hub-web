@@ -3,7 +3,8 @@ import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { UserRole } from '../../types/roles'
 import { canAccessRoute, hasAnyRole } from '../../utils/roleUtils'
-import { redirectToWebApp } from '@sms-hub/utils'
+// import { redirectToWebApp } from '@sms-hub/utils'
+// import { unifiedEnvironment } from '../../config/unifiedEnvironment'
 
 interface ProtectedRouteProps {
   children: React.ReactNode
@@ -28,6 +29,9 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading...</p>
+          <p className="mt-2 text-sm text-gray-400">
+            Checking authentication...
+          </p>
         </div>
       </div>
     )
@@ -35,18 +39,12 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
   // Show login prompt if not authenticated
   if (!isAuthenticated || !user) {
-    // Redirect to web app login page
-    redirectToWebApp('/login')
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="max-w-md w-full bg-white shadow-lg rounded-lg p-6 text-center">
-          <h3 className="text-lg font-medium text-gray-900">Redirecting to Login...</h3>
-          <p className="mt-2 text-sm text-gray-500">
-            You will be redirected to the login page.
-          </p>
-        </div>
-      </div>
-    )
+    // Redirect to web app login with current URL as redirect parameter
+    const currentUrl = window.location.href
+    const redirectUrl = `http://localhost:3000/login?redirect=${encodeURIComponent(currentUrl)}`
+    console.log('ProtectedRoute: Redirecting to web app login:', redirectUrl)
+    window.location.href = redirectUrl
+    return null
   }
 
   // Check if user can access this specific route

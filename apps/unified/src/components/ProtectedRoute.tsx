@@ -4,9 +4,9 @@ import { useSupabase } from '../providers/SupabaseProvider'
 // import { CheckoutRedirect } from './CheckoutRedirect'
 import { useDevAuth, useSuperadminAuth } from '@sms-hub/dev-auth'
 import { unifiedEnvironment } from '../config/unifiedEnvironment'
-import { redirectToWebApp } from '@sms-hub/utils'
+// import { redirectToWebApp } from '@sms-hub/utils'
 
-export function ProtectedRoute({ children }: { children: React.ReactNode }) {
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [userProfile, setUserProfile] = useState<any>(null)
@@ -16,8 +16,20 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const supabase = useSupabase()
   
   useEffect(() => {
+    console.log('ProtectedRoute useEffect - devAuth state:', {
+      isInitialized: devAuth.isInitialized,
+      isSuperadmin: devAuth.isSuperadmin,
+      devUserProfile: devAuth.devUserProfile
+    })
+    console.log('ProtectedRoute useEffect - superadminAuth state:', {
+      isAuthenticated: superadminAuth.isAuthenticated,
+      isSuperadmin: superadminAuth.isSuperadmin,
+      superadminUser: superadminAuth.superadminUser
+    })
+    
     // Wait for dev auth to initialize
     if (!devAuth.isInitialized) {
+      console.log('Dev auth not initialized yet, waiting...')
       return
     }
     
@@ -90,9 +102,6 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   }
   
   if (!isAuthenticated) {
-    // For now, show a login prompt instead of redirecting
-    // TODO: Uncomment redirect when login flow is set up
-    // redirectToWebApp('/login');
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="max-w-md w-full bg-white shadow-lg rounded-lg p-6 text-center">
@@ -100,7 +109,23 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
           <p className="mt-2 text-sm text-gray-500">
             Please log in to access this page.
           </p>
-          <div className="mt-6 space-y-2">
+          <div className="mt-6 space-y-3">
+            <a
+              href="/superadmin-login"
+              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              Superadmin Login
+            </a>
+            <button
+              onClick={() => {
+                const url = new URL(window.location.href)
+                url.searchParams.set('superadmin', 'dev123')
+                window.location.href = url.toString()
+              }}
+              className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              Dev Mode (No Password)
+            </button>
             <p className="text-xs text-gray-400">
               Dev mode: Add ?superadmin=dev123 to URL to enable superadmin mode
             </p>
@@ -135,3 +160,5 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   
   return <>{children}</>
 }
+
+export default ProtectedRoute

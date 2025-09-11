@@ -2,9 +2,24 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import { HubProvider, ErrorBoundary } from '@sms-hub/ui'
 import { unifiedEnvironment } from './config/unifiedEnvironment'
 import AppLayout from './components/layout/AppLayout'
-import ProtectedRoute from './components/ProtectedRoute'
+import { ProtectedRoute } from './components/auth/ProtectedRoute'
 import { UserRole } from './types/roles'
 import ClearAuth from './pages/ClearAuth'
+// import DevLogin from './pages/DevLogin'
+import { useAuth } from './hooks/useAuth'
+
+// Dashboard Router Component
+const DashboardRouter = () => {
+  const { user } = useAuth()
+  
+  // Show appropriate dashboard based on user role
+  if (user?.role === UserRole.SUPERADMIN || user?.role === UserRole.ADMIN) {
+    return <AdminDashboard />
+  }
+  
+  // Show regular user dashboard for regular users
+  return <UserDashboard />
+}
 
 // Import user pages
 import { Dashboard as UserDashboard } from './pages/user/Dashboard'
@@ -66,8 +81,9 @@ function App() {
     <ErrorBoundary>
       <HubProvider environment={unifiedEnvironment} defaultHub="gnymble">
         <Routes>
-          {/* Public route - accessible without authentication */}
+          {/* Public routes - accessible without authentication */}
           <Route path="/clear-auth" element={<ClearAuth />} />
+          {/* <Route path="/dev-login" element={<DevLogin />} /> */}
           
           {/* All other routes require authentication and are wrapped in AppLayout */}
           <Route path="*" element={
@@ -79,12 +95,12 @@ function App() {
                 {/* Redirect old signup route to dashboard */}
                 <Route path="/signup" element={<Navigate to="/dashboard" replace />} />
                 
-                {/* User Routes - accessible to onboarded users and above */}
+                {/* Dashboard Route - show different dashboards based on role */}
                 <Route 
                   path="/dashboard" 
                   element={
                     <ProtectedRoute requiredRoles={[UserRole.ONBOARDED, UserRole.ADMIN, UserRole.SUPERADMIN]}>
-                      <UserDashboard />
+                      <DashboardRouter />
                     </ProtectedRoute>
                   } 
                 />

@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react'
+import { UserProfile, UserRole } from '../types/roles'
 import { useSupabase } from '../providers/SupabaseProvider'
-import { useDevAuth } from '@sms-hub/dev-auth'
-import { useSuperadminAuth } from '@sms-hub/dev-auth'
-import { UserProfile } from '../types/roles'
-import { unifiedEnvironment } from '../config/unifiedEnvironment'
+import { useSearchParams } from 'react-router-dom'
 
 interface AuthState {
   isAuthenticated: boolean
@@ -19,80 +17,125 @@ export const useAuth = (): AuthState => {
     user: null,
     session: null
   })
-
-  const devAuth = useDevAuth(unifiedEnvironment)
-  const superadminAuth = useSuperadminAuth()
+  
   const supabase = useSupabase()
+  const [searchParams] = useSearchParams()
 
   useEffect(() => {
-    // Wait for dev auth to initialize
-    if (!devAuth.isInitialized) {
-      console.log('Waiting for dev auth to initialize...')
-      return
-    }
-
-    // Check for dev superadmin mode first
-    if (devAuth.isSuperadmin) {
-      console.log('Dev superadmin mode active')
-      setAuthState({
-        isAuthenticated: true,
-        isLoading: false,
-        user: devAuth.devUserProfile as UserProfile,
-        session: { user: devAuth.devUserProfile }
-      })
-      return
-    }
-
-    // Check for real superadmin authentication
-    if (superadminAuth.isAuthenticated && superadminAuth.isSuperadmin) {
-      console.log('Superadmin authentication active')
-      setAuthState({
-        isAuthenticated: true,
-        isLoading: false,
-        user: superadminAuth.superadminUser as UserProfile,
-        session: superadminAuth.superadminUser
-      })
-      return
-    }
-
     const checkAuth = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession()
-        console.log('Current session:', session)
-        
-        if (session?.user) {
-          // Load user profile from database
-          const { data: profile, error } = await supabase
-            .from('user_profiles')
-            .select('*')
-            .eq('id', session.user.id)
-            .single()
-
-          if (error) {
-            console.error('Error loading user profile:', error)
-            setAuthState({
-              isAuthenticated: false,
-              isLoading: false,
-              user: null,
-              session: null
-            })
-            return
+        // Check for dev bypass first
+        const devBypass = searchParams.get('superadmin')
+        if (devBypass === 'dev123') {
+          console.log('Dev superadmin bypass activated')
+          
+          // Create mock superadmin user
+          const mockSuperadmin: UserProfile = {
+            id: '00000000-0000-0000-0000-000000000001',
+            email: 'superadmin@sms-hub.com',
+            phone: '+15551234567',
+            mobile_phone_number: '+15551234567',
+            first_name: 'Super',
+            last_name: 'Admin',
+            company_id: '00000000-0000-0000-0000-000000000002',
+            company_name: 'SMS Hub System',
+            customer_id: '00000000-0000-0000-0000-000000000003',
+            hub_id: 1, // PercyTech
+            payment_status: 'completed',
+            onboarding_completed: true,
+            verification_setup_completed: true,
+            is_active: true,
+            role: UserRole.SUPERADMIN,
+            account_number: 'PERCY-SA001',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            signup_type: 'email',
+            permissions: {
+              can_manage_users: true,
+              can_manage_companies: true,
+              can_manage_billing: true,
+              can_view_analytics: true,
+              can_manage_system: true
+            }
           }
-
+          
           setAuthState({
             isAuthenticated: true,
             isLoading: false,
-            user: profile as unknown as UserProfile,
-            session
+            user: mockSuperadmin,
+            session: { 
+              user: { 
+                id: mockSuperadmin.id,
+                email: mockSuperadmin.email 
+              },
+              access_token: 'dev-superadmin-token'
+            }
           })
-        } else {
+          return
+        }
+
+        // Check Supabase session
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+        
+        if (sessionError) {
+          console.error('Error getting session:', sessionError)
           setAuthState({
             isAuthenticated: false,
             isLoading: false,
             user: null,
             session: null
           })
+          return
         }
+        
+        if (!session) {
+          console.log('No active session found')
+          setAuthState({
+            isAuthenticated: false,
+            isLoading: false,
+            user: null,
+            session: null
+          })
+          return
+        }
+
+        console.log('Session found:', session.user.email)
+        
+        // Load user profile from database
+        const { data: profile, error: profileError } = await supabase
+          .from('user_profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .single()
+
+        if (profileError) {
+          console.error('Error loading user profile:', profileError)
+          // Even if profile fails, user is authenticated
+          setAuthState({
+            isAuthenticated: true,
+            isLoading: false,
+            user: {
+              id: session.user.id,
+              email: session.user.email || '',
+              first_name: '',
+              last_name: '',
+              role: UserRole.USER,
+              signup_type: 'email',
+              permissions: {}
+            } as UserProfile,
+            session
+          })
+          return
+        }
+
+        console.log('User profile loaded:', profile.email)
+        
+        setAuthState({
+          isAuthenticated: true,
+          isLoading: false,
+          user: profile as UserProfile,
+          session
+        })
       } catch (error) {
         console.error('Auth check error:', error)
         setAuthState({
@@ -108,10 +151,10 @@ export const useAuth = (): AuthState => {
 
     // Subscribe to auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Auth state changed:', event, session)
+      console.log('Auth state changed:', event)
       
-      if (session?.user) {
-        // Load user profile
+      if (event === 'SIGNED_IN' && session) {
+        // Reload user profile
         const { data: profile } = await supabase
           .from('user_profiles')
           .select('*')
@@ -121,10 +164,18 @@ export const useAuth = (): AuthState => {
         setAuthState({
           isAuthenticated: true,
           isLoading: false,
-          user: profile as unknown as UserProfile,
+          user: profile as UserProfile || {
+            id: session.user.id,
+            email: session.user.email || '',
+            first_name: '',
+            last_name: '',
+            role: UserRole.USER,
+            signup_type: 'email',
+            permissions: {}
+          } as UserProfile,
           session
         })
-      } else {
+      } else if (event === 'SIGNED_OUT') {
         setAuthState({
           isAuthenticated: false,
           isLoading: false,
@@ -134,9 +185,10 @@ export const useAuth = (): AuthState => {
       }
     })
 
-    return () => subscription.unsubscribe()
-  }, [devAuth.isInitialized, devAuth.isSuperadmin, devAuth.devUserProfile, superadminAuth.isAuthenticated, superadminAuth.isSuperadmin, superadminAuth.superadminUser, supabase])
+    return () => {
+      subscription.unsubscribe()
+    }
+  }, [supabase, searchParams])
 
-  console.log('useAuth returning state:', authState)
   return authState
 }

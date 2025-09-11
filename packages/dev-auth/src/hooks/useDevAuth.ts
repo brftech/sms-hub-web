@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
+import { getAuthConfig, validateDevAuthConfig } from '../config'
 
 interface DevAuthState {
   isDevMode: boolean
@@ -29,31 +30,42 @@ export const useDevAuth = (environment: EnvironmentAdapter): DevAuthState => {
       searchParams: Object.fromEntries(searchParams.entries())
     })
     
+    // Get auth configuration
+    const authConfig = getAuthConfig();
+    
     // Only enable dev auth in development environment
-    if (!environment.isDevelopment()) {
-      console.log('Not in development environment, initializing as non-dev')
-      setDevAuthState(prev => ({ ...prev, isInitialized: true }))
-      return
+    if (!environment.isDevelopment() || !authConfig.dev.enabled) {
+      console.log('Dev auth disabled', { 
+        isDevelopment: environment.isDevelopment(),
+        devEnabled: authConfig.dev.enabled 
+      });
+      setDevAuthState(prev => ({ ...prev, isInitialized: true }));
+      return;
+    }
+
+    // Validate dev auth configuration
+    const validation = validateDevAuthConfig();
+    if (!validation.valid) {
+      console.error('Dev auth configuration error:', validation.error);
+      setDevAuthState(prev => ({ ...prev, isInitialized: true }));
+      return;
     }
 
     // Check for superadmin query parameter
-    const superadminKey = searchParams.get('superadmin')
+    const superadminKey = searchParams.get('superadmin');
     
-    // Also check environment variable (both Vite and standard)
-    const envSuperadmin = 
-      (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_DEV_SUPERADMIN === 'true') ||
-      (typeof process !== 'undefined' && process.env?.DEV_SUPERADMIN === 'true')
+    // Get the expected token from environment
+    const expectedToken = 
+      (typeof import.meta !== 'undefined' && import.meta.env?.[authConfig.dev.tokenKey]) || 
+      (typeof process !== 'undefined' && process.env?.[authConfig.dev.tokenKey]);
     
-    // Enable superadmin if query param matches or env var is set
-    // Removed auto-enable - now requires explicit ?superadmin=dev123 param
-    const isSuperadmin = superadminKey === 'dev123' || envSuperadmin
+    // Enable superadmin only if query param matches the secure token
+    const isSuperadmin = superadminKey === expectedToken && expectedToken !== undefined;
     
     console.log('useDevAuth - superadmin check:', {
-      superadminKey,
-      envSuperadmin,
-      isSuperadmin,
-      currentUrl: window.location.href,
-      searchParams: Object.fromEntries(searchParams.entries())
+      hasToken: !!superadminKey,
+      tokenValid: isSuperadmin,
+      currentUrl: window.location.href
     })
     
     if (isSuperadmin) {
@@ -110,15 +122,26 @@ export const useDevAuth = (environment: EnvironmentAdapter): DevAuthState => {
 export const activateDevAuth = (environment: EnvironmentAdapter, _userId?: string) => {
   console.log('activateDevAuth called', { isDev: environment.isDevelopment() })
   
-  if (!environment.isDevelopment()) {
+  const authConfig = getAuthConfig();
+  
+  if (!environment.isDevelopment() || !authConfig.dev.enabled) {
     console.warn('Dev auth can only be activated in development environment')
     return
   }
   
-  // Since we're not storing in sessionStorage anymore,
-  // this function now just adds the query param and reloads
+  // Get the token from environment
+  const token = 
+    (typeof import.meta !== 'undefined' && import.meta.env?.[authConfig.dev.tokenKey]) || 
+    (typeof process !== 'undefined' && process.env?.[authConfig.dev.tokenKey]);
+  
+  if (!token) {
+    console.error('Dev auth token not configured. Cannot activate dev auth.');
+    return;
+  }
+  
+  // Add the query param with the secure token and reload
   const url = new URL(window.location.href)
-  url.searchParams.set('superadmin', 'dev123')
+  url.searchParams.set('superadmin', token)
   window.location.href = url.toString()
 }
 

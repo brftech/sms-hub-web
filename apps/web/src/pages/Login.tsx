@@ -100,7 +100,7 @@ export function Login() {
 
   // Prepopulate with superadmin credentials in dev mode
   const isDev = import.meta.env.DEV;
-  const [email, setEmail] = useState(isDev ? "superadmin@sms-hub.com" : "");
+  const [email, setEmail] = useState(isDev ? "superadmin@gnymble.com" : "");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState(isDev ? "SuperAdmin123!" : "");
   const [showPassword, setShowPassword] = useState(false);
@@ -118,7 +118,7 @@ export function Login() {
       console.log("Dev superadmin mode active - redirecting from login");
       const redirectUrl =
         searchParams.get("redirect") ||
-        "http://localhost:3001/?superadmin=dev123";
+        "http://localhost:3001/dashboard";
       window.location.href = redirectUrl;
     }
   }, [devAuth.isInitialized, devAuth.isSuperadmin, searchParams]);
@@ -163,43 +163,9 @@ export function Login() {
     return `+1${withoutCountryCode}`;
   };
 
-  const handleSuperadminLogin = async () => {
-    setIsLoading(true);
-    setError("");
-
-    try {
-      const supabase = getSupabaseClient();
-
-      const { data, error: signInError } =
-        await supabase.auth.signInWithPassword({
-          email: "superadmin@sms-hub.com",
-          password: "SuperAdmin123!",
-        });
-
-      if (signInError) throw signInError;
-
-      // Update last login method
-      if (data.user) {
-        await supabase
-          .from("user_profiles")
-          .update({
-            last_login_method: "password",
-            updated_at: new Date().toISOString(),
-          })
-          .eq("id", data.user.id);
-      }
-
-      // Redirect to user app dashboard or specified redirect URL
-      const redirectUrl =
-        searchParams.get("redirect") ||
-        "http://localhost:3001/?superadmin=dev123";
-      window.location.href = redirectUrl;
-    } catch (err: any) {
-      console.error("Superadmin login error:", err);
-      setError(err.message || "Superadmin login failed");
-    } finally {
-      setIsLoading(false);
-    }
+  const handleSuperadminLogin = () => {
+    // Dev bypass - no Supabase auth, just redirect with the dev token
+    window.location.href = "http://localhost:3001/?superadmin=dev123";
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -416,7 +382,7 @@ export function Login() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     disabled={isLoading}
-                    autoFocus
+                    // autoFocus removed - don't activate email field automatically
                   />
                 </FormGroup>
 
@@ -442,21 +408,7 @@ export function Login() {
                   </PasswordInputWrapper>
                 </FormGroup>
 
-                {/* Superadmin Login Button */}
-                <div className="mt-4 pt-4 border-t border-gray-200">
-                  <Button
-                    type="button"
-                    onClick={handleSuperadminLogin}
-                    disabled={isLoading}
-                    className="w-full bg-red-600 hover:bg-red-700 text-white"
-                  >
-                    <Shield className="w-4 h-4 mr-2" />
-                    Superadmin Login
-                  </Button>
-                  <p className="text-xs text-gray-500 text-center mt-2">
-                    Quick access for system administrators
-                  </p>
-                </div>
+                {/* Moved Superadmin button after submit button */}
               </>
             )}
 
@@ -533,13 +485,31 @@ export function Login() {
                 ? "Loading..."
                 : loginType === "verification"
                   ? "Send Verification Code"
-                  : "Sign In"}
+                  : "Login"}
               {loginType === "verification" ? (
                 <Shield className="w-4 h-4 ml-2" />
               ) : (
                 <Lock className="w-4 h-4 ml-2" />
               )}
             </Button>
+
+            {/* Superadmin Login Button - bypasses Supabase auth */}
+            {loginType === "password" && (
+              <div className="mt-4">
+                <Button
+                  type="button"
+                  onClick={handleSuperadminLogin}
+                  disabled={isLoading}
+                  className="w-full bg-red-600 hover:bg-red-700 text-white"
+                >
+                  <Shield className="w-4 h-4 mr-2" />
+                  Superadmin Login
+                </Button>
+                <p className="text-xs text-gray-500 text-center mt-2">
+                  Dev mode: Opens unified app with ?superadmin=dev123 (bypasses Supabase)
+                </p>
+              </div>
+            )}
 
             {/* Toggle between password and verification login */}
             <div className="text-center">

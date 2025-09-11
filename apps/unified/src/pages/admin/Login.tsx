@@ -30,7 +30,7 @@ export function Login() {
   // Check for dev superadmin mode and redirect
   useEffect(() => {
     if (devAuth.isInitialized && devAuth.isSuperadmin) {
-      console.log("Dev superadmin mode active - redirecting from admin login");
+      // Dev superadmin mode active - redirect to dashboard
       navigate("/", { replace: true });
     }
   }, [devAuth.isInitialized, devAuth.isSuperadmin, navigate]);

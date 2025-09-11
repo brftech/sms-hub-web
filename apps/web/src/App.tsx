@@ -25,6 +25,7 @@ import { Login } from "./pages/Login";
 import { Signup } from "./pages/Signup";
 import { VerifyOtp } from "./pages/VerifyOtp";
 import { VerifyCode } from "./pages/VerifyCode";
+import { TestAuth } from "./pages/TestAuth";
 
 // Lazy load client pages (less frequently accessed)
 const DonsBurlingame = lazy(() => import("./pages/clients/DonsBurlingame"));
@@ -202,6 +203,14 @@ const AppRoutes = () => {
       />
       
       {/* Auth routes */}
+      <Route
+        path="/test-auth"
+        element={
+          <PageTransition>
+            <TestAuth />
+          </PageTransition>
+        }
+      />
       <Route
         path="/login"
         element={

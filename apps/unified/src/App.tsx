@@ -6,6 +6,7 @@ import UserLayout from "./components/layout/UserLayout";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { UserRole } from "./types/roles";
 import ClearAuth from "./pages/ClearAuth";
+import { DebugAuth } from "./pages/DebugAuth";
 // import DevLogin from './pages/DevLogin'
 // import { useAuth } from "./hooks/useAuth";
 import { GlobalViewProvider } from "./contexts/GlobalViewContext";
@@ -99,11 +100,17 @@ function App() {
           <Routes>
             {/* Public routes - accessible without authentication */}
             <Route path="/clear-auth" element={<ClearAuth />} />
+            <Route path="/debug-auth" element={<DebugAuth />} />
             {/* <Route path="/dev-login" element={<DevLogin />} /> */}
-                  {/* Redirect root to dashboard */}
+                  {/* Redirect root to dashboard - preserve query params */}
                   <Route
                     path="/"
-                    element={<Navigate to="/dashboard" replace />}
+                    element={
+                      <Navigate 
+                        to={`/dashboard${window.location.search}`} 
+                        replace 
+                      />
+                    }
                   />
 
                   {/* Redirect old signup route to dashboard */}

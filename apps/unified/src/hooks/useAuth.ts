@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback } from "react";
 import { UserProfile, UserRole } from "../types/roles";
 import { useSupabase } from "../providers/SupabaseProvider";
 import { useSearchParams } from "react-router-dom";
+import { getAuthConfig, validateDevAuthConfig } from "@sms-hub/dev-auth";
+import { logger } from "../utils/logger";
 
 interface AuthState {
   isAuthenticated: boolean;
@@ -41,24 +43,31 @@ export const useAuth = (): AuthState => {
         session: null,
       }));
     } catch (error) {
-      console.error("Logout error:", error);
+      logger.error("Logout error:", error);
     }
   }, [supabase]);
 
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        // Check for dev bypass first - also check localStorage for persistence
-        const devBypass =
-          superadminParam || localStorage.getItem("dev_bypass");
+        // Get auth configuration
+        const authConfig = getAuthConfig();
+        const isDevelopment = import.meta.env.MODE === 'development';
+        
+        // Check for dev bypass only in development
+        if (isDevelopment) {
+          // Quick hardcoded check for immediate use
+          const devBypass = superadminParam || localStorage.getItem("dev_bypass");
+          
+          // Accept either the old dev123 or the new secure token
+          if (devBypass === "dev123" || devBypass === "ZT6LyVWLAWNSSqJgkaqTKj/orJ0i9pZHNm7d0qyL3l") {
+            logger.auth("Dev superadmin bypass activated");
+            
+            // Store in localStorage for persistence
+            localStorage.setItem("dev_bypass", devBypass);
 
-        if (devBypass === "dev123") {
-          // Store in localStorage so it persists across navigation
-          localStorage.setItem("dev_bypass", "dev123");
-          console.log("Dev superadmin bypass activated");
-
-          // Create mock superadmin user
-          const mockSuperadmin: UserProfile = {
+            // Create mock superadmin user
+            const mockSuperadmin: UserProfile = {
             id: "00000000-0000-0000-0000-000000000001",
             email: "superadmin@sms-hub.com",
             mobile_phone_number: "+15551234567",
@@ -86,20 +95,21 @@ export const useAuth = (): AuthState => {
             },
           };
 
-          setAuthState({
-            isAuthenticated: true,
-            isLoading: false,
-            user: mockSuperadmin,
-            session: {
-              user: {
-                id: mockSuperadmin.id,
-                email: mockSuperadmin.email,
-              },
-              access_token: "dev-superadmin-token",
-            },
-            logout,
-          });
-          return;
+              setAuthState({
+                isAuthenticated: true,
+                isLoading: false,
+                user: mockSuperadmin,
+                session: {
+                  user: {
+                    id: mockSuperadmin.id,
+                    email: mockSuperadmin.email,
+                  },
+                  access_token: "dev-superadmin-token",
+                },
+                logout,
+              });
+              return;
+          }
         }
 
         // Check Supabase session
@@ -109,7 +119,7 @@ export const useAuth = (): AuthState => {
         } = await supabase.auth.getSession();
 
         if (sessionError) {
-          console.error("Error getting session:", sessionError);
+          logger.error("Error getting session:", sessionError);
           setAuthState({
             isAuthenticated: false,
             isLoading: false,
@@ -121,7 +131,7 @@ export const useAuth = (): AuthState => {
         }
 
         if (!session) {
-          console.log("No active session found");
+          logger.auth("No active session found");
           setAuthState({
             isAuthenticated: false,
             isLoading: false,
@@ -132,7 +142,7 @@ export const useAuth = (): AuthState => {
           return;
         }
 
-        console.log("Session found:", session.user.email);
+        logger.auth("Session found", { email: session.user.email });
 
         // Load user profile from database
         const { data: profile, error: profileError } = await supabase
@@ -142,7 +152,7 @@ export const useAuth = (): AuthState => {
           .single();
 
         if (profileError) {
-          console.error("Error loading user profile:", profileError);
+          logger.error("Error loading user profile:", profileError);
           // Even if profile fails, user is authenticated
           setAuthState({
             isAuthenticated: true,
@@ -162,7 +172,7 @@ export const useAuth = (): AuthState => {
           return;
         }
 
-        console.log("User profile loaded:", profile.email);
+        logger.auth("User profile loaded", { email: profile.email });
 
         setAuthState({
           isAuthenticated: true,
@@ -172,7 +182,7 @@ export const useAuth = (): AuthState => {
           logout,
         });
       } catch (error) {
-        console.error("Auth check error:", error);
+        logger.error("Auth check error:", error);
         setAuthState(prevState => ({
           ...prevState,
           isAuthenticated: false,
@@ -189,7 +199,7 @@ export const useAuth = (): AuthState => {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event: any, session: any) => {
-      console.log("Auth state changed:", event);
+      logger.auth("Auth state changed", { event });
 
       if (event === "SIGNED_IN" && session) {
         // Reload user profile

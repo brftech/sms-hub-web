@@ -268,7 +268,8 @@ const Dashboard = () => {
 
       // Try the FK-aware method first
       console.log("Attempting FK-aware verification cleanup...");
-      let result = await dataCleanupService.instance.performDataCleanupWithFKHandling();
+      let result =
+        await dataCleanupService.instance.performDataCleanupWithFKHandling();
 
       // If that fails, try the regular method
       if (!result.success) {

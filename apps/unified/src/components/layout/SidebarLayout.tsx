@@ -81,22 +81,29 @@ const SidebarLayout: React.FC<{ children: React.ReactNode }> = ({
     // Main navigation items for all users (matching Gnymble production)
     items.push({
       name: "Conversations",
-      href: "/messages",
+      href: "/conversations",
       icon: MessageSquare,
       showCount: false,
     });
 
     items.push({
       name: "Broadcasts",
-      href: "/campaigns",
+      href: "/broadcasts",
       icon: Zap,
       showCount: false,
     });
 
     items.push({
       name: "Statistics",
-      href: "/dashboard",
+      href: "/statistics",
       icon: BarChart3,
+      showCount: false,
+    });
+
+    items.push({
+      name: "Persons",
+      href: "/persons",
+      icon: Users,
       showCount: false,
     });
 
@@ -286,7 +293,7 @@ const SidebarLayout: React.FC<{ children: React.ReactNode }> = ({
                   <span className="font-medium text-base">Settings</span>
                 </Link>
 
-                {/* Users (person) - for users with full company admin access */}
+                {/* Company Users (person) - for users with full company admin access */}
                 <Link
                   to="/admin/users"
                   className={`
@@ -300,7 +307,7 @@ const SidebarLayout: React.FC<{ children: React.ReactNode }> = ({
                   onClick={() => setIsSidebarOpen(false)}
                 >
                   <Users className="h-5 w-5" />
-                  <span className="font-medium text-base">Users</span>
+                  <span className="font-medium text-base">Company Users</span>
                 </Link>
 
                 {/* Superadmin (globe) - for superadmin view */}
@@ -386,6 +393,11 @@ const SidebarLayout: React.FC<{ children: React.ReactNode }> = ({
                 </div>
                 <h2 className="text-lg font-semibold text-foreground">
                   Gnymble
+                  {isSuperAdmin && (
+                    <span className="ml-2 text-xs bg-orange-500 text-white px-2 py-1 rounded-full font-medium">
+                      SUPERADMIN
+                    </span>
+                  )}
                   {isGlobalView && (
                     <span className="ml-2 text-sm text-purple-600 font-normal">
                       (Global View)

@@ -6,19 +6,23 @@ import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { UserRole } from "./types/roles";
 import ClearAuth from "./pages/ClearAuth";
 // import DevLogin from './pages/DevLogin'
-import { useAuth } from "./hooks/useAuth";
+// import { useAuth } from "./hooks/useAuth";
 import { GlobalViewProvider } from "./contexts/GlobalViewContext";
 
 // Dashboard Router Component
 const DashboardRouter = () => {
-  // Always show User dashboard first - admin users can access admin features via navigation
-  return <UserDashboard />;
+  // Redirect to conversations as the default user view
+  return <Navigate to="/conversations" replace />;
 };
 
 // Import user pages
-import { Dashboard as UserDashboard } from "./pages/user/Dashboard";
+// import { Dashboard as UserDashboard } from "./pages/user/Dashboard";
 import { Campaigns as UserCampaigns } from "./pages/user/Campaigns";
 import { Messages as UserMessages } from "./pages/user/Messages";
+import { Conversations as UserConversations } from "./pages/user/Conversations";
+import { Broadcasts as UserBroadcasts } from "./pages/user/Broadcasts";
+import { Persons as UserPersons } from "./pages/user/Persons";
+import { Statistics as UserStatistics } from "./pages/user/Statistics";
 import { Settings as UserSettings } from "./pages/user/Settings";
 import { AccountDetails as UserAccountDetails } from "./pages/user/AccountDetails";
 import { Onboarding as UserOnboarding } from "./pages/user/Onboarding";
@@ -148,6 +152,64 @@ function App() {
                           ]}
                         >
                           <UserMessages />
+                        </ProtectedRoute>
+                      }
+                    />
+
+                    {/* New User View Routes */}
+                    <Route
+                      path="/conversations"
+                      element={
+                        <ProtectedRoute
+                          requiredRoles={[
+                            UserRole.ONBOARDED,
+                            UserRole.ADMIN,
+                            UserRole.SUPERADMIN,
+                          ]}
+                        >
+                          <UserConversations />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/broadcasts"
+                      element={
+                        <ProtectedRoute
+                          requiredRoles={[
+                            UserRole.ONBOARDED,
+                            UserRole.ADMIN,
+                            UserRole.SUPERADMIN,
+                          ]}
+                        >
+                          <UserBroadcasts />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/persons"
+                      element={
+                        <ProtectedRoute
+                          requiredRoles={[
+                            UserRole.ONBOARDED,
+                            UserRole.ADMIN,
+                            UserRole.SUPERADMIN,
+                          ]}
+                        >
+                          <UserPersons />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/statistics"
+                      element={
+                        <ProtectedRoute
+                          requiredRoles={[
+                            UserRole.ONBOARDED,
+                            UserRole.ADMIN,
+                            UserRole.SUPERADMIN,
+                          ]}
+                        >
+                          <UserStatistics />
                         </ProtectedRoute>
                       }
                     />

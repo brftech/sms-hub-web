@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { HubProvider, ErrorBoundary } from "@sms-hub/ui";
 import { unifiedEnvironment } from "./config/unifiedEnvironment";
 import SidebarLayout from "./components/layout/SidebarLayout";
+import AdminLayout from "./components/layout/AdminLayout";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { UserRole } from "./types/roles";
 import ClearAuth from "./pages/ClearAuth";
@@ -48,6 +49,10 @@ import AdminSettings from "./pages/admin/Settings";
 import { Analytics as AdminAnalytics } from "./pages/admin/Analytics";
 import { Messages as AdminMessages } from "./pages/admin/Messages";
 import { LayoutDemo as AdminLayoutDemo } from "./pages/admin/LayoutDemo";
+import { Accounts as AdminAccounts } from "./pages/admin/Accounts";
+import { PhoneNumbers as AdminPhoneNumbers } from "./pages/admin/PhoneNumbers";
+import { Voice as AdminVoice } from "./pages/admin/Voice";
+import { AdminStatistics } from "./pages/admin/AdminStatistics";
 
 // Unauthorized page
 const Unauthorized = () => (
@@ -382,7 +387,9 @@ function App() {
                         <ProtectedRoute
                           requiredRoles={[UserRole.ADMIN, UserRole.SUPERADMIN]}
                         >
-                          <AdminDashboard />
+                          <AdminLayout>
+                            <AdminDashboard />
+                          </AdminLayout>
                         </ProtectedRoute>
                       }
                     />
@@ -442,7 +449,59 @@ function App() {
                         <ProtectedRoute
                           requiredRoles={[UserRole.ADMIN, UserRole.SUPERADMIN]}
                         >
-                          <AdminSettings />
+                          <AdminLayout>
+                            <AdminSettings />
+                          </AdminLayout>
+                        </ProtectedRoute>
+                      }
+                    />
+
+                    {/* New Admin Routes */}
+                    <Route
+                      path="/admin/accounts"
+                      element={
+                        <ProtectedRoute
+                          requiredRoles={[UserRole.ADMIN, UserRole.SUPERADMIN]}
+                        >
+                          <AdminLayout>
+                            <AdminAccounts />
+                          </AdminLayout>
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/admin/phone-numbers"
+                      element={
+                        <ProtectedRoute
+                          requiredRoles={[UserRole.ADMIN, UserRole.SUPERADMIN]}
+                        >
+                          <AdminLayout>
+                            <AdminPhoneNumbers />
+                          </AdminLayout>
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/admin/voice"
+                      element={
+                        <ProtectedRoute
+                          requiredRoles={[UserRole.ADMIN, UserRole.SUPERADMIN]}
+                        >
+                          <AdminLayout>
+                            <AdminVoice />
+                          </AdminLayout>
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/admin/statistics"
+                      element={
+                        <ProtectedRoute
+                          requiredRoles={[UserRole.ADMIN, UserRole.SUPERADMIN]}
+                        >
+                          <AdminLayout>
+                            <AdminStatistics />
+                          </AdminLayout>
                         </ProtectedRoute>
                       }
                     />

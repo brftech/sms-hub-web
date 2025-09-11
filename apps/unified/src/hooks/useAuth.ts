@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { UserProfile, UserRole } from "../types/roles";
 import { useSupabase } from "../providers/SupabaseProvider";
 import { useSearchParams } from "react-router-dom";
@@ -22,8 +22,9 @@ export const useAuth = (): AuthState => {
 
   const supabase = useSupabase();
   const [searchParams] = useSearchParams();
+  const superadminParam = searchParams.get("superadmin");
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     try {
       // Clear dev bypass if it exists
       localStorage.removeItem("dev_bypass");
@@ -32,24 +33,24 @@ export const useAuth = (): AuthState => {
       await supabase.auth.signOut();
 
       // Reset auth state
-      setAuthState({
+      setAuthState(prevState => ({
+        ...prevState,
         isAuthenticated: false,
         isLoading: false,
         user: null,
         session: null,
-        logout,
-      });
+      }));
     } catch (error) {
       console.error("Logout error:", error);
     }
-  };
+  }, [supabase]);
 
   useEffect(() => {
     const checkAuth = async () => {
       try {
         // Check for dev bypass first - also check localStorage for persistence
         const devBypass =
-          searchParams.get("superadmin") || localStorage.getItem("dev_bypass");
+          superadminParam || localStorage.getItem("dev_bypass");
 
         if (devBypass === "dev123") {
           // Store in localStorage so it persists across navigation
@@ -172,13 +173,13 @@ export const useAuth = (): AuthState => {
         });
       } catch (error) {
         console.error("Auth check error:", error);
-        setAuthState({
+        setAuthState(prevState => ({
+          ...prevState,
           isAuthenticated: false,
           isLoading: false,
           user: null,
           session: null,
-          logout,
-        });
+        }));
       }
     };
 
@@ -198,7 +199,8 @@ export const useAuth = (): AuthState => {
           .eq("id", session.user.id)
           .single();
 
-        setAuthState({
+        setAuthState(prevState => ({
+          ...prevState,
           isAuthenticated: true,
           isLoading: false,
           user:
@@ -213,26 +215,28 @@ export const useAuth = (): AuthState => {
               permissions: {},
             } as UserProfile),
           session,
-          logout,
-        });
+        }));
       } else if (event === "SIGNED_OUT") {
-        setAuthState({
+        setAuthState(prevState => ({
+          ...prevState,
           isAuthenticated: false,
           isLoading: false,
           user: null,
           session: null,
-          logout,
-        });
+        }));
       }
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [supabase, searchParams]);
+  }, [supabase, superadminParam]);
 
   return {
-    ...authState,
+    isAuthenticated: authState.isAuthenticated,
+    isLoading: authState.isLoading,
+    user: authState.user,
+    session: authState.session,
     logout,
   };
 };

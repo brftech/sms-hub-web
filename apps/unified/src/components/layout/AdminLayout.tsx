@@ -2,8 +2,9 @@ import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { useGlobalView } from "../../contexts/GlobalViewContext";
-import { useHub, HubSwitcher } from "@sms-hub/ui";
-import { ThemeToggle } from "../ThemeToggle";
+import { useHub, HubSwitcher, HubLogo } from "@sms-hub/ui";
+import { HUB_CONFIGS } from "@sms-hub/types";
+import { useCompany } from "../../hooks/useCompany";
 import { DevAdminBanner } from "../DevAdminBanner";
 import { UserRole } from "../../types/roles";
 import {
@@ -18,13 +19,14 @@ import {
   Mic,
   BarChart3,
   Search,
-  Bell,
   Settings,
   LogOut,
   Menu,
   X,
   ChevronDown,
   Globe,
+  ArrowLeft,
+  LayoutDashboard,
 } from "lucide-react";
 
 interface AdminLayoutProps {
@@ -34,14 +36,17 @@ interface AdminLayoutProps {
 export default function AdminLayout({ children }: AdminLayoutProps) {
   const { user, logout } = useAuth();
   const { isGlobalView, toggleGlobalView } = useGlobalView();
-  const {} = useHub();
+  const { currentHub } = useHub();
+  const { company } = useCompany();
 
-  // Check if user is super admin
-  const isSuperAdmin = user?.role === UserRole.SUPERADMIN;
+  // Check if user is super admin (currently unused but may be needed for future features)
+  // const isSuperAdmin = user?.role === UserRole.SUPERADMIN;
   const location = useLocation();
   const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  // Sidebar is always minimized now
+  const isSidebarExpanded = false;
 
   // Admin navigation items
   const adminNavigationItems = [
@@ -85,6 +90,14 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       color: "text-indigo-500",
       bgColor: "bg-indigo-100",
     },
+    {
+      name: "Dashboard",
+      href: "/admin/dashboard",
+      icon: LayoutDashboard,
+      description: "Admin overview dashboard",
+      color: "text-pink-500",
+      bgColor: "bg-pink-100",
+    },
   ];
 
   const isActive = (path: string) => {
@@ -108,6 +121,113 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Top Header */}
+      <header className="bg-white border-b border-gray-200 px-6 h-[73px] flex items-center fixed top-0 left-16 right-0 z-30 lg:left-16">
+        <div className="flex items-center justify-between w-full">
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={toggleSidebar}
+              className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+            
+            {/* Company Name */}
+            {company && (
+              <div className="hidden lg:block">
+                <h3 className="text-lg font-semibold text-gray-900">{company.public_name}</h3>
+              </div>
+            )}
+          </div>
+
+          <div className="flex items-center space-x-4">
+            {/* Search */}
+            <div className="relative hidden md:block">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <input
+                type="text"
+                placeholder="Search accounts, users, phone numbers..."
+                className="pl-10 pr-4 py-2 w-80 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              />
+            </div>
+
+
+            {/* User Profile Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setIsProfileOpen(!isProfileOpen)}
+                className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              >
+                <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center">
+                  <span className="text-white font-semibold text-sm">
+                    {getInitials(user?.first_name, user?.last_name)}
+                  </span>
+                </div>
+                <div className="hidden md:block text-left">
+                  <p className="text-sm font-medium text-gray-900">
+                    {getUserDisplayName(user)}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {formatUserRole(user?.role)}
+                  </p>
+                </div>
+                <ChevronDown className="w-4 h-4 text-gray-400" />
+              </button>
+
+              {/* Profile Dropdown Menu */}
+              {isProfileOpen && (
+                <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
+                  <div className="px-4 py-3 border-b border-gray-200">
+                    <p className="text-sm font-medium text-gray-900">
+                      {getUserDisplayName(user)}
+                    </p>
+                    <p className="text-xs text-gray-500">{user?.email}</p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setIsProfileOpen(false);
+                      navigate("/settings");
+                    }}
+                    className="w-full flex items-center space-x-3 px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
+                  >
+                    <Settings className="w-4 h-4" />
+                    <span className="text-sm">Settings</span>
+                  </button>
+                  {/* Hub Switcher - always show for admin users */}
+                  <div className="px-4 py-2 border-b border-gray-200">
+                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Hub Selection</p>
+                    <HubSwitcher />
+                  </div>
+                  <button
+                    onClick={() => {
+                      toggleGlobalView();
+                      setIsProfileOpen(false);
+                    }}
+                    className={`w-full flex items-center space-x-3 px-4 py-2 transition-colors ${
+                      isGlobalView
+                        ? "bg-purple-100 text-purple-700"
+                        : "text-gray-700 hover:bg-gray-100"
+                    }`}
+                  >
+                    <Globe className="w-4 h-4" />
+                    <span className="text-sm">
+                      {isGlobalView ? "Global View (All Hubs)" : "Hub View"}
+                    </span>
+                  </button>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center space-x-3 px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span className="text-sm">Logout</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </header>
+
       {/* Mobile sidebar overlay */}
       {isSidebarOpen && (
         <div
@@ -116,50 +236,39 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         />
       )}
 
-      {/* Sidebar */}
+      {/* Sidebar - Full height */}
       <div
-        className={`fixed inset-y-0 left-0 z-50 w-80 bg-slate-900 text-white transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
+        className={`fixed top-0 bottom-0 left-0 z-40 bg-slate-900 text-white transform transition-all duration-300 ease-in-out lg:translate-x-0 ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+        } ${
+          isSidebarExpanded ? "w-80" : "w-16"
         }`}
       >
         <div className="flex flex-col h-full">
-          {/* Sidebar Header */}
-          <div className="flex items-center justify-between p-6 border-b border-slate-700">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">G</span>
+          {/* Hub Logo - Links to Accounts */}
+          <div className="flex items-center justify-center h-[73px] border-b border-slate-700">
+            <Link 
+              to="/admin/accounts" 
+              className="flex items-center justify-center w-full group"
+              title="Go to Accounts"
+            >
+              <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center transition-transform group-hover:scale-110">
+                <HubLogo hubType={currentHub} variant="icon" size="sm" className="w-full h-full" />
               </div>
-              <div>
-                <h1 className="text-xl font-bold">Gnymble</h1>
-                <p className="text-sm text-slate-400">Admin Portal</p>
-              </div>
-            </div>
+            </Link>
+          </div>
+          
+          {/* Mobile close button */}
+          <div className="lg:hidden absolute top-4 right-4">
             <button
               onClick={toggleSidebar}
-              className="lg:hidden p-2 rounded-lg hover:bg-slate-700 transition-colors"
+              className="p-2 rounded-lg hover:bg-slate-700 transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
 
-          {/* Global View Toggle */}
-          <div className="p-4 border-b border-slate-700">
-            <button
-              onClick={toggleGlobalView}
-              className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 ${
-                isGlobalView
-                  ? "bg-orange-500 text-white"
-                  : "bg-slate-700 text-slate-300 hover:bg-slate-600"
-              }`}
-            >
-              <Globe className="w-5 h-5" />
-              <span className="font-medium">
-                {isGlobalView ? "Global View Active" : "Enable Global View"}
-              </span>
-            </button>
-          </div>
-
-          {/* Navigation */}
+          {/* Main Navigation */}
           <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
             {adminNavigationItems.map((item) => {
               const Icon = item.icon;
@@ -169,137 +278,58 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 <Link
                   key={item.name}
                   to={item.href}
-                  className={`group flex items-center space-x-4 px-4 py-3 rounded-lg transition-all duration-200 ${
-                    active
-                      ? "bg-orange-500 text-white shadow-lg"
-                      : "text-slate-300 hover:bg-slate-700 hover:text-white"
-                  }`}
+                  className="group flex items-center justify-center px-4 py-3 rounded-lg transition-all duration-200 relative"
                   onClick={() => setIsSidebarOpen(false)}
                 >
+                  {/* Active indicator bar */}
+                  {active && (
+                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-orange-500 rounded-r-full animate-pulse" />
+                  )}
+                  
                   <div
-                    className={`p-2 rounded-lg ${active ? "bg-white/20" : item.bgColor}`}
+                    className={`p-2 rounded-xl transition-all duration-200 ${
+                      active 
+                        ? "bg-orange-500/20 scale-110" 
+                        : "bg-slate-800 hover:bg-slate-700 hover:scale-105"
+                    }`}
                   >
                     <Icon
-                      className={`w-5 h-5 ${active ? "text-white" : item.color}`}
+                      className={`w-5 h-5 transition-colors duration-200 ${
+                        active ? "text-orange-400" : "text-slate-400"
+                      }`}
                     />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium">{item.name}</p>
-                    <p className="text-xs opacity-75">{item.description}</p>
+                  
+                  {/* Tooltip on hover */}
+                  <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-sm rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50">
+                    {item.name}
                   </div>
                 </Link>
               );
             })}
           </nav>
 
-          {/* User Profile Section */}
+          {/* Back to User View */}
           <div className="p-4 border-t border-slate-700">
-            <div className="flex items-center space-x-3 p-3 rounded-lg bg-slate-800">
-              <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center">
-                <span className="text-white font-semibold text-sm">
-                  {getInitials(user?.first_name, user?.last_name)}
-                </span>
+            <button
+              onClick={() => navigate("/dashboard")}
+              className="relative w-full flex items-center justify-center px-4 py-3 rounded-lg transition-all duration-200 group"
+            >
+              <div className="p-2 rounded-xl bg-slate-800 transition-all duration-200 hover:bg-orange-500/20 hover:scale-105">
+                <ArrowLeft className="w-6 h-6 text-slate-300 group-hover:text-orange-400 transition-colors duration-200" />
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-medium text-white truncate">
-                  {getUserDisplayName(user)}
-                </p>
-                <p className="text-xs text-slate-400 truncate">
-                  {formatUserRole(user?.role)}
-                </p>
-                {isSuperAdmin && (
-                  <p className="text-xs text-orange-400 font-medium">
-                    Super Administrator
-                  </p>
-                )}
+              
+              {/* Tooltip on hover */}
+              <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-sm rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50">
+                Back to User View
               </div>
-              <button
-                onClick={() => setIsProfileOpen(!isProfileOpen)}
-                className="p-1 rounded-lg hover:bg-slate-700 transition-colors"
-              >
-                <ChevronDown className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* Profile Dropdown */}
-            {isProfileOpen && (
-              <div className="mt-2 bg-slate-800 rounded-lg p-2 space-y-1">
-                <button
-                  onClick={() => {
-                    setIsProfileOpen(false);
-                    navigate("/admin/settings");
-                  }}
-                  className="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-slate-300 hover:bg-slate-700 hover:text-white transition-colors"
-                >
-                  <Settings className="w-4 h-4" />
-                  <span className="text-sm">Settings</span>
-                </button>
-                <button
-                  onClick={handleLogout}
-                  className="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-slate-300 hover:bg-slate-700 hover:text-white transition-colors"
-                >
-                  <LogOut className="w-4 h-4" />
-                  <span className="text-sm">Logout</span>
-                </button>
-              </div>
-            )}
+            </button>
           </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="lg:ml-80">
-        {/* Top Header */}
-        <header className="bg-white border-b border-gray-200 px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={toggleSidebar}
-                className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
-              >
-                <Menu className="w-5 h-5" />
-              </button>
-
-              <div className="flex items-center space-x-2">
-                <div className="h-8 w-8 rounded-full bg-orange-500 flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">G</span>
-                </div>
-                <h2 className="text-lg font-semibold text-gray-900">
-                  Gnymble Admin
-                  {isGlobalView && (
-                    <span className="ml-2 text-sm text-purple-600 font-normal">
-                      (Global View)
-                    </span>
-                  )}
-                </h2>
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-4">
-              {/* Search */}
-              <div className="relative hidden md:block">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <input
-                  type="text"
-                  placeholder="Search accounts, users, phone numbers..."
-                  className="pl-10 pr-4 py-2 w-80 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                />
-              </div>
-
-              {/* Notifications */}
-              <button className="p-2 rounded-lg hover:bg-gray-100 transition-colors">
-                <Bell className="w-5 h-5 text-gray-600" />
-              </button>
-
-              {/* Theme Toggle */}
-              <ThemeToggle />
-
-              {/* Hub Switcher */}
-              <HubSwitcher />
-            </div>
-          </div>
-        </header>
-
+      <div className="lg:ml-16 pt-[73px]">
         {/* Page Content */}
         <main className="p-6">
           <DevAdminBanner />

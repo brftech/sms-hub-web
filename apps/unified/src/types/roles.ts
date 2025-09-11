@@ -102,6 +102,27 @@ export const routePermissions: RoutePermission[] = [
     roles: [UserRole.ONBOARDED, UserRole.ADMIN, UserRole.SUPERADMIN],
     description: "User settings",
   },
+  // New user view routes
+  {
+    path: "/conversations",
+    roles: [UserRole.ONBOARDED, UserRole.ADMIN, UserRole.SUPERADMIN],
+    description: "View and manage conversations",
+  },
+  {
+    path: "/broadcasts",
+    roles: [UserRole.ONBOARDED, UserRole.ADMIN, UserRole.SUPERADMIN],
+    description: "Create and manage broadcasts",
+  },
+  {
+    path: "/persons",
+    roles: [UserRole.ONBOARDED, UserRole.ADMIN, UserRole.SUPERADMIN],
+    description: "Manage contacts",
+  },
+  {
+    path: "/statistics",
+    roles: [UserRole.ONBOARDED, UserRole.ADMIN, UserRole.SUPERADMIN],
+    description: "View analytics and reports",
+  },
   {
     path: "/payment-required",
     roles: [

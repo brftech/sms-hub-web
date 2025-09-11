@@ -2,8 +2,9 @@ import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { useGlobalView } from "../../contexts/GlobalViewContext";
-import { useHub, HubSwitcher } from "@sms-hub/ui";
-import { ThemeToggle } from "../ThemeToggle";
+import { useHub, HubSwitcher, HubLogo } from "@sms-hub/ui";
+import { HUB_CONFIGS } from "@sms-hub/types";
+import { useCompany } from "../../hooks/useCompany";
 import { DevAdminBanner } from "../DevAdminBanner";
 import { UserRole } from "../../types/roles";
 import {
@@ -17,7 +18,6 @@ import {
   BarChart3,
   Users,
   Search,
-  Bell,
   Settings,
   LogOut,
   Menu,
@@ -34,7 +34,8 @@ interface UserLayoutProps {
 export default function UserLayout({ children }: UserLayoutProps) {
   const { user, logout } = useAuth();
   const { isGlobalView, toggleGlobalView } = useGlobalView();
-  const {} = useHub();
+  const { currentHub } = useHub();
+  const { company } = useCompany();
 
   // Check if user is admin
   const isAdmin =
@@ -45,6 +46,8 @@ export default function UserLayout({ children }: UserLayoutProps) {
   const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  // Sidebar is always minimized now
+  const isSidebarExpanded = false;
 
   // User navigation items
   const userNavigationItems = [
@@ -93,14 +96,6 @@ export default function UserLayout({ children }: UserLayoutProps) {
       bgColor: "bg-gray-100",
     },
     {
-      name: "Company Users",
-      href: "/admin/users",
-      icon: Users,
-      description: "Manage company users",
-      color: "text-blue-500",
-      bgColor: "bg-blue-100",
-    },
-    {
       name: "Superadmin",
       href: "/admin",
       icon: Shield,
@@ -131,54 +126,154 @@ export default function UserLayout({ children }: UserLayoutProps) {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Mobile sidebar overlay */}
-      {isSidebarOpen && (
-        <div
-          className="fixed inset-y-0 left-0 z-40 bg-black bg-opacity-50 lg:hidden"
-          onClick={toggleSidebar}
-        />
-      )}
-
-      {/* Sidebar */}
-      <div
-        className={`fixed inset-y-0 left-0 z-50 w-80 bg-white text-gray-900 border-r border-gray-200 transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
-          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
-      >
-        <div className="flex flex-col h-full">
-          {/* Sidebar Header */}
-          <div className="flex items-center justify-between p-6 border-b border-gray-200">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">G</span>
-              </div>
-              <div>
-                <h1 className="text-xl font-bold">Gnymble</h1>
-                <p className="text-sm text-gray-500">User Portal</p>
-              </div>
-            </div>
+      {/* Top Header */}
+      <header className="bg-white border-b border-gray-200 px-6 h-[73px] flex items-center fixed top-0 left-16 right-0 z-30 lg:left-16">
+        <div className="flex items-center justify-between w-full">
+          <div className="flex items-center space-x-4">
             <button
               onClick={toggleSidebar}
               className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
             >
-              <X className="w-5 h-5" />
+              <Menu className="w-5 h-5" />
             </button>
+            
+            {/* Company Name */}
+            {company && (
+              <div className="hidden lg:block">
+                <h3 className="text-lg font-semibold text-gray-900">{company.public_name}</h3>
+              </div>
+            )}
           </div>
 
-          {/* Global View Toggle */}
-          <div className="p-4 border-b border-gray-200">
-            <button
-              onClick={toggleGlobalView}
-              className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 ${
-                isGlobalView
-                  ? "bg-orange-500 text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }`}
+          <div className="flex items-center space-x-4">
+            {/* Search */}
+            <div className="relative hidden md:block">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <input
+                type="text"
+                placeholder="Search conversations, contacts..."
+                className="pl-10 pr-4 py-2 w-80 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              />
+            </div>
+
+
+            {/* User Profile Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setIsProfileOpen(!isProfileOpen)}
+                className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              >
+                <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center">
+                  <span className="text-white font-semibold text-sm">
+                    {getInitials(user?.first_name, user?.last_name)}
+                  </span>
+                </div>
+                <div className="hidden md:block text-left">
+                  <p className="text-sm font-medium text-gray-900">
+                    {getUserDisplayName(user)}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {formatUserRole(user?.role)}
+                  </p>
+                </div>
+                <ChevronDown className="w-4 h-4 text-gray-400" />
+              </button>
+
+              {/* Profile Dropdown Menu */}
+              {isProfileOpen && (
+                <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
+                  <div className="px-4 py-3 border-b border-gray-200">
+                    <p className="text-sm font-medium text-gray-900">
+                      {getUserDisplayName(user)}
+                    </p>
+                    <p className="text-xs text-gray-500">{user?.email}</p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setIsProfileOpen(false);
+                      navigate("/settings");
+                    }}
+                    className="w-full flex items-center space-x-3 px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
+                  >
+                    <Settings className="w-4 h-4" />
+                    <span className="text-sm">Settings</span>
+                  </button>
+                  {/* Hub Switcher - only show if user has appropriate permissions */}
+                  {(isAdmin || isSuperAdmin) && (
+                    <>
+                      <div className="px-4 py-2 border-b border-gray-200">
+                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Hub Selection</p>
+                        <HubSwitcher />
+                      </div>
+                      <button
+                        onClick={() => {
+                          toggleGlobalView();
+                          setIsProfileOpen(false);
+                        }}
+                        className={`w-full flex items-center space-x-3 px-4 py-2 transition-colors ${
+                          isGlobalView
+                            ? "bg-purple-100 text-purple-700"
+                            : "text-gray-700 hover:bg-gray-100"
+                        }`}
+                      >
+                        <Globe className="w-4 h-4" />
+                        <span className="text-sm">
+                          {isGlobalView ? "Global View (All Hubs)" : "Hub View"}
+                        </span>
+                      </button>
+                    </>
+                  )}
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center space-x-3 px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span className="text-sm">Logout</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Mobile sidebar overlay */}
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden"
+          onClick={toggleSidebar}
+        />
+      )}
+
+      {/* Sidebar - Full height */}
+      <div
+        className={`fixed top-0 bottom-0 left-0 z-40 bg-white text-gray-900 border-r border-gray-200 transform transition-all duration-300 ease-in-out lg:translate-x-0 ${
+          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+        } ${
+          isSidebarExpanded ? "w-80" : "w-16"
+        }`}
+      >
+        <div className="flex flex-col h-full">
+          {/* Hub Logo - Links to Conversations */}
+          <div className="flex items-center justify-center h-[73px] border-b border-gray-200">
+            <Link 
+              to="/conversations" 
+              className="flex items-center justify-center w-full group"
+              title="Go to Conversations"
             >
-              <Globe className="w-5 h-5" />
-              <span className="font-medium">
-                {isGlobalView ? "Global View Active" : "Enable Global View"}
-              </span>
+              <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center transition-transform group-hover:scale-110">
+                <HubLogo hubType={currentHub} variant="icon" size="sm" className="w-full h-full" />
+              </div>
+            </Link>
+          </div>
+          
+          {/* Mobile close button */}
+          <div className="lg:hidden absolute top-4 right-4">
+            <button
+              onClick={toggleSidebar}
+              className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              <X className="w-5 h-5" />
             </button>
           </div>
 
@@ -192,23 +287,31 @@ export default function UserLayout({ children }: UserLayoutProps) {
                 <Link
                   key={item.name}
                   to={item.href}
-                  className={`group flex items-center space-x-4 px-4 py-3 rounded-lg transition-all duration-200 ${
-                    active
-                      ? "bg-orange-500 text-white shadow-lg"
-                      : "text-gray-700 hover:bg-gray-100"
-                  }`}
+                  className="group flex items-center justify-center px-4 py-3 rounded-lg transition-all duration-200 relative"
                   onClick={() => setIsSidebarOpen(false)}
                 >
+                  {/* Active indicator bar */}
+                  {active && (
+                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-orange-500 rounded-r-full" />
+                  )}
+                  
                   <div
-                    className={`p-2 rounded-lg ${active ? "bg-white/20" : item.bgColor}`}
+                    className={`p-2 rounded-xl transition-all duration-200 ${
+                      active 
+                        ? "bg-orange-100 scale-110" 
+                        : "hover:bg-gray-100 hover:scale-105"
+                    }`}
                   >
                     <Icon
-                      className={`w-5 h-5 ${active ? "text-white" : item.color}`}
+                      className={`w-5 h-5 transition-colors duration-200 ${
+                        active ? "text-orange-600" : item.color
+                      }`}
                     />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium">{item.name}</p>
-                    <p className="text-xs opacity-75">{item.description}</p>
+                  
+                  {/* Tooltip on hover */}
+                  <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-sm rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50">
+                    {item.name}
                   </div>
                 </Link>
               );
@@ -218,9 +321,11 @@ export default function UserLayout({ children }: UserLayoutProps) {
           {/* Admin Navigation (Bottom) - Only for admin users */}
           {isAdmin && (
             <div className="p-4 border-t border-gray-200">
-              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
-                Administration
-              </div>
+              {isSidebarExpanded && (
+                <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                  Administration
+                </div>
+              )}
               <nav className="space-y-1">
                 {adminNavigationItems.map((item) => {
                   const Icon = item.icon;
@@ -230,135 +335,43 @@ export default function UserLayout({ children }: UserLayoutProps) {
                     <Link
                       key={item.name}
                       to={item.href}
-                      className={`group flex items-center space-x-3 px-3 py-2 rounded-lg transition-all duration-200 ${
-                        active
-                          ? "bg-orange-100 text-orange-700"
-                          : "text-gray-600 hover:bg-gray-100"
-                      }`}
+                      className="group flex items-center justify-center px-4 py-3 rounded-lg transition-all duration-200 relative"
                       onClick={() => setIsSidebarOpen(false)}
                     >
-                      <Icon className="w-4 h-4" />
-                      <span className="text-sm font-medium">{item.name}</span>
+                      {/* Active indicator bar */}
+                      {active && (
+                        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-orange-500 rounded-r-full" />
+                      )}
+                      
+                      <div
+                        className={`p-2 rounded-xl transition-all duration-200 ${
+                          active 
+                            ? "bg-orange-100 scale-110" 
+                            : "hover:bg-gray-100 hover:scale-105"
+                        }`}
+                      >
+                        <Icon
+                          className={`w-6 h-6 transition-colors duration-200 ${
+                            active ? "text-orange-600" : item.color
+                          }`}
+                        />
+                      </div>
+                      
+                      {/* Tooltip on hover */}
+                      <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-sm rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50">
+                        {item.name}
+                      </div>
                     </Link>
                   );
                 })}
               </nav>
             </div>
           )}
-
-          {/* User Profile Section */}
-          <div className="p-4 border-t border-gray-200">
-            <div className="flex items-center space-x-3 p-3 rounded-lg bg-gray-50">
-              <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center">
-                <span className="text-white font-semibold text-sm">
-                  {getInitials(user?.first_name, user?.last_name)}
-                </span>
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-medium text-gray-900 truncate">
-                  {getUserDisplayName(user)}
-                </p>
-                <p className="text-xs text-gray-500 truncate">
-                  {formatUserRole(user?.role)}
-                </p>
-                {isSuperAdmin && (
-                  <p className="text-xs text-orange-500 font-medium">
-                    Super Administrator
-                  </p>
-                )}
-              </div>
-              <button
-                onClick={() => setIsProfileOpen(!isProfileOpen)}
-                className="p-1 rounded-lg hover:bg-gray-200 transition-colors"
-              >
-                <ChevronDown className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* Profile Dropdown */}
-            {isProfileOpen && (
-              <div className="mt-2 bg-white rounded-lg border border-gray-200 p-2 space-y-1">
-                <button
-                  onClick={() => {
-                    setIsProfileOpen(false);
-                    navigate("/settings");
-                  }}
-                  className="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
-                >
-                  <Settings className="w-4 h-4" />
-                  <span className="text-sm">Settings</span>
-                </button>
-                <button
-                  onClick={handleLogout}
-                  className="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
-                >
-                  <LogOut className="w-4 h-4" />
-                  <span className="text-sm">Logout</span>
-                </button>
-              </div>
-            )}
-          </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="lg:ml-80">
-        {/* Top Header */}
-        <header className="bg-white border-b border-gray-200 px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={toggleSidebar}
-                className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
-              >
-                <Menu className="w-5 h-5" />
-              </button>
-
-              <div className="flex items-center space-x-2">
-                <div className="h-8 w-8 rounded-full bg-orange-500 flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">G</span>
-                </div>
-                <h2 className="text-lg font-semibold text-gray-900">
-                  Gnymble
-                  {isGlobalView && (
-                    <span className="ml-2 text-sm text-purple-600 font-normal">
-                      (Global View)
-                    </span>
-                  )}
-                  {location.pathname.startsWith("/admin") && (
-                    <span className="ml-2 text-sm text-orange-600 font-normal">
-                      (Superadmin View)
-                    </span>
-                  )}
-                </h2>
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-4">
-              {/* Search */}
-              <div className="relative hidden md:block">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <input
-                  type="text"
-                  placeholder="Search conversations, contacts..."
-                  className="pl-10 pr-4 py-2 w-80 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                />
-              </div>
-
-              {/* Notifications */}
-              <button className="p-2 rounded-lg hover:bg-gray-100 transition-colors">
-                <Bell className="w-5 h-5 text-gray-600" />
-              </button>
-
-              {/* Theme Toggle */}
-              <ThemeToggle />
-
-              {/* Hub Switcher */}
-              <HubSwitcher />
-            </div>
-          </div>
-        </header>
-
+      <div className="lg:ml-16 pt-[73px]">
         {/* Page Content */}
         <main className="p-6">
           <DevAdminBanner />

@@ -32,27 +32,12 @@ import {
   Alert,
   SystemHealth,
   CompanyOnboardingData,
+  dashboardService,
 } from "../../services/dashboardService";
 import {
   CleanupResult,
+  dataCleanupService,
 } from "../../services/dataCleanupService";
-
-// Lazy imports for services to avoid early instantiation
-let dashboardService: any = null;
-const getDashboardService = () => {
-  if (!dashboardService) {
-    dashboardService = require("../../services/dashboardService").dashboardService;
-  }
-  return dashboardService;
-};
-
-let dataCleanupService: any = null;
-const getDataCleanupService = () => {
-  if (!dataCleanupService) {
-    dataCleanupService = require("../../services/dataCleanupService").dataCleanupService;
-  }
-  return dataCleanupService;
-};
 import { navigationCountsService } from "../../components/Layout";
 
 const Dashboard = () => {
@@ -84,9 +69,9 @@ const Dashboard = () => {
         // Fetch global data across all hubs
         const [statsData, healthData, globalOnboardingData] = await Promise.all(
           [
-            getDashboardService().instance.getGlobalDashboardStats(),
-            getDashboardService().instance.getSystemHealth(),
-            getDashboardService().instance.getGlobalCompanyOnboardingData(), // New method we'll create
+            dashboardService.instance.getGlobalDashboardStats(),
+            dashboardService.instance.getSystemHealth(),
+            dashboardService.instance.getGlobalCompanyOnboardingData(), // New method we'll create
           ]
         );
 
@@ -119,11 +104,11 @@ const Dashboard = () => {
           healthData,
           onboardingData,
         ] = await Promise.all([
-          getDashboardService().instance.getDashboardStats(hubId),
-          getDashboardService().instance.getRecentActivity(hubId),
-          getDashboardService().instance.getAlerts(hubId),
-          getDashboardService().instance.getSystemHealth(),
-          getDashboardService().instance.getCompanyOnboardingData(hubId),
+          dashboardService.instance.getDashboardStats(hubId),
+          dashboardService.instance.getRecentActivity(hubId),
+          dashboardService.instance.getAlerts(hubId),
+          dashboardService.instance.getSystemHealth(),
+          dashboardService.instance.getCompanyOnboardingData(hubId),
         ]);
 
         setStats(statsData);
@@ -283,18 +268,18 @@ const Dashboard = () => {
 
       // Try the FK-aware method first
       console.log("Attempting FK-aware verification cleanup...");
-      let result = await getDataCleanupService().instance.performDataCleanupWithFKHandling();
+      let result = await dataCleanupService.instance.performDataCleanupWithFKHandling();
 
       // If that fails, try the regular method
       if (!result.success) {
         console.log("FK-aware cleanup failed, trying regular method...");
-        result = await getDataCleanupService().instance.performDataCleanup();
+        result = await dataCleanupService.instance.performDataCleanup();
       }
 
       // If that also fails, try the direct method
       if (!result.success) {
         console.log("Regular cleanup failed, trying direct method...");
-        result = await getDataCleanupService().instance.performDataCleanupDirect();
+        result = await dataCleanupService.instance.performDataCleanupDirect();
       }
 
       console.log("Final cleanup result:", result);
@@ -321,7 +306,7 @@ const Dashboard = () => {
 
   const handleCheckDataCounts = async () => {
     try {
-      const counts = await getDataCleanupService().instance.getCurrentDataCounts();
+      const counts = await dataCleanupService.instance.getCurrentDataCounts();
       alert(
         `Current Data Counts:\n\n` +
           `• Companies: ${counts.companies}\n` +

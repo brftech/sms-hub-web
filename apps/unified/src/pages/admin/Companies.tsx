@@ -16,16 +16,7 @@ import {
   ChevronDown,
   Filter,
 } from "lucide-react";
-import { Company } from "../../services/companiesService";
-
-// Lazy import for service to avoid early instantiation
-let companiesService: any = null;
-const getCompaniesService = () => {
-  if (!companiesService) {
-    companiesService = require("../../services/companiesService").companiesService;
-  }
-  return companiesService;
-};
+import { Company, companiesService } from "../../services/companiesService";
 import { CreateCompanyModal } from "../../components/CreateCompanyModal";
 import { CompanyDetailsModal } from "../../components/CompanyDetailsModal";
 
@@ -95,7 +86,7 @@ const Companies = () => {
 
       // Fetch companies with filters
       const fetchedCompanies =
-        await getCompaniesService().instance.getCompanies(filterOptions);
+        await companiesService.instance.getCompanies(filterOptions);
 
       console.log("Companies: Fetched companies:", fetchedCompanies);
       console.log("Companies: Count:", fetchedCompanies.length);
@@ -157,7 +148,7 @@ const Companies = () => {
 
     try {
       setIsUpdating(true);
-      const result = await getCompaniesService().instance.updateCompany(
+      const result = await companiesService.instance.updateCompany(
         editingCompany.id,
         editingCompany
       );
@@ -180,7 +171,7 @@ const Companies = () => {
     if (!deletingCompanyId) return;
 
     try {
-      const result = await getCompaniesService().instance.deleteCompany(deletingCompanyId);
+      const result = await companiesService.instance.deleteCompany(deletingCompanyId);
 
       if (result.success) {
         await fetchData();
@@ -198,7 +189,7 @@ const Companies = () => {
   const handleCreateCompany = async (newCompany: Partial<Company>) => {
     try {
       setIsUpdating(true);
-      const result = await getCompaniesService().instance.createCompany(newCompany);
+      const result = await companiesService.instance.createCompany(newCompany);
 
       if (result.success) {
         await fetchData();

@@ -22,7 +22,7 @@ const Navigation = () => {
     return <HubLogo hubType={currentHub} variant="icon" size="lg" />;
   };
 
-  const isContactPage = location.pathname === "/contact";
+  const isLoginPage = location.pathname === "/login";
 
   const handleNavClick = (path: string) => {
     setIsMobileMenuOpen(false);
@@ -101,35 +101,33 @@ const Navigation = () => {
           {/* Right side - SignUp and Contact buttons (Desktop only) */}
           <div className="hidden md:flex items-center space-x-4">
             <HubSwitcher />
-            <a
-              href="http://localhost:3001/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-xs text-gray-400 hover:text-white transition-colors"
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => window.open("http://localhost:3001/", "_blank")}
+              className="transition-all duration-300 backdrop-blur-sm px-4 py-1.5 text-xs bg-black/50 text-white border border-orange-500/50 hover:bg-orange-500/10 hover:border-orange-400"
             >
               Superadmin
-            </a>
+            </Button>
             <Button
-              variant="default"
+              variant="outline"
               size="sm"
               onClick={() => handleDesktopNavClick("/signup")}
-              className={`transition-all duration-300 backdrop-blur-sm px-4 py-1.5 text-xs ${
-                hubColors.bg
-              } hover:${hubColors.bgHover} text-white font-medium`}
+              className="transition-all duration-300 backdrop-blur-sm px-4 py-1.5 text-xs bg-black/50 text-white border border-orange-500/50 hover:bg-orange-500/10 hover:border-orange-400"
             >
               Sign Up
             </Button>
             <Button
               variant="outline"
               size="sm"
-              onClick={() => handleDesktopNavClick("/contact")}
-              className={`transition-all duration-300 backdrop-blur-sm px-4 py-1.5 text-xs w-20 ${
-                isContactPage
+              onClick={() => window.location.href = "http://localhost:3000/login"}
+              className={`transition-all duration-300 backdrop-blur-sm px-4 py-1.5 text-xs ${
+                isLoginPage
                   ? `${hubColors.bgLight} ${hubColors.text} ${hubColors.border}`
                   : "bg-black/50 text-white border border-orange-500/50 hover:bg-orange-500/10 hover:border-orange-400"
               }`}
             >
-              Contact
+              Login
             </Button>
           </div>
 
@@ -138,14 +136,14 @@ const Navigation = () => {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => handleNavClick("/contact")}
+              onClick={() => window.location.href = "http://localhost:3000/login"}
               className={`transition-all duration-300 backdrop-blur-sm px-3 py-1.5 text-xs ${
-                isContactPage
+                isLoginPage
                   ? `${hubColors.bgLight} ${hubColors.text} ${hubColors.border}`
                   : "bg-black/50 text-white border border-orange-500/50 hover:bg-orange-500/10 hover:border-orange-400"
               }`}
             >
-              Contact
+              Login
             </Button>
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -196,10 +194,10 @@ const Navigation = () => {
                 </Button>
                 <Button
                   variant="outline"
-                  onClick={() => handleNavClick("/contact")}
+                  onClick={() => window.location.href = "http://localhost:3000/login"}
                   className="w-full bg-black/50 text-white border border-orange-500/50 hover:bg-orange-500/10 hover:border-orange-400 font-medium py-3 text-base"
                 >
-                  Contact Us
+                  Login
                 </Button>
               </div>
             </div>

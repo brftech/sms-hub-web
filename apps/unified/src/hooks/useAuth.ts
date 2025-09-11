@@ -24,9 +24,12 @@ export const useAuth = (): AuthState => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        // Check for dev bypass first
-        const devBypass = searchParams.get('superadmin')
+        // Check for dev bypass first - also check localStorage for persistence
+        const devBypass = searchParams.get('superadmin') || localStorage.getItem('dev_bypass')
+        
         if (devBypass === 'dev123') {
+          // Store in localStorage so it persists across navigation
+          localStorage.setItem('dev_bypass', 'dev123')
           console.log('Dev superadmin bypass activated')
           
           // Create mock superadmin user

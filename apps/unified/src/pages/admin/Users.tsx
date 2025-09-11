@@ -15,16 +15,7 @@ import {
   Filter,
   Shield,
 } from "lucide-react";
-import { UserProfile } from "../../services/usersService";
-
-// Lazy import for service to avoid early instantiation
-let usersService: any = null;
-const getUsersService = () => {
-  if (!usersService) {
-    usersService = require("../../services/usersService").usersService;
-  }
-  return usersService;
-};
+import { UserProfile, usersService } from "../../services/usersService";
 
 const Users = () => {
   const { currentHub } = useHub();
@@ -88,7 +79,7 @@ const Users = () => {
       }
 
       // Fetch users with filters
-      const fetchedUsers = await getUsersService().instance.getUsers(filterOptions);
+      const fetchedUsers = await usersService.instance.getUsers(filterOptions);
 
       console.log("Users: Fetched users:", fetchedUsers);
       console.log("Users: Count:", fetchedUsers.length);

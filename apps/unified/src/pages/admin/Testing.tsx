@@ -19,14 +19,7 @@ import {
   TestSuite,
   TestRunResult,
 } from "../../services/testingService";
-// Lazy import for service to avoid early instantiation
-let dataCleanupService: any = null;
-const getDataCleanupService = () => {
-  if (!dataCleanupService) {
-    dataCleanupService = require("../../services/dataCleanupService").dataCleanupService;
-  }
-  return dataCleanupService;
-};
+import { dataCleanupService } from "../../services/dataCleanupService";
 
 const Testing = () => {
   const { currentHub } = useHub();
@@ -181,7 +174,7 @@ const Testing = () => {
       console.log("Testing data cleanup service...");
 
       // Test the connection and get current data counts
-      const counts = await getDataCleanupService().instance.getCurrentDataCounts();
+      const counts = await dataCleanupService.instance.getCurrentDataCounts();
 
       console.log("Data cleanup service test successful:", counts);
 

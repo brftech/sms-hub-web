@@ -7,6 +7,7 @@ import { UserRole } from './types/roles'
 import ClearAuth from './pages/ClearAuth'
 // import DevLogin from './pages/DevLogin'
 import { useAuth } from './hooks/useAuth'
+import { GlobalViewProvider } from './contexts/GlobalViewContext'
 
 // Dashboard Router Component
 const DashboardRouter = () => {
@@ -80,15 +81,16 @@ function App() {
   return (
     <ErrorBoundary>
       <HubProvider environment={unifiedEnvironment} defaultHub="gnymble">
-        <Routes>
-          {/* Public routes - accessible without authentication */}
-          <Route path="/clear-auth" element={<ClearAuth />} />
-          {/* <Route path="/dev-login" element={<DevLogin />} /> */}
-          
-          {/* All other routes require authentication and are wrapped in AppLayout */}
-          <Route path="*" element={
-            <AppLayout>
-              <Routes>
+        <GlobalViewProvider>
+          <Routes>
+            {/* Public routes - accessible without authentication */}
+            <Route path="/clear-auth" element={<ClearAuth />} />
+            {/* <Route path="/dev-login" element={<DevLogin />} /> */}
+            
+            {/* All other routes require authentication and are wrapped in AppLayout */}
+            <Route path="*" element={
+              <AppLayout>
+                <Routes>
                 {/* Redirect root to dashboard */}
                 <Route path="/" element={<Navigate to="/dashboard" replace />} />
                 
@@ -298,10 +300,11 @@ function App() {
                 
                 {/* Catch all - redirect to dashboard */}
                 <Route path="*" element={<Navigate to="/dashboard" replace />} />
-              </Routes>
-            </AppLayout>
-          } />
-        </Routes>
+                </Routes>
+              </AppLayout>
+            } />
+          </Routes>
+        </GlobalViewProvider>
       </HubProvider>
     </ErrorBoundary>
   )

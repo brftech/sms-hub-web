@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate, Link, useSearchParams } from 'react-router-dom'
 import { useHub, Button, Card, CardContent, CardDescription, CardHeader, CardTitle, HubLogo } from '@sms-hub/ui'
 import { Input, Label, Alert, AlertDescription } from '@sms-hub/ui'
-import { Mail, Phone, CheckCircle, Shield, Lock } from 'lucide-react'
+import { Mail, Phone, CheckCircle, Shield, Lock, Eye, EyeOff } from 'lucide-react'
 import styled from 'styled-components'
 import { getSupabaseClient } from '../lib/supabaseSingleton'
 import { useDevAuth, activateDevAuth } from '../hooks/useDevAuth'
@@ -50,16 +50,45 @@ const VerificationMethod = styled.div`
   margin-bottom: 1rem;
 `;
 
+const PasswordInputWrapper = styled.div`
+  position: relative;
+  display: flex;
+  align-items: center;
+`;
+
+const PasswordToggleButton = styled.button`
+  position: absolute;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  color: #6b7280;
+  transition: color 0.2s;
+  
+  &:hover {
+    color: #374151;
+  }
+  
+  &:focus {
+    outline: none;
+  }
+`;
+
 export function Login() {
   const { hubConfig } = useHub()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const devAuth = useDevAuth()
-  const [email, setEmail] = useState('')
+  
+  // Prepopulate with superadmin credentials in dev mode
+  const isDev = import.meta.env.DEV
+  const [email, setEmail] = useState(isDev ? 'superadmin@sms-hub.com' : '')
   const [phone, setPhone] = useState('')
-  const [password, setPassword] = useState('')
-  const [authMethod, setAuthMethod] = useState<'sms' | 'email'>('sms')
-  const [loginType, setLoginType] = useState<'verification' | 'password'>('verification')
+  const [password, setPassword] = useState(isDev ? 'SuperAdmin123!' : '')
+  const [showPassword, setShowPassword] = useState(false)
+  const [authMethod, setAuthMethod] = useState<'sms' | 'email'>('email')
+  const [loginType, setLoginType] = useState<'verification' | 'password'>('password')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
@@ -356,14 +385,24 @@ export function Login() {
                   <StyledLabel htmlFor="password">
                     Password *
                   </StyledLabel>
-                  <StyledInput
-                    id="password"
-                    type="password"
-                    placeholder="Enter your password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    disabled={isLoading}
-                  />
+                  <PasswordInputWrapper>
+                    <StyledInput
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Enter your password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      disabled={isLoading}
+                      style={{ paddingRight: '2.5rem' }}
+                    />
+                    <PasswordToggleButton
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      tabIndex={-1}
+                    >
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </PasswordToggleButton>
+                  </PasswordInputWrapper>
                 </FormGroup>
                 
                 {/* Superadmin Login Button */}
@@ -455,24 +494,22 @@ export function Login() {
               )}
             </Button>
             
-            {/* Legacy user option */}
-            {(showLegacyOption || loginType === 'password') && (
-              <div className="text-center">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setLoginType(loginType === 'verification' ? 'password' : 'verification')
-                    setError('')
-                    setPassword('')
-                  }}
-                  className="text-sm hub-text-primary hover:underline"
-                >
-                  {loginType === 'verification' 
-                    ? 'Returning user? Sign in with password' 
-                    : 'Use verification code instead'}
-                </button>
-              </div>
-            )}
+            {/* Toggle between password and verification login */}
+            <div className="text-center">
+              <button
+                type="button"
+                onClick={() => {
+                  setLoginType(loginType === 'verification' ? 'password' : 'verification')
+                  setError('')
+                  setPassword('')
+                }}
+                className="text-sm hub-text-primary hover:underline"
+              >
+                {loginType === 'verification' 
+                  ? 'Returning user? Sign in with password' 
+                  : 'Use verification code instead'}
+              </button>
+            </div>
           </form>
           
           <div className="text-center mt-6 pt-6 border-t">
@@ -482,16 +519,6 @@ export function Login() {
                 Sign up
               </Link>
             </p>
-            
-            {/* Subtle legacy login option for users who know they need it */}
-            {!showLegacyOption && loginType === 'verification' && (
-              <button
-                onClick={() => setShowLegacyOption(true)}
-                className="text-xs text-gray-500 hover:text-gray-600 mt-2 underline"
-              >
-                Having trouble? More options
-              </button>
-            )}
           </div>
         </CardContent>
       </Card>

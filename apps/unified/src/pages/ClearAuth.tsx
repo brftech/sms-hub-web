@@ -30,6 +30,9 @@ export const ClearAuth: React.FC = () => {
         }
         keysToRemove.forEach(key => localStorage.removeItem(key))
         
+        // Also clear dev bypass
+        localStorage.removeItem('dev_bypass')
+        
         // Clear cookies if any
         document.cookie.split(";").forEach((c) => {
           document.cookie = c

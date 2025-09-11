@@ -191,7 +191,7 @@ export function Signup() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
-  const [authMethod, setAuthMethod] = useState<"sms" | "email">("sms");
+  const [authMethod, setAuthMethod] = useState<"sms" | "email">("email");
   const [signupType, setSignupType] = useState<
     "new_company" | "invited_user" | "individual"
   >("new_company");

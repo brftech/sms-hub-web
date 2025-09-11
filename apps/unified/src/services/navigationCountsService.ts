@@ -68,14 +68,12 @@ class NavigationCountsService {
   }
 }
 
-// Lazy-loaded service instance
-let _navigationCountsService: NavigationCountsService | null = null;
+// Export singleton instance
+export const navigationCountsService = new NavigationCountsService();
 
-export const navigationCountsService = {
+// Also export for compatibility with code expecting .instance
+export const navigationCountsServiceLazy = {
   get instance() {
-    if (!_navigationCountsService) {
-      _navigationCountsService = new NavigationCountsService();
-    }
-    return _navigationCountsService;
+    return navigationCountsService;
   }
 };

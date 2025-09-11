@@ -1,7 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { HubProvider, ErrorBoundary } from '@sms-hub/ui'
 import { unifiedEnvironment } from './config/unifiedEnvironment'
-import AppLayout from './components/layout/AppLayout'
+import SidebarLayout from './components/layout/SidebarLayout'
 import { ProtectedRoute } from './components/auth/ProtectedRoute'
 import { UserRole } from './types/roles'
 import ClearAuth from './pages/ClearAuth'
@@ -87,9 +87,9 @@ function App() {
             <Route path="/clear-auth" element={<ClearAuth />} />
             {/* <Route path="/dev-login" element={<DevLogin />} /> */}
             
-            {/* All other routes require authentication and are wrapped in AppLayout */}
+            {/* All other routes require authentication and are wrapped in SidebarLayout */}
             <Route path="*" element={
-              <AppLayout>
+              <SidebarLayout>
                 <Routes>
                 {/* Redirect root to dashboard */}
                 <Route path="/" element={<Navigate to="/dashboard" replace />} />
@@ -301,7 +301,7 @@ function App() {
                 {/* Catch all - redirect to dashboard */}
                 <Route path="*" element={<Navigate to="/dashboard" replace />} />
                 </Routes>
-              </AppLayout>
+              </SidebarLayout>
             } />
           </Routes>
         </GlobalViewProvider>

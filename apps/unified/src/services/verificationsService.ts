@@ -16,8 +16,8 @@ export interface Verification {
   stripe_customer_id?: string | null;
   created_at?: string | null;
   expires_at: string;
-  is_verified?: boolean | null;
-  verified_at?: string | null;
+  verification_sent_at?: string | null;
+  last_verification_attempt_at?: string | null;
 }
 
 export interface VerificationStats {
@@ -64,7 +64,7 @@ class VerificationsService {
     hub_id?: number;
     auth_method?: string;
     is_expired?: boolean;
-    is_verified?: boolean;
+    is_pending?: boolean;
     search?: string;
     limit?: number;
     offset?: number;
@@ -92,8 +92,13 @@ class VerificationsService {
       }
     }
 
-    if (options?.is_verified !== undefined) {
-      query = query.eq("is_verified", options.is_verified);
+    if (options?.is_pending !== undefined) {
+      // Consider pending if no verification has been sent
+      if (options.is_pending) {
+        query = query.is("verification_sent_at", null);
+      } else {
+        query = query.not("verification_sent_at", "is", null);
+      }
     }
 
     if (options?.search) {
@@ -146,9 +151,9 @@ class VerificationsService {
     const now = new Date();
     const stats: VerificationStats = {
       total: verifications.length,
-      verified: verifications.filter((signup) => signup.is_verified === true)
+      verified: verifications.filter((signup) => signup.verification_sent_at !== null)
         .length,
-      unverified: verifications.filter((signup) => signup.is_verified !== true)
+      unverified: verifications.filter((signup) => signup.verification_sent_at === null)
         .length,
       expired: verifications.filter(
         (signup) => new Date(signup.expires_at) < now
@@ -267,10 +272,10 @@ class VerificationsService {
       const stats: VerificationStats = {
         total: verifications?.length || 0,
         verified:
-          verifications?.filter((signup) => signup.is_verified === true)
+          verifications?.filter((signup) => signup.verification_sent_at !== null)
             .length || 0,
         unverified:
-          verifications?.filter((signup) => signup.is_verified !== true)
+          verifications?.filter((signup) => signup.verification_sent_at === null)
             .length || 0,
         expired:
           verifications?.filter((signup) => new Date(signup.expires_at) < now)

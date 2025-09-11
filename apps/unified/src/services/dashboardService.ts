@@ -128,14 +128,15 @@ class DashboardService {
       const { data: verificationsData, error: verificationsError } =
         await this.supabase
           .from("verifications")
-          .select("id, is_verified, created_at")
+          .select("id, verification_sent_at, created_at")
           .eq("hub_id", hubId);
 
       if (verificationsError) throw verificationsError;
 
       const totalVerifications = verificationsData?.length || 0;
+      // Count verifications that haven't been verified (no associated user created)
       const pendingVerifications =
-        verificationsData?.filter((verification) => !verification.is_verified)
+        verificationsData?.filter((verification) => !verification.verification_sent_at)
           .length || 0;
 
       // Get messages stats (mock for now since we don't have a messages table)
@@ -210,14 +211,14 @@ class DashboardService {
       const { data: allVerificationsData, error: verificationsError } =
         await this.supabase
           .from("verifications")
-          .select("id, is_verified, created_at, hub_id");
+          .select("id, verification_sent_at, created_at, hub_id");
 
       if (verificationsError) throw verificationsError;
 
       const totalVerifications = allVerificationsData?.length || 0;
       const pendingVerifications =
         allVerificationsData?.filter(
-          (verification) => !verification.is_verified
+          (verification) => !verification.verification_sent_at
         ).length || 0;
 
       // Get revenue stats (mock for now since we don't have a revenue table)
@@ -361,13 +362,13 @@ class DashboardService {
         });
       }
 
-      // Check for pending verifications
+      // Check for pending verifications (those without verification_sent_at)
       const { data: pendingVerifications, error: pendingError } =
         await this.supabase
           .from("verifications")
           .select("id")
           .eq("hub_id", hubId)
-          .eq("is_verified", false);
+          .is("verification_sent_at", null);
 
       if (
         !pendingError &&
@@ -483,7 +484,7 @@ class DashboardService {
     try {
       const { data: companies, error } = await this.supabase
         .from("companies")
-        .select("id, account_onboarding_step, created_at")
+        .select("id, payment_status, created_at")
         .eq("hub_id", hubId);
 
       if (error) throw error;
@@ -501,25 +502,14 @@ class DashboardService {
         completed: 0,
       };
 
+      // Since account_onboarding_step doesn't exist, we'll estimate based on payment_status
       companies?.forEach((company) => {
-        const stage = company.account_onboarding_step || "authentication";
-        
-        // For migration scenario: if company is in authentication stage and was created before today,
-        // consider it as "migrated" rather than "pending verification"
-        if (stage === "authentication") {
-          const companyCreated = new Date(company.created_at || Date.now());
-          const today = new Date();
-          today.setHours(0, 0, 0, 0);
-          
-          if (companyCreated < today) {
-            // This is a migrated company, count it as "completed" for now
-            stageCounts.completed++;
-          } else {
-            // This is a new company that needs verification
-            stageCounts.authentication++;
-          }
-        } else if (stageCounts.hasOwnProperty(stage)) {
-          stageCounts[stage as keyof OnboardingStageStats]++;
+        if (company.payment_status === 'completed') {
+          stageCounts.completed++;
+        } else if (company.payment_status === 'processing') {
+          stageCounts.payment++;
+        } else {
+          stageCounts.authentication++;
         }
       });
 
@@ -552,7 +542,7 @@ class DashboardService {
           `
           id, 
           public_name, 
-          account_onboarding_step, 
+          payment_status, 
           created_at,
           updated_at
         `
@@ -565,7 +555,13 @@ class DashboardService {
 
       return (
         companies?.map((company) => {
-          const stage = company.account_onboarding_step || "authentication";
+          // Estimate stage based on payment_status
+          let stage = "authentication";
+          if (company.payment_status === 'completed') {
+            stage = "completed";
+          } else if (company.payment_status === 'processing') {
+            stage = "payment";
+          }
           const stageOrder = [
             "authentication",
             "payment",
@@ -626,7 +622,7 @@ class DashboardService {
           `
           id, 
           public_name, 
-          account_onboarding_step, 
+          payment_status, 
           created_at,
           updated_at,
           hub_id
@@ -639,7 +635,13 @@ class DashboardService {
 
       return (
         companies?.map((company) => {
-          const stage = company.account_onboarding_step || "authentication";
+          // Estimate stage based on payment_status
+          let stage = "authentication";
+          if (company.payment_status === 'completed') {
+            stage = "completed";
+          } else if (company.payment_status === 'processing') {
+            stage = "payment";
+          }
           const stageOrder = [
             "authentication",
             "payment",
@@ -705,7 +707,7 @@ class DashboardService {
     try {
       const { data: companies, error } = await this.supabase
         .from("companies")
-        .select("id, account_onboarding_step, created_at");
+        .select("id, payment_status, created_at");
 
       if (error) throw error;
 
@@ -722,10 +724,14 @@ class DashboardService {
         completed: 0,
       };
 
+      // Since account_onboarding_step doesn't exist, we'll estimate based on payment_status
       companies?.forEach((company) => {
-        const stage = company.account_onboarding_step || "authentication";
-        if (stageCounts.hasOwnProperty(stage)) {
-          stageCounts[stage as keyof OnboardingStageStats]++;
+        if (company.payment_status === 'completed') {
+          stageCounts.completed++;
+        } else if (company.payment_status === 'processing') {
+          stageCounts.payment++;
+        } else {
+          stageCounts.authentication++;
         }
       });
 
@@ -810,14 +816,14 @@ class DashboardService {
 
       // Get verifications count by hub
       const { data: verificationsData, error: verificationsError } =
-        await this.supabase.from("verifications").select("hub_id, is_verified");
+        await this.supabase.from("verifications").select("hub_id, verification_sent_at");
 
       if (!verificationsError && verificationsData) {
         verificationsData.forEach((verification) => {
           const hub = hubMap.get(verification.hub_id);
           if (hub) {
             hub.verifications++;
-            if (!verification.is_verified) hub.pendingVerifications++;
+            if (!verification.verification_sent_at) hub.pendingVerifications++;
           }
         });
       }

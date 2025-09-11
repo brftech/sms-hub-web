@@ -38,7 +38,7 @@ import {
   CleanupResult,
   dataCleanupService,
 } from "../../services/dataCleanupService";
-import { navigationCountsService } from "../../components/Layout";
+import { navigationCountsService } from "../../services/navigationCountsService";
 
 const Dashboard = () => {
   const { currentHub } = useHub();

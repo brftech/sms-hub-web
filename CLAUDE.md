@@ -258,12 +258,37 @@ import { getSupabaseClient } from '../lib/supabaseSingleton'
 5. **Consider mobile**: All interfaces must be responsive
 6. **Document decisions**: Add comments for non-obvious choices
 
-## 🔄 Recent Changes (Last Updated: 2025-01-10)
+## 🔄 Recent Changes (Last Updated: 2025-01-11)
 
-1. **Fixed Authentication Flow**: Resolved "Loading..." page issue
-2. **Clear-Auth Page**: Now properly clears auth and redirects
-3. **Consolidated Services**: Created shared services package
-4. **Optimized Imports**: Moved hub content to packages
-5. **Fixed Routing**: Separated public/protected routes properly
+1. **Fixed ESM/CommonJS Issues**: Converted all require() to proper ESM imports in admin pages
+2. **Authentication Improvements**: 
+   - Dev bypass with `?superadmin=dev123` persists in localStorage
+   - Email/password is now default login method (was SMS)
+   - Added password visibility toggle on login page
+   - Auto-populates superadmin credentials in dev mode
+3. **UI/UX Updates**:
+   - Changed "Contact" button to "Login" in navigation
+   - Standardized button styling (Superadmin, Sign Up, Login)
+   - Made login method toggle always visible
+4. **GlobalViewProvider Fix**: Wrapped App with required context provider
+5. **Environment Standardization**: All apps now use `.env.local` consistently
+
+### Known Issues
+- **Superadmin Password Login**: User exists in database but lacks Supabase Auth user
+  - Workaround: Use dev bypass `?superadmin=dev123`
+  - Fix requires creating auth user in Supabase dashboard
+
+### Quick Access for Development
+```bash
+# Dev Superadmin Access (persists in localStorage)
+http://localhost:3001/?superadmin=dev123
+
+# Test Authentication
+node test-auth.mjs
+
+# Dev Credentials (auto-populated in dev mode)
+Email: superadmin@sms-hub.com
+Password: SuperAdmin123!
+```
 
 Remember: You're working on a **production system**. Every change should maintain or improve stability, performance, and user experience. When in doubt, analyze thoroughly before making changes.

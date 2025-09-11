@@ -1,4 +1,4 @@
-import { HubType } from '@sms-hub/types';
+import { HubType } from "@sms-hub/types";
 
 // Hero Content Types
 export interface HeroContent {
@@ -27,7 +27,11 @@ export interface CTAContent {
   ctaText: string;
   ctaSubtext: string;
   guaranteeText: string;
-  badge?: any; // Keep as generic for now
+  badge?: {
+    text: string;
+    variant?: string;
+    [key: string]: unknown;
+  };
 }
 
 // Problem Solution Content Types
@@ -95,7 +99,8 @@ const gnymbleContent: HubContentData = {
       line1: "We do it really well.",
       line2: "Others...don't do it at all.",
     },
-    description: "Built for businesses that need reliable, compliant messaging.",
+    description:
+      "Built for businesses that need reliable, compliant messaging.",
     ctaText: "🔥 For business owners who demand SMS that delivers",
   },
   cta: {
@@ -128,41 +133,25 @@ const gnymbleContent: HubContentData = {
     guaranteeText:
       "If we can't get you set up in 8 days, your $179 onboarding is free.",
     badge: {
-      type: "component",
-      className: "bg-white p-4 rounded-lg shadow-lg",
-      content: {
-        className: "text-center",
-        children: [
-          {
-            className: "text-black font-bold text-sm mb-1",
-            text: "PCA PREMIUM CIGAR ASSOCIATION"
-          },
-          {
-            className: "text-gray-600 text-xs mb-2",
-            text: "Preferred Partner"
-          },
-          {
-            className: "text-amber-600 font-bold text-2xl",
-            text: "7"
-          }
-        ]
-      }
+      text: "PCA PREMIUM CIGAR ASSOCIATION",
+      variant: "component",
     },
   },
   problemSolution: {
     title: {
       prefix: "The Platform",
-      highlight: "Advantage"
+      highlight: "Advantage",
     },
-    description: "While others exclude, we excel. We champion every business that dares to be different.",
+    description:
+      "While others exclude, we excel. We champion every business that dares to be different.",
     deliver: {
       title: "WE DELIVER WHAT OTHERS PROMISE",
       features: [
         "Master-level compliance expertise for every industry",
         "8-day setup guarantee that we actually honor",
         "White-glove service that exceeds expectations",
-        "Expert humans who solve problems fast"
-      ]
+        "Expert humans who solve problems fast",
+      ],
     },
     overlook: {
       title: "WHAT OTHERS OVERLOOK",
@@ -170,10 +159,10 @@ const gnymbleContent: HubContentData = {
         "Complex industries need expert guidance",
         "Regulated businesses demand proven compliance",
         "Growing companies require scalable solutions",
-        "Professional teams deserve premium support"
-      ]
+        "Professional teams deserve premium support",
+      ],
     },
-    badge: "COMPLIANT ✓"
+    badge: "COMPLIANT ✓",
   },
   stats: {
     title: "BATTLE-TESTED RESULTS",
@@ -181,19 +170,19 @@ const gnymbleContent: HubContentData = {
       {
         value: "98%",
         label: "Client Retention",
-        description: "Nobody leaves the family"
+        description: "Nobody leaves the family",
       },
       {
         value: "40%",
         label: "Revenue Boost",
-        description: "Average first year"
+        description: "Average first year",
       },
       {
         value: "0",
         label: "Compliance Issues",
-        description: "Perfect track record"
-      }
-    ]
+        description: "Perfect track record",
+      },
+    ],
   },
   testimonials: {
     title: {
@@ -274,22 +263,23 @@ const percymdContent: HubContentData = {
     ctaSubtext: "📱 SEE THE PROOF",
     guaranteeText:
       "If we can't get you set up in 8 days, your $179 onboarding is free. Plus, we guarantee HIPAA compliance from day one.",
-    badge: null,
+    // badge: undefined, // No badge for this content
   },
   problemSolution: {
     title: {
       prefix: "The Healthcare",
-      highlight: "Communication Crisis"
+      highlight: "Communication Crisis",
     },
-    description: "While others struggle with HIPAA compliance and patient privacy, we've cracked the code. We champion healthcare providers who demand secure, effective patient communication.",
+    description:
+      "While others struggle with HIPAA compliance and patient privacy, we've cracked the code. We champion healthcare providers who demand secure, effective patient communication.",
     deliver: {
       title: "WE DELIVER HEALTHCARE EXCELLENCE",
       features: [
         "Bulletproof HIPAA compliance built from day one",
         "8-day setup with healthcare-specific expertise",
         "Patient communication that actually improves outcomes",
-        "Healthcare experts who understand your challenges"
-      ]
+        "Healthcare experts who understand your challenges",
+      ],
     },
     overlook: {
       title: "WHAT OTHERS GET WRONG",
@@ -297,10 +287,10 @@ const percymdContent: HubContentData = {
         "HIPAA compliance isn't just a checkbox",
         "Patient privacy requires bulletproof security",
         "Healthcare communication needs specialized expertise",
-        "Medical practices deserve enterprise-grade solutions"
-      ]
+        "Medical practices deserve enterprise-grade solutions",
+      ],
     },
-    badge: "HIPAA ✓"
+    badge: "HIPAA ✓",
   },
   stats: {
     title: "HEALTHCARE-PROVEN RESULTS",
@@ -375,15 +365,21 @@ export const getHubCTAContent = (hubType: HubType): CTAContent => {
   return hubContentMap[hubType]?.cta || gnymbleContent.cta;
 };
 
-export const getHubProblemSolutionContent = (hubType: HubType): ProblemSolutionContent => {
-  return hubContentMap[hubType]?.problemSolution || gnymbleContent.problemSolution;
+export const getHubProblemSolutionContent = (
+  hubType: HubType
+): ProblemSolutionContent => {
+  return (
+    hubContentMap[hubType]?.problemSolution || gnymbleContent.problemSolution
+  );
 };
 
 export const getHubStatsContent = (hubType: HubType): StatsContent => {
   return hubContentMap[hubType]?.stats || gnymbleContent.stats;
 };
 
-export const getHubTestimonialsContent = (hubType: HubType): TestimonialsContent => {
+export const getHubTestimonialsContent = (
+  hubType: HubType
+): TestimonialsContent => {
   return hubContentMap[hubType]?.testimonials || gnymbleContent.testimonials;
 };
 

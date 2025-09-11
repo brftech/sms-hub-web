@@ -14,7 +14,7 @@ export const phoneSchema = z
   .string()
   .min(10, "Phone number must be at least 10 digits")
   .max(15, "Phone number must be no more than 15 digits")
-  .regex(/^[\+]?[1-9][\d]{0,15}$/, "Invalid phone number format")
+  .regex(/^[+]?[1-9][\d]{0,15}$/, "Invalid phone number format")
   .transform((val) => {
     // Normalize phone number format
     const cleaned = val.replace(/\D/g, "");
@@ -39,14 +39,14 @@ export const nameSchema = z
   .string()
   .min(1, "Name is required")
   .max(100, "Name is too long")
-  .regex(/^[a-zA-Z\s\-'\.]+$/, "Name contains invalid characters");
+  .regex(/^[a-zA-Z\s\-'.]+$/, "Name contains invalid characters");
 
 // Company name validation
 export const companySchema = z
   .string()
   .min(1, "Company name is required")
   .max(200, "Company name is too long")
-  .regex(/^[a-zA-Z0-9\s\-'\.&,]+$/, "Company name contains invalid characters");
+  .regex(/^[a-zA-Z0-9\s\-'.&,]+$/, "Company name contains invalid characters");
 
 // Message validation
 export const messageSchema = z
@@ -196,7 +196,7 @@ export const validatePartial = <T>(
   context?: Record<string, unknown>
 ): Partial<T> => {
   try {
-    return (schema as any).partial().parse(data);
+    return (schema as { partial: () => z.ZodSchema<T> }).partial().parse(data);
   } catch (error) {
     if (error instanceof z.ZodError) {
       const validationError = createValidationError(

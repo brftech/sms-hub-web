@@ -83,7 +83,7 @@ export function BrandStep({ onComplete }: StepComponentProps) {
 
     try {
       // TODO: Submit brand registration to TCR
-      await onComplete(data);
+      await onComplete(data as any);
     } catch (error) {
       console.error("Brand registration error:", error);
     } finally {

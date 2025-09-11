@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { getSupabaseClient } from "../lib/supabaseSingleton";
 
 export function TestAuth() {
-  const [status, setStatus] = useState<any>({});
+  const [status, setStatus] = useState<Record<string, unknown>>({});
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -50,10 +50,10 @@ export function TestAuth() {
         if (authData) {
           await supabase.auth.signOut();
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
         setStatus({
-          error: error.message,
-          stack: error.stack,
+          error: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack : undefined,
         });
       }
     };

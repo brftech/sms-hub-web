@@ -1,4 +1,4 @@
-import { Navigate, useLocation } from 'react-router-dom';
+import { Navigate, useLocation } from "react-router-dom";
 
 export interface ProtectedRouteConfig {
   loginPath?: string;
@@ -14,9 +14,23 @@ export interface ProtectedRouteConfig {
 export interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
-  user?: any;
-  userProfile?: any;
-  session?: any;
+  user?: {
+    id: string;
+    email?: string;
+    [key: string]: unknown;
+  };
+  userProfile?: {
+    id: string;
+    email: string;
+    first_name?: string;
+    last_name?: string;
+    [key: string]: unknown;
+  };
+  session?: {
+    access_token?: string;
+    refresh_token?: string;
+    [key: string]: unknown;
+  };
 }
 
 export interface ProtectedRouteProps {
@@ -26,19 +40,19 @@ export interface ProtectedRouteProps {
   checkoutRedirectComponent?: React.ReactNode;
 }
 
-export function ProtectedRoute({ 
-  children, 
+export function ProtectedRoute({
+  children,
   authState,
   config = {},
-  checkoutRedirectComponent
+  checkoutRedirectComponent,
 }: ProtectedRouteProps) {
   const location = useLocation();
   const {
-    loginPath = '/login',
-    paymentRequiredPath = '/payment-required',
+    loginPath = "/login",
+    paymentRequiredPath = "/payment-required",
     checkPaymentStatus = false,
     checkOnboarding = false,
-    onboardingPaths = ['/onboarding'],
+    onboardingPaths = ["/onboarding"],
     allowedPaths = [],
     loadingComponent,
     redirectAfterLogin = true,
@@ -60,38 +74,52 @@ export function ProtectedRoute({
   if (!authState.isAuthenticated) {
     // Save the attempted location for redirect after login
     return (
-      <Navigate 
-        to={loginPath} 
-        state={redirectAfterLogin ? { from: location } : undefined} 
-        replace 
+      <Navigate
+        to={loginPath}
+        state={redirectAfterLogin ? { from: location } : undefined}
+        replace
       />
     );
   }
 
   // Check if there's a pending checkout from signup
-  const pendingCheckout = typeof sessionStorage !== 'undefined' 
-    ? sessionStorage.getItem('pending_checkout')
-    : null;
-    
-  if (pendingCheckout && checkoutRedirectComponent && location.pathname === '/') {
+  const pendingCheckout =
+    typeof sessionStorage !== "undefined"
+      ? sessionStorage.getItem("pending_checkout")
+      : null;
+
+  if (
+    pendingCheckout &&
+    checkoutRedirectComponent &&
+    location.pathname === "/"
+  ) {
     // Only redirect to CheckoutRedirect if they're not trying to access allowed paths
-    const isAllowedPath = allowedPaths.some(path => location.pathname.includes(path));
+    const isAllowedPath = allowedPaths.some((path) =>
+      location.pathname.includes(path)
+    );
     if (!isAllowedPath) {
       return <>{checkoutRedirectComponent}</>;
     }
   }
 
   // Check if user needs to complete payment
-  if (checkPaymentStatus && authState.userProfile && !authState.userProfile.payment_status) {
+  if (
+    checkPaymentStatus &&
+    authState.userProfile &&
+    !authState.userProfile.payment_status
+  ) {
     // Allow access to onboarding and payment-related paths
-    const isOnboardingPath = onboardingPaths.some(path => location.pathname.includes(path));
-    const isPaymentPath = location.pathname.includes('payment') || 
-                         location.pathname.includes('stripe');
-    
+    const isOnboardingPath = onboardingPaths.some((path) =>
+      location.pathname.includes(path)
+    );
+    const isPaymentPath =
+      location.pathname.includes("payment") ||
+      location.pathname.includes("stripe");
+
     if (checkOnboarding && isOnboardingPath) {
       return <>{children}</>;
     }
-    
+
     if (!isPaymentPath && !isOnboardingPath) {
       return <Navigate to={paymentRequiredPath} replace />;
     }

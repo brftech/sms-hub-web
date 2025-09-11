@@ -196,7 +196,18 @@ export function Signup() {
     "new_company" | "invited_user" | "individual"
   >("new_company");
   const [invitationToken, setInvitationToken] = useState("");
-  const [invitationData, setInvitationData] = useState<any>(null);
+  const [invitationData, setInvitationData] = useState<{
+    company_id?: string;
+    company_name?: string;
+    inviter_name?: string;
+    hub_id?: number;
+    first_name?: string | null;
+    last_name?: string | null;
+    role?: string | null;
+    companies?: {
+      public_name?: string;
+    };
+  } | null>(null);
   const [isLoadingInvitation, setIsLoadingInvitation] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -391,9 +402,9 @@ export function Signup() {
       setTimeout(() => {
         navigate(`/verify?id=${result.verification_id}`);
       }, 2000);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Signup error:", err);
-      setError(err.message || "Failed to create account");
+      setError(err instanceof Error ? err.message : "Failed to create account");
     } finally {
       setIsSubmitting(false);
     }
@@ -403,7 +414,12 @@ export function Signup() {
     return (
       <SignupContainer>
         <DevAuthToggle
-          environment={webEnvironment}
+          environment={
+            webEnvironment as unknown as {
+              isDevelopment?: () => boolean;
+              [key: string]: unknown;
+            }
+          }
           onActivate={() => activateDevAuth()}
         />
         <SignupCard>
@@ -426,7 +442,12 @@ export function Signup() {
   return (
     <SignupContainer>
       <DevAuthToggle
-        environment={webEnvironment}
+        environment={
+          webEnvironment as unknown as {
+            isDevelopment?: () => boolean;
+            [key: string]: unknown;
+          }
+        }
         onActivate={() => activateDevAuth()}
       />
       <SignupCard>

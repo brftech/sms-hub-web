@@ -1,9 +1,13 @@
-import React, { useState } from 'react';
-import { Outlet } from 'react-router-dom';
-import { AppSidebar } from './AppSidebar';
-import { AppHeader } from './AppHeader';
-import { DevAdminBanner } from '../DevAdminBanner';
-import type { NavigationItem, UserProfile, DashboardLayoutConfig } from './types';
+import React, { useState } from "react";
+import { Outlet } from "react-router-dom";
+import { AppSidebar } from "./AppSidebar";
+import { AppHeader } from "./AppHeader";
+import { DevAdminBanner } from "../DevAdminBanner";
+import type {
+  NavigationItem,
+  UserProfile,
+  DashboardLayoutConfig,
+} from "./types";
 
 export interface DashboardLayoutProps {
   config: DashboardLayoutConfig;
@@ -26,14 +30,22 @@ export function DashboardLayout({
   onLogout,
   navigationCounts = {},
   onRefreshCounts,
-  className = '',
+  className = "",
 }: DashboardLayoutProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
     <div className={`min-h-screen bg-gray-50 ${className}`}>
-      {showDevBanner && <DevAdminBanner environment={{ isDevelopment: () => true }} />}
-      
+      {showDevBanner && (
+        <DevAdminBanner
+          environment={{
+            isDevelopment: () => true,
+            isProduction: () => false,
+            isTest: () => false,
+          }}
+        />
+      )}
+
       {/* Mobile sidebar backdrop */}
       {isSidebarOpen && (
         <div
@@ -63,10 +75,12 @@ export function DashboardLayout({
         />
 
         {/* Page content */}
-        <main className={config.mainClassName || 'p-6 overflow-y-auto h-[calc(100vh-4rem)]'}>
-          <div className="max-w-full">
-            {children || <Outlet />}
-          </div>
+        <main
+          className={
+            config.mainClassName || "p-6 overflow-y-auto h-[calc(100vh-4rem)]"
+          }
+        >
+          <div className="max-w-full">{children || <Outlet />}</div>
         </main>
       </div>
     </div>

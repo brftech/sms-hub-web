@@ -21,7 +21,7 @@ export interface SMSMessage {
   message_body: string;
   status: "pending" | "sent" | "delivered" | "failed";
   external_id?: string | null;
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
   created_at: string;
   updated_at: string;
 }
@@ -36,7 +36,7 @@ export interface ChatMessage {
   sender: "user" | "business";
   timestamp: string;
   businessName?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 // Conversation context for chat sessions
@@ -45,7 +45,7 @@ export interface ConversationContext {
   userId?: string;
   businessId?: string;
   campaignId?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface TCRBrandRegistration {

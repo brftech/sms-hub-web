@@ -282,8 +282,8 @@ export const createAPIError = (
   );
 
   // Add HTTP-specific properties
-  (error as any).status = status;
-  (error as any).statusText = statusText;
+  (error as { status?: number; statusText?: string }).status = status;
+  (error as { status?: number; statusText?: string }).statusText = statusText;
 
   return error;
 };

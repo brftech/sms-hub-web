@@ -163,9 +163,11 @@ export function VerifyCode() {
         // Redirect to user app for account details
         window.location.href = `http://localhost:3001/account-details?id=${verifyData.verification_id}&superadmin=dev123`;
       }, 1500);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Error in handleVerify:", err);
-      setError(err.message || "Invalid verification code");
+      setError(
+        err instanceof Error ? err.message : "Invalid verification code"
+      );
       setCode("");
     } finally {
       setIsVerifying(false);
@@ -204,8 +206,12 @@ export function VerifyCode() {
       setCanResend(false);
       setError("");
       setCode("");
-    } catch (err: any) {
-      setError(err.message || "Failed to resend verification code");
+    } catch (err: unknown) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to resend verification code"
+      );
     } finally {
       setIsResending(false);
     }

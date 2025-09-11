@@ -8,7 +8,11 @@ export type Membership = Database["public"]["Tables"]["memberships"]["Row"];
 
 export interface AuthContextType {
   user: UserProfile | null;
-  session: any | null;
+  session: {
+    access_token?: string;
+    refresh_token?: string;
+    user?: unknown;
+  } | null;
   loading: boolean;
   signOut: () => Promise<void>;
   signInWithPhone: (phone: string, hubId: number) => Promise<void>;

@@ -6,8 +6,12 @@ import { Company, UserProfile } from "@sms-hub/types";
 // Create a single supabase client instance
 const getSupabaseClient = () => {
   // Get from window if available (set by user app)
-  if (typeof window !== "undefined" && (window as any).__supabaseClient) {
-    return (window as any).__supabaseClient;
+  if (
+    typeof window !== "undefined" &&
+    (window as { __supabaseClient?: unknown }).__supabaseClient
+  ) {
+    return (window as { __supabaseClient: unknown })
+      .__supabaseClient as unknown;
   }
 
   // Otherwise create a new one
@@ -213,7 +217,8 @@ export const useCreateVerification = () => {
   const authService = createAuthService(supabase);
 
   return useMutation({
-    mutationFn: (data: any) => authService.createVerification(data),
+    mutationFn: (data: Record<string, unknown>) =>
+      authService.createVerification(data as Record<string, unknown>),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["verifications"] });
     },
@@ -226,7 +231,8 @@ export const useVerifyCode = () => {
   const authService = createAuthService(supabase);
 
   return useMutation({
-    mutationFn: (data: any) => authService.verifyCode(data),
+    mutationFn: (data: Record<string, unknown>) =>
+      authService.verifyCode(data as Record<string, unknown>),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user-profile"] });
     },
@@ -321,7 +327,7 @@ export const useUpdateOnboardingSubmission = () => {
     mutationFn: async (data: {
       id: string;
       current_step: string;
-      step_data: Record<string, any>;
+      step_data: Record<string, unknown>;
       stripe_status?: string;
       tcr_brand_id?: string;
       tcr_campaign_id?: string;
@@ -354,7 +360,7 @@ export const useCreateOnboardingSubmission = () => {
       hub_id: number;
       user_id: string;
       current_step: string;
-      step_data: Record<string, any>;
+      step_data: Record<string, unknown>;
     }) => {
       const client = getSupabaseClient();
       const { data: result, error } = await client
@@ -594,7 +600,7 @@ export const useUpdateCompany = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: { id: string; [key: string]: any }) => {
+    mutationFn: async (data: { id: string; [key: string]: unknown }) => {
       const supabase = getSupabaseClient();
       const { data: result, error } = await supabase
         .from("companies")
@@ -618,7 +624,7 @@ export const useUpdateProfile = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: { id: string; [key: string]: any }) => {
+    mutationFn: async (data: { id: string; [key: string]: unknown }) => {
       const client = getSupabaseClient();
       const { data: result, error } = await client
         .from("user_profiles")

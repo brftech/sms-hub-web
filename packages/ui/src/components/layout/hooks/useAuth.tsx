@@ -2,15 +2,15 @@ import { useState, useEffect } from "react";
 import type { AuthState } from "../ProtectedRoute";
 
 export interface UseAuthConfig {
-  checkSession: () => Promise<{ session: any; user: any } | null>;
-  getUserProfile?: (userId: string) => Promise<any>;
-  onAuthStateChange?: (callback: (event: string, session: any) => void) => {
+  checkSession: () => Promise<{ session: unknown; user: unknown } | null>;
+  getUserProfile?: (userId: string) => Promise<unknown>;
+  onAuthStateChange?: (callback: (event: string, session: unknown) => void) => {
     unsubscribe: () => void;
   };
   devAuthOverride?: {
     isEnabled: boolean;
-    user?: any;
-    profile?: any;
+    user?: unknown;
+    profile?: unknown;
   };
 }
 
@@ -18,9 +18,9 @@ export function useAuth(config: UseAuthConfig): AuthState {
   const [authState, setAuthState] = useState<AuthState>({
     isAuthenticated: false,
     isLoading: true,
-    user: null,
-    userProfile: null,
-    session: null,
+    user: undefined,
+    userProfile: undefined,
+    session: undefined,
   });
 
   useEffect(() => {
@@ -33,9 +33,23 @@ export function useAuth(config: UseAuthConfig): AuthState {
           setAuthState({
             isAuthenticated: true,
             isLoading: false,
-            user: config.devAuthOverride.user,
-            userProfile: config.devAuthOverride.profile,
-            session: { user: config.devAuthOverride.user },
+            user: config.devAuthOverride.user as {
+              id: string;
+              email?: string;
+              [key: string]: unknown;
+            },
+            userProfile: config.devAuthOverride.profile as {
+              id: string;
+              email: string;
+              first_name?: string;
+              last_name?: string;
+              [key: string]: unknown;
+            },
+            session: { user: config.devAuthOverride.user } as {
+              access_token?: string;
+              refresh_token?: string;
+              [key: string]: unknown;
+            },
           });
           return;
         }
@@ -47,9 +61,14 @@ export function useAuth(config: UseAuthConfig): AuthState {
           let profile = null;
 
           // Load user profile if available
-          if (config.getUserProfile && sessionData.user?.id) {
+          if (
+            config.getUserProfile &&
+            (sessionData.user as { id?: string })?.id
+          ) {
             try {
-              profile = await config.getUserProfile(sessionData.user.id);
+              profile = await config.getUserProfile(
+                (sessionData.user as { id: string }).id
+              );
             } catch (error) {
               console.error("Failed to load user profile:", error);
             }
@@ -58,17 +77,31 @@ export function useAuth(config: UseAuthConfig): AuthState {
           setAuthState({
             isAuthenticated: true,
             isLoading: false,
-            user: sessionData.user,
-            userProfile: profile,
-            session: sessionData.session,
+            user: sessionData.user as {
+              id: string;
+              email?: string;
+              [key: string]: unknown;
+            },
+            userProfile: profile as {
+              id: string;
+              email: string;
+              first_name?: string;
+              last_name?: string;
+              [key: string]: unknown;
+            },
+            session: sessionData.session as {
+              access_token?: string;
+              refresh_token?: string;
+              [key: string]: unknown;
+            },
           });
         } else {
           setAuthState({
             isAuthenticated: false,
             isLoading: false,
-            user: null,
-            userProfile: null,
-            session: null,
+            user: undefined,
+            userProfile: undefined,
+            session: undefined,
           });
         }
       } catch (error) {
@@ -76,9 +109,9 @@ export function useAuth(config: UseAuthConfig): AuthState {
         setAuthState({
           isAuthenticated: false,
           isLoading: false,
-          user: null,
-          userProfile: null,
-          session: null,
+          user: undefined,
+          userProfile: undefined,
+          session: undefined,
         });
       }
     };
@@ -92,8 +125,17 @@ export function useAuth(config: UseAuthConfig): AuthState {
         setAuthState((prev) => ({
           ...prev,
           isAuthenticated: !!session,
-          session,
-          user: session?.user || null,
+          session: session as {
+            access_token?: string;
+            refresh_token?: string;
+            [key: string]: unknown;
+          },
+          user:
+            (
+              session as {
+                user?: { id: string; email?: string; [key: string]: unknown };
+              }
+            )?.user || undefined,
         }));
       });
       unsubscribe = subscription.unsubscribe;

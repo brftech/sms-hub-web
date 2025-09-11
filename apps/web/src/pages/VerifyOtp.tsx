@@ -92,8 +92,10 @@ export function VerifyOtp() {
       setTimeout(() => {
         window.location.href = "http://localhost:3001/?superadmin=dev123";
       }, 1500);
-    } catch (err: any) {
-      setError(err.message || "Invalid verification code");
+    } catch (err: unknown) {
+      setError(
+        err instanceof Error ? err.message : "Invalid verification code"
+      );
       setCode("");
     } finally {
       setIsVerifying(false);
@@ -122,8 +124,8 @@ export function VerifyOtp() {
         document.getElementById("resend-button")?.appendChild(successMsg);
         setTimeout(() => successMsg.remove(), 3000);
       }
-    } catch (err: any) {
-      setError(err.message || "Failed to resend code");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to resend code");
     }
   };
 

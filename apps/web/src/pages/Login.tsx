@@ -231,20 +231,25 @@ export function Login() {
           searchParams.get("redirect") ||
           "http://localhost:3001/?superadmin=dev123";
         window.location.href = redirectUrl;
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error("Password login error:", err);
         console.error("Error details:", {
-          message: err.message,
-          status: err.status,
-          statusText: err.statusText,
-          details: err.details,
-          hint: err.hint,
-          code: err.code,
+          message: err instanceof Error ? err.message : String(err),
+          status: (err as { status?: unknown })?.status,
+          statusText: (err as { statusText?: unknown })?.statusText,
+          details: (err as { details?: unknown })?.details,
+          hint: (err as { hint?: unknown })?.hint,
+          code: (err as { code?: unknown })?.code,
         });
-        setError(err.message || "Invalid email or password");
+        setError(
+          err instanceof Error ? err.message : "Invalid email or password"
+        );
 
         // If error suggests no account, show helpful message
-        if (err.message?.includes("Invalid login credentials")) {
+        if (
+          err instanceof Error &&
+          err.message?.includes("Invalid login credentials")
+        ) {
           setError(
             "Invalid email or password. New users should sign up first."
           );
@@ -312,9 +317,13 @@ export function Login() {
         setTimeout(() => {
           navigate(`/verify?id=${result.id}`);
         }, 2000);
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error("Login error:", err);
-        setError(err.message || "Failed to send verification code");
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Failed to send verification code"
+        );
       } finally {
         setIsLoading(false);
       }
@@ -346,7 +355,12 @@ export function Login() {
   return (
     <LoginContainer>
       <DevAuthToggle
-        environment={webEnvironment}
+        environment={
+          webEnvironment as unknown as {
+            isDevelopment?: () => boolean;
+            [key: string]: unknown;
+          }
+        }
         onActivate={() => activateDevAuth()}
       />
       <Card className="w-full max-w-md">

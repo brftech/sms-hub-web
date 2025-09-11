@@ -53,7 +53,7 @@ const Testing = () => {
     },
   ]);
   const [isRunning, setIsRunning] = useState(false);
-  const [overallStatus, setOverallStatus] = useState<
+  const [_overallStatus, setOverallStatus] = useState<
     "idle" | "running" | "completed"
   >("idle");
   const [lastRunTime, setLastRunTime] = useState<Date | null>(null);
@@ -251,8 +251,8 @@ const Testing = () => {
         <p className="mt-1 text-sm text-gray-500">
           Run and monitor tests for the {currentHub} hub
         </p>
-        <Link 
-          to="/layout-demo" 
+        <Link
+          to="/layout-demo"
           className="inline-flex items-center mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
         >
           View New Layout Component Demo →

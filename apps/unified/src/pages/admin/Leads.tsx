@@ -19,10 +19,7 @@ import {
   XCircle,
   AlertCircle,
 } from "lucide-react";
-import {
-  leadsService,
-  Lead,
-} from "../../services/leadsService";
+import { leadsService, Lead } from "../../services/leadsService";
 
 const Leads = () => {
   const { currentHub } = useHub();
@@ -39,12 +36,12 @@ const Leads = () => {
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deletingLeadId, setDeletingLeadId] = useState<string | null>(null);
-  
+
   // Filtering states
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [priorityFilter, setPriorityFilter] = useState<string>("all");
   const [sourceFilter, setSourceFilter] = useState<string>("all");
-  
+
   // Sorting states
   const [sortField, setSortField] = useState<keyof Lead>("created_at");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
@@ -69,10 +66,7 @@ const Leads = () => {
 
       console.log("Leads: Current hub:", currentHub);
       console.log("Leads: Global view:", isGlobalView);
-      console.log(
-        "Leads: Using hub_id:",
-        isGlobalView ? "ALL HUBS" : hubId
-      );
+      console.log("Leads: Using hub_id:", isGlobalView ? "ALL HUBS" : hubId);
 
       // Build filter options
       const filterOptions: any = {
@@ -119,7 +113,7 @@ const Leads = () => {
 
   const handleUpdateLead = async () => {
     if (!editingLead) return;
-    
+
     try {
       setIsUpdating(true);
       // TODO: Implement lead update in service
@@ -135,7 +129,7 @@ const Leads = () => {
 
   const handleDeleteLead = async () => {
     if (!deletingLeadId) return;
-    
+
     try {
       // TODO: Implement lead deletion in service
       await fetchData();
@@ -169,44 +163,48 @@ const Leads = () => {
   // Filter leads when search query or global view changes
   useEffect(() => {
     fetchData();
-  }, [
-    searchQuery,
-    isGlobalView,
-  ]);
+  }, [searchQuery, isGlobalView]);
 
   // Compute filtered and sorted leads using useMemo to prevent flicker
   const filteredLeads = useMemo(() => {
     let filtered = [...leads];
-    
+
     // Apply status filter
     if (statusFilter !== "all") {
-      filtered = filtered.filter(l => l.status === statusFilter);
+      filtered = filtered.filter((l) => l.status === statusFilter);
     }
-    
+
     // Apply priority filter
     if (priorityFilter !== "all") {
-      filtered = filtered.filter(l => l.priority === priorityFilter);
+      filtered = filtered.filter((l) => l.priority === priorityFilter);
     }
-    
+
     // Apply source filter
     if (sourceFilter !== "all") {
-      filtered = filtered.filter(l => l.source === sourceFilter);
+      filtered = filtered.filter((l) => l.source === sourceFilter);
     }
-    
+
     // Apply sorting
     filtered.sort((a, b) => {
       const aVal = a[sortField] || "";
       const bVal = b[sortField] || "";
-      
+
       if (sortDirection === "asc") {
         return aVal > bVal ? 1 : -1;
       } else {
         return aVal < bVal ? 1 : -1;
       }
     });
-    
+
     return filtered;
-  }, [leads, statusFilter, priorityFilter, sourceFilter, sortField, sortDirection]);
+  }, [
+    leads,
+    statusFilter,
+    priorityFilter,
+    sourceFilter,
+    sortField,
+    sortDirection,
+  ]);
 
   const handleSort = (field: keyof Lead) => {
     if (field === sortField) {
@@ -221,17 +219,47 @@ const Leads = () => {
   const getStatusInfo = (status: string) => {
     switch (status) {
       case "new":
-        return { label: "New", icon: Clock, color: "text-blue-600", bg: "bg-blue-100" };
+        return {
+          label: "New",
+          icon: Clock,
+          color: "text-blue-600",
+          bg: "bg-blue-100",
+        };
       case "contacted":
-        return { label: "Contacted", icon: MessageSquare, color: "text-yellow-600", bg: "bg-yellow-100" };
+        return {
+          label: "Contacted",
+          icon: MessageSquare,
+          color: "text-yellow-600",
+          bg: "bg-yellow-100",
+        };
       case "qualified":
-        return { label: "Qualified", icon: CheckCircle, color: "text-purple-600", bg: "bg-purple-100" };
+        return {
+          label: "Qualified",
+          icon: CheckCircle,
+          color: "text-purple-600",
+          bg: "bg-purple-100",
+        };
       case "converted":
-        return { label: "Converted", icon: TrendingUp, color: "text-green-600", bg: "bg-green-100" };
+        return {
+          label: "Converted",
+          icon: TrendingUp,
+          color: "text-green-600",
+          bg: "bg-green-100",
+        };
       case "lost":
-        return { label: "Lost", icon: XCircle, color: "text-red-600", bg: "bg-red-100" };
+        return {
+          label: "Lost",
+          icon: XCircle,
+          color: "text-red-600",
+          bg: "bg-red-100",
+        };
       default:
-        return { label: status, icon: AlertCircle, color: "text-gray-600", bg: "bg-gray-100" };
+        return {
+          label: status,
+          icon: AlertCircle,
+          color: "text-gray-600",
+          bg: "bg-gray-100",
+        };
     }
   };
 
@@ -239,11 +267,19 @@ const Leads = () => {
   const getPriorityInfo = (priority: string) => {
     switch (priority) {
       case "urgent":
-        return { label: "Urgent", color: "text-purple-800", bg: "bg-purple-100" };
+        return {
+          label: "Urgent",
+          color: "text-purple-800",
+          bg: "bg-purple-100",
+        };
       case "high":
         return { label: "High", color: "text-red-800", bg: "bg-red-100" };
       case "medium":
-        return { label: "Medium", color: "text-yellow-800", bg: "bg-yellow-100" };
+        return {
+          label: "Medium",
+          color: "text-yellow-800",
+          bg: "bg-yellow-100",
+        };
       case "low":
         return { label: "Low", color: "text-green-800", bg: "bg-green-100" };
       default:
@@ -349,7 +385,7 @@ const Leads = () => {
           <h3 className="text-base font-medium text-gray-900">
             Leads ({filteredLeads.length})
           </h3>
-          
+
           {/* Filters */}
           <div className="flex items-center space-x-3">
             <div className="flex items-center space-x-2">
@@ -366,7 +402,7 @@ const Leads = () => {
                 <option value="converted">Converted</option>
                 <option value="lost">Lost</option>
               </select>
-              
+
               <select
                 value={priorityFilter}
                 onChange={(e) => setPriorityFilter(e.target.value)}
@@ -378,7 +414,7 @@ const Leads = () => {
                 <option value="medium">Medium</option>
                 <option value="low">Low</option>
               </select>
-              
+
               <select
                 value={sourceFilter}
                 onChange={(e) => setSourceFilter(e.target.value)}
@@ -398,83 +434,104 @@ const Leads = () => {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50 sticky top-0 z-10">
               <tr>
-                <th 
+                <th
                   className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                   onClick={() => handleSort("name")}
                 >
                   <div className="flex items-center space-x-1">
                     <span>Lead</span>
-                    {sortField === "name" && (
-                      sortDirection === "asc" ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />
-                    )}
+                    {sortField === "name" &&
+                      (sortDirection === "asc" ? (
+                        <ChevronUp className="w-3 h-3" />
+                      ) : (
+                        <ChevronDown className="w-3 h-3" />
+                      ))}
                   </div>
                 </th>
                 {isGlobalView && (
-                  <th 
+                  <th
                     className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                     onClick={() => handleSort("hub_id")}
                   >
                     <div className="flex items-center space-x-1">
                       <span>Hub</span>
-                      {sortField === "hub_id" && (
-                        sortDirection === "asc" ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />
-                      )}
+                      {sortField === "hub_id" &&
+                        (sortDirection === "asc" ? (
+                          <ChevronUp className="w-3 h-3" />
+                        ) : (
+                          <ChevronDown className="w-3 h-3" />
+                        ))}
                     </div>
                   </th>
                 )}
-                <th 
+                <th
                   className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                   onClick={() => handleSort("email")}
                 >
                   <div className="flex items-center space-x-1">
                     <span>Contact</span>
-                    {sortField === "email" && (
-                      sortDirection === "asc" ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />
-                    )}
+                    {sortField === "email" &&
+                      (sortDirection === "asc" ? (
+                        <ChevronUp className="w-3 h-3" />
+                      ) : (
+                        <ChevronDown className="w-3 h-3" />
+                      ))}
                   </div>
                 </th>
-                <th 
+                <th
                   className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                   onClick={() => handleSort("status")}
                 >
                   <div className="flex items-center space-x-1">
                     <span>Status</span>
-                    {sortField === "status" && (
-                      sortDirection === "asc" ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />
-                    )}
+                    {sortField === "status" &&
+                      (sortDirection === "asc" ? (
+                        <ChevronUp className="w-3 h-3" />
+                      ) : (
+                        <ChevronDown className="w-3 h-3" />
+                      ))}
                   </div>
                 </th>
-                <th 
+                <th
                   className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                   onClick={() => handleSort("priority")}
                 >
                   <div className="flex items-center space-x-1">
                     <span>Priority</span>
-                    {sortField === "priority" && (
-                      sortDirection === "asc" ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />
-                    )}
+                    {sortField === "priority" &&
+                      (sortDirection === "asc" ? (
+                        <ChevronUp className="w-3 h-3" />
+                      ) : (
+                        <ChevronDown className="w-3 h-3" />
+                      ))}
                   </div>
                 </th>
-                <th 
+                <th
                   className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                   onClick={() => handleSort("source")}
                 >
                   <div className="flex items-center space-x-1">
                     <span>Source</span>
-                    {sortField === "source" && (
-                      sortDirection === "asc" ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />
-                    )}
+                    {sortField === "source" &&
+                      (sortDirection === "asc" ? (
+                        <ChevronUp className="w-3 h-3" />
+                      ) : (
+                        <ChevronDown className="w-3 h-3" />
+                      ))}
                   </div>
                 </th>
-                <th 
+                <th
                   className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                   onClick={() => handleSort("created_at")}
                 >
                   <div className="flex items-center space-x-1">
                     <span>Created</span>
-                    {sortField === "created_at" && (
-                      sortDirection === "asc" ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />
-                    )}
+                    {sortField === "created_at" &&
+                      (sortDirection === "asc" ? (
+                        <ChevronUp className="w-3 h-3" />
+                      ) : (
+                        <ChevronDown className="w-3 h-3" />
+                      ))}
                   </div>
                 </th>
                 <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -553,7 +610,7 @@ const Leads = () => {
                         >
                           <Eye className="w-4 h-4" />
                         </button>
-                        <button 
+                        <button
                           onClick={() => handleEditLead(lead)}
                           className="text-green-600 hover:text-green-900"
                           title="Edit Lead"
@@ -591,7 +648,10 @@ const Leads = () => {
               No leads found
             </h3>
             <p className="mt-1 text-sm text-gray-500">
-              {searchQuery || statusFilter !== "all" || priorityFilter !== "all" || sourceFilter !== "all"
+              {searchQuery ||
+              statusFilter !== "all" ||
+              priorityFilter !== "all" ||
+              sourceFilter !== "all"
                 ? "Try adjusting your search or filter criteria."
                 : "No leads have been created yet."}
             </p>
@@ -611,9 +671,10 @@ const Leads = () => {
                 Delete Lead
               </h3>
             </div>
-            
+
             <p className="text-gray-600 mb-6">
-              Are you sure you want to delete this lead? This action cannot be undone and will remove all associated data.
+              Are you sure you want to delete this lead? This action cannot be
+              undone and will remove all associated data.
             </p>
 
             <div className="flex justify-end space-x-3">

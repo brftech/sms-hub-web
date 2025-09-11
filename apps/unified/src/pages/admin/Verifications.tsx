@@ -30,14 +30,17 @@ const Verifications = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [selectedVerification, setSelectedVerification] = useState<Verification | null>(null);
+  const [selectedVerification, setSelectedVerification] =
+    useState<Verification | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [deletingVerificationId, setDeletingVerificationId] = useState<string | null>(null);
-  
+  const [deletingVerificationId, setDeletingVerificationId] = useState<
+    string | null
+  >(null);
+
   // Filtering states
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [methodFilter, setMethodFilter] = useState<string>("all");
-  
+
   // Sorting states
   const [sortField, setSortField] = useState<keyof Verification>("created_at");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
@@ -79,9 +82,13 @@ const Verifications = () => {
       }
 
       // Fetch verifications with filters
-      const fetchedVerifications = await verificationsService.instance.getVerifications(filterOptions);
+      const fetchedVerifications =
+        await verificationsService.instance.getVerifications(filterOptions);
 
-      console.log("Verifications: Fetched verifications:", fetchedVerifications);
+      console.log(
+        "Verifications: Fetched verifications:",
+        fetchedVerifications
+      );
       console.log("Verifications: Count:", fetchedVerifications.length);
 
       setVerifications(fetchedVerifications);
@@ -102,9 +109,11 @@ const Verifications = () => {
 
   const handleDeleteVerification = async () => {
     if (!deletingVerificationId) return;
-    
+
     try {
-      await verificationsService.instance.deleteVerification(deletingVerificationId);
+      await verificationsService.instance.deleteVerification(
+        deletingVerificationId
+      );
       await fetchData();
       setShowDeleteConfirm(false);
       setDeletingVerificationId(null);
@@ -122,42 +131,40 @@ const Verifications = () => {
   // Filter verifications when search query or global view changes
   useEffect(() => {
     fetchData();
-  }, [
-    searchQuery,
-    isGlobalView,
-  ]);
+  }, [searchQuery, isGlobalView]);
 
   // Compute filtered and sorted verifications using useMemo to prevent flicker
   const filteredVerifications = useMemo(() => {
     let filtered = [...verifications];
-    
+
     // Apply status filter
     if (statusFilter !== "all") {
-      filtered = filtered.filter(v => {
-        if (statusFilter === "verified") return v.is_verified === true;
-        if (statusFilter === "unverified") return v.is_verified !== true;
-        if (statusFilter === "expired") return v.expires_at && new Date(v.expires_at) < new Date();
+      filtered = filtered.filter((v) => {
+        if (statusFilter === "verified") return v.verification_code !== null;
+        if (statusFilter === "unverified") return v.verification_code === null;
+        if (statusFilter === "expired")
+          return v.expires_at && new Date(v.expires_at) < new Date();
         return true;
       });
     }
-    
+
     // Apply method filter
     if (methodFilter !== "all") {
-      filtered = filtered.filter(v => v.auth_method === methodFilter);
+      filtered = filtered.filter((v) => v.auth_method === methodFilter);
     }
-    
+
     // Apply sorting
     filtered.sort((a, b) => {
       const aVal = a[sortField] || "";
       const bVal = b[sortField] || "";
-      
+
       if (sortDirection === "asc") {
         return aVal > bVal ? 1 : -1;
       } else {
         return aVal < bVal ? 1 : -1;
       }
     });
-    
+
     return filtered;
   }, [verifications, statusFilter, methodFilter, sortField, sortDirection]);
 
@@ -171,17 +178,43 @@ const Verifications = () => {
   };
 
   const getVerificationStatus = (verification: Verification) => {
-    if (verification.is_verified) {
-      return { label: "Verified", icon: CheckCircle, color: "text-green-600", bg: "bg-green-100" };
+    if (verification.verification_code) {
+      return {
+        label: "Verified",
+        icon: CheckCircle,
+        color: "text-green-600",
+        bg: "bg-green-100",
+      };
     }
-    if (verification.expires_at && new Date(verification.expires_at) < new Date()) {
-      return { label: "Expired", icon: AlertTriangle, color: "text-orange-600", bg: "bg-orange-100" };
+    if (
+      verification.expires_at &&
+      new Date(verification.expires_at) < new Date()
+    ) {
+      return {
+        label: "Expired",
+        icon: AlertTriangle,
+        color: "text-orange-600",
+        bg: "bg-orange-100",
+      };
     }
-    if (verification.verification_attempts && verification.max_attempts && 
-        verification.verification_attempts >= parseInt(verification.max_attempts)) {
-      return { label: "Max Attempts", icon: XCircle, color: "text-red-600", bg: "bg-red-100" };
+    if (
+      verification.verification_attempts &&
+      verification.max_attempts &&
+      verification.verification_attempts >= parseInt(verification.max_attempts)
+    ) {
+      return {
+        label: "Max Attempts",
+        icon: XCircle,
+        color: "text-red-600",
+        bg: "bg-red-100",
+      };
     }
-    return { label: "Pending", icon: Clock, color: "text-yellow-600", bg: "bg-yellow-100" };
+    return {
+      label: "Pending",
+      icon: Clock,
+      color: "text-yellow-600",
+      bg: "bg-yellow-100",
+    };
   };
 
   if (isLoading) {
@@ -189,7 +222,9 @@ const Verifications = () => {
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading verifications from database...</p>
+          <p className="mt-4 text-gray-600">
+            Loading verifications from database...
+          </p>
         </div>
       </div>
     );
@@ -264,7 +299,7 @@ const Verifications = () => {
           <h3 className="text-base font-medium text-gray-900">
             Verifications ({filteredVerifications.length})
           </h3>
-          
+
           {/* Filters */}
           <div className="flex items-center space-x-3">
             <div className="flex items-center space-x-2">
@@ -279,7 +314,7 @@ const Verifications = () => {
                 <option value="unverified">Unverified</option>
                 <option value="expired">Expired</option>
               </select>
-              
+
               <select
                 value={methodFilter}
                 onChange={(e) => setMethodFilter(e.target.value)}
@@ -297,72 +332,90 @@ const Verifications = () => {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50 sticky top-0 z-10">
               <tr>
-                <th 
+                <th
                   className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                   onClick={() => handleSort("first_name")}
                 >
                   <div className="flex items-center space-x-1">
                     <span>User</span>
-                    {sortField === "first_name" && (
-                      sortDirection === "asc" ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />
-                    )}
+                    {sortField === "first_name" &&
+                      (sortDirection === "asc" ? (
+                        <ChevronUp className="w-3 h-3" />
+                      ) : (
+                        <ChevronDown className="w-3 h-3" />
+                      ))}
                   </div>
                 </th>
                 {isGlobalView && (
-                  <th 
+                  <th
                     className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                     onClick={() => handleSort("hub_id")}
                   >
                     <div className="flex items-center space-x-1">
                       <span>Hub</span>
-                      {sortField === "hub_id" && (
-                        sortDirection === "asc" ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />
-                      )}
+                      {sortField === "hub_id" &&
+                        (sortDirection === "asc" ? (
+                          <ChevronUp className="w-3 h-3" />
+                        ) : (
+                          <ChevronDown className="w-3 h-3" />
+                        ))}
                     </div>
                   </th>
                 )}
-                <th 
+                <th
                   className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                   onClick={() => handleSort("auth_method")}
                 >
                   <div className="flex items-center space-x-1">
                     <span>Method</span>
-                    {sortField === "auth_method" && (
-                      sortDirection === "asc" ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />
-                    )}
+                    {sortField === "auth_method" &&
+                      (sortDirection === "asc" ? (
+                        <ChevronUp className="w-3 h-3" />
+                      ) : (
+                        <ChevronDown className="w-3 h-3" />
+                      ))}
                   </div>
                 </th>
-                <th 
+                <th
                   className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                   onClick={() => handleSort("verification_code")}
                 >
                   <div className="flex items-center space-x-1">
                     <span>Code</span>
-                    {sortField === "verification_code" && (
-                      sortDirection === "asc" ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />
-                    )}
+                    {sortField === "verification_code" &&
+                      (sortDirection === "asc" ? (
+                        <ChevronUp className="w-3 h-3" />
+                      ) : (
+                        <ChevronDown className="w-3 h-3" />
+                      ))}
                   </div>
                 </th>
-                <th 
+                <th
                   className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                  onClick={() => handleSort("is_verified")}
+                  onClick={() => handleSort("verification_code")}
                 >
                   <div className="flex items-center space-x-1">
                     <span>Status</span>
-                    {sortField === "is_verified" && (
-                      sortDirection === "asc" ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />
-                    )}
+                    {sortField === "verification_code" &&
+                      (sortDirection === "asc" ? (
+                        <ChevronUp className="w-3 h-3" />
+                      ) : (
+                        <ChevronDown className="w-3 h-3" />
+                      ))}
                   </div>
                 </th>
-                <th 
+                <th
                   className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                   onClick={() => handleSort("created_at")}
                 >
                   <div className="flex items-center space-x-1">
                     <span>Created</span>
-                    {sortField === "created_at" && (
-                      sortDirection === "asc" ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />
-                    )}
+                    {sortField === "created_at" &&
+                      (sortDirection === "asc" ? (
+                        <ChevronUp className="w-3 h-3" />
+                      ) : (
+                        <ChevronDown className="w-3 h-3" />
+                      ))}
                   </div>
                 </th>
                 <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -381,7 +434,8 @@ const Verifications = () => {
                           {verification.first_name} {verification.last_name}
                         </div>
                         <div className="text-xs text-gray-500">
-                          {verification.email || verification.mobile_phone_number}
+                          {verification.email ||
+                            verification.mobile_phone_number}
                         </div>
                       </div>
                     </td>
@@ -490,9 +544,10 @@ const Verifications = () => {
                 Delete Verification
               </h3>
             </div>
-            
+
             <p className="text-gray-600 mb-6">
-              Are you sure you want to delete this verification? This action cannot be undone.
+              Are you sure you want to delete this verification? This action
+              cannot be undone.
             </p>
 
             <div className="flex justify-end space-x-3">

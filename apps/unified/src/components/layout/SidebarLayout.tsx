@@ -1,18 +1,21 @@
-import React, { useState, useEffect } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { useAuth } from '../../hooks/useAuth'
-import { useSupabase } from '../../providers/SupabaseProvider'
-import { useGlobalView } from '../../contexts/GlobalViewContext'
-import { useHub, HubSwitcher } from '@sms-hub/ui'
-import { ThemeToggle } from '../ThemeToggle'
-import { DevAdminBanner } from '../DevAdminBanner'
-import { getAvailableNavigationItems, getUserDisplayName, getRoleDisplayName, getRoleColor, hasAnyRole } from '../../utils/roleUtils'
-import { UserRole } from '../../types/roles'
-import { navigationCountsService } from '../../services/navigationCountsService'
+import React, { useState, useEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth";
+import { useSupabase } from "../../providers/SupabaseProvider";
+import { useGlobalView } from "../../contexts/GlobalViewContext";
+import { useHub, HubSwitcher } from "@sms-hub/ui";
+import { ThemeToggle } from "../ThemeToggle";
+import { DevAdminBanner } from "../DevAdminBanner";
 import {
-  Home,
+  getUserDisplayName,
+  getRoleDisplayName,
+  getRoleColor,
+  hasAnyRole,
+} from "../../utils/roleUtils";
+import { UserRole } from "../../types/roles";
+import { navigationCountsService } from "../../services/navigationCountsService";
+import {
   Users,
-  Building,
   MessageSquare,
   Settings,
   Menu,
@@ -20,195 +23,144 @@ import {
   LogOut,
   Bell,
   Search,
-  Shield,
-  ShieldCheck,
-  UserPlus,
-  Clock,
   Zap,
   Globe,
   CheckCircle,
   BarChart3,
-  FileText,
-  TestTube
-} from 'lucide-react'
+} from "lucide-react";
 
 interface NavigationCounts {
-  companies: number
-  users: number
-  verifications: number
-  leads: number
+  companies: number;
+  users: number;
+  verifications: number;
+  leads: number;
 }
 
-const SidebarLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+const SidebarLayout: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [counts, setCounts] = useState<NavigationCounts>({
     companies: 0,
     users: 0,
     verifications: 0,
-    leads: 0
-  })
-  const [searchQuery, setSearchQuery] = useState('')
-  
-  const { user, isAuthenticated } = useAuth()
-  const { hubConfig, currentHub } = useHub()
-  const { isGlobalView, setIsGlobalView } = useGlobalView()
-  const supabase = useSupabase()
-  const location = useLocation()
-  const navigate = useNavigate()
+    leads: 0,
+  });
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const { user, isAuthenticated } = useAuth();
+  const { hubConfig } = useHub();
+  const { isGlobalView, setIsGlobalView } = useGlobalView();
+  const supabase = useSupabase();
+  const location = useLocation();
+  const navigate = useNavigate();
 
   // Determine user's primary role and permissions
-  const isAdmin = user && hasAnyRole(user, [UserRole.ADMIN, UserRole.SUPERADMIN])
-  const isSuperAdmin = user?.role === UserRole.SUPERADMIN
-  const isOnboarded = user && hasAnyRole(user, [UserRole.ONBOARDED, UserRole.ADMIN, UserRole.SUPERADMIN])
+  const isAdmin =
+    user && hasAnyRole(user, [UserRole.ADMIN, UserRole.SUPERADMIN]);
+  const isSuperAdmin = user?.role === UserRole.SUPERADMIN;
+  const isOnboarded =
+    user &&
+    hasAnyRole(user, [UserRole.ONBOARDED, UserRole.ADMIN, UserRole.SUPERADMIN]);
 
   // Get display information
-  const userDisplayName = user ? getUserDisplayName(user) : ''
-  const roleDisplayName = user ? getRoleDisplayName(user.role) : ''
-  const roleColor = user ? getRoleColor(user.role) : 'gray'
-  const initials = user 
-    ? `${user.first_name?.[0] || ''}${user.last_name?.[0] || ''}`.toUpperCase() || 'U'
-    : 'U'
+  const userDisplayName = user ? getUserDisplayName(user) : "";
+  const roleDisplayName = user ? getRoleDisplayName(user.role) : "";
+  const roleColor = user ? getRoleColor(user.role) : "gray";
+  const initials = user
+    ? `${user.first_name?.[0] || ""}${user.last_name?.[0] || ""}`.toUpperCase() ||
+      "U"
+    : "U";
 
-  // Build navigation items based on role
+  // Build navigation items based on role - matching Gnymble production structure
   const navigationItems = React.useMemo(() => {
-    if (!user) return []
+    if (!user) return [];
 
-    const items = []
+    const items = [];
 
-    // Common items for all authenticated users
-    items.push({ 
-      name: 'Dashboard', 
-      href: '/dashboard', 
-      icon: Home,
-      showCount: false 
-    })
+    // Main navigation items for all users (matching Gnymble production)
+    items.push({
+      name: "Conversations",
+      href: "/messages",
+      icon: MessageSquare,
+      showCount: false,
+    });
 
-    // User-specific items
-    if (!isAdmin) {
-      // Check if user is still onboarding
-      const onboardingComplete = user.onboarding_completed || false
-      if (!onboardingComplete) {
-        items.push({ 
-          name: 'Onboarding', 
-          href: '/onboarding-progress', 
-          icon: CheckCircle,
-          showCount: false,
-          showProgress: true 
-        })
-      }
+    items.push({
+      name: "Broadcasts",
+      href: "/campaigns",
+      icon: Zap,
+      showCount: false,
+    });
 
-      if (isOnboarded) {
-        items.push({ 
-          name: 'Campaigns', 
-          href: '/campaigns', 
-          icon: Zap,
-          showCount: false 
-        })
-        items.push({ 
-          name: 'Messages', 
-          href: '/messages', 
-          icon: MessageSquare,
-          showCount: false 
-        })
-      }
+    items.push({
+      name: "Statistics",
+      href: "/dashboard",
+      icon: BarChart3,
+      showCount: false,
+    });
+
+    // Check if user is still onboarding
+    const onboardingComplete = user.onboarding_completed || false;
+    if (!onboardingComplete) {
+      items.push({
+        name: "Onboarding",
+        href: "/onboarding-progress",
+        icon: CheckCircle,
+        showCount: false,
+        showProgress: true,
+      });
     }
 
-    // Admin-specific items
-    if (isAdmin) {
-      items.push({ 
-        name: 'Companies', 
-        href: '/admin/companies', 
-        icon: Building,
-        showCount: true,
-        countKey: 'companies' 
-      })
-      items.push({ 
-        name: 'Users', 
-        href: '/admin/users', 
-        icon: Users,
-        showCount: true,
-        countKey: 'users' 
-      })
-      items.push({ 
-        name: 'Verifications', 
-        href: '/admin/verifications', 
-        icon: Clock,
-        showCount: true,
-        countKey: 'verifications' 
-      })
-      items.push({ 
-        name: 'Leads', 
-        href: '/admin/leads', 
-        icon: UserPlus,
-        showCount: true,
-        countKey: 'leads' 
-      })
-      items.push({ 
-        name: 'Analytics', 
-        href: '/admin/analytics', 
-        icon: BarChart3,
-        showCount: false 
-      })
-      items.push({ 
-        name: 'Testing', 
-        href: '/admin/testing', 
-        icon: TestTube,
-        showCount: false 
-      })
-    }
-
-    // Settings for all
-    items.push({ 
-      name: 'Settings', 
-      href: '/settings', 
-      icon: Settings,
-      showCount: false 
-    })
-
-    return items
-  }, [user, isAdmin, isOnboarded])
+    return items;
+  }, [user, isOnboarded]);
 
   // Fetch navigation counts for admin users
   useEffect(() => {
-    if (!isAdmin) return
+    if (!isAdmin) return;
 
     const fetchCounts = async () => {
       try {
-        const hubId = hubConfig?.id || 1
-        const newCounts = await navigationCountsService.getCounts(hubId, isGlobalView)
-        setCounts(newCounts)
+        const hubId = typeof hubConfig?.id === "number" ? hubConfig.id : 1;
+        const newCounts = await navigationCountsService.getCounts(
+          hubId,
+          isGlobalView
+        );
+        setCounts(newCounts);
       } catch (error) {
-        console.error('Error fetching navigation counts:', error)
+        console.error("Error fetching navigation counts:", error);
       }
-    }
+    };
 
-    fetchCounts()
+    fetchCounts();
     // Refresh counts every 30 seconds
-    const interval = setInterval(fetchCounts, 30000)
-    return () => clearInterval(interval)
-  }, [isAdmin, hubConfig, isGlobalView])
+    const interval = setInterval(fetchCounts, 30000);
+    return () => clearInterval(interval);
+  }, [isAdmin, hubConfig, isGlobalView]);
 
   const handleLogout = async () => {
-    await supabase.auth.signOut()
-    localStorage.removeItem('dev_bypass')
-    window.location.href = 'http://localhost:3000/login'
-  }
+    await supabase.auth.signOut();
+    localStorage.removeItem("dev_bypass");
+    window.location.href = "http://localhost:3000/login";
+  };
 
   const isActive = (path: string) => {
-    if (path === '/dashboard' && location.pathname === '/dashboard') return true
-    if (path !== '/dashboard' && location.pathname.startsWith(path)) return true
-    return false
-  }
+    if (path === "/dashboard" && location.pathname === "/dashboard")
+      return true;
+    if (path !== "/dashboard" && location.pathname.startsWith(path))
+      return true;
+    return false;
+  };
 
   const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (searchQuery.trim()) {
-      navigate(`/search?q=${encodeURIComponent(searchQuery)}`)
+      navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
     }
-  }
+  };
 
   if (!isAuthenticated || !user) {
-    return <div>Loading...</div>
+    return <div>Loading...</div>;
   }
 
   return (
@@ -229,7 +181,7 @@ const SidebarLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
         className={`
           fixed top-0 left-0 z-50 h-full w-64 bg-card border-r border-border
           transform transition-transform duration-300 ease-in-out
-          ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+          ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
           lg:translate-x-0
         `}
       >
@@ -252,15 +204,16 @@ const SidebarLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                 onClick={() => setIsGlobalView(!isGlobalView)}
                 className={`
                   flex items-center space-x-2 w-full px-3 py-2 rounded-lg transition-colors
-                  ${isGlobalView 
-                    ? 'bg-purple-50 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400' 
-                    : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                  ${
+                    isGlobalView
+                      ? "bg-purple-50 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400"
+                      : "text-muted-foreground hover:text-foreground hover:bg-accent"
                   }
                 `}
               >
                 <Globe className="h-4 w-4" />
                 <span className="text-sm font-medium">
-                  {isGlobalView ? 'Global View Active' : 'Enable Global View'}
+                  {isGlobalView ? "Global View Active" : "Enable Global View"}
                 </span>
               </button>
             </div>
@@ -269,30 +222,35 @@ const SidebarLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
           {/* Navigation */}
           <nav className="flex-1 space-y-1 px-3 py-4 overflow-y-auto">
             {navigationItems.map((item) => {
-              const active = isActive(item.href)
-              const Icon = item.icon
-              const count = item.showCount && item.countKey ? counts[item.countKey as keyof NavigationCounts] : 0
-              
+              const active = isActive(item.href);
+              const Icon = item.icon;
+              const count = 0; // Counts removed for simplified navigation
+
               return (
                 <Link
                   key={item.name}
                   to={item.href}
                   className={`
                     flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-all duration-200
-                    ${active
-                      ? isAdmin 
-                        ? 'bg-orange-500 text-white shadow-md'
-                        : 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400'
-                      : 'text-foreground hover:bg-accent hover:translate-x-1'
+                    ${
+                      active
+                        ? isAdmin
+                          ? "bg-orange-500 text-white shadow-md"
+                          : "bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400"
+                        : "text-foreground hover:bg-accent hover:translate-x-1"
                     }
                   `}
                   onClick={() => setIsSidebarOpen(false)}
                 >
-                  <Icon className={`h-5 w-5 ${active ? '' : 'text-muted-foreground'}`} />
+                  <Icon
+                    className={`h-5 w-5 ${active ? "" : "text-muted-foreground"}`}
+                  />
                   <span className="font-medium text-base flex-1">
                     {item.name}
                     {item.showCount && count > 0 && (
-                      <span className={`ml-2 text-sm ${active ? 'text-white/80' : 'text-muted-foreground'}`}>
+                      <span
+                        className={`ml-2 text-sm ${active ? "text-white/80" : "text-muted-foreground"}`}
+                      >
                         ({count})
                       </span>
                     )}
@@ -303,35 +261,66 @@ const SidebarLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                     )}
                   </span>
                 </Link>
-              )
+              );
             })}
 
-            {/* Admin Portal Link for non-superadmin admins */}
-            {isAdmin && !isSuperAdmin && (
+            {/* Bottom navigation for admin users - matching Gnymble production structure */}
+            {isAdmin && (
               <>
                 <div className="my-4 mx-3 border-t border-border" />
-                <a
-                  href="http://localhost:3002/admin"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-colors text-foreground hover:bg-accent group"
+
+                {/* Settings (gear) - for users with inbox access */}
+                <Link
+                  to="/settings"
+                  className={`
+                    flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-all duration-200
+                    ${
+                      isActive("/settings")
+                        ? "bg-orange-500 text-white shadow-md"
+                        : "text-foreground hover:bg-accent hover:translate-x-1"
+                    }
+                  `}
+                  onClick={() => setIsSidebarOpen(false)}
                 >
-                  <ShieldCheck className="h-5 w-5 text-muted-foreground group-hover:text-orange-500" />
-                  <span className="font-medium text-base">Admin Portal</span>
-                  <svg
-                    className="h-4 w-4 text-muted-foreground ml-auto"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
+                  <Settings className="h-5 w-5" />
+                  <span className="font-medium text-base">Settings</span>
+                </Link>
+
+                {/* Users (person) - for users with full company admin access */}
+                <Link
+                  to="/admin/users"
+                  className={`
+                    flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-all duration-200
+                    ${
+                      isActive("/admin/users")
+                        ? "bg-orange-500 text-white shadow-md"
+                        : "text-foreground hover:bg-accent hover:translate-x-1"
+                    }
+                  `}
+                  onClick={() => setIsSidebarOpen(false)}
+                >
+                  <Users className="h-5 w-5" />
+                  <span className="font-medium text-base">Users</span>
+                </Link>
+
+                {/* Superadmin (globe) - for superadmin view */}
+                {isSuperAdmin && (
+                  <Link
+                    to="/admin"
+                    className={`
+                      flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-all duration-200
+                      ${
+                        isActive("/admin")
+                          ? "bg-orange-500 text-white shadow-md"
+                          : "text-foreground hover:bg-accent hover:translate-x-1"
+                      }
+                    `}
+                    onClick={() => setIsSidebarOpen(false)}
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                    />
-                  </svg>
-                </a>
+                    <Globe className="h-5 w-5" />
+                    <span className="font-medium text-base">Superadmin</span>
+                  </Link>
+                )}
               </>
             )}
           </nav>
@@ -340,9 +329,11 @@ const SidebarLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
           <div className="border-t border-border p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <div className={`h-8 w-8 rounded-full flex items-center justify-center ${
-                  isAdmin ? 'bg-orange-600' : 'bg-blue-600'
-                }`}>
+                <div
+                  className={`h-8 w-8 rounded-full flex items-center justify-center ${
+                    isAdmin ? "bg-orange-600" : "bg-blue-600"
+                  }`}
+                >
                   <span className="text-sm font-medium text-white">
                     {initials}
                   </span>
@@ -355,7 +346,9 @@ const SidebarLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                     {user.account_number || user.email}
                   </p>
                   {isAdmin && (
-                    <p className={`text-xs font-medium mt-0.5 text-${roleColor}-600`}>
+                    <p
+                      className={`text-xs font-medium mt-0.5 text-${roleColor}-600`}
+                    >
                       {roleDisplayName}
                     </p>
                   )}
@@ -388,13 +381,11 @@ const SidebarLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 
               {/* Page Title with appropriate icon */}
               <div className="flex items-center space-x-2">
-                {isAdmin ? (
-                  <Shield className="h-6 w-6 text-orange-600" />
-                ) : (
-                  <Shield className="h-6 w-6 text-blue-600" />
-                )}
+                <div className="h-8 w-8 rounded-full bg-orange-500 flex items-center justify-center">
+                  <span className="text-white font-bold text-sm">G</span>
+                </div>
                 <h2 className="text-lg font-semibold text-foreground">
-                  {isAdmin ? 'Admin Portal' : 'User Portal'}
+                  Gnymble
                   {isGlobalView && (
                     <span className="ml-2 text-sm text-purple-600 font-normal">
                       (Global View)
@@ -406,15 +397,19 @@ const SidebarLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 
             <div className="flex items-center space-x-4">
               {/* Search */}
-              <form onSubmit={handleSearch} className="relative hidden sm:block">
+              <form
+                onSubmit={handleSearch}
+                className="relative hidden sm:block"
+              >
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder={isAdmin 
-                    ? "Search users, companies, messages..." 
-                    : "Search campaigns, messages..."
+                  placeholder={
+                    isAdmin
+                      ? "Search users, companies, messages..."
+                      : "Search campaigns, messages..."
                   }
                   className="w-64 lg:w-96 pl-10 pr-4 py-2 rounded-lg border border-border bg-input text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                 />
@@ -433,12 +428,10 @@ const SidebarLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
         </header>
 
         {/* Page content */}
-        <main className="p-6">
-          {children}
-        </main>
+        <main className="p-6">{children}</main>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default SidebarLayout
+export default SidebarLayout;

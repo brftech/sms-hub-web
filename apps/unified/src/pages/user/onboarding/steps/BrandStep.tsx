@@ -1,74 +1,95 @@
-import { useState } from 'react'
-import { useHub, Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sms-hub/ui'
-import { Input, Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@sms-hub/ui'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sms-hub/ui'
-import { StepComponentProps } from '@sms-hub/types'
-import { useForm } from 'react-hook-form'
-import { Building, ChevronRight } from 'lucide-react'
+import { useState } from "react";
+import {
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@sms-hub/ui";
+import {
+  Input,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@sms-hub/ui";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@sms-hub/ui";
+import { StepComponentProps } from "@sms-hub/types";
+import { useForm } from "react-hook-form";
+import { Building, ChevronRight } from "lucide-react";
 
 interface BrandFormData {
-  company_legal_name: string
-  company_website: string
-  ein: string
-  industry: string
-  vertical_type: string
-  legal_form: string
-  brand_relationship: string
-  address_street: string
-  address_city: string
-  address_state: string
-  address_postal_code: string
-  address_country: string
-  contact_first_name: string
-  contact_last_name: string
-  contact_email: string
-  contact_phone: string
-  stock_symbol?: string
-  alternate_business_id?: string
-  alternate_business_id_type?: string
+  company_legal_name: string;
+  company_website: string;
+  ein: string;
+  industry: string;
+  vertical_type: string;
+  legal_form: string;
+  brand_relationship: string;
+  address_street: string;
+  address_city: string;
+  address_state: string;
+  address_postal_code: string;
+  address_country: string;
+  contact_first_name: string;
+  contact_last_name: string;
+  contact_email: string;
+  contact_phone: string;
+  stock_symbol?: string;
+  alternate_business_id?: string;
+  alternate_business_id_type?: string;
 }
 
 export function BrandStep({ onComplete }: StepComponentProps) {
   // const { hubConfig } = useHub()
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<BrandFormData>({
     defaultValues: {
-      company_legal_name: '',
-      company_website: '',
-      ein: '',
-      industry: '',
-      vertical_type: '',
-      legal_form: '',
-      brand_relationship: 'BASIC_ACCOUNT',
-      address_street: '',
-      address_city: '',
-      address_state: '',
-      address_postal_code: '',
-      address_country: 'US',
-      contact_first_name: '',
-      contact_last_name: '',
-      contact_email: '',
-      contact_phone: '',
-      stock_symbol: '',
-      alternate_business_id: '',
-      alternate_business_id_type: ''
+      company_legal_name: "",
+      company_website: "",
+      ein: "",
+      industry: "",
+      vertical_type: "",
+      legal_form: "",
+      brand_relationship: "BASIC_ACCOUNT",
+      address_street: "",
+      address_city: "",
+      address_state: "",
+      address_postal_code: "",
+      address_country: "US",
+      contact_first_name: "",
+      contact_last_name: "",
+      contact_email: "",
+      contact_phone: "",
+      stock_symbol: "",
+      alternate_business_id: "",
+      alternate_business_id_type: "",
     },
-    mode: 'onChange'
-  })
+    mode: "onChange",
+  });
 
   const onSubmit = async (data: BrandFormData) => {
-    setIsSubmitting(true)
-    
+    setIsSubmitting(true);
+
     try {
       // TODO: Submit brand registration to TCR
-      await onComplete(data)
+      await onComplete(data);
     } catch (error) {
-      console.error('Brand registration error:', error)
+      console.error("Brand registration error:", error);
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <Card>
@@ -138,7 +159,10 @@ export function BrandStep({ onComplete }: StepComponentProps) {
                     <FormItem>
                       <FormLabel>Street Address</FormLabel>
                       <FormControl>
-                        <Input placeholder="123 Main Street, Suite 100" {...field} />
+                        <Input
+                          placeholder="123 Main Street, Suite 100"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -198,7 +222,10 @@ export function BrandStep({ onComplete }: StepComponentProps) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Industry</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select industry" />
@@ -228,22 +255,33 @@ export function BrandStep({ onComplete }: StepComponentProps) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Vertical Type</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select vertical" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="PROFESSIONAL">Professional Services</SelectItem>
+                        <SelectItem value="PROFESSIONAL">
+                          Professional Services
+                        </SelectItem>
                         <SelectItem value="REAL_ESTATE">Real Estate</SelectItem>
                         <SelectItem value="HEALTHCARE">Healthcare</SelectItem>
-                        <SelectItem value="RETAIL">Retail/E-commerce</SelectItem>
+                        <SelectItem value="RETAIL">
+                          Retail/E-commerce
+                        </SelectItem>
                         <SelectItem value="EDUCATION">Education</SelectItem>
                         <SelectItem value="INSURANCE">Insurance</SelectItem>
-                        <SelectItem value="FINANCIAL_SERVICES">Financial Services</SelectItem>
+                        <SelectItem value="FINANCIAL_SERVICES">
+                          Financial Services
+                        </SelectItem>
                         <SelectItem value="ENERGY">Energy/Utilities</SelectItem>
-                        <SelectItem value="ENTERTAINMENT">Entertainment</SelectItem>
+                        <SelectItem value="ENTERTAINMENT">
+                          Entertainment
+                        </SelectItem>
                         <SelectItem value="NON_PROFIT">Non-Profit</SelectItem>
                         <SelectItem value="GOVERNMENT">Government</SelectItem>
                         <SelectItem value="OTHER">Other</SelectItem>
@@ -260,7 +298,10 @@ export function BrandStep({ onComplete }: StepComponentProps) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Legal Form</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select legal form" />
@@ -270,7 +311,9 @@ export function BrandStep({ onComplete }: StepComponentProps) {
                         <SelectItem value="LLC">LLC</SelectItem>
                         <SelectItem value="Corporation">Corporation</SelectItem>
                         <SelectItem value="Partnership">Partnership</SelectItem>
-                        <SelectItem value="Sole Proprietorship">Sole Proprietorship</SelectItem>
+                        <SelectItem value="Sole Proprietorship">
+                          Sole Proprietorship
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -280,7 +323,9 @@ export function BrandStep({ onComplete }: StepComponentProps) {
             </div>
 
             <div className="border-t pt-4">
-              <h3 className="font-semibold mb-4">Primary Contact Information</h3>
+              <h3 className="font-semibold mb-4">
+                Primary Contact Information
+              </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
@@ -319,7 +364,11 @@ export function BrandStep({ onComplete }: StepComponentProps) {
                     <FormItem>
                       <FormLabel>Contact Email</FormLabel>
                       <FormControl>
-                        <Input type="email" placeholder="john@company.com" {...field} />
+                        <Input
+                          type="email"
+                          placeholder="john@company.com"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -333,7 +382,11 @@ export function BrandStep({ onComplete }: StepComponentProps) {
                     <FormItem>
                       <FormLabel>Contact Phone</FormLabel>
                       <FormControl>
-                        <Input type="tel" placeholder="(555) 123-4567" {...field} />
+                        <Input
+                          type="tel"
+                          placeholder="(555) 123-4567"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -343,12 +396,12 @@ export function BrandStep({ onComplete }: StepComponentProps) {
             </div>
 
             <div className="flex justify-end pt-4">
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 className="hub-bg-primary hover:hub-bg-primary/90"
                 disabled={isSubmitting}
               >
-                {isSubmitting ? 'Submitting...' : 'Continue to Privacy & Terms'}
+                {isSubmitting ? "Submitting..." : "Continue to Privacy & Terms"}
                 <ChevronRight className="w-4 h-4 ml-2" />
               </Button>
             </div>
@@ -356,5 +409,5 @@ export function BrandStep({ onComplete }: StepComponentProps) {
         </Form>
       </CardContent>
     </Card>
-  )
+  );
 }

@@ -15,8 +15,8 @@ import {
   useUserProfile,
   useCurrentUserCompany,
   useCurrentUserPhoneNumbers,
-  useBrands,
-  useCurrentUserCampaigns,
+  // useBrands,
+  // useCurrentUserCampaigns,
 } from "@sms-hub/supabase/react";
 import { PhoneNumber } from "@sms-hub/types";
 

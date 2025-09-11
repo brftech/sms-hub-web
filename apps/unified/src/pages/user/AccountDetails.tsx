@@ -1,6 +1,14 @@
 import { useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { useHub, Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from "@sms-hub/ui";
+import { useSearchParams } from "react-router-dom";
+import {
+  useHub,
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@sms-hub/ui";
 import { Input, Label, Alert, AlertDescription } from "@sms-hub/ui";
 import { Building, User, Key, AlertCircle, CheckCircle2 } from "lucide-react";
 import styled from "styled-components";
@@ -32,18 +40,18 @@ export function AccountDetails() {
   const { hubConfig } = useHub();
   // const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  
+
   const verificationId = searchParams.get("id");
-  const signupData = JSON.parse(sessionStorage.getItem('signup_data') || '{}');
-  
+  const signupData = JSON.parse(sessionStorage.getItem("signup_data") || "{}");
+
   const [formData, setFormData] = useState({
     companyName: "",
     firstName: "",
     lastName: "",
     password: "",
-    confirmPassword: ""
+    confirmPassword: "",
   });
-  
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
@@ -51,24 +59,24 @@ export function AccountDetails() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!verificationId) {
       setError("Session expired. Please start over.");
-      setTimeout(() => redirectToWebApp('/signup'), 2000);
+      setTimeout(() => redirectToWebApp("/signup"), 2000);
       return;
     }
-    
+
     // Validate form
     if (!formData.companyName || !formData.firstName || !formData.lastName) {
       setError("Please fill in all fields");
       return;
     }
-    
+
     if (formData.password.length < 6) {
       setError("Password must be at least 6 characters");
       return;
     }
-    
+
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match");
       return;
@@ -80,25 +88,28 @@ export function AccountDetails() {
     console.log("AccountDetails debug:", {
       verificationId,
       signupData,
-      formData: { ...formData, password: "***", confirmPassword: "***" }
+      formData: { ...formData, password: "***", confirmPassword: "***" },
     });
 
     try {
       // Update verifications with the collected info
-      const updateResponse = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/rest/v1/verifications?id=eq.${verificationId}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-          "apikey": import.meta.env.VITE_SUPABASE_ANON_KEY,
-          "Prefer": "return=representation"
-        },
-        body: JSON.stringify({
-          company_name: formData.companyName,
-          first_name: formData.firstName,
-          last_name: formData.lastName
-        }),
-      });
+      const updateResponse = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/verifications?id=eq.${verificationId}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+            apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
+            Prefer: "return=representation",
+          },
+          body: JSON.stringify({
+            company_name: formData.companyName,
+            first_name: formData.firstName,
+            last_name: formData.lastName,
+          }),
+        }
+      );
 
       if (!updateResponse.ok) {
         const errorData = await updateResponse.json();
@@ -112,22 +123,29 @@ export function AccountDetails() {
         password: formData.password,
         company_name: formData.companyName,
         first_name: formData.firstName,
-        last_name: formData.lastName
+        last_name: formData.lastName,
       };
-      
+
       console.log("Sending create-account request:", createAccountPayload);
-      
-      const accountResponse = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-account`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-        },
-        body: JSON.stringify(createAccountPayload),
-      });
+
+      const accountResponse = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-account`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify(createAccountPayload),
+        }
+      );
 
       const accountData = await accountResponse.json();
-      console.log("Create account response:", accountResponse.status, accountData);
+      console.log(
+        "Create account response:",
+        accountResponse.status,
+        accountData
+      );
 
       if (!accountResponse.ok) {
         throw new Error(accountData.error || "Failed to create account");
@@ -143,63 +161,73 @@ export function AccountDetails() {
       }
 
       // Store user info for checkout
-      sessionStorage.setItem('account_data', JSON.stringify({
-        user_id: accountData.user_id,
-        company_id: accountData.company_id,
-        email: accountData.email,
-        hub_id: accountData.hub_id,
-        customer_type: accountData.customer_type,
-        company_name: formData.companyName,
-        verification_id: accountData.verification_id
-      }));
+      sessionStorage.setItem(
+        "account_data",
+        JSON.stringify({
+          user_id: accountData.user_id,
+          company_id: accountData.company_id,
+          email: accountData.email,
+          hub_id: accountData.hub_id,
+          customer_type: accountData.customer_type,
+          company_name: formData.companyName,
+          verification_id: accountData.verification_id,
+        })
+      );
 
       setAccountData(accountData);
       setSuccess(true);
 
       // Redirect to Stripe checkout instead of magic link
       console.log("Redirecting to Stripe checkout...");
-      
+
       try {
         // Create checkout session
-        const checkoutResponse = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-checkout-session`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-          },
-          body: JSON.stringify({
-            email: accountData.email,
-            userId: accountData.user_id,
-            companyId: accountData.company_id,
-            hubId: accountData.hub_id,
-            customerType: accountData.customer_type || signupData.customer_type,
-            successUrl: `${window.location.origin}/payment-callback?session_id={CHECKOUT_SESSION_ID}`,
-            cancelUrl: getWebAppUrl('/signup'),
-          }),
-        });
+        const checkoutResponse = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-checkout-session`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+            },
+            body: JSON.stringify({
+              email: accountData.email,
+              userId: accountData.user_id,
+              companyId: accountData.company_id,
+              hubId: accountData.hub_id,
+              customerType:
+                accountData.customer_type || signupData.customer_type,
+              successUrl: `${window.location.origin}/payment-callback?session_id={CHECKOUT_SESSION_ID}`,
+              cancelUrl: getWebAppUrl("/signup"),
+            }),
+          }
+        );
 
         const checkoutData = await checkoutResponse.json();
-        
+
         if (checkoutResponse.ok && checkoutData.url) {
           // Redirect to Stripe checkout - webhook will handle post-payment flow
-          console.log('🔄 Redirecting to Stripe checkout...')
+          console.log("🔄 Redirecting to Stripe checkout...");
           window.location.href = checkoutData.url;
           return;
         } else {
-          throw new Error(checkoutData.error || "Failed to create checkout session");
+          throw new Error(
+            checkoutData.error || "Failed to create checkout session"
+          );
         }
       } catch (checkoutError) {
         console.error("Error creating checkout session:", checkoutError);
         // Fallback to magic link if checkout fails
         if (accountData.magic_link) {
-          console.log("Falling back to magic link...")
+          console.log("Falling back to magic link...");
           window.location.href = accountData.magic_link;
           return;
         } else {
-          throw new Error("Failed to create checkout session and no magic link available");
+          throw new Error(
+            "Failed to create checkout session and no magic link available"
+          );
         }
       }
-      
     } catch (err: any) {
       console.error("Error creating account:", err);
       setError(err.message || "Failed to create account");
@@ -208,7 +236,6 @@ export function AccountDetails() {
     }
   };
 
-
   if (success) {
     return (
       <Container>
@@ -216,13 +243,14 @@ export function AccountDetails() {
           <CardContent className="text-center py-12">
             <CheckCircle2 className="w-16 h-16 text-green-600 mx-auto mb-4" />
             <h2 className="text-2xl font-bold mb-2">
-              {accountData?.is_existing_user ? "Welcome Back!" : "Account Created!"}
+              {accountData?.is_existing_user
+                ? "Welcome Back!"
+                : "Account Created!"}
             </h2>
             <p className="text-gray-600 mb-4">
-              {accountData?.is_existing_user 
+              {accountData?.is_existing_user
                 ? `Welcome back to ${hubConfig.displayName}!`
-                : `Welcome to ${hubConfig.displayName}!`
-              }
+                : `Welcome to ${hubConfig.displayName}!`}
             </p>
             <p className="text-sm text-gray-500">
               Redirecting to Stripe checkout...
@@ -244,7 +272,7 @@ export function AccountDetails() {
             Tell us about yourself and your company
           </CardDescription>
         </CardHeader>
-        
+
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
@@ -254,7 +282,7 @@ export function AccountDetails() {
               </Alert>
             )}
 
-            {signupData.customer_type !== 'individual' && (
+            {signupData.customer_type !== "individual" && (
               <FormSection>
                 <SectionTitle>
                   <Building className="w-4 h-4" />
@@ -266,7 +294,9 @@ export function AccountDetails() {
                     id="companyName"
                     type="text"
                     value={formData.companyName}
-                    onChange={(e) => setFormData({...formData, companyName: e.target.value})}
+                    onChange={(e) =>
+                      setFormData({ ...formData, companyName: e.target.value })
+                    }
                     placeholder="Enter your company name"
                     required
                     autoComplete="organization"
@@ -287,7 +317,9 @@ export function AccountDetails() {
                     id="firstName"
                     type="text"
                     value={formData.firstName}
-                    onChange={(e) => setFormData({...formData, firstName: e.target.value})}
+                    onChange={(e) =>
+                      setFormData({ ...formData, firstName: e.target.value })
+                    }
                     placeholder="First name"
                     required
                     autoComplete="given-name"
@@ -299,7 +331,9 @@ export function AccountDetails() {
                     id="lastName"
                     type="text"
                     value={formData.lastName}
-                    onChange={(e) => setFormData({...formData, lastName: e.target.value})}
+                    onChange={(e) =>
+                      setFormData({ ...formData, lastName: e.target.value })
+                    }
                     placeholder="Last name"
                     required
                     autoComplete="family-name"
@@ -320,7 +354,9 @@ export function AccountDetails() {
                     id="password"
                     type="password"
                     value={formData.password}
-                    onChange={(e) => setFormData({...formData, password: e.target.value})}
+                    onChange={(e) =>
+                      setFormData({ ...formData, password: e.target.value })
+                    }
                     placeholder="Create a password"
                     required
                     minLength={6}
@@ -333,7 +369,12 @@ export function AccountDetails() {
                     id="confirmPassword"
                     type="password"
                     value={formData.confirmPassword}
-                    onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        confirmPassword: e.target.value,
+                      })
+                    }
                     placeholder="Confirm your password"
                     required
                     autoComplete="new-password"
@@ -342,12 +383,10 @@ export function AccountDetails() {
               </div>
             </FormSection>
 
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "Creating Account..." : "Create Account & Continue"}
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+              {isSubmitting
+                ? "Creating Account..."
+                : "Create Account & Continue"}
             </Button>
           </form>
         </CardContent>

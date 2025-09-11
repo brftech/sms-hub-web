@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import {
-  useHub,
+  // useHub,
   Button,
   Card,
   CardContent,
@@ -110,7 +110,7 @@ export function Verify() {
 
   useEffect(() => {
     if (!verificationId) {
-      redirectToWebApp('/signup');
+      redirectToWebApp("/signup");
       return;
     }
 
@@ -163,7 +163,6 @@ export function Verify() {
 
       // Handle session if provided
       if (result.session || result.session_url) {
-
         // For login flow, we might get a session URL
         if (result.session_url) {
           window.location.href = result.session_url;
@@ -284,7 +283,7 @@ export function Verify() {
         </CardHeader>
 
         <CardContent>
-          <BackButton onClick={() => redirectToWebApp('/signup')}>
+          <BackButton onClick={() => redirectToWebApp("/signup")}>
             <ArrowLeft className="w-3 h-3 mr-1" />
             Back to Signup
           </BackButton>

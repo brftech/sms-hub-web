@@ -1,39 +1,46 @@
-import { useState } from 'react'
-import { useHub, Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sms-hub/ui'
-import { Badge } from '@sms-hub/ui'
-import { StepComponentProps } from '@sms-hub/types'
-import { Phone, ChevronRight, RefreshCw } from 'lucide-react'
+import { useState } from "react";
+import {
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@sms-hub/ui";
+import { Badge } from "@sms-hub/ui";
+import { StepComponentProps } from "@sms-hub/types";
+import { Phone, ChevronRight, RefreshCw } from "lucide-react";
 
 export function BandwidthStep({ onComplete }: StepComponentProps) {
   // const { hubConfig } = useHub()
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [selectedNumber, setSelectedNumber] = useState<string>('')
-  
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedNumber, setSelectedNumber] = useState<string>("");
+
   // Mock available phone numbers
   const [availableNumbers] = useState([
-    { number: '+1-555-0101', area: 'New York, NY', type: 'Local' },
-    { number: '+1-555-0202', area: 'Los Angeles, CA', type: 'Local' },
-    { number: '+1-555-0303', area: 'Chicago, IL', type: 'Local' },
-    { number: '+1-888-555-0001', area: 'Toll-free', type: 'Toll-free' }
-  ])
+    { number: "+1-555-0101", area: "New York, NY", type: "Local" },
+    { number: "+1-555-0202", area: "Los Angeles, CA", type: "Local" },
+    { number: "+1-555-0303", area: "Chicago, IL", type: "Local" },
+    { number: "+1-888-555-0001", area: "Toll-free", type: "Toll-free" },
+  ]);
 
   const handleSubmit = async () => {
-    if (!selectedNumber) return
-    
-    setIsSubmitting(true)
-    
+    if (!selectedNumber) return;
+
+    setIsSubmitting(true);
+
     try {
       // TODO: Reserve phone number with Bandwidth
       await onComplete({
         assigned_phone_number: selectedNumber,
-        bandwidth_account_setup: true
-      })
+        bandwidth_account_setup: true,
+      });
     } catch (error) {
-      console.error('Phone number assignment error:', error)
+      console.error("Phone number assignment error:", error);
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <Card>
@@ -55,24 +62,32 @@ export function BandwidthStep({ onComplete }: StepComponentProps) {
               Refresh
             </Button>
           </div>
-          
+
           <div className="space-y-2">
             {availableNumbers.map((phoneNumber) => (
               <div
                 key={phoneNumber.number}
                 className={`p-4 border rounded-lg cursor-pointer transition-all ${
                   selectedNumber === phoneNumber.number
-                    ? 'border-hub-primary bg-hub-primary/5'
-                    : 'border-border hover:border-hub-primary/50'
+                    ? "border-hub-primary bg-hub-primary/5"
+                    : "border-border hover:border-hub-primary/50"
                 }`}
                 onClick={() => setSelectedNumber(phoneNumber.number)}
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <div className="font-mono font-semibold">{phoneNumber.number}</div>
-                    <div className="text-sm text-muted-foreground">{phoneNumber.area}</div>
+                    <div className="font-mono font-semibold">
+                      {phoneNumber.number}
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      {phoneNumber.area}
+                    </div>
                   </div>
-                  <Badge variant={phoneNumber.type === 'Toll-free' ? 'default' : 'secondary'}>
+                  <Badge
+                    variant={
+                      phoneNumber.type === "Toll-free" ? "default" : "secondary"
+                    }
+                  >
                     {phoneNumber.type}
                   </Badge>
                 </div>
@@ -92,16 +107,16 @@ export function BandwidthStep({ onComplete }: StepComponentProps) {
         </div>
 
         <div className="flex justify-end pt-4">
-          <Button 
+          <Button
             onClick={handleSubmit}
             className="hub-bg-primary hover:hub-bg-primary/90"
             disabled={!selectedNumber || isSubmitting}
           >
-            {isSubmitting ? 'Assigning Number...' : 'Activate Platform'}
+            {isSubmitting ? "Assigning Number..." : "Activate Platform"}
             <ChevronRight className="w-4 h-4 ml-2" />
           </Button>
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

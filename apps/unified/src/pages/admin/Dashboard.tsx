@@ -234,7 +234,7 @@ const Dashboard = () => {
                 ? 0
                 : 1;
 
-      await navigationCountsService().instance.getCounts(hubId, isGlobalView);
+      await navigationCountsService.getCounts(hubId, isGlobalView);
       // Force a page refresh to update counts in Layout
       window.location.reload();
     } catch (error) {

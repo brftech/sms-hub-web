@@ -1,10 +1,10 @@
 // User Roles and Permissions
 export enum UserRole {
-  GUEST = 'guest',           // Not authenticated
-  USER = 'user',            // Authenticated, not onboarded
-  ONBOARDED = 'onboarded',  // Authenticated, onboarded, can use texting
-  ADMIN = 'admin',          // Staff member, can access admin features
-  SUPERADMIN = 'superadmin' // Full platform access
+  GUEST = "guest", // Not authenticated
+  USER = "user", // Authenticated, not onboarded
+  ONBOARDED = "onboarded", // Authenticated, onboarded, can use texting
+  ADMIN = "admin", // Staff member, can access admin features
+  SUPERADMIN = "superadmin", // Full platform access
 }
 
 export interface UserPermissions {
@@ -16,6 +16,7 @@ export interface UserPermissions {
   can_manage_billing?: boolean;
   can_access_admin_panel?: boolean;
   can_manage_system_settings?: boolean;
+  can_manage_system?: boolean;
   can_send_sms?: boolean;
   can_create_campaigns?: boolean;
   can_view_reports?: boolean;
@@ -26,6 +27,7 @@ export interface UserProfile {
   email: string;
   first_name: string;
   last_name: string;
+  mobile_phone_number?: string;
   role: UserRole;
   signup_type: string;
   company_admin: boolean | null;
@@ -61,117 +63,142 @@ export interface RoutePermission {
 export const routePermissions: RoutePermission[] = [
   // User routes
   {
-    path: '/onboarding',
-    roles: [UserRole.USER, UserRole.ONBOARDED, UserRole.ADMIN, UserRole.SUPERADMIN],
-    description: 'User onboarding process'
+    path: "/onboarding",
+    roles: [
+      UserRole.USER,
+      UserRole.ONBOARDED,
+      UserRole.ADMIN,
+      UserRole.SUPERADMIN,
+    ],
+    description: "User onboarding process",
   },
   {
-    path: '/account-details',
-    roles: [UserRole.USER, UserRole.ONBOARDED, UserRole.ADMIN, UserRole.SUPERADMIN],
-    description: 'Account management'
+    path: "/account-details",
+    roles: [
+      UserRole.USER,
+      UserRole.ONBOARDED,
+      UserRole.ADMIN,
+      UserRole.SUPERADMIN,
+    ],
+    description: "Account management",
   },
   {
-    path: '/dashboard',
+    path: "/dashboard",
     roles: [UserRole.ONBOARDED, UserRole.ADMIN, UserRole.SUPERADMIN],
-    description: 'Main dashboard'
+    description: "Main dashboard",
   },
   {
-    path: '/campaigns',
+    path: "/campaigns",
     roles: [UserRole.ONBOARDED, UserRole.ADMIN, UserRole.SUPERADMIN],
-    description: 'Campaign management'
+    description: "Campaign management",
   },
   {
-    path: '/messages',
+    path: "/messages",
     roles: [UserRole.ONBOARDED, UserRole.ADMIN, UserRole.SUPERADMIN],
-    description: 'Message management'
+    description: "Message management",
   },
   {
-    path: '/settings',
+    path: "/settings",
     roles: [UserRole.ONBOARDED, UserRole.ADMIN, UserRole.SUPERADMIN],
-    description: 'User settings'
+    description: "User settings",
   },
   {
-    path: '/payment-required',
-    roles: [UserRole.USER, UserRole.ONBOARDED, UserRole.ADMIN, UserRole.SUPERADMIN],
-    description: 'Payment required page'
+    path: "/payment-required",
+    roles: [
+      UserRole.USER,
+      UserRole.ONBOARDED,
+      UserRole.ADMIN,
+      UserRole.SUPERADMIN,
+    ],
+    description: "Payment required page",
   },
   {
-    path: '/payment-success',
-    roles: [UserRole.USER, UserRole.ONBOARDED, UserRole.ADMIN, UserRole.SUPERADMIN],
-    description: 'Payment success page'
+    path: "/payment-success",
+    roles: [
+      UserRole.USER,
+      UserRole.ONBOARDED,
+      UserRole.ADMIN,
+      UserRole.SUPERADMIN,
+    ],
+    description: "Payment success page",
   },
   {
-    path: '/verify',
-    roles: [UserRole.USER, UserRole.ONBOARDED, UserRole.ADMIN, UserRole.SUPERADMIN],
-    description: 'Verification page'
+    path: "/verify",
+    roles: [
+      UserRole.USER,
+      UserRole.ONBOARDED,
+      UserRole.ADMIN,
+      UserRole.SUPERADMIN,
+    ],
+    description: "Verification page",
   },
   // Texting routes
   {
-    path: '/texting',
+    path: "/texting",
     roles: [UserRole.ONBOARDED, UserRole.ADMIN, UserRole.SUPERADMIN],
-    description: 'SMS texting features'
+    description: "SMS texting features",
   },
   {
-    path: '/texting/campaigns',
+    path: "/texting/campaigns",
     roles: [UserRole.ONBOARDED, UserRole.ADMIN, UserRole.SUPERADMIN],
-    description: 'Texting campaign management'
+    description: "Texting campaign management",
   },
   {
-    path: '/texting/messages',
+    path: "/texting/messages",
     roles: [UserRole.ONBOARDED, UserRole.ADMIN, UserRole.SUPERADMIN],
-    description: 'Texting message management'
+    description: "Texting message management",
   },
   {
-    path: '/texting/settings',
+    path: "/texting/settings",
     roles: [UserRole.ONBOARDED, UserRole.ADMIN, UserRole.SUPERADMIN],
-    description: 'Texting settings'
+    description: "Texting settings",
   },
   // Admin routes
   {
-    path: '/admin',
+    path: "/admin",
     roles: [UserRole.ADMIN, UserRole.SUPERADMIN],
-    description: 'Admin panel'
+    description: "Admin panel",
   },
   {
-    path: '/admin/users',
+    path: "/admin/users",
     roles: [UserRole.ADMIN, UserRole.SUPERADMIN],
-    description: 'User management'
+    description: "User management",
   },
   {
-    path: '/admin/companies',
+    path: "/admin/companies",
     roles: [UserRole.ADMIN, UserRole.SUPERADMIN],
-    description: 'Company management'
+    description: "Company management",
   },
   {
-    path: '/admin/leads',
+    path: "/admin/leads",
     roles: [UserRole.ADMIN, UserRole.SUPERADMIN],
-    description: 'Lead management'
+    description: "Lead management",
   },
   {
-    path: '/admin/verifications',
+    path: "/admin/verifications",
     roles: [UserRole.ADMIN, UserRole.SUPERADMIN],
-    description: 'Verification management'
+    description: "Verification management",
   },
   {
-    path: '/admin/testing',
+    path: "/admin/testing",
     roles: [UserRole.ADMIN, UserRole.SUPERADMIN],
-    description: 'Testing tools'
+    description: "Testing tools",
   },
   {
-    path: '/admin/settings',
+    path: "/admin/settings",
     roles: [UserRole.ADMIN, UserRole.SUPERADMIN],
-    description: 'Admin settings'
+    description: "Admin settings",
   },
   {
-    path: '/admin/analytics',
+    path: "/admin/analytics",
     roles: [UserRole.ADMIN, UserRole.SUPERADMIN],
-    description: 'Analytics dashboard'
+    description: "Analytics dashboard",
   },
   {
-    path: '/admin/messages',
+    path: "/admin/messages",
     roles: [UserRole.ADMIN, UserRole.SUPERADMIN],
-    description: 'Admin message management'
-  }
+    description: "Admin message management",
+  },
 ];
 
 // Navigation items based on role
@@ -186,47 +213,47 @@ export interface NavigationItem {
 export const navigationItems: NavigationItem[] = [
   // User navigation
   {
-    label: 'Dashboard',
-    path: '/dashboard',
-    icon: '📊',
+    label: "Dashboard",
+    path: "/dashboard",
+    icon: "📊",
     roles: [UserRole.ONBOARDED, UserRole.ADMIN, UserRole.SUPERADMIN],
-    description: 'Main dashboard'
+    description: "Main dashboard",
   },
   {
-    label: 'Campaigns',
-    path: '/campaigns',
-    icon: '📈',
+    label: "Campaigns",
+    path: "/campaigns",
+    icon: "📈",
     roles: [UserRole.ONBOARDED, UserRole.ADMIN, UserRole.SUPERADMIN],
-    description: 'Campaign management'
+    description: "Campaign management",
   },
   {
-    label: 'Messages',
-    path: '/messages',
-    icon: '💬',
+    label: "Messages",
+    path: "/messages",
+    icon: "💬",
     roles: [UserRole.ONBOARDED, UserRole.ADMIN, UserRole.SUPERADMIN],
-    description: 'Message management'
+    description: "Message management",
   },
   {
-    label: 'Settings',
-    path: '/settings',
-    icon: '⚙️',
+    label: "Settings",
+    path: "/settings",
+    icon: "⚙️",
     roles: [UserRole.ONBOARDED, UserRole.ADMIN, UserRole.SUPERADMIN],
-    description: 'User settings'
+    description: "User settings",
   },
   // Texting navigation
   {
-    label: 'Texting',
-    path: '/texting',
-    icon: '📱',
+    label: "Texting",
+    path: "/texting",
+    icon: "📱",
     roles: [UserRole.ONBOARDED, UserRole.ADMIN, UserRole.SUPERADMIN],
-    description: 'SMS campaigns and messaging'
+    description: "SMS campaigns and messaging",
   },
   // Admin navigation
   {
-    label: 'Admin',
-    path: '/admin',
-    icon: '🔧',
+    label: "Admin",
+    path: "/admin",
+    icon: "🔧",
     roles: [UserRole.ADMIN, UserRole.SUPERADMIN],
-    description: 'Administrative functions'
-  }
+    description: "Administrative functions",
+  },
 ];

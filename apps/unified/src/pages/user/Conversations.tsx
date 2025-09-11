@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { useAuth } from "../../hooks/useAuth";
-import { useHub } from "@sms-hub/ui";
+// import { useAuth } from "../../hooks/useAuth";
+// import { useHub } from "@sms-hub/ui";
 import { Card, CardContent } from "@sms-hub/ui";
 import { Button } from "@sms-hub/ui";
 import { Input } from "@sms-hub/ui";
@@ -78,10 +78,12 @@ export function Conversations() {
       },
     ];
 
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       setConversations(mockConversations);
       setIsLoading(false);
     }, 1000);
+
+    return () => clearTimeout(timer);
   }, []);
 
   const filteredConversations = conversations.filter((conv) => {

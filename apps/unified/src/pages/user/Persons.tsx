@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { useAuth } from "../../hooks/useAuth";
+// import { useAuth } from "../../hooks/useAuth";
 import { Card, CardContent } from "@sms-hub/ui";
-import { useHub, Button, Input, Badge } from "@sms-hub/ui";
+import { Button, Input, Badge } from "@sms-hub/ui";
 import {
   Users,
   Search,
@@ -16,7 +16,6 @@ import {
   Tag,
   Star,
   Edit,
-  Trash2,
   UserPlus,
 } from "lucide-react";
 
@@ -37,8 +36,8 @@ interface Person {
 }
 
 export function Persons() {
-  const { user } = useAuth();
-  const { hubConfig } = useHub();
+  // const { user } = useAuth();
+  // const { hubConfig } = useHub();
   const [persons, setPersons] = useState<Person[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -124,10 +123,12 @@ export function Persons() {
       },
     ];
 
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       setPersons(mockPersons);
       setIsLoading(false);
     }, 1000);
+
+    return () => clearTimeout(timer);
   }, []);
 
   const filteredPersons = persons.filter((person) => {

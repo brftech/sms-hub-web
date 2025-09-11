@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { useAuth } from "../../hooks/useAuth";
-import { useHub } from "@sms-hub/ui";
+// import { useAuth } from "../../hooks/useAuth";
+// import { useHub } from "@sms-hub/ui";
 import {
   Card,
   CardContent,
@@ -19,8 +19,6 @@ import {
   Zap,
   Clock,
   CheckCircle2,
-  AlertCircle,
-  Calendar,
   Download,
   Filter,
 } from "lucide-react";
@@ -42,8 +40,8 @@ interface ChartData {
 }
 
 export function Statistics() {
-  const { user } = useAuth();
-  const { hubConfig } = useHub();
+  // const { user } = useAuth();
+  // const { hubConfig } = useHub();
   const [isLoading, setIsLoading] = useState(true);
   const [timeRange, setTimeRange] = useState<string>("30d");
   const [chartData, setChartData] = useState<ChartData[]>([]);
@@ -83,10 +81,12 @@ export function Statistics() {
       { date: "2024-01-30", messages: 198, conversations: 56, broadcasts: 13 },
     ];
 
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       setChartData(mockChartData);
       setIsLoading(false);
     }, 1000);
+
+    return () => clearTimeout(timer);
   }, [timeRange]);
 
   const statCards: StatCard[] = [

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { useAuth } from "../../hooks/useAuth";
-import { useHub } from "@sms-hub/ui";
+// import { useAuth } from "../../hooks/useAuth";
+// import { useHub } from "@sms-hub/ui";
 import { Card, CardContent } from "@sms-hub/ui";
 import { Button } from "@sms-hub/ui";
 import { Input } from "@sms-hub/ui";
@@ -45,6 +45,7 @@ export function Broadcasts() {
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [timeRange, setTimeRange] = useState<string>("30d");
 
   // Mock data for now - will be replaced with actual API calls
   useEffect(() => {
@@ -101,11 +102,13 @@ export function Broadcasts() {
       },
     ];
 
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       setBroadcasts(mockBroadcasts);
       setIsLoading(false);
     }, 1000);
-  }, []);
+
+    return () => clearTimeout(timer);
+  }, [timeRange]);
 
   const filteredBroadcasts = broadcasts.filter((broadcast) => {
     const matchesSearch =

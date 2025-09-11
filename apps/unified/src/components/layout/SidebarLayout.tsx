@@ -393,7 +393,7 @@ const SidebarLayout: React.FC<{ children: React.ReactNode }> = ({
                 </div>
                 <h2 className="text-lg font-semibold text-foreground">
                   Gnymble
-                  {isSuperAdmin && (
+                  {location.pathname.startsWith("/admin") && (
                     <span className="ml-2 text-xs bg-orange-500 text-white px-2 py-1 rounded-full font-medium">
                       SUPERADMIN
                     </span>

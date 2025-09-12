@@ -10,9 +10,7 @@ import {
   Activity,
   Clock,
   CheckCircle,
-  XCircle,
   UserPlus,
-  Eye,
   Shield,
   CreditCard,
   UserCheck,
@@ -21,7 +19,6 @@ import {
   Phone,
   Settings,
   Target,
-  Trash2,
   RefreshCw,
 } from "lucide-react";
 import { useGlobalView } from "../../contexts/GlobalViewContext";
@@ -34,10 +31,6 @@ import {
   CompanyOnboardingData,
   dashboardService,
 } from "../../services/dashboardService";
-import {
-  CleanupResult,
-  dataCleanupService,
-} from "../../services/dataCleanupService";
 import { navigationCountsService } from "../../services/navigationCountsService";
 
 const Dashboard = () => {
@@ -53,10 +46,6 @@ const Dashboard = () => {
   );
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isCleanupRunning, setIsCleanupRunning] = useState(false);
-  const [cleanupResult, setCleanupResult] = useState<CleanupResult | null>(
-    null
-  );
   const [isRefreshingCounts, setIsRefreshingCounts] = useState(false);
 
   // Fetch dashboard data
@@ -158,21 +147,35 @@ const Dashboard = () => {
         label: string;
       };
     } = {
-      authentication: {
-        icon: Shield,
-        color: "text-red-600",
-        label: "Verification",
-      },
-      payment: { icon: CreditCard, color: "text-orange-600", label: "Payment" },
-      personalInfo: {
-        icon: UserCheck,
+      signup: {
+        icon: UserPlus,
         color: "text-blue-600",
-        label: "Personal Info",
+        label: "Signup",
       },
-      businessInfo: {
+      verification: {
+        icon: Shield,
+        color: "text-yellow-600",
+        label: "Verification Sent",
+      },
+      verified: {
+        icon: CheckCircle,
+        color: "text-green-600",
+        label: "Verified",
+      },
+      accountCreated: {
         icon: Building,
         color: "text-indigo-600",
-        label: "Business Info",
+        label: "Account Created",
+      },
+      paymentPending: {
+        icon: CreditCard,
+        color: "text-orange-600",
+        label: "Payment Pending",
+      },
+      paymentCompleted: {
+        icon: CheckCircle,
+        color: "text-green-600",
+        label: "Payment Complete",
       },
       brandSubmission: {
         icon: FileText,
@@ -199,10 +202,10 @@ const Dashboard = () => {
         color: "text-gray-600",
         label: "Account Setup",
       },
-      completed: {
+      onboardingComplete: {
         icon: CheckCircle,
         color: "text-green-600",
-        label: "Completed",
+        label: "Complete",
       },
     };
     return (
@@ -244,84 +247,6 @@ const Dashboard = () => {
     }
   };
 
-  // Data cleanup handlers
-  const handleDataCleanup = async () => {
-    if (
-      !confirm(
-        "⚠️ DANGER: This will permanently delete data from the database!\n\nThis operation cannot be undone and will affect all hubs.\n\nAre you absolutely sure you want to continue?"
-      )
-    ) {
-      return;
-    }
-
-    if (
-      !confirm(
-        "⚠️ FINAL WARNING: This will delete:\n• All companies created after Sept 1, 2025\n• All verifications\n• All user profiles\n• All leads and activities\n• All auth users and sessions\n• All other business data\n\nThis is your LAST chance to cancel. Continue?"
-      )
-    ) {
-      return;
-    }
-
-    try {
-      setIsCleanupRunning(true);
-      setCleanupResult(null);
-
-      // Try the FK-aware method first
-      console.log("Attempting FK-aware verification cleanup...");
-      let result =
-        await dataCleanupService.instance.performDataCleanupWithFKHandling();
-
-      // If that fails, try the regular method
-      if (!result.success) {
-        console.log("FK-aware cleanup failed, trying regular method...");
-        result = await dataCleanupService.instance.performDataCleanup();
-      }
-
-      // If that also fails, try the direct method
-      if (!result.success) {
-        console.log("Regular cleanup failed, trying direct method...");
-        result = await dataCleanupService.instance.performDataCleanupDirect();
-      }
-
-      console.log("Final cleanup result:", result);
-
-      setCleanupResult(result);
-
-      if (result.success) {
-        // Refresh dashboard data after successful cleanup
-        setTimeout(() => {
-          fetchDashboardData();
-        }, 1000);
-      }
-    } catch (error) {
-      console.error("Data cleanup error:", error);
-      setCleanupResult({
-        success: false,
-        message: "Data cleanup failed",
-        error: error instanceof Error ? error.message : "Unknown error",
-      });
-    } finally {
-      setIsCleanupRunning(false);
-    }
-  };
-
-  const handleCheckDataCounts = async () => {
-    try {
-      const counts = await dataCleanupService.instance.getCurrentDataCounts();
-      alert(
-        `Current Data Counts:\n\n` +
-          `• Companies: ${counts.companies}\n` +
-          `• Verifications: ${counts.verifications}\n` +
-          `• User Profiles: ${counts.userProfiles}\n` +
-          `• Leads: ${counts.leads}\n` +
-          `• Auth Users: ${counts.authUsers}\n\n` +
-          `This shows what would be affected by the cleanup operation.`
-      );
-    } catch (error) {
-      console.error("Error checking data counts:", error);
-      alert("Failed to check data counts. See console for details.");
-    }
-  };
 
   if (isLoading) {
     return (
@@ -366,7 +291,7 @@ const Dashboard = () => {
         <div>
           <div className="flex items-center space-x-3">
             <h1 className="text-xl sm:text-2xl font-bold text-foreground">
-              {isGlobalView ? "Global Dashboard" : `${currentHub} Dashboard`}
+              {isGlobalView ? "Global Dashboard" : "Dashboard"}
             </h1>
             <div
               className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
@@ -393,7 +318,7 @@ const Dashboard = () => {
           </p>
         </div>
 
-        {/* Data Management Buttons */}
+        {/* Refresh Button */}
         <div className="flex items-center space-x-2">
           <button
             onClick={handleRefreshCounts}
@@ -405,66 +330,47 @@ const Dashboard = () => {
               className={`w-3 h-3 ${isRefreshingCounts ? "animate-spin" : ""}`}
             />
           </button>
-
-          <button
-            onClick={handleDataCleanup}
-            disabled={isCleanupRunning}
-            className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            title="Delete all records except companies created before Sept 1, 2025 (keeps your 53 existing clients)"
-          >
-            {isCleanupRunning ? (
-              <>
-                <RefreshCw className="w-3 h-3 mr-1 animate-spin" />
-                Running...
-              </>
-            ) : (
-              <>
-                <Trash2 className="w-3 h-3 mr-1" />
-                Cleanup (Keep 53)
-              </>
-            )}
-          </button>
-
-          <button
-            onClick={handleCheckDataCounts}
-            className="inline-flex items-center px-2 py-1.5 text-xs font-medium rounded-md text-red-700 bg-white border border-red-300 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
-            title="Check current data counts"
-          >
-            <Eye className="w-3 h-3" />
-          </button>
         </div>
       </div>
 
-      {/* Onboarding Pipeline Overview */}
+      {/* Payment Track */}
       {stats && (
         <div className="bg-card rounded-lg shadow-sm p-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 space-y-3 sm:space-y-0">
             <div>
               <h2 className="text-base sm:text-lg font-medium text-foreground">
-                Onboarding Pipeline
+                Payment Track
               </h2>
               <p className="text-xs sm:text-sm text-muted-foreground">
-                Track companies through their onboarding journey
+                Signup → Verification → Account Creation → Payment
               </p>
             </div>
             <div className="text-left sm:text-right">
               <p className="text-xl sm:text-2xl font-bold text-foreground">
-                {stats.totalCompanies}
+                {stats.onboardingStages.paymentCompleted}
               </p>
               <p className="text-xs sm:text-sm text-muted-foreground">
-                Total Companies
+                Payments Completed
               </p>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-8 xl:grid-cols-10 gap-2 sm:gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 sm:gap-3">
             {Object.entries(stats.onboardingStages).map(([stage, count]) => {
               const stageInfo = getStageInfo(stage);
               const IconComponent = stageInfo.icon;
+              const isPaymentStage = ['signup', 'verification', 'verified', 'accountCreated', 'paymentPending', 'paymentCompleted'].includes(stage);
+              
+              if (!isPaymentStage) return null; // Only show payment stages
+              
               return (
                 <div key={stage} className="text-center">
                   <div
-                    className={`p-2 sm:p-3 rounded-lg bg-gray-50 border-2 transition-all duration-200 hover:shadow-sm min-h-[80px] sm:min-h-[90px] lg:min-h-[100px] flex flex-col justify-center ${(count as number) > 0 ? "border-blue-200 bg-blue-50" : "border-gray-200"}`}
+                    className={`p-2 sm:p-3 rounded-lg border-2 transition-all duration-200 hover:shadow-sm min-h-[80px] sm:min-h-[90px] lg:min-h-[100px] flex flex-col justify-center ${
+                      (count as number) > 0 
+                        ? "border-blue-200 bg-blue-50" 
+                        : "border-gray-200 bg-gray-50"
+                    }`}
                   >
                     <IconComponent
                       className={`w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 mx-auto mb-1 sm:mb-2 ${(count as number) > 0 ? stageInfo.color : "text-gray-400"}`}
@@ -475,10 +381,110 @@ const Dashboard = () => {
                     <p className="text-xs text-gray-600 leading-tight">
                       {stageInfo.label.split(" ")[0]}
                     </p>
+                    <div className="w-2 h-2 bg-blue-500 rounded-full mx-auto mt-1"></div>
                   </div>
                 </div>
               );
             })}
+          </div>
+          
+          {/* Payment Summary */}
+          <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
+              <div>
+                <p className="text-2xl font-bold text-blue-600">
+                  {stats.onboardingStages.signup}
+                </p>
+                <p className="text-sm text-gray-600">Total Signups</p>
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-orange-600">
+                  {stats.onboardingStages.paymentPending}
+                </p>
+                <p className="text-sm text-gray-600">Payment Pending</p>
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-green-600">
+                  {stats.onboardingStages.paymentCompleted}
+                </p>
+                <p className="text-sm text-gray-600">Payment Complete</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Onboarding Track */}
+      {stats && (
+        <div className="bg-card rounded-lg shadow-sm p-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 space-y-3 sm:space-y-0">
+            <div>
+              <h2 className="text-base sm:text-lg font-medium text-foreground">
+                Onboarding Track
+              </h2>
+              <p className="text-xs sm:text-sm text-muted-foreground">
+                Brand → Privacy → Campaign → gPhone → Account Setup → Complete
+              </p>
+            </div>
+            <div className="text-left sm:text-right">
+              <p className="text-xl sm:text-2xl font-bold text-foreground">
+                {stats.onboardingStages.onboardingComplete}
+              </p>
+              <p className="text-xs sm:text-sm text-muted-foreground">
+                Onboarding Complete
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 sm:gap-3">
+            {Object.entries(stats.onboardingStages).map(([stage, count]) => {
+              const stageInfo = getStageInfo(stage);
+              const IconComponent = stageInfo.icon;
+              const isOnboardingStage = ['brandSubmission', 'privacySetup', 'campaignSubmission', 'gphoneProcurement', 'accountSetup', 'onboardingComplete'].includes(stage);
+              
+              if (!isOnboardingStage) return null; // Only show onboarding stages
+              
+              return (
+                <div key={stage} className="text-center">
+                  <div
+                    className={`p-2 sm:p-3 rounded-lg border-2 transition-all duration-200 hover:shadow-sm min-h-[80px] sm:min-h-[90px] lg:min-h-[100px] flex flex-col justify-center ${
+                      (count as number) > 0 
+                        ? "border-green-200 bg-green-50" 
+                        : "border-gray-200 bg-gray-50"
+                    }`}
+                  >
+                    <IconComponent
+                      className={`w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 mx-auto mb-1 sm:mb-2 ${(count as number) > 0 ? stageInfo.color : "text-gray-400"}`}
+                    />
+                    <p className="text-sm sm:text-base lg:text-lg font-bold text-gray-900">
+                      {count as number}
+                    </p>
+                    <p className="text-xs text-gray-600 leading-tight">
+                      {stageInfo.label.split(" ")[0]}
+                    </p>
+                    <div className="w-2 h-2 bg-green-500 rounded-full mx-auto mt-1"></div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          
+          {/* Onboarding Summary */}
+          <div className="mt-6 p-4 bg-green-50 rounded-lg">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-center">
+              <div>
+                <p className="text-2xl font-bold text-green-600">
+                  {stats.onboardingStages.paymentCompleted}
+                </p>
+                <p className="text-sm text-gray-600">Ready for Onboarding</p>
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-green-600">
+                  {stats.onboardingStages.onboardingComplete}
+                </p>
+                <p className="text-sm text-gray-600">Onboarding Complete</p>
+              </div>
+            </div>
           </div>
         </div>
       )}
@@ -954,46 +960,6 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Cleanup Results Display */}
-      {cleanupResult && (
-        <div className="bg-white rounded-lg shadow-sm p-4">
-          <div className="flex items-start">
-            <div className="flex-shrink-0">
-              {cleanupResult.success ? (
-                <CheckCircle className="h-5 w-5 text-green-600" />
-              ) : (
-                <XCircle className="h-5 w-5 text-red-600" />
-              )}
-            </div>
-            <div className="ml-3">
-              <p
-                className={`text-sm font-medium ${
-                  cleanupResult.success ? "text-green-800" : "text-red-800"
-                }`}
-              >
-                {cleanupResult.message}
-              </p>
-              {cleanupResult.details && (
-                <div className="mt-2 text-xs text-green-700">
-                  <strong>Deleted:</strong>
-                  <br />• Companies: {cleanupResult.details.companiesDeleted}
-                  <br />• Verifications:{" "}
-                  {cleanupResult.details.verificationsDeleted}
-                  <br />• User Profiles:{" "}
-                  {cleanupResult.details.userProfilesDeleted}
-                  <br />• Leads: {cleanupResult.details.leadsDeleted}
-                  <br />• Auth Users: {cleanupResult.details.authUsersDeleted}
-                </div>
-              )}
-              {cleanupResult.error && (
-                <p className="mt-2 text-xs text-red-700">
-                  <strong>Error:</strong> {cleanupResult.error}
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

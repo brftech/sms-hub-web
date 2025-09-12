@@ -29,16 +29,18 @@ export interface HubBreakdown {
 }
 
 export interface OnboardingStageStats {
-  authentication: number;
-  payment: number;
-  personalInfo: number;
-  businessInfo: number;
-  brandSubmission: number;
-  privacySetup: number;
-  campaignSubmission: number;
-  gphoneProcurement: number;
-  accountSetup: number;
-  completed: number;
+  signup: number;           // User submitted signup form
+  verification: number;     // Verification code sent
+  verified: number;         // Verification completed
+  accountCreated: number;   // User profile and company created
+  paymentPending: number;   // Payment initiated but not completed
+  paymentCompleted: number; // Payment completed
+  brandSubmission: number;  // Brand submitted for TCR approval
+  privacySetup: number;     // Privacy settings configured
+  campaignSubmission: number; // Campaign submitted for TCR approval
+  gphoneProcurement: number; // gPhone numbers procured
+  accountSetup: number;     // Account fully configured
+  onboardingComplete: number; // Full onboarding done
 }
 
 export interface CompanyOnboardingData {
@@ -489,34 +491,100 @@ class DashboardService {
 
   async getOnboardingStageStats(hubId: number): Promise<OnboardingStageStats> {
     try {
-      const { data: companies, error } = await this.supabase
-        .from("companies")
-        .select("id, payment_status, created_at")
+      // Get verifications data to track signup and verification flow
+      const { data: verifications, error: verificationsError } = await this.supabase
+        .from("verifications")
+        .select("id, verification_sent_at, verification_completed_at, created_at")
         .eq("hub_id", hubId);
 
-      if (error) throw error;
+      if (verificationsError) throw verificationsError;
+
+      // Get companies with their customer payment status
+      const { data: companies, error: companiesError } = await this.supabase
+        .from("companies")
+        .select(`
+          id, 
+          created_at,
+          customers!inner(
+            payment_status
+          )
+        `)
+        .eq("hub_id", hubId);
+
+      if (companiesError) throw companiesError;
+
+      // Get onboarding submissions to track actual progress
+      const { data: onboardingSubmissions, error: onboardingError } = await this.supabase
+        .from("onboarding_submissions")
+        .select("id, current_step, stripe_status, created_at, updated_at")
+        .eq("hub_id", hubId);
+
+      if (onboardingError) throw onboardingError;
 
       const stageCounts = {
-        authentication: 0,
-        payment: 0,
-        personalInfo: 0,
-        businessInfo: 0,
+        signup: 0,
+        verification: 0,
+        verified: 0,
+        accountCreated: 0,
+        paymentPending: 0,
+        paymentCompleted: 0,
         brandSubmission: 0,
         privacySetup: 0,
         campaignSubmission: 0,
         gphoneProcurement: 0,
         accountSetup: 0,
-        completed: 0,
+        onboardingComplete: 0,
       };
 
-      // Since account_onboarding_step doesn't exist, we'll estimate based on payment_status
+      // Count signups (verifications created)
+      stageCounts.signup = verifications?.length || 0;
+
+      // Count verification sent (verification_sent_at exists)
+      stageCounts.verification = verifications?.filter(v => v.verification_sent_at).length || 0;
+
+      // Count verified (verification_completed_at exists)
+      stageCounts.verified = verifications?.filter(v => v.verification_completed_at).length || 0;
+
+      // Count account created (companies exist)
+      stageCounts.accountCreated = companies?.length || 0;
+
+      // Count payment statuses
       companies?.forEach((company) => {
-        if (company.payment_status === "completed") {
-          stageCounts.completed++;
-        } else if (company.payment_status === "processing") {
-          stageCounts.payment++;
-        } else {
-          stageCounts.authentication++;
+        const paymentStatus = company.customers?.[0]?.payment_status;
+        if (paymentStatus === "completed") {
+          stageCounts.paymentCompleted++;
+        } else if (paymentStatus === "pending") {
+          stageCounts.paymentPending++;
+        }
+      });
+
+      // Count onboarding stages based on actual onboarding_submissions data
+      onboardingSubmissions?.forEach((submission) => {
+        const currentStep = submission.current_step;
+        const stripeStatus = submission.stripe_status;
+
+        // Only count if payment is completed (stripe_status = "completed")
+        if (stripeStatus === "completed") {
+          switch (currentStep) {
+            case "brand":
+              stageCounts.brandSubmission++;
+              break;
+            case "privacy":
+              stageCounts.privacySetup++;
+              break;
+            case "campaign":
+              stageCounts.campaignSubmission++;
+              break;
+            case "gphone":
+              stageCounts.gphoneProcurement++;
+              break;
+            case "account":
+              stageCounts.accountSetup++;
+              break;
+            case "complete":
+              stageCounts.onboardingComplete++;
+              break;
+          }
         }
       });
 
@@ -525,16 +593,18 @@ class DashboardService {
       console.error("Error fetching onboarding stage stats:", error);
       // Return default values if there's an error
       return {
-        authentication: 0,
-        payment: 0,
-        personalInfo: 0,
-        businessInfo: 0,
+        signup: 0,
+        verification: 0,
+        verified: 0,
+        accountCreated: 0,
+        paymentPending: 0,
+        paymentCompleted: 0,
         brandSubmission: 0,
         privacySetup: 0,
         campaignSubmission: 0,
         gphoneProcurement: 0,
         accountSetup: 0,
-        completed: 0,
+        onboardingComplete: 0,
       };
     }
   }
@@ -553,6 +623,11 @@ class DashboardService {
           updated_at,
           customers!inner(
             payment_status
+          ),
+          onboarding_submissions(
+            current_step,
+            stripe_status,
+            updated_at
           )
         `
         )
@@ -564,25 +639,57 @@ class DashboardService {
 
       return (
         companies?.map((company) => {
-          // Estimate stage based on payment_status from customer record
           const paymentStatus = company.customers?.[0]?.payment_status;
-          let stage = "authentication";
-          if (paymentStatus === "completed") {
-            stage = "completed";
-          } else if (paymentStatus === "processing") {
-            stage = "payment";
+          const onboardingSubmission = company.onboarding_submissions?.[0];
+          
+          let stage = "accountCreated"; // Default to account created since company exists
+          
+          // Determine stage based on payment status and onboarding progress
+          if (paymentStatus === "pending") {
+            stage = "paymentPending";
+          } else if (paymentStatus === "completed") {
+            if (onboardingSubmission?.stripe_status === "completed") {
+              // Use actual onboarding step from database
+              switch (onboardingSubmission.current_step) {
+                case "brand":
+                  stage = "brandSubmission";
+                  break;
+                case "privacy":
+                  stage = "privacySetup";
+                  break;
+                case "campaign":
+                  stage = "campaignSubmission";
+                  break;
+                case "gphone":
+                  stage = "gphoneProcurement";
+                  break;
+                case "account":
+                  stage = "accountSetup";
+                  break;
+                case "complete":
+                  stage = "onboardingComplete";
+                  break;
+                default:
+                  stage = "paymentCompleted"; // Payment done but no onboarding step yet
+              }
+            } else {
+              stage = "paymentCompleted";
+            }
           }
+          
           const stageOrder = [
-            "authentication",
-            "payment",
-            "personalInfo",
-            "businessInfo",
+            "signup",
+            "verification", 
+            "verified",
+            "accountCreated",
+            "paymentPending",
+            "paymentCompleted",
             "brandSubmission",
             "privacySetup",
             "campaignSubmission",
             "gphoneProcurement",
             "accountSetup",
-            "completed",
+            "onboardingComplete",
           ];
           const stageIndex = stageOrder.indexOf(stage);
           const progress =
@@ -592,17 +699,25 @@ class DashboardService {
           let status: "active" | "stuck" | "completed" = "active";
           let nextAction = "Continue onboarding";
 
-          if (stage === "completed") {
+          if (stage === "onboardingComplete") {
             status = "completed";
             nextAction = "Onboarding complete";
-          } else if (stage === "authentication") {
-            nextAction = "Complete verification";
-          } else if (stage === "payment") {
-            nextAction = "Complete payment setup";
+          } else if (stage === "accountCreated") {
+            nextAction = "Initiate payment";
+          } else if (stage === "paymentPending") {
+            nextAction = "Complete payment";
+          } else if (stage === "paymentCompleted") {
+            nextAction = "Continue with brand submission";
           } else if (stage === "brandSubmission") {
             nextAction = "Submit brand for TCR approval";
+          } else if (stage === "privacySetup") {
+            nextAction = "Configure privacy settings";
           } else if (stage === "campaignSubmission") {
             nextAction = "Submit campaign for TCR approval";
+          } else if (stage === "gphoneProcurement") {
+            nextAction = "Set up gPhone numbers";
+          } else if (stage === "accountSetup") {
+            nextAction = "Complete account configuration";
           }
 
           return {
@@ -611,8 +726,8 @@ class DashboardService {
             currentStage: stage,
             stageProgress: progress,
             lastActivity:
-              company.updated_at || company.created_at
-                ? this.getTimeAgo(company.updated_at || company.created_at!)
+              onboardingSubmission?.updated_at || company.updated_at || company.created_at
+                ? this.getTimeAgo(onboardingSubmission?.updated_at || company.updated_at || company.created_at!)
                 : "Unknown",
             status,
             nextAction,
@@ -638,6 +753,11 @@ class DashboardService {
           hub_id,
           customers!inner(
             payment_status
+          ),
+          onboarding_submissions(
+            current_step,
+            stripe_status,
+            updated_at
           )
         `
         )
@@ -648,25 +768,57 @@ class DashboardService {
 
       return (
         companies?.map((company) => {
-          // Estimate stage based on payment_status from customer record
           const paymentStatus = company.customers?.[0]?.payment_status;
-          let stage = "authentication";
-          if (paymentStatus === "completed") {
-            stage = "completed";
-          } else if (paymentStatus === "processing") {
-            stage = "payment";
+          const onboardingSubmission = company.onboarding_submissions?.[0];
+          
+          let stage = "accountCreated"; // Default to account created since company exists
+          
+          // Determine stage based on payment status and onboarding progress
+          if (paymentStatus === "pending") {
+            stage = "paymentPending";
+          } else if (paymentStatus === "completed") {
+            if (onboardingSubmission?.stripe_status === "completed") {
+              // Use actual onboarding step from database
+              switch (onboardingSubmission.current_step) {
+                case "brand":
+                  stage = "brandSubmission";
+                  break;
+                case "privacy":
+                  stage = "privacySetup";
+                  break;
+                case "campaign":
+                  stage = "campaignSubmission";
+                  break;
+                case "gphone":
+                  stage = "gphoneProcurement";
+                  break;
+                case "account":
+                  stage = "accountSetup";
+                  break;
+                case "complete":
+                  stage = "onboardingComplete";
+                  break;
+                default:
+                  stage = "paymentCompleted"; // Payment done but no onboarding step yet
+              }
+            } else {
+              stage = "paymentCompleted";
+            }
           }
+          
           const stageOrder = [
-            "authentication",
-            "payment",
-            "personalInfo",
-            "businessInfo",
+            "signup",
+            "verification", 
+            "verified",
+            "accountCreated",
+            "paymentPending",
+            "paymentCompleted",
             "brandSubmission",
             "privacySetup",
             "campaignSubmission",
             "gphoneProcurement",
             "accountSetup",
-            "completed",
+            "onboardingComplete",
           ];
           const stageIndex = stageOrder.indexOf(stage);
           const progress =
@@ -676,17 +828,25 @@ class DashboardService {
           let status: "active" | "stuck" | "completed" = "active";
           let nextAction = "Continue onboarding";
 
-          if (stage === "completed") {
+          if (stage === "onboardingComplete") {
             status = "completed";
             nextAction = "Onboarding complete";
-          } else if (stage === "authentication") {
-            nextAction = "Complete verification";
-          } else if (stage === "payment") {
-            nextAction = "Complete payment setup";
+          } else if (stage === "accountCreated") {
+            nextAction = "Initiate payment";
+          } else if (stage === "paymentPending") {
+            nextAction = "Complete payment";
+          } else if (stage === "paymentCompleted") {
+            nextAction = "Continue with brand submission";
           } else if (stage === "brandSubmission") {
             nextAction = "Submit brand for TCR approval";
+          } else if (stage === "privacySetup") {
+            nextAction = "Configure privacy settings";
           } else if (stage === "campaignSubmission") {
             nextAction = "Submit campaign for TCR approval";
+          } else if (stage === "gphoneProcurement") {
+            nextAction = "Set up gPhone numbers";
+          } else if (stage === "accountSetup") {
+            nextAction = "Complete account configuration";
           }
 
           // Get hub name for display
@@ -704,8 +864,8 @@ class DashboardService {
             currentStage: stage,
             stageProgress: progress,
             lastActivity:
-              company.updated_at || company.created_at
-                ? this.getTimeAgo(company.updated_at || company.created_at!)
+              onboardingSubmission?.updated_at || company.updated_at || company.created_at
+                ? this.getTimeAgo(onboardingSubmission?.updated_at || company.updated_at || company.created_at!)
                 : "Unknown",
             status,
             nextAction,
@@ -720,33 +880,98 @@ class DashboardService {
 
   async getGlobalOnboardingStageStats(): Promise<OnboardingStageStats> {
     try {
-      const { data: companies, error } = await this.supabase
-        .from("companies")
-        .select("id, payment_status, created_at");
+      // Get verifications data across all hubs
+      const { data: verifications, error: verificationsError } = await this.supabase
+        .from("verifications")
+        .select("id, verification_sent_at, verification_completed_at, created_at, hub_id");
 
-      if (error) throw error;
+      if (verificationsError) throw verificationsError;
+
+      // Get companies with their customer payment status across all hubs
+      const { data: companies, error: companiesError } = await this.supabase
+        .from("companies")
+        .select(`
+          id, 
+          created_at,
+          hub_id,
+          customers!inner(
+            payment_status
+          )
+        `);
+
+      if (companiesError) throw companiesError;
+
+      // Get onboarding submissions across all hubs
+      const { data: onboardingSubmissions, error: onboardingError } = await this.supabase
+        .from("onboarding_submissions")
+        .select("id, current_step, stripe_status, created_at, updated_at, hub_id");
+
+      if (onboardingError) throw onboardingError;
 
       const stageCounts = {
-        authentication: 0,
-        payment: 0,
-        personalInfo: 0,
-        businessInfo: 0,
+        signup: 0,
+        verification: 0,
+        verified: 0,
+        accountCreated: 0,
+        paymentPending: 0,
+        paymentCompleted: 0,
         brandSubmission: 0,
         privacySetup: 0,
         campaignSubmission: 0,
         gphoneProcurement: 0,
         accountSetup: 0,
-        completed: 0,
+        onboardingComplete: 0,
       };
 
-      // Since account_onboarding_step doesn't exist, we'll estimate based on payment_status
+      // Count signups (verifications created)
+      stageCounts.signup = verifications?.length || 0;
+
+      // Count verification sent (verification_sent_at exists)
+      stageCounts.verification = verifications?.filter(v => v.verification_sent_at).length || 0;
+
+      // Count verified (verification_completed_at exists)
+      stageCounts.verified = verifications?.filter(v => v.verification_completed_at).length || 0;
+
+      // Count account created (companies exist)
+      stageCounts.accountCreated = companies?.length || 0;
+
+      // Count payment statuses
       companies?.forEach((company) => {
-        if (company.payment_status === "completed") {
-          stageCounts.completed++;
-        } else if (company.payment_status === "processing") {
-          stageCounts.payment++;
-        } else {
-          stageCounts.authentication++;
+        const paymentStatus = company.customers?.[0]?.payment_status;
+        if (paymentStatus === "completed") {
+          stageCounts.paymentCompleted++;
+        } else if (paymentStatus === "pending") {
+          stageCounts.paymentPending++;
+        }
+      });
+
+      // Count onboarding stages based on actual onboarding_submissions data
+      onboardingSubmissions?.forEach((submission) => {
+        const currentStep = submission.current_step;
+        const stripeStatus = submission.stripe_status;
+
+        // Only count if payment is completed (stripe_status = "completed")
+        if (stripeStatus === "completed") {
+          switch (currentStep) {
+            case "brand":
+              stageCounts.brandSubmission++;
+              break;
+            case "privacy":
+              stageCounts.privacySetup++;
+              break;
+            case "campaign":
+              stageCounts.campaignSubmission++;
+              break;
+            case "gphone":
+              stageCounts.gphoneProcurement++;
+              break;
+            case "account":
+              stageCounts.accountSetup++;
+              break;
+            case "complete":
+              stageCounts.onboardingComplete++;
+              break;
+          }
         }
       });
 
@@ -755,16 +980,18 @@ class DashboardService {
       console.error("Error fetching global onboarding stage stats:", error);
       // Return default values if there's an error
       return {
-        authentication: 0,
-        payment: 0,
-        personalInfo: 0,
-        businessInfo: 0,
+        signup: 0,
+        verification: 0,
+        verified: 0,
+        accountCreated: 0,
+        paymentPending: 0,
+        paymentCompleted: 0,
         brandSubmission: 0,
         privacySetup: 0,
         campaignSubmission: 0,
         gphoneProcurement: 0,
         accountSetup: 0,
-        completed: 0,
+        onboardingComplete: 0,
       };
     }
   }

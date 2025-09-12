@@ -82,8 +82,7 @@ serve(async (req) => {
           signup_type: verificationRequest.step_data?.customer_type || "company",
           is_active: true,
           first_name: first_name || "",
-          last_name: last_name || "",
-          verification_id: verification_id, // Link to verification record
+          last_name: last_name || ""
         },
       ])
       .select()
@@ -94,6 +93,20 @@ serve(async (req) => {
       // Try to clean up auth user
       await supabaseAdmin.auth.admin.deleteUser(authData.user.id);
       throw new Error("Failed to create user profile");
+    }
+
+    // Update the verification record to link it to the created user profile
+    const { error: verificationUpdateError } = await supabaseAdmin
+      .from("verifications")
+      .update({ 
+        existing_user_id: authData.user.id,
+        user_created_at: new Date().toISOString()
+      })
+      .eq("id", verification_id);
+
+    if (verificationUpdateError) {
+      console.error("Failed to update verification record:", verificationUpdateError);
+      // Don't throw error here - user profile was created successfully
     }
 
     // Create company and membership for B2B signups

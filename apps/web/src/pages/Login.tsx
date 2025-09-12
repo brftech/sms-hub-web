@@ -111,6 +111,7 @@ export function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
 
   // Check for dev superadmin mode and redirect
   useEffect(() => {
@@ -299,6 +300,7 @@ export function Login() {
           throw new Error(result.error || "Failed to send verification");
         }
 
+        setSuccessMessage("Verification code sent! Check your phone or email for the code.");
         setSuccess(true);
 
         // Store data for verification page
@@ -337,15 +339,16 @@ export function Login() {
           <CardContent className="text-center py-12">
             <CheckCircle className="w-16 h-16 text-green-600 mx-auto mb-4" />
             <h2 className="text-2xl font-bold mb-2 text-gray-900">
-              Verification Sent!
+              {successMessage.includes("Password reset") ? "Email Sent!" : "Verification Sent!"}
             </h2>
             <p className="text-gray-600 mb-4">
-              We've sent a verification code to your{" "}
-              {authMethod === "sms" ? "phone" : "email"}
+              {successMessage}
             </p>
-            <p className="text-sm text-gray-500">
-              Redirecting to verification page...
-            </p>
+            {!successMessage.includes("Password reset") && (
+              <p className="text-sm text-gray-500">
+                Redirecting to verification page...
+              </p>
+            )}
           </CardContent>
         </Card>
       </LoginContainer>
@@ -395,6 +398,11 @@ export function Login() {
                       value={phone}
                       onChange={handlePhoneChange}
                       disabled={isLoading}
+                      style={{
+                        backgroundColor: "white",
+                        color: "#374151",
+                        border: "1px solid #d1d5db"
+                      }}
                       autoFocus
                     />
                   </NameField>
@@ -408,6 +416,11 @@ export function Login() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       disabled={isLoading}
+                      style={{
+                        backgroundColor: "white",
+                        color: "#374151",
+                        border: "1px solid #d1d5db"
+                      }}
                     />
                   </NameField>
                 </NameRow>
@@ -423,6 +436,11 @@ export function Login() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     disabled={isLoading}
+                    style={{
+                      backgroundColor: "white",
+                      color: "#374151",
+                      border: "1px solid #d1d5db"
+                    }}
                     // autoFocus removed - don't activate email field automatically
                   />
                 </FormGroup>
@@ -437,7 +455,12 @@ export function Login() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       disabled={isLoading}
-                      style={{ paddingRight: "2.5rem" }}
+                      style={{ 
+                        paddingRight: "2.5rem",
+                        backgroundColor: "white",
+                        color: "#374151",
+                        border: "1px solid #d1d5db"
+                      }}
                     />
                     <PasswordToggleButton
                       type="button"
@@ -448,6 +471,52 @@ export function Login() {
                     </PasswordToggleButton>
                   </PasswordInputWrapper>
                 </FormGroup>
+
+                {/* Forgot Password Link */}
+                <div className="text-right">
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      if (!email) {
+                        setError("Please enter your email address first");
+                        return;
+                      }
+                      
+                      setIsLoading(true);
+                      setError("");
+                      
+                      try {
+                        const supabase = getSupabaseClient();
+                        if (!supabase) {
+                          throw new Error("Failed to initialize Supabase client");
+                        }
+
+                        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                          redirectTo: `${window.location.origin}/reset-password`,
+                        });
+
+                        if (error) throw error;
+
+                        setSuccessMessage("Password reset email sent! Check your inbox and follow the link to reset your password.");
+                        setSuccess(true);
+                        setError("");
+                      } catch (err: unknown) {
+                        console.error("Password reset error:", err);
+                        setError(
+                          err instanceof Error 
+                            ? err.message 
+                            : "Failed to send password reset email"
+                        );
+                      } finally {
+                        setIsLoading(false);
+                      }
+                    }}
+                    disabled={isLoading}
+                    className="text-sm text-gray-600 hover:text-gray-800 hover:underline disabled:opacity-50"
+                  >
+                    {isLoading ? "Sending..." : "Forgot your password?"}
+                  </button>
+                </div>
 
                 {/* Moved Superadmin button after submit button */}
               </>

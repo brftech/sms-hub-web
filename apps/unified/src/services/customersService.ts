@@ -147,7 +147,7 @@ class CustomersService {
     }
   }
 
-  async createCustomer(customerData: Partial<Customer>): Promise<CustomerWithJoins> {
+  async createCustomer(customerData: Partial<Customer>): Promise<CustomerWithJoins> {ched 
     try {
       const { data, error } = await this.supabase
         .from("customers")

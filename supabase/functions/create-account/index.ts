@@ -78,7 +78,7 @@ serve(async (req) => {
           email: verificationRequest.email,
           hub_id: verificationRequest.hub_id,
           account_number: userAccountNumber || `USR-${Date.now()}`,
-          mobile_phone_number: verificationRequest.mobile_phone_number,
+          mobile_phone_number: verificationRequest.mobile_phone,
           is_individual_customer:
             verificationRequest.step_data?.customer_type === "individual",
           is_active: true,

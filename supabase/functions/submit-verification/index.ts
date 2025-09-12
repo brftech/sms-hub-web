@@ -72,20 +72,35 @@ serve(async (req) => {
         throw new Error("SMS service not configured");
       }
 
+      console.log("📱 Sending SMS via Zapier to:", mobile_phone_number);
+
       const smsResponse = await fetch(zapierUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          From: Deno.env.get("TWILIO_PHONE_NUMBER") || "+18885551234",
-          To: mobile_phone_number,
-          Body: `Your verification code is: ${verificationCode}`,
+          phoneNumber: mobile_phone_number,
+          to: mobile_phone_number,
+          phone: mobile_phone_number,
+          phone_number: mobile_phone_number,
+          message: `Your verification code is: ${verificationCode}. This code will expire in 15 minutes.`,
+          text: `Your verification code is: ${verificationCode}. This code will expire in 15 minutes.`,
+          type: "verification",
+          code: verificationCode,
         }),
       });
 
       if (!smsResponse.ok) {
-        console.error("SMS send failed:", await smsResponse.text());
+        const errorText = await smsResponse.text();
+        console.error("❌ SMS send failed:", {
+          status: smsResponse.status,
+          statusText: smsResponse.statusText,
+          error: errorText,
+          payload: payload
+        });
         throw new Error("Failed to send SMS");
       }
+
+      console.log("✅ SMS sent successfully via Zapier");
     } else {
       // Send email via Resend
       const resendApiKey = Deno.env.get("RESEND_API_KEY");

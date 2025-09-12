@@ -92,32 +92,7 @@ export function AccountDetails() {
     });
 
     try {
-      // Update verifications with the collected info
-      const updateResponse = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/verifications?id=eq.${verificationId}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-            apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
-            Prefer: "return=representation",
-          },
-          body: JSON.stringify({
-            company_name: formData.companyName,
-            first_name: formData.firstName,
-            last_name: formData.lastName,
-          }),
-        }
-      );
-
-      if (!updateResponse.ok) {
-        const errorData = await updateResponse.json();
-        console.error("Failed to update verification:", errorData);
-        throw new Error("Failed to update information");
-      }
-
-      // Create the account
+      // Create the account directly using the create-account Edge Function
       const createAccountPayload = {
         verification_id: verificationId,
         password: formData.password,

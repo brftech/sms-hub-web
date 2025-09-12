@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { getAuthConfig, validateDevAuthConfig } from '../config'
 
@@ -6,7 +6,7 @@ interface DevAuthState {
   isDevMode: boolean
   isSuperadmin: boolean
   devUserId: string | null
-  devUserProfile: any
+  devUserProfile: Record<string, unknown> | null
   isInitialized: boolean
 }
 
@@ -23,8 +23,15 @@ export const useDevAuth = (environment: EnvironmentAdapter): DevAuthState => {
     devUserProfile: null,
     isInitialized: false
   })
+  
+  const hasInitialized = useRef(false)
 
   useEffect(() => {
+    // Prevent infinite loops by checking if already initialized
+    if (hasInitialized.current) {
+      return;
+    }
+
     console.log('useDevAuth useEffect - environment check:', {
       isDevelopment: environment.isDevelopment(),
       searchParams: Object.fromEntries(searchParams.entries())
@@ -40,6 +47,7 @@ export const useDevAuth = (environment: EnvironmentAdapter): DevAuthState => {
         devEnabled: authConfig.dev.enabled 
       });
       setDevAuthState(prev => ({ ...prev, isInitialized: true }));
+      hasInitialized.current = true;
       return;
     }
 
@@ -48,6 +56,7 @@ export const useDevAuth = (environment: EnvironmentAdapter): DevAuthState => {
     if (!validation.valid) {
       console.error('Dev auth configuration error:', validation.error);
       setDevAuthState(prev => ({ ...prev, isInitialized: true }));
+      hasInitialized.current = true;
       return;
     }
 
@@ -102,6 +111,8 @@ export const useDevAuth = (environment: EnvironmentAdapter): DevAuthState => {
         isInitialized: true
       })
       
+      hasInitialized.current = true
+      
       // DO NOT store in sessionStorage - auth should only last for this page load
       // This prevents auth from persisting across refreshes
       // sessionStorage.setItem('dev_superadmin', 'true')
@@ -112,8 +123,10 @@ export const useDevAuth = (environment: EnvironmentAdapter): DevAuthState => {
       // This prevents dev auth from persisting across page refreshes
       console.log('useDevAuth - no superadmin detected, initializing as regular user')
       setDevAuthState(prev => ({ ...prev, isInitialized: true }))
+      hasInitialized.current = true
     }
-  }, [searchParams, environment])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]) // Only depend on searchParams to avoid infinite loops with environment object
 
   return devAuthState
 }

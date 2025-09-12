@@ -1,15 +1,8 @@
-import { createSupabaseClient } from '@sms-hub/supabase'
 import { createContactService } from '@sms-hub/services'
+import { getSupabaseClient } from '../lib/supabaseSingleton'
 
-// Create singleton instance
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
-
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables')
-}
-
-const supabase = createSupabaseClient(supabaseUrl, supabaseAnonKey)
+// Use singleton instance
+const supabase = getSupabaseClient()
 export const contactService = createContactService(supabase)
 
 // Re-export types for convenience

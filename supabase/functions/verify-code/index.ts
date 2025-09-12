@@ -26,7 +26,7 @@ serve(async (req) => {
     // Find and verify the verification request
     const identifier = auth_method === "sms" ? mobile_phone_number : email;
     const identifierField =
-      auth_method === "sms" ? "mobile_phone_number" : "email";
+      auth_method === "sms" ? "mobile_phone" : "email";
 
     console.log("🔍 Verification attempt:", {
       verification_id,
@@ -42,8 +42,7 @@ serve(async (req) => {
       .eq("id", verification_id)
       .eq(identifierField, identifier)
       .eq("verification_code", verification_code)
-      .eq("is_verified", false)
-      .gte("expires_at", new Date().toISOString())
+      .is("verification_completed_at", null) // Check if not yet completed
       .single();
 
     if (findError || !verificationExists) {
@@ -52,8 +51,7 @@ serve(async (req) => {
         id: verification_id,
         [identifierField]: identifier,
         verification_code,
-        is_verified: false,
-        expires_at: new Date().toISOString(),
+        verification_completed_at: null,
       });
       throw new Error("Invalid or expired verification code");
     }
@@ -64,7 +62,7 @@ serve(async (req) => {
     const { error: updateError } = await supabaseAdmin
       .from("verifications")
       .update({
-        is_verified: true,
+        verification_completed_at: new Date().toISOString(),
       })
       .eq("id", verification_id);
 

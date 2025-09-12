@@ -264,7 +264,12 @@ const App = () => (
           <Toaster />
           <SonnerToaster />
           <HubProvider environment={webEnvironment} defaultHub="gnymble">
-            <BrowserRouter>
+            <BrowserRouter
+              future={{
+                v7_startTransition: true,
+                v7_relativeSplatPath: true,
+              }}
+            >
               <AppRoutes />
             </BrowserRouter>
           </HubProvider>

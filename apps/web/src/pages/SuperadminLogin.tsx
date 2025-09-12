@@ -13,7 +13,7 @@ import {
 import { Input, Label, Alert, AlertDescription } from "@sms-hub/ui";
 import { Shield, Lock, AlertCircle } from "lucide-react";
 import styled from "styled-components";
-import { createSupabaseClient } from "@sms-hub/supabase";
+import { getSupabaseClient } from "../lib/supabaseSingleton";
 
 const LoginContainer = styled.div`
   min-height: 100vh;
@@ -65,10 +65,7 @@ export function SuperadminLogin() {
 
   // Check if already authenticated
   useEffect(() => {
-    const supabase = createSupabaseClient(
-      import.meta.env.VITE_SUPABASE_URL,
-      import.meta.env.VITE_SUPABASE_ANON_KEY
-    );
+    const supabase = getSupabaseClient();
 
     if (supabase) {
       supabase.auth.getUser().then(({ data: { user } }) => {

@@ -128,16 +128,16 @@ class DashboardService {
       const { data: verificationsData, error: verificationsError } =
         await this.supabase
           .from("verifications")
-          .select("id, verification_sent_at, created_at")
+          .select("id, verification_sent_at, verification_completed_at, created_at")
           .eq("hub_id", hubId);
 
       if (verificationsError) throw verificationsError;
 
       const totalVerifications = verificationsData?.length || 0;
-      // Count verifications that haven't been verified (no associated user created)
+      // Count verifications that haven't been completed (no verification_completed_at)
       const pendingVerifications =
         verificationsData?.filter(
-          (verification) => !verification.verification_sent_at
+          (verification) => !verification.verification_completed_at
         ).length || 0;
 
       // Get messages stats (mock for now since we don't have a messages table)
@@ -212,14 +212,14 @@ class DashboardService {
       const { data: allVerificationsData, error: verificationsError } =
         await this.supabase
           .from("verifications")
-          .select("id, verification_sent_at, created_at, hub_id");
+          .select("id, verification_sent_at, verification_completed_at, created_at, hub_id");
 
       if (verificationsError) throw verificationsError;
 
       const totalVerifications = allVerificationsData?.length || 0;
       const pendingVerifications =
         allVerificationsData?.filter(
-          (verification) => !verification.verification_sent_at
+          (verification) => !verification.verification_completed_at
         ).length || 0;
 
       // Get revenue stats (mock for now since we don't have a revenue table)
@@ -369,13 +369,13 @@ class DashboardService {
         });
       }
 
-      // Check for pending verifications (those without verification_sent_at)
+      // Check for pending verifications (those without verification_completed_at)
       const { data: pendingVerifications, error: pendingError } =
         await this.supabase
           .from("verifications")
           .select("id")
           .eq("hub_id", hubId)
-          .is("verification_sent_at", null);
+          .is("verification_completed_at", null);
 
       if (
         !pendingError &&
@@ -549,9 +549,11 @@ class DashboardService {
           `
           id, 
           public_name, 
-          payment_status, 
           created_at,
-          updated_at
+          updated_at,
+          customers!inner(
+            payment_status
+          )
         `
         )
         .eq("hub_id", hubId)
@@ -562,11 +564,12 @@ class DashboardService {
 
       return (
         companies?.map((company) => {
-          // Estimate stage based on payment_status
+          // Estimate stage based on payment_status from customer record
+          const paymentStatus = company.customers?.[0]?.payment_status;
           let stage = "authentication";
-          if (company.payment_status === "completed") {
+          if (paymentStatus === "completed") {
             stage = "completed";
-          } else if (company.payment_status === "processing") {
+          } else if (paymentStatus === "processing") {
             stage = "payment";
           }
           const stageOrder = [
@@ -630,10 +633,12 @@ class DashboardService {
           `
           id, 
           public_name, 
-          payment_status, 
           created_at,
           updated_at,
-          hub_id
+          hub_id,
+          customers!inner(
+            payment_status
+          )
         `
         )
         .order("updated_at", { ascending: false })
@@ -643,11 +648,12 @@ class DashboardService {
 
       return (
         companies?.map((company) => {
-          // Estimate stage based on payment_status
+          // Estimate stage based on payment_status from customer record
+          const paymentStatus = company.customers?.[0]?.payment_status;
           let stage = "authentication";
-          if (company.payment_status === "completed") {
+          if (paymentStatus === "completed") {
             stage = "completed";
-          } else if (company.payment_status === "processing") {
+          } else if (paymentStatus === "processing") {
             stage = "payment";
           }
           const stageOrder = [
@@ -827,14 +833,14 @@ class DashboardService {
       const { data: verificationsData, error: verificationsError } =
         await this.supabase
           .from("verifications")
-          .select("hub_id, verification_sent_at");
+          .select("hub_id, verification_sent_at, verification_completed_at");
 
       if (!verificationsError && verificationsData) {
         verificationsData.forEach((verification) => {
           const hub = hubMap.get(verification.hub_id);
           if (hub) {
             hub.verifications++;
-            if (!verification.verification_sent_at) hub.pendingVerifications++;
+            if (!verification.verification_completed_at) hub.pendingVerifications++;
           }
         });
       }

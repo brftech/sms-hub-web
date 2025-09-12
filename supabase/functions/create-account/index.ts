@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "whttps://esm.sh/@supabase/supabase-js@2";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { corsHeaders } from "../_shared/cors.ts";
 
 serve(async (req) => {
@@ -22,7 +22,7 @@ serve(async (req) => {
       .from("verifications")
       .select("*")
       .eq("id", verification_id)
-      .eq("is_verified", true)
+      .not("verification_completed_at", "is", null) // Check if verification is completed
       .single();
 
     if (findError || !verificationRequest) {
@@ -82,8 +82,8 @@ serve(async (req) => {
           is_individual_customer:
             verificationRequest.step_data?.customer_type === "individual",
           is_active: true,
-          first_name: first_name || verificationRequest.first_name || "",
-          last_name: last_name || verificationRequest.last_name || "",
+          first_name: first_name || "",
+          last_name: last_name || "",
           verification_id: verification_id, // Link to verification record
         },
       ])
@@ -116,8 +116,7 @@ serve(async (req) => {
         .insert([
           {
             hub_id: verificationRequest.hub_id,
-            public_name:
-              company_name || verificationRequest.company_name || "TBD",
+            public_name: company_name || "TBD",
             company_account_number: accountNumber || `COMP-${Date.now()}`,
             billing_email: verificationRequest.email,
             created_by_profile_id: authData.user.id,

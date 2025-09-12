@@ -41,20 +41,16 @@ serve(async (req) => {
         .insert([
           {
             email,
-            mobile_phone_number,
-            auth_method,
+            mobile_phone: mobile_phone_number, // Correct column name
             verification_code: verificationCode,
             hub_id,
-            company_name: "TBD", // Required field - will be collected later
-            first_name: "TBD", // Required field - will be collected later
-            last_name: "TBD", // Required field - will be collected later
+            preferred_verification_method: auth_method,
             step_data: {
               signup_type,
               invitation_token,
               customer_type,
             },
-            is_verified: false,
-            expires_at: new Date(Date.now() + 10 * 60 * 1000).toISOString(), // 10 minutes
+            verification_sent_at: new Date().toISOString(),
           },
         ])
         .select()

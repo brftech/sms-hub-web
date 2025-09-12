@@ -105,11 +105,8 @@ const Navigation = () => {
               variant="outline"
               size="sm"
               onClick={() => {
-                // Using dev123 temporarily for quick access
-                window.open(
-                  "http://localhost:3001/?superadmin=dev123",
-                  "_blank"
-                );
+                // Navigate to unified app in same tab for better UX
+                window.location.href = "http://localhost:3001/?superadmin=dev123";
               }}
               className="transition-all duration-300 backdrop-blur-sm px-4 py-1.5 text-xs bg-black/50 text-white border border-orange-500/50 hover:bg-orange-500/10 hover:border-orange-400"
             >

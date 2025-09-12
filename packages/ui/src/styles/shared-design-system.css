@@ -196,23 +196,23 @@
   }
 
   [data-hub="gnymble"] {
-    /* Force dark theme for Gnymble */
+    /* Gnymble theme with light cards for better readability */
     --background: 0 0% 0%;
     --foreground: 0 0% 100%;
-    --card: 0 0% 3%;
-    --card-foreground: 0 0% 100%;
-    --popover: 0 0% 3%;
-    --popover-foreground: 0 0% 100%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 9%;
     --primary: 25 95% 53%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 8%;
-    --secondary-foreground: 0 0% 100%;
-    --muted: 0 0% 5%;
-    --muted-foreground: 0 0% 85%;
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 9%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
     --accent: 25 95% 53%;
     --accent-foreground: 0 0% 100%;
-    --border: 0 0% 12%;
-    --input: 0 0% 8%;
+    --border: 0 0% 90%;
+    --input: 0 0% 96%;
     --ring: 25 95% 53%;
     --hub-primary: #f97316;
     --hub-secondary: #ea580c;
@@ -671,6 +671,15 @@
   h5,
   h6 {
     @apply tracking-tight;
+  }
+
+  /* Typography improvements for better readability */
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+  }
+  
+  label {
+    font-weight: 600;
   }
 
   /* Mobile-first responsive design */

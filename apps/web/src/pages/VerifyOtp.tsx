@@ -10,7 +10,7 @@ import {
 } from "@sms-hub/ui";
 import { Input, Label, Alert, AlertDescription } from "@sms-hub/ui";
 import { Shield, CheckCircle, RefreshCw } from "lucide-react";
-import { createSupabaseClient } from "@sms-hub/supabase";
+import { getSupabaseClient } from "../lib/supabaseSingleton";
 import styled from "styled-components";
 
 const VerificationContainer = styled.div`
@@ -39,10 +39,7 @@ export function VerifyOtp() {
 
   const email = location.state?.email || sessionStorage.getItem("login_email");
 
-  const supabase = createSupabaseClient(
-    import.meta.env.VITE_SUPABASE_URL,
-    import.meta.env.VITE_SUPABASE_ANON_KEY
-  );
+  const supabase = getSupabaseClient();
 
   useEffect(() => {
     if (!email) {

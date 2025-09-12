@@ -8,20 +8,17 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  HubLogo,
 } from "@sms-hub/ui";
 import { Input, Label, Alert, AlertDescription } from "@sms-hub/ui";
 import {
   CheckCircle,
   Mail,
   Phone,
-  ArrowRight,
-  Building,
-  UserPlus,
-  User,
+  Shield,
 } from "lucide-react";
 import styled from "styled-components";
-import logoIcon from "@sms-hub/ui/assets/gnymble-icon-logo.svg";
-import { createSupabaseClient } from "@sms-hub/supabase";
+import { getSupabaseClient } from "../lib/supabaseSingleton";
 import { useDevAuth, activateDevAuth } from "../hooks/useDevAuth";
 import { DevAuthToggle } from "@sms-hub/ui";
 import { webEnvironment } from "../config/webEnvironment";
@@ -35,29 +32,18 @@ const SignupContainer = styled.div`
   padding: 1rem;
 `;
 
-const SignupCard = styled(Card)`
-  width: 100%;
-  max-width: 360px;
-`;
-
-const LogoSection = styled.div`
-  text-align: center;
-  margin-bottom: 1rem;
-`;
-
-const LogoImage = styled.img`
-  width: 40px;
-  height: 40px;
-  margin: 0 auto 0.75rem;
+const StyledLabel = styled(Label)`
   display: block;
+  margin-bottom: 0.25rem;
+  font-weight: 600;
+  color: #1f2937;
+  font-size: 0.875rem;
 `;
 
-const FormSection = styled.form`
-  space-y: 4;
-`;
-
-const FormGroup = styled.div`
-  margin-bottom: 1rem;
+const StyledInput = styled(Input)`
+  width: 100%;
+  height: 36px;
+  font-size: 0.875rem;
 `;
 
 const NameRow = styled.div`
@@ -70,51 +56,11 @@ const NameField = styled.div`
   flex: 1;
 `;
 
-const StyledLabel = styled(Label)`
-  display: block;
-  margin-bottom: 0.25rem;
-  font-weight: 500;
-  color: #374151;
-  font-size: 0.875rem;
-  font-family:
-    "Inter",
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    Roboto,
-    sans-serif;
-`;
-
-const StyledInput = styled(Input)`
-  width: 100%;
-  height: 36px;
-  font-size: 0.875rem;
-`;
-
-const SubmitButton = styled(Button)`
-  width: 100%;
-  height: 44px;
-  font-size: 0.95rem;
-  font-weight: 600;
-`;
-
-const Footer = styled.div`
-  text-align: center;
-  margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid #e5e7eb;
-`;
-
 const VerificationMethod = styled.div`
   margin-bottom: 1rem;
 `;
 
-const PathwaySelection = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-`;
+// Removed PathwaySelection - defaulting to new business
 
 const InvitationTokenInput = styled.div`
   margin-bottom: 1.5rem;
@@ -126,40 +72,6 @@ const HelperText = styled.p`
   margin-top: 0.5rem;
 `;
 
-const PathwayCard = styled.div<{ $selected: boolean }>`
-  border: 2px solid ${(props) => (props.$selected ? "#667eea" : "#e5e7eb")};
-  background: ${(props) => (props.$selected ? "#f0f4ff" : "#ffffff")};
-  border-radius: 12px;
-  padding: 1.5rem;
-  cursor: pointer;
-  transition: all 0.2s;
-  text-align: center;
-
-  &:hover {
-    border-color: #667eea;
-    transform: translateY(-2px);
-  }
-
-  svg {
-    width: 32px;
-    height: 32px;
-    color: ${(props) => (props.$selected ? "#667eea" : "#6b7280")};
-    margin: 0 auto 0.5rem;
-  }
-
-  h4 {
-    font-size: 1rem;
-    font-weight: 600;
-    color: ${(props) => (props.$selected ? "#1e293b" : "#374151")};
-    margin-bottom: 0.25rem;
-  }
-
-  p {
-    font-size: 0.75rem;
-    color: ${(props) => (props.$selected ? "#475569" : "#6b7280")};
-  }
-`;
-
 const InvitationAlert = styled(Alert)`
   margin-bottom: 1.5rem;
   background: #f0f9ff;
@@ -169,19 +81,16 @@ const InvitationAlert = styled(Alert)`
 // Helper function to get hub ID for database
 const getHubIdForDatabase = (hubType: string) => {
   const hubMap: { [key: string]: number } = {
-    percytech: 1,
-    gnymble: 2,
-    percymd: 3,
-    percytext: 4,
+    percytech: 0,
+    gnymble: 1,
+    percymd: 2,
+    percytext: 3,
   };
-  return hubMap[hubType] || 2; // Default to Gnymble (2)
+  return hubMap[hubType] || 1; // Default to Gnymble (1)
 };
 
-// Create supabase client
-const supabase = createSupabaseClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
+// Use singleton supabase client
+const supabase = getSupabaseClient();
 
 export function Signup() {
   const { hubConfig } = useHub();
@@ -194,7 +103,7 @@ export function Signup() {
   const [authMethod, setAuthMethod] = useState<"sms" | "email">("email");
   const [signupType, setSignupType] = useState<
     "new_company" | "invited_user" | "individual"
-  >("new_company");
+  >("new_company"); // Default to new business
   const [invitationToken, setInvitationToken] = useState("");
   const [invitationData, setInvitationData] = useState<{
     company_id?: string;
@@ -208,7 +117,7 @@ export function Signup() {
       public_name?: string;
     };
   } | null>(null);
-  const [isLoadingInvitation, setIsLoadingInvitation] = useState(false);
+  // Removed isLoadingInvitation - no longer used
 
   const [formData, setFormData] = useState({
     email: "",
@@ -234,7 +143,6 @@ export function Signup() {
   }, [searchParams]);
 
   const loadInvitationData = async (token: string) => {
-    setIsLoadingInvitation(true);
     try {
       const { data, error } = await supabase
         .from("user_invitations")
@@ -271,8 +179,6 @@ export function Signup() {
     } catch (err) {
       console.error("Error loading invitation:", err);
       setError("Failed to load invitation details");
-    } finally {
-      setIsLoadingInvitation(false);
     }
   };
 
@@ -413,28 +319,21 @@ export function Signup() {
   if (success) {
     return (
       <SignupContainer>
-        <DevAuthToggle
-          environment={
-            webEnvironment as unknown as {
-              isDevelopment?: () => boolean;
-              [key: string]: unknown;
-            }
-          }
-          onActivate={() => activateDevAuth()}
-        />
-        <SignupCard>
+        <Card className="w-full max-w-md">
           <CardContent className="text-center py-12">
             <CheckCircle className="w-16 h-16 text-green-600 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold mb-2">Verification Sent!</h2>
-            <p className="text-gray-600 mb-4">
+            <h2 className="text-2xl font-bold mb-2 text-gray-900">
+              Verification Sent!
+            </h2>
+            <p className="text-gray-700 mb-4 font-medium">
               We've sent a verification code to your{" "}
               {authMethod === "sms" ? "phone" : "email"}
             </p>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-600 font-medium">
               Redirecting to verification page...
             </p>
           </CardContent>
-        </SignupCard>
+        </Card>
       </SignupContainer>
     );
   }
@@ -450,21 +349,26 @@ export function Signup() {
         }
         onActivate={() => activateDevAuth()}
       />
-      <SignupCard>
+      <Card className="w-full max-w-md">
         <CardHeader>
-          <LogoSection>
-            <LogoImage src={logoIcon} alt="Logo" />
-            <CardTitle className="text-xl">
+          <div className="text-center mb-6">
+            <HubLogo
+              hubType={hubConfig.id}
+              variant="icon"
+              size="md"
+              className="mx-auto mb-4"
+            />
+            <CardTitle className="text-2xl text-gray-900 font-bold">
               {signupType === "invited_user"
                 ? "Join Your Team"
-                : "Create Account"}
+                : "Create Business Account"}
             </CardTitle>
-            <CardDescription className="text-sm">
+            <CardDescription className="text-gray-700 font-medium">
               {signupType === "invited_user"
                 ? `You've been invited to join ${invitationData?.companies?.public_name || hubConfig.displayName}`
-                : `Get started with ${hubConfig.displayName}`}
+                : `Start your business with ${hubConfig.displayName}`}
             </CardDescription>
-          </LogoSection>
+          </div>
         </CardHeader>
 
         <CardContent>
@@ -514,61 +418,11 @@ export function Signup() {
             </InvitationAlert>
           )}
 
-          {/* Show pathway selection if no invitation - HIDDEN FOR NOW */}
-          {!invitationToken && (
-            <PathwaySelection>
-              <PathwayCard
-                $selected={signupType === "new_company"}
-                onClick={() => setSignupType("new_company")}
-              >
-                <Building />
-                <h4>New Business</h4>
-                <p>Start fresh with a new company account</p>
-              </PathwayCard>
+          {/* Pathway selection removed - defaulting to new business */}
 
-              <PathwayCard
-                $selected={signupType === "invited_user"}
-                onClick={() => setSignupType("invited_user")}
-              >
-                <UserPlus />
-                <h4>Join Team</h4>
-                <p>Join an existing company</p>
-              </PathwayCard>
+          {/* Invitation input removed - defaulting to new business */}
 
-              <PathwayCard
-                $selected={signupType === "individual"}
-                onClick={() => setSignupType("individual")}
-              >
-                <User />
-                <h4>Personal</h4>
-                <p>For individual use</p>
-              </PathwayCard>
-            </PathwaySelection>
-          )}
-
-          {/* Show invitation input if user selected invited_user but has no token - HIDDEN SINCE PATHWAYS ARE HIDDEN */}
-          {signupType === "invited_user" && !invitationToken && (
-            <FormGroup style={{ marginBottom: "1.5rem" }}>
-              <StyledLabel htmlFor="invitation_code">
-                Invitation Code
-              </StyledLabel>
-              <StyledInput
-                id="invitation_code"
-                type="text"
-                placeholder="Enter your invitation code"
-                onChange={(e) => {
-                  const code = e.target.value.trim();
-                  if (code) {
-                    setInvitationToken(code);
-                    loadInvitationData(code);
-                  }
-                }}
-                disabled={isLoadingInvitation}
-              />
-            </FormGroup>
-          )}
-
-          <FormSection onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} className="space-y-4">
             <NameRow>
               <NameField>
                 <StyledLabel htmlFor="phone">Phone Number *</StyledLabel>
@@ -604,9 +458,9 @@ export function Signup() {
 
             <VerificationMethod>
               <StyledLabel>Verification Method</StyledLabel>
-              <div className="space-y-2 mt-2">
+              <div className="space-y-3 mt-3">
                 <label
-                  className={`flex items-start space-x-3 p-2.5 border rounded-lg cursor-pointer transition-all hover:border-orange-300 ${authMethod === "sms" ? "border-orange-500 bg-orange-50" : "border-gray-200"}`}
+                  className={`flex items-start space-x-3 p-3 border rounded-lg cursor-pointer transition-all hover:border-orange-300 ${authMethod === "sms" ? "border-orange-500 bg-orange-50" : "border-gray-200"}`}
                 >
                   <input
                     type="radio"
@@ -616,24 +470,24 @@ export function Signup() {
                     onChange={() => setAuthMethod("sms")}
                     className="mt-1 w-4 h-4 text-orange-600 border-gray-300 focus:ring-orange-500"
                   />
-                  <div className="flex-1">
-                    <div className="flex items-center">
-                      <Phone className="w-4 h-4 mr-1.5 text-orange-600" />
-                      <span className="font-medium text-orange-600">
-                        SMS Verification
-                      </span>
-                      <span className="ml-2 text-xs bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full">
-                        Recommended
-                      </span>
+                    <div className="flex-1">
+                      <div className="flex items-center">
+                        <Phone className="w-4 h-4 mr-1.5 text-orange-600" />
+                        <span className="font-semibold text-orange-600">
+                          SMS Verification
+                        </span>
+                        <span className="ml-2 text-xs bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full font-medium">
+                          Faster
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-700 mt-1 font-medium">
+                        Receive your code instantly via SMS
+                      </p>
                     </div>
-                    <p className="text-xs text-gray-600 mt-1">
-                      Receive a 6-digit code via SMS
-                    </p>
-                  </div>
                 </label>
 
                 <label
-                  className={`flex items-start space-x-3 p-2.5 border rounded-lg cursor-pointer transition-all hover:border-gray-300 ${authMethod === "email" ? "border-gray-500 bg-gray-50" : "border-gray-200"}`}
+                  className={`flex items-start space-x-3 p-3 border rounded-lg cursor-pointer transition-all hover:border-gray-300 ${authMethod === "email" ? "border-gray-500 bg-gray-50" : "border-gray-200"}`}
                 >
                   <input
                     type="radio"
@@ -643,17 +497,17 @@ export function Signup() {
                     onChange={() => setAuthMethod("email")}
                     className="mt-1 w-4 h-4 text-gray-600 border-gray-300 focus:ring-gray-500"
                   />
-                  <div className="flex-1">
-                    <div className="flex items-center">
-                      <Mail className="w-4 h-4 mr-1.5 text-gray-600" />
-                      <span className="font-medium text-gray-700">
-                        Email Verification
-                      </span>
+                    <div className="flex-1">
+                      <div className="flex items-center">
+                        <Mail className="w-4 h-4 mr-1.5 text-gray-600" />
+                        <span className="font-semibold text-gray-700">
+                          Email Verification
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-700 mt-1 font-medium">
+                        Receive a 6-digit code via email
+                      </p>
                     </div>
-                    <p className="text-xs text-gray-600 mt-1">
-                      Receive a 6-digit code via email
-                    </p>
-                  </div>
                 </label>
               </div>
             </VerificationMethod>
@@ -664,25 +518,29 @@ export function Signup() {
               </Alert>
             )}
 
-            <SubmitButton type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Sending Verification..." : "Get Started"}
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </SubmitButton>
-          </FormSection>
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full hub-bg-primary hover:hub-bg-primary/90"
+            >
+              {isSubmitting ? "Sending Verification..." : "Start Your Business"}
+              <Shield className="w-4 h-4 ml-2" />
+            </Button>
+          </form>
 
-          <Footer>
-            <p className="text-sm text-gray-600">
+          <div className="text-center mt-6 pt-6 border-t">
+            <p className="text-sm text-gray-700 font-medium">
               Already have an account?{" "}
               <Link
                 to="/login"
-                className="text-blue-600 hover:text-blue-700 font-medium"
+                className="hub-text-primary hover:underline font-semibold"
               >
-                Log in
+                Login
               </Link>
             </p>
-          </Footer>
+          </div>
         </CardContent>
-      </SignupCard>
+      </Card>
     </SignupContainer>
   );
 }

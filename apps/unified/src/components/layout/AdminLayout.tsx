@@ -67,14 +67,6 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       bgColor: "bg-blue-100",
     },
     {
-      name: "gPhone Numbers",
-      href: "/admin/phone-numbers",
-      icon: Phone,
-      description: "Manage phone number inventory",
-      color: "text-green-500",
-      bgColor: "bg-green-100",
-    },
-    {
       name: "Verifications",
       href: "/admin/verifications",
       icon: Shield,
@@ -89,6 +81,14 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       description: "Manage sales leads",
       color: "text-emerald-500",
       bgColor: "bg-emerald-100",
+    },
+    {
+      name: "gPhone Numbers",
+      href: "/admin/phone-numbers",
+      icon: Phone,
+      description: "Manage phone number inventory",
+      color: "text-green-500",
+      bgColor: "bg-green-100",
     },
     {
       name: "Voice",

@@ -43,13 +43,12 @@ serve(async (req) => {
       100000 + Math.random() * 900000
     ).toString();
 
-    // Update verification record with new code and extend expiry
+    // Update verification record with new code
     const { error: updateError } = await supabaseAdmin
       .from("verifications")
       .update({
         verification_code: verificationCode,
-        expires_at: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
-        verification_attempts: 0,
+        verification_sent_at: new Date().toISOString(),
       })
       .eq("id", request.verification_id);
 

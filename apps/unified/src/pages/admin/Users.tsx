@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useHub } from "@sms-hub/ui";
 import { useGlobalView } from "../../contexts/GlobalViewContext";
-import { getSupabaseAdminClient } from "../../lib/supabaseSingleton";
+// Removed getSupabaseAdminClient import - admin operations should use Edge Functions or API endpoints
 import {
   Search,
   UserPlus,
@@ -591,58 +591,11 @@ const Users = () => {
                   try {
                     setIsUpdating(true);
 
-                    const supabaseAdmin = getSupabaseAdminClient();
-                    if (!supabaseAdmin) {
-                      throw new Error(
-                        "Failed to initialize Supabase admin client"
-                      );
-                    }
-
-                    // Create user in Supabase Auth
-                    const { error: authError } =
-                      await supabaseAdmin.auth.admin.createUser({
-                        email,
-                        password,
-                        email_confirm: true,
-                        user_metadata: {
-                          first_name: firstName,
-                          last_name: lastName,
-                          full_name: `${firstName} ${lastName}`,
-                          hub_id: 1,
-                        },
-                      });
-
-                    if (authError) throw authError;
-
-                    // Create user profile
-                    const { error: profileError } = await supabaseAdmin
-                      .from("user_profiles")
-                      .insert({
-                        id: crypto.randomUUID(),
-                        email,
-                        first_name: firstName,
-                        last_name: lastName,
-                        role: role as
-                          | "SUPERADMIN"
-                          | "OWNER"
-                          | "ADMIN"
-                          | "SUPPORT"
-                          | "VIEWER"
-                          | "MEMBER",
-                        hub_id: 1,
-                        account_number: `GNYMBLE-${Date.now()}`,
-                        company_id: "00000000-0000-0000-0000-000000000002", // SMS Hub System company
-                        customer_id: "00000000-0000-0000-0000-000000000003",
-                        is_active: true,
-                        verification_setup_completed: true,
-                        payment_status: "completed",
-                      });
-
-                    if (profileError) throw profileError;
-
-                    await fetchData();
+                    // TODO: Implement proper admin user creation through Edge Function
+                    // For now, show a message that this feature needs to be implemented
+                    alert("User creation through admin panel is not yet implemented. Please use the regular signup flow or contact system administrator.");
+                    
                     setIsCreateModalOpen(false);
-                    alert("User created successfully!");
                   } catch (error: any) {
                     console.error("Error creating user:", error);
                     alert(`Failed to create user: ${error.message}`);

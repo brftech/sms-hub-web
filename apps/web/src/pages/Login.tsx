@@ -375,8 +375,8 @@ export function Login() {
             <CardTitle className="text-2xl text-gray-900">
               Welcome Back
             </CardTitle>
-            <CardDescription className="text-gray-600">
-              Sign in to your {hubConfig.displayName} account
+            <CardDescription className="text-gray-700 font-medium">
+              Login to your {hubConfig.displayName} account
             </CardDescription>
           </div>
         </CardHeader>
@@ -567,18 +567,18 @@ export function Login() {
                 className="text-sm hub-text-primary hover:underline"
               >
                 {loginType === "verification"
-                  ? "Returning user? Sign in with password"
+                  ? "Returning user? Login with password"
                   : "Use verification code instead"}
               </button>
             </div>
           </form>
 
           <div className="text-center mt-6 pt-6 border-t">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-gray-700 font-medium">
               Don't have an account?{" "}
               <Link
                 to="/signup"
-                className="hub-text-primary hover:underline font-medium"
+                className="hub-text-primary hover:underline font-semibold"
               >
                 Sign up
               </Link>

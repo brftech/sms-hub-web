@@ -5,6 +5,7 @@ export * from "./onboarding";
 export * from "./sms";
 export * from "./contact";
 export * from "./leads";
+export * from "./account";
 
 import type { Database } from "./database";
 

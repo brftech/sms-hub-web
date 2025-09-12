@@ -1,5 +1,6 @@
 // Unified App Environment Configuration
-export const unifiedEnvironment = {
+// Use a stable object reference to prevent infinite loops in useDevAuth
+const createUnifiedEnvironment = () => ({
   isDevelopment: () => true, // Always true for now
   isProduction: () => false, // Always false for now
   isStaging: () => false, // Always false for now
@@ -14,6 +15,9 @@ export const unifiedEnvironment = {
     analytics: () => true,
     errorReporting: () => true,
   }
-}
+})
+
+// Create a single stable instance
+export const unifiedEnvironment = createUnifiedEnvironment()
 
 export type UnifiedEnvironment = typeof unifiedEnvironment

@@ -129,8 +129,11 @@ serve(async (req) => {
           {
             hub_id: verificationRequest.hub_id,
             public_name: company_name || "TBD",
+            legal_name: company_name || "TBD", // Set legal_name same as public_name initially
             company_account_number: accountNumber || `COMP-${Date.now()}`,
             created_by_user_id: authData.user.id,
+            first_admin_user_id: authData.user.id, // First user is the admin
+            signup_type: verificationRequest.step_data?.customer_type || "company",
             is_active: true,
           },
         ])

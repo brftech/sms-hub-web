@@ -267,6 +267,14 @@ const Dashboard = () => {
       const superadminUserId = '00000000-0000-0000-0000-000000000001';
       let preview = `=== CLEANUP PREVIEW ===\n`;
       preview += `Superadmin user ID: ${superadminUserId}\n\n`;
+      
+      // Debug: Check what superadmin records actually exist
+      preview += `=== DEBUG INFO ===\n`;
+      const { data: debugUsers } = await supabase
+        .from('user_profiles')
+        .select('id, email, first_name, last_name')
+        .or('email.like.%superadmin%,email.like.%admin%');
+      preview += `Superadmin users found: ${JSON.stringify(debugUsers, null, 2)}\n\n`;
 
       // Count records that would be deleted
       const tables = [
@@ -290,7 +298,7 @@ const Dashboard = () => {
             continue;
           }
 
-          // Get superadmin count
+          // Get superadmin count - check both the hardcoded ID and any superadmin email
           let superadminCount = 0;
           if (table.name === 'user_profiles') {
             const { count: superadminUserCount } = await supabase
@@ -299,12 +307,18 @@ const Dashboard = () => {
               .eq('id', superadminUserId);
             superadminCount = superadminUserCount || 0;
           } else if (table.name === 'companies') {
-            const { count: superadminCompanyCount } = await supabase
+            // Check both created_by_user_id and first_admin_user_id
+            const { count: superadminCompanyCount1 } = await supabase
               .from(table.name)
               .select('*', { count: 'exact', head: true })
               .eq('created_by_user_id', superadminUserId);
-            superadminCount = superadminCompanyCount || 0;
+            const { count: superadminCompanyCount2 } = await supabase
+              .from(table.name)
+              .select('*', { count: 'exact', head: true })
+              .eq('first_admin_user_id', superadminUserId);
+            superadminCount = (superadminCompanyCount1 || 0) + (superadminCompanyCount2 || 0);
           } else {
+            // For other tables, check user_id
             const { count: superadminRecordCount } = await supabase
               .from(table.name)
               .select('*', { count: 'exact', head: true })
@@ -359,7 +373,10 @@ const Dashboard = () => {
           if (op.table === 'user_profiles') {
             deleteQuery = deleteQuery.neq('id', superadminUserId);
           } else if (op.table === 'companies') {
-            deleteQuery = deleteQuery.neq('created_by_user_id', superadminUserId);
+            // Exclude companies created by or administered by superadmin
+            deleteQuery = deleteQuery
+              .neq('created_by_user_id', superadminUserId)
+              .neq('first_admin_user_id', superadminUserId);
           } else {
             deleteQuery = deleteQuery.neq('user_id', superadminUserId);
           }

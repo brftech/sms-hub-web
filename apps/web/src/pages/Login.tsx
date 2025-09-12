@@ -113,7 +113,7 @@ export function Login() {
   const [success, setSuccess] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
 
-  // Check for dev superadmin mode and redirect
+  // Check for dev superadmin mode and redirect (only if dev auth is available)
   useEffect(() => {
     if (devAuth.isInitialized && devAuth.isSuperadmin) {
       console.log("Dev superadmin mode active - redirecting from login");

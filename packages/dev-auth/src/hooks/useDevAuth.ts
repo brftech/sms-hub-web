@@ -54,7 +54,7 @@ export const useDevAuth = (environment: EnvironmentAdapter): DevAuthState => {
     // Validate dev auth configuration
     const validation = validateDevAuthConfig();
     if (!validation.valid) {
-      console.error('Dev auth configuration error:', validation.error);
+      console.log('Dev auth configuration not available:', validation.error);
       setDevAuthState(prev => ({ ...prev, isInitialized: true }));
       hasInitialized.current = true;
       return;

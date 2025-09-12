@@ -181,7 +181,6 @@ const Testing = () => {
       alert(
         `✅ Data Cleanup Service Test Successful!\n\nCurrent Data Counts:\n` +
           `• Companies: ${counts.companies}\n` +
-          `• Verifications: ${counts.verifications}\n` +
           `• User Profiles: ${counts.userProfiles}\n` +
           `• Leads: ${counts.leads}\n` +
           `• Auth Users: ${counts.authUsers}\n\n` +

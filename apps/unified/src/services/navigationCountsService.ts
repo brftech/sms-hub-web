@@ -4,7 +4,6 @@ import type { SupabaseClient } from '@sms-hub/supabase'
 export interface NavigationCounts {
   companies: number;
   users: number;
-  verifications: number;
   leads: number;
 }
 
@@ -26,10 +25,6 @@ class NavigationCountsService {
         .from('user_profiles')
         .select('*', { count: 'exact', head: true })
       
-      let verificationsQuery = this.supabase
-        .from('verifications')
-        .select('*', { count: 'exact', head: true })
-      
       let leadsQuery = this.supabase
         .from('leads')
         .select('*', { count: 'exact', head: true })
@@ -38,22 +33,19 @@ class NavigationCountsService {
       if (!isGlobalView && hubId !== undefined) {
         companiesQuery = companiesQuery.eq('hub_id', hubId)
         usersQuery = usersQuery.eq('hub_id', hubId)
-        verificationsQuery = verificationsQuery.eq('hub_id', hubId)
         leadsQuery = leadsQuery.eq('hub_id', hubId)
       }
 
       // Execute all queries in parallel
-      const [companiesResult, usersResult, verificationsResult, leadsResult] = await Promise.all([
+      const [companiesResult, usersResult, leadsResult] = await Promise.all([
         companiesQuery,
         usersQuery,
-        verificationsQuery,
         leadsQuery
       ])
 
       return {
         companies: companiesResult.count || 0,
         users: usersResult.count || 0,
-        verifications: verificationsResult.count || 0,
         leads: leadsResult.count || 0
       }
     } catch (error) {
@@ -61,7 +53,6 @@ class NavigationCountsService {
       return {
         companies: 0,
         users: 0,
-        verifications: 0,
         leads: 0
       }
     }

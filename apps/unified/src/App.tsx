@@ -62,7 +62,6 @@ import AdminDashboard from "./pages/admin/Dashboard";
 import AdminUsers from "./pages/admin/Users";
 import AdminCompanies from "./pages/admin/Companies";
 import AdminLeads from "./pages/admin/Leads";
-import AdminVerifications from "./pages/admin/Verifications";
 import AdminTesting from "./pages/admin/Testing";
 import AdminSettings from "./pages/admin/Settings";
 import { Analytics as AdminAnalytics } from "./pages/admin/Analytics";
@@ -466,18 +465,6 @@ function App() {
                 >
                   <AdminLayout>
                     <AdminLeads />
-                  </AdminLayout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin/verifications"
-              element={
-                <ProtectedRoute
-                  requiredRoles={[UserRole.ADMIN, UserRole.SUPERADMIN]}
-                >
-                  <AdminLayout>
-                    <AdminVerifications />
                   </AdminLayout>
                 </ProtectedRoute>
               }

@@ -39,7 +39,6 @@ const navigation = [
   { name: "Dashboard", href: "/", icon: Home },
   { name: "Companies", href: "/companies", icon: Building },
   { name: "Users", href: "/users", icon: Users },
-  { name: "Verifications", href: "/verifications", icon: Clock },
   { name: "Leads", href: "/leads", icon: UserPlus },
   { name: "Testing", href: "/testing", icon: Zap },
   // { name: 'Messages', href: '/messages', icon: MessageSquare },
@@ -155,12 +154,6 @@ export function Layout() {
                         ({counts.users})
                       </span>
                     )}
-                    {item.name === "Verifications" &&
-                      counts.verifications > 0 && (
-                        <span className="ml-1 text-muted-foreground">
-                          ({counts.verifications})
-                        </span>
-                      )}
                     {item.name === "Leads" && counts.leads > 0 && (
                       <span className="ml-1 text-muted-foreground">
                         ({counts.leads})

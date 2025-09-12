@@ -32,7 +32,6 @@ export function LayoutDemo() {
     { name: "Dashboard", href: "#dashboard", icon: Home },
     { name: "Companies", href: "#companies", icon: Building },
     { name: "Users", href: "#users", icon: Users },
-    { name: "Verifications", href: "#verifications", icon: Clock },
     { name: "Leads", href: "#leads", icon: UserPlus },
     { name: "Testing", href: "#testing", icon: Zap },
   ];

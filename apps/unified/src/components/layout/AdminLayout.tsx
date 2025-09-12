@@ -75,14 +75,6 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       bgColor: "bg-blue-100",
     },
     {
-      name: "Verifications",
-      href: "/admin/verifications",
-      icon: Shield,
-      description: "Manage user verifications",
-      color: "text-cyan-500",
-      bgColor: "bg-cyan-100",
-    },
-    {
       name: "Leads",
       href: "/admin/leads",
       icon: UserPlus,

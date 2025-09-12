@@ -8,8 +8,6 @@ export interface DashboardStats {
   activeCompanies: number;
   totalLeads: number;
   pendingLeads: number;
-  totalVerifications: number;
-  pendingVerifications: number;
   totalMessages: number;
   messagesThisMonth: number;
   revenue: number;
@@ -24,12 +22,9 @@ export interface HubBreakdown {
   companies: number;
   users: number;
   leads: number;
-  verifications: number;
-  pendingVerifications: number;
 }
 
 export interface OnboardingStageStats {
-  verifications: number;        // verifications table records
   userAuth: number;             // Supabase Auth users
   userProfiles: number;         // user_profiles table records
   companies: number;            // companies table records
@@ -127,22 +122,6 @@ class DashboardService {
       const pendingLeads =
         leadsData?.filter((lead) => lead.status === "pending").length || 0;
 
-      // Get verification stats
-      const { data: verificationsData, error: verificationsError } =
-        await this.supabase
-          .from("verifications")
-          .select("id, verification_sent_at, verification_completed_at, created_at")
-          .eq("hub_id", hubId);
-
-      if (verificationsError) throw verificationsError;
-
-      const totalVerifications = verificationsData?.length || 0;
-      // Count verifications that haven't been completed (no verification_completed_at)
-      const pendingVerifications =
-        verificationsData?.filter(
-          (verification) => !verification.verification_completed_at
-        ).length || 0;
-
       // Get messages stats (mock for now since we don't have a messages table)
       const totalMessages = 15420; // Mock data
       const messagesThisMonth = 2340; // Mock data
@@ -161,8 +140,6 @@ class DashboardService {
         activeCompanies,
         totalLeads,
         pendingLeads,
-        totalVerifications,
-        pendingVerifications,
         totalMessages,
         messagesThisMonth,
         revenue,
@@ -211,20 +188,6 @@ class DashboardService {
       const pendingLeads =
         allLeadsData?.filter((lead) => lead.status === "pending").length || 0;
 
-      // Get all verification stats across all hubs
-      const { data: allVerificationsData, error: verificationsError } =
-        await this.supabase
-          .from("verifications")
-          .select("id, verification_sent_at, verification_completed_at, created_at, hub_id");
-
-      if (verificationsError) throw verificationsError;
-
-      const totalVerifications = allVerificationsData?.length || 0;
-      const pendingVerifications =
-        allVerificationsData?.filter(
-          (verification) => !verification.verification_completed_at
-        ).length || 0;
-
       // Get revenue stats (mock for now since we don't have a revenue table)
       const revenue = 45600 * 4; // Mock data for all hubs
       const revenueGrowth = 12.5; // Mock data
@@ -242,8 +205,6 @@ class DashboardService {
         activeCompanies,
         totalLeads,
         pendingLeads,
-        totalVerifications,
-        pendingVerifications,
         totalMessages: 15420 * 4, // Mock data for all hubs
         messagesThisMonth: 2340 * 4, // Mock data for all hubs
         revenue,
@@ -350,51 +311,6 @@ class DashboardService {
     try {
       const alerts: Alert[] = [];
 
-      // Check for high verification volume
-      const { data: verifications, error: verificationsError } =
-        await this.supabase
-          .from("verifications")
-          .select("id, created_at")
-          .eq("hub_id", hubId)
-          .gte(
-            "created_at",
-            new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
-          ); // Last 24 hours
-
-      if (!verificationsError && verifications && verifications.length > 50) {
-        alerts.push({
-          id: "high-verifications",
-          type: "warning",
-          title: "High verification volume",
-          description: `${verifications.length} new verifications in the last 24 hours`,
-          icon: "AlertTriangle",
-          color: "text-yellow-600",
-        });
-      }
-
-      // Check for pending verifications (those without verification_completed_at)
-      const { data: pendingVerifications, error: pendingError } =
-        await this.supabase
-          .from("verifications")
-          .select("id")
-          .eq("hub_id", hubId)
-          .is("verification_completed_at", null);
-
-      if (
-        !pendingError &&
-        pendingVerifications &&
-        pendingVerifications.length > 20
-      ) {
-        alerts.push({
-          id: "pending-verifications",
-          type: "info",
-          title: "Pending verifications",
-          description: `${pendingVerifications.length} signups awaiting verification`,
-          icon: "Clock",
-          color: "text-blue-600",
-        });
-      }
-
       // Check for inactive companies
       const { data: inactiveCompanies, error: inactiveError } =
         await this.supabase
@@ -492,14 +408,6 @@ class DashboardService {
 
   async getOnboardingStageStats(hubId: number): Promise<OnboardingStageStats> {
     try {
-      // Get verifications table count
-      const { count: verificationsCount, error: verificationsError } = await this.supabase
-        .from("verifications")
-        .select("*", { count: "exact", head: true })
-        .eq("hub_id", hubId);
-
-      if (verificationsError) throw verificationsError;
-
       // Get user_profiles table count
       const { count: userProfilesCount, error: userProfilesError } = await this.supabase
         .from("user_profiles")
@@ -549,7 +457,6 @@ class DashboardService {
       if (onboardingDataError) throw onboardingDataError;
 
       const stageCounts = {
-        verifications: verificationsCount || 0,
         userAuth: userProfilesCount || 0, // Use user_profiles count as proxy for auth users
         userProfiles: userProfilesCount || 0,
         companies: companiesCount || 0,
@@ -599,7 +506,6 @@ class DashboardService {
       console.error("Error fetching onboarding stage stats:", error);
       // Return default values if there's an error
       return {
-        verifications: 0,
         userAuth: 0,
         userProfiles: 0,
         companies: 0,
@@ -885,13 +791,6 @@ class DashboardService {
 
   async getGlobalOnboardingStageStats(): Promise<OnboardingStageStats> {
     try {
-      // Get verifications table count across all hubs
-      const { count: verificationsCount, error: verificationsError } = await this.supabase
-        .from("verifications")
-        .select("*", { count: "exact", head: true });
-
-      if (verificationsError) throw verificationsError;
-
       // Get user_profiles table count across all hubs
       const { count: userProfilesCount, error: userProfilesError } = await this.supabase
         .from("user_profiles")
@@ -935,7 +834,6 @@ class DashboardService {
       if (onboardingDataError) throw onboardingDataError;
 
       const stageCounts = {
-        verifications: verificationsCount || 0,
         userAuth: userProfilesCount || 0, // Use user_profiles count as proxy for auth users
         userProfiles: userProfilesCount || 0,
         companies: companiesCount || 0,
@@ -985,7 +883,6 @@ class DashboardService {
       console.error("Error fetching global onboarding stage stats:", error);
       // Return default values if there's an error
       return {
-        verifications: 0,
         userAuth: 0,
         userProfiles: 0,
         companies: 0,
@@ -1021,8 +918,6 @@ class DashboardService {
           companies: 0,
           users: 0,
           leads: 0,
-          verifications: 0,
-          pendingVerifications: 0,
         });
       });
 
@@ -1059,22 +954,6 @@ class DashboardService {
         leadsData.forEach((lead) => {
           const hub = hubMap.get(lead.hub_id);
           if (hub) hub.leads++;
-        });
-      }
-
-      // Get verifications count by hub
-      const { data: verificationsData, error: verificationsError } =
-        await this.supabase
-          .from("verifications")
-          .select("hub_id, verification_sent_at, verification_completed_at");
-
-      if (!verificationsError && verificationsData) {
-        verificationsData.forEach((verification) => {
-          const hub = hubMap.get(verification.hub_id);
-          if (hub) {
-            hub.verifications++;
-            if (!verification.verification_completed_at) hub.pendingVerifications++;
-          }
         });
       }
 

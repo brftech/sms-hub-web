@@ -153,11 +153,6 @@ const Dashboard = () => {
         label: string;
       };
     } = {
-      verifications: {
-        icon: Shield,
-        color: "text-blue-600",
-        label: "Verifications",
-      },
       userAuth: {
         icon: UserCheck,
         color: "text-yellow-600",
@@ -287,10 +282,6 @@ const Dashboard = () => {
         .select('id, created_by_user_id, first_admin_user_id, public_name');
       preview += `Companies table: ${JSON.stringify(debugCompanies, null, 2)}\n`;
       
-      const { data: debugVerifications } = await supabase
-        .from('verifications')
-        .select('id, existing_user_id, mobile_phone, is_existing_user');
-      preview += `Verifications table: ${JSON.stringify(debugVerifications, null, 2)}\n\n`;
 
       // Count records that would be deleted
       const tables = [
@@ -298,8 +289,7 @@ const Dashboard = () => {
         { name: 'memberships', condition: `user_id != '${superadminUserId}'` },
         { name: 'customers', condition: `user_id != '${superadminUserId}'` },
         { name: 'companies', condition: `created_by_user_id != '${superadminUserId}'` },
-        { name: 'user_profiles', condition: `id != '${superadminUserId}'` },
-        { name: 'verifications', condition: `existing_user_id != '${superadminUserId}'` }
+        { name: 'user_profiles', condition: `id != '${superadminUserId}'` }
       ];
 
       for (const table of tables) {
@@ -329,13 +319,6 @@ const Dashboard = () => {
               .select('*', { count: 'exact', head: true })
               .or(`created_by_user_id.eq.${superadminUserId},first_admin_user_id.eq.${superadminUserId}`);
             superadminCount = superadminCompanyCount || 0;
-          } else if (table.name === 'verifications') {
-            // Verifications table uses existing_user_id, not user_id
-            const { count: superadminVerificationCount } = await supabase
-              .from(table.name)
-              .select('*', { count: 'exact', head: true })
-              .eq('existing_user_id', superadminUserId);
-            superadminCount = superadminVerificationCount || 0;
           } else if (table.name === 'customers') {
             // Check user_id first
             const { count: superadminCustomerCount1 } = await supabase
@@ -387,8 +370,7 @@ const Dashboard = () => {
         { table: 'memberships', condition: `user_id.neq.${superadminUserId}` },
         { table: 'customers', condition: `user_id.neq.${superadminUserId}` },
         { table: 'companies', condition: `created_by_user_id.neq.${superadminUserId}` },
-        { table: 'user_profiles', condition: `id.neq.${superadminUserId}` },
-        { table: 'verifications', condition: `existing_user_id.neq.${superadminUserId}` }
+        { table: 'user_profiles', condition: `id.neq.${superadminUserId}` }
       ];
 
       for (const op of deleteOperations) {
@@ -403,9 +385,6 @@ const Dashboard = () => {
             deleteQuery = deleteQuery
               .neq('created_by_user_id', superadminUserId)
               .neq('first_admin_user_id', superadminUserId);
-          } else if (op.table === 'verifications') {
-            // Verifications table uses existing_user_id, not user_id
-            deleteQuery = deleteQuery.neq('existing_user_id', superadminUserId);
           } else {
             deleteQuery = deleteQuery.neq('user_id', superadminUserId);
           }
@@ -546,7 +525,7 @@ const Dashboard = () => {
             {Object.entries(stats.onboardingStages).map(([stage, count]) => {
               const stageInfo = getStageInfo(stage);
               const IconComponent = stageInfo.icon;
-              const isPaymentStage = ['verifications', 'userAuth', 'userProfiles', 'companies', 'customers', 'memberships', 'onboardingSubmissions'].includes(stage);
+              const isPaymentStage = ['userAuth', 'userProfiles', 'companies', 'customers', 'memberships', 'onboardingSubmissions'].includes(stage);
               
               if (!isPaymentStage) return null; // Only show payment stages
               
@@ -688,12 +667,6 @@ const Dashboard = () => {
                     <span className="text-gray-600">Leads:</span>
                     <span className="font-medium text-gray-900">
                       {hub.leads}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-xs sm:text-sm">
-                    <span className="text-gray-600">Pending:</span>
-                    <span className="font-medium text-gray-900">
-                      {hub.pendingVerifications}
                     </span>
                   </div>
                 </div>

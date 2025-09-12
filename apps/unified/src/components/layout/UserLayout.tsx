@@ -136,6 +136,16 @@ export default function UserLayout({ children }: UserLayoutProps) {
               <Menu className="w-5 h-5" />
             </button>
 
+            {/* Hub Logo */}
+            <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center">
+              <HubLogo
+                hubType={currentHub}
+                variant="icon"
+                size="sm"
+                className="w-full h-full"
+              />
+            </div>
+
             {/* Company Name */}
             {company && (
               <div className="hidden lg:block">

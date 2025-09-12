@@ -7,11 +7,6 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instantiate createClient with right options
-  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
-  __InternalSupabase: {
-    PostgrestVersion: "13.0.4"
-  }
   public: {
     Tables: {
       admin_audit_logs: {
@@ -71,7 +66,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "hubs"
             referencedColumns: ["hub_number"]
-          },
+          }
         ]
       }
       bandwidth_accounts: {
@@ -88,7 +83,7 @@ export type Database = {
         }
         Insert: {
           bandwidth_account_id?: string | null
-          bandwidth_credentials: Json
+          bandwidth_credentials?: Json
           company_id: string
           created_at?: string | null
           hub_id: number
@@ -122,7 +117,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "hubs"
             referencedColumns: ["hub_number"]
-          },
+          }
         ]
       }
       brands: {
@@ -197,7 +192,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "hubs"
             referencedColumns: ["hub_number"]
-          },
+          }
         ]
       }
       campaign_phone_assignments: {
@@ -233,7 +228,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "phone_numbers"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       campaigns: {
@@ -368,7 +363,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "hubs"
             referencedColumns: ["hub_number"]
-          },
+          }
         ]
       }
       companies: {
@@ -413,49 +408,81 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "companies_created_by_user_id_fkey"
+            columns: ["created_by_user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "companies_first_admin_user_id_fkey"
+            columns: ["first_admin_user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "companies_hub_id_fkey"
             columns: ["hub_id"]
             isOneToOne: false
             referencedRelation: "hubs"
             referencedColumns: ["hub_number"]
-          },
+          }
         ]
       }
       contacts: {
         Row: {
           company_id: string
           created_at: string | null
+          created_by_user_id: string | null
+          custom_fields: Json | null
           email: string | null
           first_name: string | null
           hub_id: number
           id: string
+          is_active: boolean | null
           last_name: string | null
-          opt_out: boolean | null
+          opted_in: boolean | null
+          opted_in_at: string | null
+          opted_out_at: string | null
           phone_number: string
+          tags: Json | null
           updated_at: string | null
         }
         Insert: {
           company_id: string
           created_at?: string | null
+          created_by_user_id?: string | null
+          custom_fields?: Json | null
           email?: string | null
           first_name?: string | null
           hub_id: number
           id?: string
+          is_active?: boolean | null
           last_name?: string | null
-          opt_out?: boolean | null
+          opted_in?: boolean | null
+          opted_in_at?: string | null
+          opted_out_at?: string | null
           phone_number: string
+          tags?: Json | null
           updated_at?: string | null
         }
         Update: {
           company_id?: string
           created_at?: string | null
+          created_by_user_id?: string | null
+          custom_fields?: Json | null
           email?: string | null
           first_name?: string | null
           hub_id?: number
           id?: string
+          is_active?: boolean | null
           last_name?: string | null
-          opt_out?: boolean | null
+          opted_in?: boolean | null
+          opted_in_at?: string | null
+          opted_out_at?: string | null
           phone_number?: string
+          tags?: Json | null
           updated_at?: string | null
         }
         Relationships: [
@@ -467,26 +494,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "contacts_created_by_user_id_fkey"
+            columns: ["created_by_user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "contacts_hub_id_fkey"
             columns: ["hub_id"]
             isOneToOne: false
             referencedRelation: "hubs"
             referencedColumns: ["hub_number"]
-          },
+          }
         ]
       }
       customers: {
         Row: {
           billing_email: string
-          company_id: string
+          company_id: string | null
           created_at: string | null
           customer_type: string | null
           hub_id: number
           id: string
           is_active: boolean | null
+          metadata: Json | null
           payment_status: string | null
           payment_type: string | null
           stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          subscription_ends_at: string | null
           subscription_status: string | null
           subscription_tier: string | null
           trial_ends_at: string | null
@@ -495,15 +532,18 @@ export type Database = {
         }
         Insert: {
           billing_email: string
-          company_id: string
+          company_id?: string | null
           created_at?: string | null
           customer_type?: string | null
           hub_id: number
           id?: string
           is_active?: boolean | null
+          metadata?: Json | null
           payment_status?: string | null
           payment_type?: string | null
           stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          subscription_ends_at?: string | null
           subscription_status?: string | null
           subscription_tier?: string | null
           trial_ends_at?: string | null
@@ -512,15 +552,18 @@ export type Database = {
         }
         Update: {
           billing_email?: string
-          company_id?: string
+          company_id?: string | null
           created_at?: string | null
           customer_type?: string | null
           hub_id?: number
           id?: string
           is_active?: boolean | null
+          metadata?: Json | null
           payment_status?: string | null
           payment_type?: string | null
           stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          subscription_ends_at?: string | null
           subscription_status?: string | null
           subscription_tier?: string | null
           trial_ends_at?: string | null
@@ -542,26 +585,39 @@ export type Database = {
             referencedRelation: "hubs"
             referencedColumns: ["hub_number"]
           },
+          {
+            foreignKeyName: "customers_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          }
         ]
       }
       hub_configs: {
         Row: {
-          config_data: Json | null
+          branding: Json | null
+          config_data: Json
           created_at: string | null
+          features: Json | null
           hub_id: number
           id: string
           updated_at: string | null
         }
         Insert: {
-          config_data?: Json | null
+          branding?: Json | null
+          config_data?: Json
           created_at?: string | null
+          features?: Json | null
           hub_id: number
           id?: string
           updated_at?: string | null
         }
         Update: {
-          config_data?: Json | null
+          branding?: Json | null
+          config_data?: Json
           created_at?: string | null
+          features?: Json | null
           hub_id?: number
           id?: string
           updated_at?: string | null
@@ -573,7 +629,7 @@ export type Database = {
             isOneToOne: true
             referencedRelation: "hubs"
             referencedColumns: ["hub_number"]
-          },
+          }
         ]
       }
       hubs: {
@@ -673,33 +729,36 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "phone_numbers"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       lead_activities: {
         Row: {
+          activity_data: Json | null
           activity_type: string
           created_at: string | null
-          description: string | null
           hub_id: number
           id: string
           lead_id: string
+          performed_by_user_id: string | null
         }
         Insert: {
+          activity_data?: Json | null
           activity_type: string
           created_at?: string | null
-          description?: string | null
           hub_id: number
           id?: string
           lead_id: string
+          performed_by_user_id?: string | null
         }
         Update: {
+          activity_data?: Json | null
           activity_type?: string
           created_at?: string | null
-          description?: string | null
           hub_id?: number
           id?: string
           lead_id?: string
+          performed_by_user_id?: string | null
         }
         Relationships: [
           {
@@ -716,89 +775,131 @@ export type Database = {
             referencedRelation: "leads"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "lead_activities_performed_by_user_id_fkey"
+            columns: ["performed_by_user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          }
         ]
       }
       leads: {
         Row: {
+          assigned_to_user_id: string | null
+          campaign_source: string | null
           company_name: string | null
+          converted_at: string | null
+          converted_to_company_id: string | null
           created_at: string | null
-          email: string | null
-          first_name: string | null
+          email: string
           hub_id: number
           id: string
           interaction_count: number | null
           ip_address: unknown | null
+          landing_page_url: string | null
           last_interaction_at: string | null
-          last_name: string | null
           lead_phone_number: string | null
           lead_score: number | null
           message: string | null
           name: string | null
           phone: string | null
           platform_interest: string | null
-          priority: string | null
+          referrer_url: string | null
           source: string | null
-          source_type: string | null
           status: string | null
           updated_at: string | null
           user_agent: string | null
+          utm_campaign: string | null
+          utm_content: string | null
+          utm_medium: string | null
+          utm_source: string | null
+          utm_term: string | null
         }
         Insert: {
+          assigned_to_user_id?: string | null
+          campaign_source?: string | null
           company_name?: string | null
+          converted_at?: string | null
+          converted_to_company_id?: string | null
           created_at?: string | null
-          email?: string | null
-          first_name?: string | null
+          email: string
           hub_id: number
           id?: string
           interaction_count?: number | null
           ip_address?: unknown | null
+          landing_page_url?: string | null
           last_interaction_at?: string | null
-          last_name?: string | null
           lead_phone_number?: string | null
           lead_score?: number | null
           message?: string | null
           name?: string | null
           phone?: string | null
           platform_interest?: string | null
-          priority?: string | null
+          referrer_url?: string | null
           source?: string | null
-          source_type?: string | null
           status?: string | null
           updated_at?: string | null
           user_agent?: string | null
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
         }
         Update: {
+          assigned_to_user_id?: string | null
+          campaign_source?: string | null
           company_name?: string | null
+          converted_at?: string | null
+          converted_to_company_id?: string | null
           created_at?: string | null
-          email?: string | null
-          first_name?: string | null
+          email?: string
           hub_id?: number
           id?: string
           interaction_count?: number | null
           ip_address?: unknown | null
+          landing_page_url?: string | null
           last_interaction_at?: string | null
-          last_name?: string | null
           lead_phone_number?: string | null
           lead_score?: number | null
           message?: string | null
           name?: string | null
           phone?: string | null
           platform_interest?: string | null
-          priority?: string | null
+          referrer_url?: string | null
           source?: string | null
-          source_type?: string | null
           status?: string | null
           updated_at?: string | null
           user_agent?: string | null
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "leads_assigned_to_user_id_fkey"
+            columns: ["assigned_to_user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leads_converted_to_company_id_fkey"
+            columns: ["converted_to_company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "leads_hub_id_fkey"
             columns: ["hub_id"]
             isOneToOne: false
             referencedRelation: "hubs"
             referencedColumns: ["hub_number"]
-          },
+          }
         ]
       }
       memberships: {
@@ -807,6 +908,10 @@ export type Database = {
           created_at: string | null
           hub_id: number
           id: string
+          is_active: boolean | null
+          joined_at: string | null
+          left_at: string | null
+          permissions: Json | null
           role: string | null
           updated_at: string | null
           user_id: string
@@ -816,6 +921,10 @@ export type Database = {
           created_at?: string | null
           hub_id: number
           id?: string
+          is_active?: boolean | null
+          joined_at?: string | null
+          left_at?: string | null
+          permissions?: Json | null
           role?: string | null
           updated_at?: string | null
           user_id: string
@@ -825,6 +934,10 @@ export type Database = {
           created_at?: string | null
           hub_id?: number
           id?: string
+          is_active?: boolean | null
+          joined_at?: string | null
+          left_at?: string | null
+          permissions?: Json | null
           role?: string | null
           updated_at?: string | null
           user_id?: string
@@ -850,59 +963,99 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "user_profiles"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       messages: {
         Row: {
-          campaign_id: string | null
           company_id: string
+          contact_id: string | null
+          cost: number | null
           created_at: string | null
+          created_by_user_id: string | null
+          delivered_at: string | null
+          direction: string
+          external_id: string | null
+          failed_at: string | null
+          failure_reason: string | null
           from_number: string
           hub_id: number
           id: string
+          inbox_id: string
           message_content: string
+          phone_number_id: string
+          read_at: string | null
+          segments: number | null
+          sent_at: string | null
           status: string | null
           to_number: string
-          updated_at: string | null
         }
         Insert: {
-          campaign_id?: string | null
           company_id: string
+          contact_id?: string | null
+          cost?: number | null
           created_at?: string | null
+          created_by_user_id?: string | null
+          delivered_at?: string | null
+          direction: string
+          external_id?: string | null
+          failed_at?: string | null
+          failure_reason?: string | null
           from_number: string
           hub_id: number
           id?: string
+          inbox_id: string
           message_content: string
+          phone_number_id: string
+          read_at?: string | null
+          segments?: number | null
+          sent_at?: string | null
           status?: string | null
           to_number: string
-          updated_at?: string | null
         }
         Update: {
-          campaign_id?: string | null
           company_id?: string
+          contact_id?: string | null
+          cost?: number | null
           created_at?: string | null
+          created_by_user_id?: string | null
+          delivered_at?: string | null
+          direction?: string
+          external_id?: string | null
+          failed_at?: string | null
+          failure_reason?: string | null
           from_number?: string
           hub_id?: number
           id?: string
+          inbox_id?: string
           message_content?: string
+          phone_number_id?: string
+          read_at?: string | null
+          segments?: number | null
+          sent_at?: string | null
           status?: string | null
           to_number?: string
-          updated_at?: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "messages_campaign_id_fkey"
-            columns: ["campaign_id"]
-            isOneToOne: false
-            referencedRelation: "campaigns"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "messages_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_created_by_user_id_fkey"
+            columns: ["created_by_user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
             referencedColumns: ["id"]
           },
           {
@@ -912,37 +1065,67 @@ export type Database = {
             referencedRelation: "hubs"
             referencedColumns: ["hub_number"]
           },
+          {
+            foreignKeyName: "messages_inbox_id_fkey"
+            columns: ["inbox_id"]
+            isOneToOne: false
+            referencedRelation: "inboxes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_phone_number_id_fkey"
+            columns: ["phone_number_id"]
+            isOneToOne: false
+            referencedRelation: "phone_numbers"
+            referencedColumns: ["id"]
+          }
         ]
       }
       onboarding_steps: {
         Row: {
+          company_id: string
+          completed_at: string | null
           created_at: string | null
           hub_id: number
           id: string
-          is_required: boolean | null
-          step_description: string | null
+          step_data: Json | null
           step_name: string
-          step_number: number
+          step_status: string | null
+          updated_at: string | null
+          user_id: string
         }
         Insert: {
+          company_id: string
+          completed_at?: string | null
           created_at?: string | null
           hub_id: number
           id?: string
-          is_required?: boolean | null
-          step_description?: string | null
+          step_data?: Json | null
           step_name: string
-          step_number: number
+          step_status?: string | null
+          updated_at?: string | null
+          user_id: string
         }
         Update: {
+          company_id?: string
+          completed_at?: string | null
           created_at?: string | null
           hub_id?: number
           id?: string
-          is_required?: boolean | null
-          step_description?: string | null
+          step_data?: Json | null
           step_name?: string
-          step_number?: number
+          step_status?: string | null
+          updated_at?: string | null
+          user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "onboarding_steps_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "onboarding_steps_hub_id_fkey"
             columns: ["hub_id"]
@@ -950,6 +1133,13 @@ export type Database = {
             referencedRelation: "hubs"
             referencedColumns: ["hub_number"]
           },
+          {
+            foreignKeyName: "onboarding_steps_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          }
         ]
       }
       onboarding_submissions: {
@@ -959,7 +1149,14 @@ export type Database = {
           current_step: string | null
           hub_id: number
           id: string
+          review_notes: string | null
+          reviewed_at: string | null
+          reviewed_by_user_id: string | null
+          status: string | null
+          step_data: Json | null
           stripe_status: string | null
+          submission_data: Json
+          submission_type: string
           updated_at: string | null
           user_id: string
         }
@@ -969,7 +1166,14 @@ export type Database = {
           current_step?: string | null
           hub_id: number
           id?: string
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by_user_id?: string | null
+          status?: string | null
+          step_data?: Json | null
           stripe_status?: string | null
+          submission_data?: Json
+          submission_type: string
           updated_at?: string | null
           user_id: string
         }
@@ -979,7 +1183,14 @@ export type Database = {
           current_step?: string | null
           hub_id?: number
           id?: string
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by_user_id?: string | null
+          status?: string | null
+          step_data?: Json | null
           stripe_status?: string | null
+          submission_data?: Json
+          submission_type?: string
           updated_at?: string | null
           user_id?: string
         }
@@ -999,41 +1210,57 @@ export type Database = {
             referencedColumns: ["hub_number"]
           },
           {
+            foreignKeyName: "onboarding_submissions_reviewed_by_user_id_fkey"
+            columns: ["reviewed_by_user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "onboarding_submissions_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "user_profiles"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       payment_history: {
         Row: {
-          amount_cents: number
+          amount: number
           created_at: string | null
           currency: string | null
+          description: string | null
           hub_id: number
           id: string
+          metadata: Json | null
+          payment_method: string | null
           status: string
           stripe_payment_intent_id: string | null
           user_profile_id: string
         }
         Insert: {
-          amount_cents: number
+          amount: number
           created_at?: string | null
           currency?: string | null
+          description?: string | null
           hub_id: number
           id?: string
+          metadata?: Json | null
+          payment_method?: string | null
           status: string
           stripe_payment_intent_id?: string | null
           user_profile_id: string
         }
         Update: {
-          amount_cents?: number
+          amount?: number
           created_at?: string | null
           currency?: string | null
+          description?: string | null
           hub_id?: number
           id?: string
+          metadata?: Json | null
+          payment_method?: string | null
           status?: string
           stripe_payment_intent_id?: string | null
           user_profile_id?: string
@@ -1052,7 +1279,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "user_profiles"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       phone_numbers: {
@@ -1107,38 +1334,99 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "hubs"
             referencedColumns: ["hub_number"]
-          },
+          }
         ]
+      }
+      sms_verifications: {
+        Row: {
+          consent_given: boolean | null
+          consent_ip_address: unknown | null
+          consent_text: string | null
+          consent_timestamp: string | null
+          created_at: string | null
+          expires_at: string | null
+          id: string
+          phone_number: string
+          user_id: string
+          verification_code: string
+          verified_at: string | null
+        }
+        Insert: {
+          consent_given?: boolean | null
+          consent_ip_address?: unknown | null
+          consent_text?: string | null
+          consent_timestamp?: string | null
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          phone_number: string
+          user_id: string
+          verification_code: string
+          verified_at?: string | null
+        }
+        Update: {
+          consent_given?: boolean | null
+          consent_ip_address?: unknown | null
+          consent_text?: string | null
+          consent_timestamp?: string | null
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          phone_number?: string
+          user_id?: string
+          verification_code?: string
+          verified_at?: string | null
+        }
+        Relationships: []
       }
       tcr_integrations: {
         Row: {
+          brand_id: string | null
           company_id: string
           created_at: string | null
           hub_id: number
           id: string
           tcr_brand_id: string | null
+          tcr_brand_status: string | null
           tcr_campaign_id: string | null
+          tcr_campaign_status: string | null
+          tcr_credentials: Json | null
           updated_at: string | null
         }
         Insert: {
+          brand_id?: string | null
           company_id: string
           created_at?: string | null
           hub_id: number
           id?: string
           tcr_brand_id?: string | null
+          tcr_brand_status?: string | null
           tcr_campaign_id?: string | null
+          tcr_campaign_status?: string | null
+          tcr_credentials?: Json | null
           updated_at?: string | null
         }
         Update: {
+          brand_id?: string | null
           company_id?: string
           created_at?: string | null
           hub_id?: number
           id?: string
           tcr_brand_id?: string | null
+          tcr_brand_status?: string | null
           tcr_campaign_id?: string | null
+          tcr_campaign_status?: string | null
+          tcr_credentials?: Json | null
           updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "tcr_integrations_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "tcr_integrations_company_id_fkey"
             columns: ["company_id"]
@@ -1152,7 +1440,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "hubs"
             referencedColumns: ["hub_number"]
-          },
+          }
         ]
       }
       user_inbox_assignments: {
@@ -1233,7 +1521,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "user_profiles"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       user_invitations: {
@@ -1241,16 +1529,15 @@ export type Database = {
           accepted_at: string | null
           company_id: string
           created_at: string | null
-          email: string
-          expires_at: string
-          first_name: string | null
+          created_user_id: string | null
+          expires_at: string | null
           hub_id: number
           id: string
-          invitation_token: string
+          invitation_token: string | null
           invited_by_user_id: string
-          last_name: string | null
-          permissions: Json | null
+          invited_email: string
           role: string | null
+          sent_at: string | null
           status: string | null
           updated_at: string | null
         }
@@ -1258,16 +1545,15 @@ export type Database = {
           accepted_at?: string | null
           company_id: string
           created_at?: string | null
-          email: string
-          expires_at?: string
-          first_name?: string | null
+          created_user_id?: string | null
+          expires_at?: string | null
           hub_id: number
           id?: string
-          invitation_token: string
+          invitation_token?: string | null
           invited_by_user_id: string
-          last_name?: string | null
-          permissions?: Json | null
+          invited_email: string
           role?: string | null
+          sent_at?: string | null
           status?: string | null
           updated_at?: string | null
         }
@@ -1275,16 +1561,15 @@ export type Database = {
           accepted_at?: string | null
           company_id?: string
           created_at?: string | null
-          email?: string
-          expires_at?: string
-          first_name?: string | null
+          created_user_id?: string | null
+          expires_at?: string | null
           hub_id?: number
           id?: string
-          invitation_token?: string
+          invitation_token?: string | null
           invited_by_user_id?: string
-          last_name?: string | null
-          permissions?: Json | null
+          invited_email?: string
           role?: string | null
+          sent_at?: string | null
           status?: string | null
           updated_at?: string | null
         }
@@ -1294,6 +1579,13 @@ export type Database = {
             columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_invitations_created_user_id_fkey"
+            columns: ["created_user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
             referencedColumns: ["id"]
           },
           {
@@ -1309,7 +1601,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "user_profiles"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       user_profiles: {
@@ -1327,9 +1619,12 @@ export type Database = {
           invitation_accepted_at: string | null
           invited_by_user_id: string | null
           is_active: boolean | null
+          last_login_at: string | null
+          last_login_method: string | null
           last_name: string | null
           mobile_phone_number: string | null
-          payment_status: string | null
+          onboarding_completed: boolean | null
+          permissions: Json | null
           role: string | null
           signup_type: string | null
           updated_at: string | null
@@ -1350,9 +1645,12 @@ export type Database = {
           invitation_accepted_at?: string | null
           invited_by_user_id?: string | null
           is_active?: boolean | null
+          last_login_at?: string | null
+          last_login_method?: string | null
           last_name?: string | null
           mobile_phone_number?: string | null
-          payment_status?: string | null
+          onboarding_completed?: boolean | null
+          permissions?: Json | null
           role?: string | null
           signup_type?: string | null
           updated_at?: string | null
@@ -1373,9 +1671,12 @@ export type Database = {
           invitation_accepted_at?: string | null
           invited_by_user_id?: string | null
           is_active?: boolean | null
+          last_login_at?: string | null
+          last_login_method?: string | null
           last_name?: string | null
           mobile_phone_number?: string | null
-          payment_status?: string | null
+          onboarding_completed?: boolean | null
+          permissions?: Json | null
           role?: string | null
           signup_type?: string | null
           updated_at?: string | null
@@ -1410,117 +1711,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "user_profiles"
             referencedColumns: ["id"]
-          },
-        ]
-      }
-      verification_attempts: {
-        Row: {
-          attempt_count: number | null
-          created_at: string | null
-          id: string
-          verification_id: string
-        }
-        Insert: {
-          attempt_count?: number | null
-          created_at?: string | null
-          id?: string
-          verification_id: string
-        }
-        Update: {
-          attempt_count?: number | null
-          created_at?: string | null
-          id?: string
-          verification_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "verification_attempts_verification_id_fkey"
-            columns: ["verification_id"]
-            isOneToOne: false
-            referencedRelation: "verifications"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      verifications: {
-        Row: {
-          created_at: string | null
-          email: string | null
-          existing_user_id: string | null
-          hub_id: number
-          id: string
-          is_existing_user: boolean | null
-          last_verification_attempt_at: string | null
-          marketing_consent: boolean | null
-          mobile_phone: string | null
-          onboarding_step: string | null
-          preferred_verification_method: string | null
-          privacy_policy_accepted_at: string | null
-          step_data: Json | null
-          terms_accepted_at: string | null
-          updated_at: string | null
-          user_created_at: string | null
-          verification_code: string | null
-          verification_completed_at: string | null
-          verification_sent_at: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          email?: string | null
-          existing_user_id?: string | null
-          hub_id: number
-          id?: string
-          is_existing_user?: boolean | null
-          last_verification_attempt_at?: string | null
-          marketing_consent?: boolean | null
-          mobile_phone?: string | null
-          onboarding_step?: string | null
-          preferred_verification_method?: string | null
-          privacy_policy_accepted_at?: string | null
-          step_data?: Json | null
-          terms_accepted_at?: string | null
-          updated_at?: string | null
-          user_created_at?: string | null
-          verification_code?: string | null
-          verification_completed_at?: string | null
-          verification_sent_at?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          email?: string | null
-          existing_user_id?: string | null
-          hub_id?: number
-          id?: string
-          is_existing_user?: boolean | null
-          last_verification_attempt_at?: string | null
-          marketing_consent?: boolean | null
-          mobile_phone?: string | null
-          onboarding_step?: string | null
-          preferred_verification_method?: string | null
-          privacy_policy_accepted_at?: string | null
-          step_data?: Json | null
-          terms_accepted_at?: string | null
-          updated_at?: string | null
-          user_created_at?: string | null
-          verification_code?: string | null
-          verification_completed_at?: string | null
-          verification_sent_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "verifications_existing_user_id_fkey"
-            columns: ["existing_user_id"]
-            isOneToOne: false
-            referencedRelation: "user_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "verifications_hub_id_fkey"
-            columns: ["hub_id"]
-            isOneToOne: false
-            referencedRelation: "hubs"
-            referencedColumns: ["hub_number"]
-          },
+          }
         ]
       }
     }
@@ -1532,6 +1723,14 @@ export type Database = {
         Args: { schema_name: string; table_name: string }
         Returns: number
       }
+      generate_company_account_number: {
+        Args: { hub_name: string }
+        Returns: string
+      }
+      generate_user_account_number: {
+        Args: { hub_name: string }
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never
@@ -1542,33 +1741,27 @@ export type Database = {
   }
 }
 
-type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
-
-type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
+type PublicSchema = Database[Extract<keyof Database, "public">]
 
 export type Tables<
-  DefaultSchemaTableNameOrOptions extends
-    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
-    | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
-  }
-    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+  PublicTableNameOrOptions extends
+    | keyof (PublicSchema["Tables"] & PublicSchema["Views"])
+    | { schema: keyof Database },
+  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
+    ? keyof (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
+        Database[PublicTableNameOrOptions["schema"]]["Views"])
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+> = PublicTableNameOrOptions extends { schema: keyof Database }
+  ? (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
+      Database[PublicTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R
     }
     ? R
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
-        DefaultSchema["Views"])
-    ? (DefaultSchema["Tables"] &
-        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+  : PublicTableNameOrOptions extends keyof (PublicSchema["Tables"] &
+        PublicSchema["Views"])
+    ? (PublicSchema["Tables"] &
+        PublicSchema["Views"])[PublicTableNameOrOptions] extends {
         Row: infer R
       }
       ? R
@@ -1576,24 +1769,20 @@ export type Tables<
     : never
 
 export type TablesInsert<
-  DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema["Tables"]
-    | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
-  }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+  PublicTableNameOrOptions extends
+    | keyof PublicSchema["Tables"]
+    | { schema: keyof Database },
+  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
+    ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = PublicTableNameOrOptions extends { schema: keyof Database }
+  ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Insert: infer I
     }
     ? I
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+  : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
+    ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
         Insert: infer I
       }
       ? I
@@ -1601,24 +1790,20 @@ export type TablesInsert<
     : never
 
 export type TablesUpdate<
-  DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema["Tables"]
-    | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
-  }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+  PublicTableNameOrOptions extends
+    | keyof PublicSchema["Tables"]
+    | { schema: keyof Database },
+  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
+    ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = PublicTableNameOrOptions extends { schema: keyof Database }
+  ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Update: infer U
     }
     ? U
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+  : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
+    ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
         Update: infer U
       }
       ? U
@@ -1626,41 +1811,14 @@ export type TablesUpdate<
     : never
 
 export type Enums<
-  DefaultSchemaEnumNameOrOptions extends
-    | keyof DefaultSchema["Enums"]
-    | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
-  }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+  PublicEnumNameOrOptions extends
+    | keyof PublicSchema["Enums"]
+    | { schema: keyof Database },
+  EnumName extends PublicEnumNameOrOptions extends { schema: keyof Database }
+    ? keyof Database[PublicEnumNameOrOptions["schema"]]["Enums"]
     : never = never,
-> = DefaultSchemaEnumNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
-  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
-    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+> = PublicEnumNameOrOptions extends { schema: keyof Database }
+  ? Database[PublicEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : PublicEnumNameOrOptions extends keyof PublicSchema["Enums"]
+    ? PublicSchema["Enums"][PublicEnumNameOrOptions]
     : never
-
-export type CompositeTypes<
-  PublicCompositeTypeNameOrOptions extends
-    | keyof DefaultSchema["CompositeTypes"]
-    | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
-  }
-    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
-> = PublicCompositeTypeNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
-  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
-    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
-    : never
-
-export const Constants = {
-  public: {
-    Enums: {},
-  },
-} as const

@@ -21,8 +21,8 @@ import FAQ from "./pages/FAQ";
 import Demo from "./pages/Demo";
 
 // Import auth pages
-import { Login } from "./pages/Login";
-import { Signup } from "./pages/Signup";
+import { LoginNative } from "./pages/LoginNative";
+import { SignupNative } from "./pages/SignupNative";
 import { VerifyOtp } from "./pages/VerifyOtp";
 import { VerifyCode } from "./pages/VerifyCode";
 import { TestAuth } from "./pages/TestAuth";
@@ -215,7 +215,7 @@ const AppRoutes = () => {
         path="/login"
         element={
           <PageTransition>
-            <Login />
+            <LoginNative />
           </PageTransition>
         }
       />
@@ -223,7 +223,7 @@ const AppRoutes = () => {
         path="/signup"
         element={
           <PageTransition>
-            <Signup />
+            <SignupNative />
           </PageTransition>
         }
       />

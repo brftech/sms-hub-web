@@ -51,6 +51,14 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   // Admin navigation items
   const adminNavigationItems = [
     {
+      name: "Dashboard",
+      href: "/admin/dashboard",
+      icon: LayoutDashboard,
+      description: "Admin overview dashboard",
+      color: "text-pink-500",
+      bgColor: "bg-pink-100",
+    },
+    {
       name: "Accounts",
       href: "/admin/accounts",
       icon: Building2,
@@ -105,14 +113,6 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       description: "System-wide analytics",
       color: "text-indigo-500",
       bgColor: "bg-indigo-100",
-    },
-    {
-      name: "Dashboard",
-      href: "/admin/dashboard",
-      icon: LayoutDashboard,
-      description: "Admin overview dashboard",
-      color: "text-pink-500",
-      bgColor: "bg-pink-100",
     },
   ];
 
@@ -262,12 +262,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         } ${isSidebarExpanded ? "w-80" : "w-16"}`}
       >
         <div className="flex flex-col h-full">
-          {/* Hub Logo - Links to Accounts */}
+          {/* Hub Logo - Links to Dashboard */}
           <div className="flex items-center justify-center h-[73px] border-b border-slate-700">
             <Link
-              to="/admin/accounts"
+              to="/admin/dashboard"
               className="flex items-center justify-center w-full group"
-              title="Go to Accounts"
+              title="Go to Dashboard"
             >
               <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center transition-transform group-hover:scale-110">
                 <HubLogo

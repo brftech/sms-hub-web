@@ -42,7 +42,7 @@ export const validateGnymbleCompliance = (data: {
 }) => {
   const errors: string[] = [];
 
-  if (!GNYMBLE_INDUSTRIES.includes(data.industry as string)) {
+  if (!GNYMBLE_INDUSTRIES.includes(data.industry as any)) {
     errors.push("Invalid industry selection for Gnymble platform");
   }
 

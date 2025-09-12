@@ -46,7 +46,7 @@ export const validatePercyMDCompliance = (data: {
 }) => {
   const errors: string[] = [];
 
-  if (!PERCYMD_PROVIDER_TYPES.includes(data.providerType as string)) {
+  if (!PERCYMD_PROVIDER_TYPES.includes(data.providerType as any)) {
     errors.push("Invalid provider type selection for PercyMD platform");
   }
 

@@ -18,31 +18,19 @@ export const useCompanySubscription = (companyId: string) => {
 
       if (!supabase) throw new Error("Failed to initialize Supabase client");
 
-      // First get company's customer_id
-      const { data: company } = await supabase
-        .from("companies")
-        .select("customer_id")
-        .eq("id", companyId)
-        .single();
-
-      if (!company?.customer_id)
-        throw new Error("No customer associated with this company");
-
-      // Then get customer subscription details
+      // Get customer subscription details by company_id
       const { data, error } = await getSupabaseClient()
         .from("customers")
         .select(
           `
           id,
           stripe_customer_id,
-          stripe_subscription_id,
           subscription_status,
           subscription_tier,
-          billing_email,
-          billing_address
+          billing_email
         `
         )
-        .eq("id", company.customer_id)
+        .eq("company_id", companyId)
         .single();
 
       if (error) throw error;
@@ -85,18 +73,10 @@ export const useUpcomingInvoice = (companyId: string) => {
       const supabase = getSupabaseClient();
 
       // Get company's customer
-      const { data: company } = await supabase
-        .from("companies")
-        .select("customer_id")
-        .eq("id", companyId)
-        .single();
-
-      if (!company?.customer_id) return null;
-
       const { data: customer } = await supabase
         .from("customers")
         .select("stripe_customer_id")
-        .eq("id", company.customer_id)
+        .eq("company_id", companyId)
         .single();
 
       if (!customer?.stripe_customer_id) return null;
@@ -274,18 +254,10 @@ export const usePaymentMethods = (companyId: string) => {
       const supabase = getSupabaseClient();
 
       // Get company's customer
-      const { data: company } = await supabase
-        .from("companies")
-        .select("customer_id")
-        .eq("id", companyId)
-        .single();
-
-      if (!company?.customer_id) return [];
-
       const { data: customer } = await supabase
         .from("customers")
         .select("stripe_customer_id")
-        .eq("id", company.customer_id)
+        .eq("company_id", companyId)
         .single();
 
       if (!customer?.stripe_customer_id) return [];
@@ -315,18 +287,10 @@ export const useInvoices = (companyId: string, limit = 10) => {
       const supabase = getSupabaseClient();
 
       // Get company's customer
-      const { data: company } = await supabase
-        .from("companies")
-        .select("customer_id")
-        .eq("id", companyId)
-        .single();
-
-      if (!company?.customer_id) return [];
-
       const { data: customer } = await supabase
         .from("customers")
         .select("stripe_customer_id")
-        .eq("id", company.customer_id)
+        .eq("company_id", companyId)
         .single();
 
       if (!customer?.stripe_customer_id) return [];
@@ -381,21 +345,13 @@ export const useSubscriptionUsage = (companyId: string) => {
       const usage = null;
 
       // Also get subscription info for limits
-      const { data: company } = await getSupabaseClient()
-        .from("companies")
-        .select("customer_id")
-        .eq("id", companyId)
+      const { data: customer } = await getSupabaseClient()
+        .from("customers")
+        .select("subscription_tier")
+        .eq("company_id", companyId)
         .single();
 
-      let tier = "free";
-      if (company?.customer_id) {
-        const { data: customer } = await getSupabaseClient()
-          .from("customers")
-          .select("subscription_tier")
-          .eq("id", company.customer_id)
-          .single();
-        tier = customer?.subscription_tier || "free";
-      }
+      const tier = customer?.subscription_tier || "free";
 
       return {
         current: usage || { sms_sent: 0, sms_received: 0 },

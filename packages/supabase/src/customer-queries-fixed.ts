@@ -20,11 +20,9 @@ export const useCustomerSubscription = (customerId: string | null) => {
           id,
           customer_type,
           stripe_customer_id,
-          stripe_subscription_id,
           subscription_status,
           subscription_tier,
           billing_email,
-          subscription_ends_at,
           created_at,
           updated_at
         `
@@ -51,7 +49,7 @@ export const useCustomerByUser = (userId: string | null) => {
       // First check if user has direct customer relationship
       const { data: userProfile } = await supabase
         .from("user_profiles")
-        .select("customer_id, is_individual_customer")
+        .select("customer_id, company_id, signup_type")
         .eq("id", userId)
         .single();
 
@@ -81,19 +79,11 @@ export const useCustomerByCompany = (companyId: string | null) => {
       if (!companyId) return null;
 
       // Get company's customer ID
-      const { data: company } = await supabase
-        .from("companies")
-        .select("customer_id")
-        .eq("id", companyId)
-        .single();
-
-      if (!company?.customer_id) return null;
-
-      // Get customer data
+      // Get customer data by company_id
       const { data, error } = await supabase
         .from("customers")
         .select("*")
-        .eq("id", company.customer_id)
+        .eq("company_id", companyId)
         .single();
 
       if (error) throw error;
@@ -119,14 +109,14 @@ export const useCurrentCustomer = () => {
       // Get user profile
       const { data: profile } = await supabase
         .from("user_profiles")
-        .select("customer_id, company_id, is_individual_customer")
+        .select("customer_id, company_id, signup_type")
         .eq("id", user.id)
         .single();
 
       if (!profile) throw new Error("User profile not found");
 
       // For B2C users with direct customer relationship
-      if (profile.is_individual_customer && profile.customer_id) {
+      if (profile.signup_type === "individual" && profile.customer_id) {
         const { data, error } = await supabase
           .from("customers")
           .select("*")
@@ -139,22 +129,14 @@ export const useCurrentCustomer = () => {
 
       // For B2B users, get customer through company
       if (profile.company_id) {
-        const { data: company } = await supabase
-          .from("companies")
-          .select("customer_id")
-          .eq("id", profile.company_id)
+        const { data, error } = await supabase
+          .from("customers")
+          .select("*")
+          .eq("company_id", profile.company_id)
           .single();
 
-        if (company?.customer_id) {
-          const { data, error } = await supabase
-            .from("customers")
-            .select("*")
-            .eq("id", company.customer_id)
-            .single();
-
-          if (error) throw error;
-          return data as Customer;
-        }
+        if (error) throw error;
+        return data as Customer;
       }
 
       return null;
@@ -173,7 +155,7 @@ export const useCreateCustomer = () => {
       customer_type: "company" | "individual";
       stripe_customer_id?: string;
       billing_email: string;
-      company_id?: string;
+      company_id: string;
       user_id?: string;
     }) => {
       const { data: customer, error } = await supabase

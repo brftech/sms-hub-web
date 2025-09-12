@@ -33,6 +33,10 @@ export class AccountService implements IAccountService {
    * Create a new account (maps to customer)
    */
   async createAccount(data: CreateAccountData): Promise<Account> {
+    if (!data.company_id) {
+      throw new Error('company_id is required for account creation');
+    }
+    
     const { data: account, error } = await this.supabase
       .from('customers')
       .insert({

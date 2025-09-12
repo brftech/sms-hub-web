@@ -279,16 +279,43 @@ const Dashboard = () => {
       ];
 
       for (const table of tables) {
-        const { count, error } = await supabase
-          .from(table.name)
-          .select('*', { count: 'exact', head: true })
-          .not('id', 'is', null); // This is a workaround since we can't use complex conditions in count
+        try {
+          // Get total count first
+          const { count: totalCount, error: totalError } = await supabase
+            .from(table.name)
+            .select('*', { count: 'exact', head: true });
 
-        if (error) {
-          preview += `${table.name}: Error - ${error.message}\n`;
-        } else {
-          // For now, just show the total count - in a real implementation you'd need to filter
-          preview += `${table.name} to delete: ${count || 0} (total records)\n`;
+          if (totalError) {
+            preview += `${table.name}: Error getting total count - ${totalError.message}\n`;
+            continue;
+          }
+
+          // Get superadmin count
+          let superadminCount = 0;
+          if (table.name === 'user_profiles') {
+            const { count: superadminUserCount } = await supabase
+              .from(table.name)
+              .select('*', { count: 'exact', head: true })
+              .eq('id', superadminUserId);
+            superadminCount = superadminUserCount || 0;
+          } else if (table.name === 'companies') {
+            const { count: superadminCompanyCount } = await supabase
+              .from(table.name)
+              .select('*', { count: 'exact', head: true })
+              .eq('created_by_user_id', superadminUserId);
+            superadminCount = superadminCompanyCount || 0;
+          } else {
+            const { count: superadminRecordCount } = await supabase
+              .from(table.name)
+              .select('*', { count: 'exact', head: true })
+              .eq('user_id', superadminUserId);
+            superadminCount = superadminRecordCount || 0;
+          }
+
+          const recordsToDelete = (totalCount || 0) - superadminCount;
+          preview += `${table.name}: ${recordsToDelete} records to delete (${totalCount || 0} total, ${superadminCount} superadmin preserved)\n`;
+        } catch (err) {
+          preview += `${table.name}: Error - ${err.message}\n`;
         }
       }
 
@@ -326,10 +353,18 @@ const Dashboard = () => {
 
       for (const op of deleteOperations) {
         try {
-          const { error } = await supabase
-            .from(op.table)
-            .delete()
-            .neq('id', superadminUserId); // This is a simplified approach
+          let deleteQuery = supabase.from(op.table).delete();
+          
+          // Apply the correct filter based on table
+          if (op.table === 'user_profiles') {
+            deleteQuery = deleteQuery.neq('id', superadminUserId);
+          } else if (op.table === 'companies') {
+            deleteQuery = deleteQuery.neq('created_by_user_id', superadminUserId);
+          } else {
+            deleteQuery = deleteQuery.neq('user_id', superadminUserId);
+          }
+
+          const { error } = await deleteQuery;
 
           if (error) {
             result += `Error deleting from ${op.table}: ${error.message}\n`;

@@ -130,7 +130,7 @@ serve(async (req) => {
             hub_id: verificationRequest.hub_id,
             public_name: company_name || "TBD",
             company_account_number: accountNumber || `COMP-${Date.now()}`,
-            created_by_profile_id: authData.user.id,
+            created_by_user_id: authData.user.id,
             is_active: true,
           },
         ])

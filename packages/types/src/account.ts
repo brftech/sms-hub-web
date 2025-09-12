@@ -6,7 +6,6 @@ import type { Database } from "./database";
 // Re-export existing types with Account naming
 export type Account = Database["public"]["Tables"]["customers"]["Row"];
 export type Company = Database["public"]["Tables"]["companies"]["Row"];
-export type UserProfile = Database["public"]["Tables"]["user_profiles"]["Row"];
 
 // Account types for better type safety
 export type AccountType = 'company' | 'individual';

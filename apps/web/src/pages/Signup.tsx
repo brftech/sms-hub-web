@@ -78,16 +78,7 @@ const InvitationAlert = styled(Alert)`
   border: 1px solid #0284c7;
 `;
 
-// Helper function to get hub ID for database
-const getHubIdForDatabase = (hubType: string) => {
-  const hubMap: { [key: string]: number } = {
-    percytech: 0,
-    gnymble: 1,
-    percymd: 2,
-    percytext: 3,
-  };
-  return hubMap[hubType] || 1; // Default to Gnymble (1)
-};
+// Removed getHubIdForDatabase - now using hubConfig.hubNumber directly
 
 // Use singleton supabase client
 const supabase = getSupabaseClient();
@@ -158,7 +149,7 @@ export function Signup() {
           if (parsed.invitationToken) {
             setInvitationToken(parsed.invitationToken);
           }
-          console.log("🔄 Restored form data from backup");
+          console.log("🔄 Restored form data from backup, hubId:", parsed.hubId);
         }
       }
     } catch (error) {
@@ -264,6 +255,20 @@ export function Signup() {
     setIsSubmitting(true);
     setError("");
 
+    // Determine hubId first
+    const hubId =
+      signupType === "invited_user" && invitationData
+        ? invitationData.hub_id
+        : hubConfig.hubNumber;
+    
+    console.log("🔍 Signup hubId debug:", {
+      signupType,
+      invitationData: invitationData?.hub_id,
+      hubConfigId: hubConfig.id,
+      hubConfigHubNumber: hubConfig.hubNumber,
+      finalHubId: hubId
+    });
+
     // Store form data immediately to prevent data loss
     const formDataToStore = {
       email: formData.email,
@@ -282,10 +287,6 @@ export function Signup() {
     }
 
     try {
-      const hubId =
-        signupType === "invited_user" && invitationData
-          ? invitationData.hub_id
-          : getHubIdForDatabase(hubConfig.id);
 
       // Call submit-verification to send verification code
       const response = await fetch(

@@ -384,7 +384,7 @@ const Dashboard = () => {
                       {count as number}
                     </p>
                     <p className="text-xs text-gray-600 leading-tight">
-                      {stageInfo.label.split(" ")[0]}
+                      {stageInfo.label}
                     </p>
                     <div className="w-2 h-2 bg-blue-500 rounded-full mx-auto mt-1"></div>
                   </div>
@@ -393,29 +393,6 @@ const Dashboard = () => {
             })}
           </div>
           
-          {/* Table Summary */}
-          <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
-              <div>
-                <p className="text-2xl font-bold text-blue-600">
-                  {stats.onboardingStages.verifications}
-                </p>
-                <p className="text-sm text-gray-600">Verifications</p>
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-orange-600">
-                  {stats.onboardingStages.companies}
-                </p>
-                <p className="text-sm text-gray-600">Companies</p>
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-green-600">
-                  {stats.onboardingStages.customers}
-                </p>
-                <p className="text-sm text-gray-600">Customers</p>
-              </div>
-            </div>
-          </div>
         </div>
       )}
 

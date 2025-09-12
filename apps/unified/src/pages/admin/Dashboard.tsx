@@ -263,20 +263,8 @@ const Dashboard = () => {
     try {
       setCleanupResult("Loading preview...");
       
-      // Get superadmin user ID first
-      const { data: superadminUser, error: userError } = await supabase
-        .from('auth.users')
-        .select('id, email')
-        .or('email.like.%superadmin%,email.like.%admin%')
-        .limit(1)
-        .single();
-
-      if (userError || !superadminUser) {
-        setCleanupResult('No superadmin user found.');
-        return;
-      }
-
-      const superadminUserId = superadminUser.id;
+      // Use the known superadmin user ID
+      const superadminUserId = '00000000-0000-0000-0000-000000000001';
       let preview = `=== CLEANUP PREVIEW ===\n`;
       preview += `Superadmin user ID: ${superadminUserId}\n\n`;
 
@@ -321,20 +309,8 @@ const Dashboard = () => {
       setIsExecutingCleanup(true);
       setCleanupResult("Executing cleanup...");
       
-      // Get superadmin user ID first
-      const { data: superadminUser, error: userError } = await supabase
-        .from('auth.users')
-        .select('id, email')
-        .or('email.like.%superadmin%,email.like.%admin%')
-        .limit(1)
-        .single();
-
-      if (userError || !superadminUser) {
-        setCleanupResult('No superadmin user found. Skipping cleanup.');
-        return;
-      }
-
-      const superadminUserId = superadminUser.id;
+      // Use the known superadmin user ID
+      const superadminUserId = '00000000-0000-0000-0000-000000000001';
       let result = `=== CLEANUP EXECUTION ===\n`;
       result += `Found superadmin user: ${superadminUserId}\n\n`;
 

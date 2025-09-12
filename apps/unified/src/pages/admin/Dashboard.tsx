@@ -275,6 +275,22 @@ const Dashboard = () => {
         .select('id, email, first_name, last_name')
         .or('email.like.%superadmin%,email.like.%admin%');
       preview += `Superadmin users found: ${JSON.stringify(debugUsers, null, 2)}\n\n`;
+      
+      // Debug: Check what's in each table
+      const { data: debugCustomers } = await supabase
+        .from('customers')
+        .select('id, user_id, company_id, billing_email');
+      preview += `Customers table: ${JSON.stringify(debugCustomers, null, 2)}\n`;
+      
+      const { data: debugCompanies } = await supabase
+        .from('companies')
+        .select('id, created_by_user_id, first_admin_user_id, public_name');
+      preview += `Companies table: ${JSON.stringify(debugCompanies, null, 2)}\n`;
+      
+      const { data: debugVerifications } = await supabase
+        .from('verifications')
+        .select('id, existing_user_id, mobile_phone_number');
+      preview += `Verifications table: ${JSON.stringify(debugVerifications, null, 2)}\n\n`;
 
       // Count records that would be deleted
       const tables = [

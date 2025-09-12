@@ -1,4 +1,4 @@
-import type { Database } from "./database-comprehensive";
+import type { Database } from "./database";
 
 export type Brand = Database["public"]["Tables"]["brands"]["Row"];
 export type Campaign = Database["public"]["Tables"]["campaigns"]["Row"];

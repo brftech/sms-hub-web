@@ -267,3 +267,61 @@ export const useReactivateSubscription = () => {
     },
   });
 };
+
+// Create checkout session with customer type support
+export const useCreateCustomerCheckout = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (params: {
+      email: string;
+      priceId: string;
+      successUrl: string;
+      cancelUrl: string;
+      customerType: "company" | "individual";
+      companyId?: string;
+      userId?: string;
+      hubId: number;
+    }) => {
+      const supabase = useSupabaseClient();
+      const { data, error } = await supabase.functions.invoke(
+        "create-checkout-session",
+        {
+          body: params,
+        }
+      );
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["current-customer"] });
+      queryClient.invalidateQueries({ queryKey: ["customer-subscription"] });
+    },
+  });
+};
+
+// Create portal session for customer
+export const useCreateCustomerPortalSession = () => {
+  return useMutation({
+    mutationFn: async (params: {
+      customerId: string;
+      stripeCustomerId: string;
+      returnUrl: string;
+    }) => {
+      const supabase = useSupabaseClient();
+      const { data, error } = await supabase.functions.invoke(
+        "create-portal-session",
+        {
+          body: {
+            customerId: params.stripeCustomerId,
+            returnUrl: params.returnUrl,
+          },
+        }
+      );
+
+      if (error) throw error;
+      return data;
+    },
+  });
+};

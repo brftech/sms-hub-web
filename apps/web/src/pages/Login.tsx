@@ -22,9 +22,6 @@ import {
 } from "lucide-react";
 import styled from "styled-components";
 import { getSupabaseClient } from "../lib/supabaseSingleton";
-import { useDevAuth, activateDevAuth } from "../hooks/useDevAuth";
-import { DevAuthToggle } from "@sms-hub/ui";
-import { webEnvironment } from "../config/webEnvironment";
 
 const LoginContainer = styled.div`
   min-height: 100vh;
@@ -96,7 +93,6 @@ export function Login() {
   const { hubConfig } = useHub();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const devAuth = useDevAuth();
 
   // Prepopulate with superadmin credentials in dev mode
   const isDev = import.meta.env.DEV;
@@ -113,15 +109,6 @@ export function Login() {
   const [success, setSuccess] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
 
-  // Check for dev superadmin mode and redirect (only if dev auth is available)
-  useEffect(() => {
-    if (devAuth.isInitialized && devAuth.isSuperadmin) {
-      console.log("Dev superadmin mode active - redirecting from login");
-      const redirectUrl =
-        searchParams.get("redirect") || "http://localhost:3001/dashboard";
-      window.location.href = redirectUrl;
-    }
-  }, [devAuth.isInitialized, devAuth.isSuperadmin, searchParams]);
 
   const formatPhoneNumber = (value: string) => {
     const cleaned = value.replace(/\D/g, "");
@@ -357,15 +344,6 @@ export function Login() {
 
   return (
     <LoginContainer>
-      <DevAuthToggle
-        environment={
-          webEnvironment as unknown as {
-            isDevelopment?: () => boolean;
-            [key: string]: unknown;
-          }
-        }
-        onActivate={() => activateDevAuth()}
-      />
       <Card className="w-full max-w-md">
         <CardHeader>
           <div className="text-center mb-6">

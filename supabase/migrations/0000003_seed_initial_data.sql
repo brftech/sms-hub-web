@@ -16,27 +16,48 @@ DECLARE
   v_percytext_customer_id UUID := '00000000-0000-0000-0000-000000000001';
 BEGIN
   -- Check if superadmin exists in auth.users (must be created first via Supabase Auth)
-  IF NOT EXISTS (SELECT 1 FROM auth.users WHERE email = 'superadmin@gnymble.com') THEN
-    RAISE NOTICE '===============================================';
-    RAISE NOTICE 'IMPORTANT: Superadmin user must be created first!';
-    RAISE NOTICE '===============================================';
-    RAISE NOTICE '';
-    RAISE NOTICE 'Please create the superadmin user via Supabase Dashboard:';
-    RAISE NOTICE '1. Go to Authentication > Users';
-    RAISE NOTICE '2. Click "Add user"';
-    RAISE NOTICE '3. Email: superadmin@gnymble.com';
-    RAISE NOTICE '4. Password: SuperAdmin123!';
-    RAISE NOTICE '5. Auto Confirm User: Yes';
-    RAISE NOTICE '';
-    RAISE NOTICE 'Then run this migration again.';
-    RAISE NOTICE '===============================================';
-    RETURN; -- Exit early if superadmin doesn't exist
+  IF NOT EXISTS (SELECT 1 FROM auth.users WHERE email = 'superadmin@percytech.com') THEN
+    RAISE EXCEPTION 'Superadmin user (superadmin@percytech.com) must be created first! \n\nPlease create via Supabase Dashboard:\n1. Go to Authentication > Users\n2. Click "Add user"\n3. Email: superadmin@percytech.com\n4. Password: SuperAdmin123!\n5. Auto Confirm User: Yes\n\nThen run this migration again.';
   END IF;
 
   -- Get the actual superadmin ID from auth.users
-  SELECT id INTO v_superadmin_id FROM auth.users WHERE email = 'superadmin@gnymble.com';
+  SELECT id INTO v_superadmin_id FROM auth.users WHERE email = 'superadmin@percytech.com';
 
-  -- 1. Create PercyTech company (for superadmin)
+  -- 1. Create superadmin user profile first (without company_id initially)
+  INSERT INTO user_profiles (
+    id, email, account_number, hub_id, first_name, last_name,
+    mobile_phone_number, role, signup_type, company_admin,
+    company_admin_since, verification_setup_completed,
+    verification_setup_completed_at, is_active, company_id,
+    onboarding_completed, permissions
+  ) VALUES (
+    v_superadmin_id,
+    'superadmin@percytech.com',
+    'PERCY-000001',
+    0, -- PercyTech hub
+    'System',
+    'Administrator',
+    '+14155551234',
+    'SUPERADMIN',
+    'internal',
+    true,
+    NOW(),
+    true,
+    NOW(),
+    true,
+    NULL, -- Will be updated after company creation
+    true,
+    jsonb_build_object(
+      'can_manage_users', true,
+      'can_manage_companies', true,
+      'can_manage_billing', true,
+      'can_view_analytics', true,
+      'can_manage_system', true,
+      'can_access_all_hubs', true
+    )
+  ) ON CONFLICT (id) DO NOTHING;
+
+  -- 2. Create PercyTech company (for superadmin)
   INSERT INTO companies (
     id, public_name, legal_company_name, hub_id, company_account_number,
     signup_type, is_active, created_by_user_id, first_admin_user_id,
@@ -72,41 +93,12 @@ BEGIN
     'Technology'
   ) ON CONFLICT (id) DO NOTHING;
 
-  -- 2. Create superadmin user profile
-  INSERT INTO user_profiles (
-    id, email, account_number, hub_id, first_name, last_name,
-    mobile_phone_number, role, signup_type, company_admin,
-    company_admin_since, verification_setup_completed,
-    verification_setup_completed_at, is_active, company_id,
-    onboarding_completed, permissions
-  ) VALUES (
-    v_superadmin_id,
-    'superadmin@gnymble.com',
-    'PERCY-000001',
-    0, -- PercyTech hub
-    'System',
-    'Administrator',
-    '+14155551234',
-    'SUPERADMIN',
-    'internal',
-    true,
-    NOW(),
-    true,
-    NOW(),
-    true,
-    v_percytech_company_id,
-    true,
-    jsonb_build_object(
-      'can_manage_users', true,
-      'can_manage_companies', true,
-      'can_manage_billing', true,
-      'can_view_analytics', true,
-      'can_manage_system', true,
-      'can_access_all_hubs', true
-    )
-  ) ON CONFLICT (id) DO NOTHING;
+  -- 3. Update superadmin user profile with company_id
+  UPDATE user_profiles 
+  SET company_id = v_percytech_company_id
+  WHERE id = v_superadmin_id;
 
-  -- 3. Create PercyTech customer record (even internal companies need customer records)
+  -- 4. Create PercyTech customer record (even internal companies need customer records)
   INSERT INTO customers (
     id, company_id, billing_email, customer_type, hub_id,
     payment_status, payment_type, subscription_status,
@@ -124,7 +116,7 @@ BEGIN
     true
   ) ON CONFLICT (id) DO NOTHING;
 
-  -- 4. Create Gnymble sample company (Cigar Lounge - B2B)
+  -- 5. Create Gnymble sample company (Cigar Lounge - B2B)
   INSERT INTO companies (
     id, public_name, legal_company_name, hub_id, company_account_number,
     signup_type, is_active, ein, company_type, address, city, state, zip,
@@ -158,7 +150,7 @@ BEGIN
     'Havana Room'
   ) ON CONFLICT (id) DO NOTHING;
 
-  -- 5. Create PercyMD sample company (Medical Practice - B2B)
+  -- 6. Create PercyMD sample company (Medical Practice - B2B)
   INSERT INTO companies (
     id, public_name, legal_company_name, hub_id, company_account_number,
     signup_type, is_active, ein, company_type, address, city, state, zip,
@@ -191,7 +183,7 @@ BEGIN
     'Healthcare'
   ) ON CONFLICT (id) DO NOTHING;
 
-  -- 6. Create PercyText individual user (B2C)
+  -- 7. Create PercyText individual user (B2C)
   -- First create the user profile
   INSERT INTO user_profiles (
     id, email, account_number, hub_id, first_name, last_name,
@@ -231,7 +223,7 @@ BEGIN
     true
   ) ON CONFLICT (id) DO NOTHING;
 
-  -- 7. Create sample users for each B2B company
+  -- 8. Create sample users for each B2B company
   -- Gnymble company admin
   INSERT INTO user_profiles (
     id, email, account_number, hub_id, first_name, last_name,
@@ -280,7 +272,7 @@ BEGIN
     true
   ) ON CONFLICT (email) DO NOTHING;
 
-  -- 8. Create customer records for B2B companies
+  -- 9. Create customer records for B2B companies
   INSERT INTO customers (
     company_id, billing_email, customer_type, hub_id,
     payment_status, payment_type, subscription_status,
@@ -311,7 +303,7 @@ BEGIN
     NULL
   ) ON CONFLICT (company_id) DO NOTHING;
 
-  -- 9. Create sample phone numbers for each company
+  -- 10. Create sample phone numbers for each company
   INSERT INTO phone_numbers (hub_id, company_id, phone_number) VALUES
   (1, v_gnymble_company_id, '+13055559001'),
   (1, v_gnymble_company_id, '+13055559002'),
@@ -319,7 +311,7 @@ BEGIN
   (2, v_percymd_company_id, '+15125559002')
   ON CONFLICT (phone_number) DO NOTHING;
 
-  -- 10. Log the setup
+  -- 11. Log the setup
   RAISE NOTICE '===============================================';
   RAISE NOTICE 'INITIAL DATA SEED COMPLETE';
   RAISE NOTICE '===============================================';
@@ -327,7 +319,7 @@ BEGIN
   RAISE NOTICE 'Created accounts:';
   RAISE NOTICE '';
   RAISE NOTICE '1. SUPERADMIN (PercyTech):';
-  RAISE NOTICE '   Email: superadmin@gnymble.com';
+  RAISE NOTICE '   Email: superadmin@percytech.com';
   RAISE NOTICE '   Company: PercyTech SMS Platform';
   RAISE NOTICE '   Access: All hubs';
   RAISE NOTICE '';

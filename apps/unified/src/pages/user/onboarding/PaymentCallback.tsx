@@ -37,22 +37,40 @@ export function PaymentCallback() {
     }
 
     try {
-      // Payment successful - webhook will handle all database updates
-      setStatus('success')
-      setMessage('Payment successful! Setting up your account...')
-      toast.success('Payment completed successfully!')
-      
-      // Clear any payment required flags
-      sessionStorage.removeItem('payment_required')
-      
-      // Clear pending checkout data since webhook handles everything now
-      sessionStorage.removeItem('pending_checkout')
-      
-      // Redirect to onboarding flow - webhook will have updated the database
-      setTimeout(() => {
-        console.log('🔄 Redirecting to onboarding - webhook should have updated database')
-        navigate('/onboarding')
-      }, 2000)
+      // Verify payment with Stripe via our backend
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/verify-payment`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({ session_id: sessionId })
+      })
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Payment verification failed')
+      }
+
+      if (result.payment_status === 'paid') {
+        setStatus('success')
+        setMessage('Payment successful! Setting up your account...')
+        toast.success('Payment completed successfully!')
+        
+        // Clear any payment required flags
+        sessionStorage.removeItem('payment_required')
+        sessionStorage.removeItem('pending_checkout')
+        
+        // Redirect to onboarding flow
+        setTimeout(() => {
+          console.log('🔄 Redirecting to onboarding - payment verified')
+          navigate('/onboarding')
+        }, 2000)
+      } else {
+        setStatus('error')
+        setMessage('Payment verification failed. Please contact support.')
+      }
       
     } catch (error) {
       console.error('Error in payment verification:', error)

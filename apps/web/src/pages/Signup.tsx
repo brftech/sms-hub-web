@@ -140,6 +140,30 @@ export function Signup() {
       setSignupType("invited_user");
       loadInvitationData(token);
     }
+
+    // Try to recover form data from backup
+    try {
+      const backupData = sessionStorage.getItem("signup_data_backup");
+      if (backupData) {
+        const parsed = JSON.parse(backupData);
+        // Only restore if data is recent (within last hour)
+        const dataAge = Date.now() - new Date(parsed.timestamp).getTime();
+        if (dataAge < 60 * 60 * 1000) {
+          setFormData({
+            email: parsed.email || "",
+            phone: parsed.phone || "",
+          });
+          setAuthMethod(parsed.authMethod || "sms");
+          setSignupType(parsed.signupType || "new_company");
+          if (parsed.invitationToken) {
+            setInvitationToken(parsed.invitationToken);
+          }
+          console.log("🔄 Restored form data from backup");
+        }
+      }
+    } catch (error) {
+      console.warn("Failed to restore form data:", error);
+    }
   }, [searchParams]);
 
   const loadInvitationData = async (token: string) => {
@@ -239,6 +263,23 @@ export function Signup() {
 
     setIsSubmitting(true);
     setError("");
+
+    // Store form data immediately to prevent data loss
+    const formDataToStore = {
+      email: formData.email,
+      phone: formData.phone,
+      authMethod,
+      signupType,
+      invitationToken: invitationToken || undefined,
+      hubId,
+      timestamp: new Date().toISOString()
+    };
+    
+    try {
+      sessionStorage.setItem("signup_data_backup", JSON.stringify(formDataToStore));
+    } catch (error) {
+      console.warn("Failed to backup form data:", error);
+    }
 
     try {
       const hubId =

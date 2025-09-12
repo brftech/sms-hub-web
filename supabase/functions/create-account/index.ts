@@ -110,7 +110,7 @@ serve(async (req) => {
         }
       );
 
-      // Create company
+      // Create company (without billing_email - that goes in customers table)
       const { data: companyData, error: companyError } = await supabaseAdmin
         .from("companies")
         .insert([
@@ -118,10 +118,8 @@ serve(async (req) => {
             hub_id: verificationRequest.hub_id,
             public_name: company_name || "TBD",
             company_account_number: accountNumber || `COMP-${Date.now()}`,
-            billing_email: verificationRequest.email,
             created_by_profile_id: authData.user.id,
             is_active: true,
-            // customer_id will be added after Stripe payment
           },
         ])
         .select()
@@ -135,6 +133,30 @@ serve(async (req) => {
       }
 
       companyId = companyData.id;
+
+      // Create customer record for this company
+      const { data: customerData, error: customerError } = await supabaseAdmin
+        .from("customers")
+        .insert([
+          {
+            company_id: companyId,
+            user_id: authData.user.id,
+            billing_email: verificationRequest.email,
+            customer_type: verificationRequest.step_data?.customer_type || 'company',
+            hub_id: verificationRequest.hub_id,
+            payment_status: 'pending',
+            is_active: true,
+          },
+        ])
+        .select()
+        .single();
+
+      if (customerError) {
+        console.error("Failed to create customer:", customerError);
+        // Try to clean up
+        await supabaseAdmin.auth.admin.deleteUser(authData.user.id);
+        throw new Error("Failed to create customer record");
+      }
 
       // Update profile with company_id
       await supabaseAdmin

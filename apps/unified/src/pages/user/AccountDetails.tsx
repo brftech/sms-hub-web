@@ -42,7 +42,26 @@ export function AccountDetails() {
   const [searchParams] = useSearchParams();
 
   const verificationId = searchParams.get("id");
-  const signupData = JSON.parse(sessionStorage.getItem("signup_data") || "{}");
+  
+  // Try to get signup data with fallback
+  let signupData = {};
+  try {
+    const storedData = sessionStorage.getItem("signup_data");
+    if (storedData) {
+      signupData = JSON.parse(storedData);
+    }
+  } catch (error) {
+    console.warn("Failed to parse signup data:", error);
+    // Try backup data
+    try {
+      const backupData = sessionStorage.getItem("signup_data_backup");
+      if (backupData) {
+        signupData = JSON.parse(backupData);
+      }
+    } catch (backupError) {
+      console.warn("Failed to parse backup data:", backupError);
+    }
+  }
 
   const [formData, setFormData] = useState({
     companyName: "",

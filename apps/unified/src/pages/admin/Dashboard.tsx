@@ -11,6 +11,7 @@ import {
   Clock,
   CheckCircle,
   UserPlus,
+  UserCheck,
   Shield,
   CreditCard,
   FileText,
@@ -146,30 +147,40 @@ const Dashboard = () => {
         label: string;
       };
     } = {
-      verification: {
+      verifications: {
         icon: Shield,
+        color: "text-blue-600",
+        label: "Verifications",
+      },
+      userAuth: {
+        icon: UserCheck,
         color: "text-yellow-600",
-        label: "Verification Sent",
+        label: "User Auth",
       },
-      verified: {
-        icon: CheckCircle,
+      userProfiles: {
+        icon: UserPlus,
         color: "text-green-600",
-        label: "Verified",
+        label: "User Profiles",
       },
-      accountCreated: {
+      companies: {
         icon: Building,
         color: "text-indigo-600",
-        label: "Account Created",
+        label: "Companies",
       },
-      paymentPending: {
+      customers: {
         icon: CreditCard,
         color: "text-orange-600",
-        label: "Payment Pending",
+        label: "Customers",
       },
-      paymentCompleted: {
-        icon: CheckCircle,
-        color: "text-green-600",
-        label: "Payment Complete",
+      memberships: {
+        icon: Users,
+        color: "text-purple-600",
+        label: "Memberships",
+      },
+      onboardingSubmissions: {
+        icon: FileText,
+        color: "text-teal-600",
+        label: "Onboarding Submissions",
       },
       brandSubmission: {
         icon: FileText,
@@ -336,24 +347,24 @@ const Dashboard = () => {
                 Payment Track
               </h2>
                     <p className="text-xs sm:text-sm text-muted-foreground">
-                      Verification → Account Creation → Payment
+                      Database Tables in Population Order
                     </p>
             </div>
             <div className="text-left sm:text-right">
               <p className="text-xl sm:text-2xl font-bold text-foreground">
-                {stats.onboardingStages.paymentCompleted}
+                {stats.onboardingStages.onboardingSubmissions}
               </p>
               <p className="text-xs sm:text-sm text-muted-foreground">
-                Payments Completed
+                Onboarding Submissions
               </p>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 sm:gap-3">
+          <div className="grid grid-cols-7 gap-2 sm:gap-3">
             {Object.entries(stats.onboardingStages).map(([stage, count]) => {
               const stageInfo = getStageInfo(stage);
               const IconComponent = stageInfo.icon;
-              const isPaymentStage = ['verification', 'verified', 'accountCreated', 'paymentPending', 'paymentCompleted'].includes(stage);
+              const isPaymentStage = ['verifications', 'userAuth', 'userProfiles', 'companies', 'customers', 'memberships', 'onboardingSubmissions'].includes(stage);
               
               if (!isPaymentStage) return null; // Only show payment stages
               
@@ -382,26 +393,26 @@ const Dashboard = () => {
             })}
           </div>
           
-          {/* Payment Summary */}
+          {/* Table Summary */}
           <div className="mt-6 p-4 bg-blue-50 rounded-lg">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
               <div>
                 <p className="text-2xl font-bold text-blue-600">
-                  {stats.onboardingStages.verification}
+                  {stats.onboardingStages.verifications}
                 </p>
-                <p className="text-sm text-gray-600">Verification Sent</p>
+                <p className="text-sm text-gray-600">Verifications</p>
               </div>
               <div>
                 <p className="text-2xl font-bold text-orange-600">
-                  {stats.onboardingStages.paymentPending}
+                  {stats.onboardingStages.companies}
                 </p>
-                <p className="text-sm text-gray-600">Payment Pending</p>
+                <p className="text-sm text-gray-600">Companies</p>
               </div>
               <div>
                 <p className="text-2xl font-bold text-green-600">
-                  {stats.onboardingStages.paymentCompleted}
+                  {stats.onboardingStages.customers}
                 </p>
-                <p className="text-sm text-gray-600">Payment Complete</p>
+                <p className="text-sm text-gray-600">Customers</p>
               </div>
             </div>
           </div>
@@ -468,7 +479,7 @@ const Dashboard = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-center">
               <div>
                 <p className="text-2xl font-bold text-green-600">
-                  {stats.onboardingStages.paymentCompleted}
+                  {stats.onboardingStages.onboardingSubmissions}
                 </p>
                 <p className="text-sm text-gray-600">Ready for Onboarding</p>
               </div>

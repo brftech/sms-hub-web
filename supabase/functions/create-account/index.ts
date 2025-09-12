@@ -184,10 +184,10 @@ serve(async (req) => {
         .from("memberships")
         .insert([
           {
-            user_profile_id: authData.user.id,
+            user_id: authData.user.id,
             company_id: companyId,
             role: "OWNER", // First user is the owner
-            is_active: true,
+            hub_id: verificationRequest.hub_id,
           },
         ]);
 

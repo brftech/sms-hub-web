@@ -110,9 +110,6 @@ serve(async (req) => {
             if (customer) {
               // Update existing customer
               const updateData: any = {
-                last_payment_amount: paymentAmount,
-                last_payment_at: new Date().toISOString(),
-                total_spent: (customer.total_spent || 0) + paymentAmount,
                 updated_at: new Date().toISOString(),
               };
               
@@ -144,17 +141,11 @@ serve(async (req) => {
                   billing_email: session.customer_details?.email || session.metadata?.email || "unknown@example.com",
                   customer_type: session.metadata?.customer_type || "b2b",
                   stripe_customer_id: session.customer as string,
-                  last_payment_amount: paymentAmount,
-                  last_payment_at: new Date().toISOString(),
-                  total_spent: paymentAmount,
                   subscription_status: isOneTimePurchase ? "active" : "pending",
                   subscription_tier: isOneTimePurchase ? "one_time" : "starter",
                   is_active: true,
-                  metadata: {
-                    company_id: session.metadata.company_id,
-                    checkout_session_id: session.id,
-                    payment_type: isOneTimePurchase ? "one_time" : "subscription"
-                  }
+                  company_id: session.metadata.company_id,
+                  user_id: session.metadata.user_id
                 });
                 
               if (customerCreateError) {

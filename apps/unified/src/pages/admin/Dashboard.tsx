@@ -13,7 +13,6 @@ import {
   UserPlus,
   Shield,
   CreditCard,
-  UserCheck,
   FileText,
   Globe,
   Phone,
@@ -147,11 +146,6 @@ const Dashboard = () => {
         label: string;
       };
     } = {
-      signup: {
-        icon: UserPlus,
-        color: "text-blue-600",
-        label: "Signup",
-      },
       verification: {
         icon: Shield,
         color: "text-yellow-600",
@@ -341,9 +335,9 @@ const Dashboard = () => {
               <h2 className="text-base sm:text-lg font-medium text-foreground">
                 Payment Track
               </h2>
-              <p className="text-xs sm:text-sm text-muted-foreground">
-                Signup → Verification → Account Creation → Payment
-              </p>
+                    <p className="text-xs sm:text-sm text-muted-foreground">
+                      Verification → Account Creation → Payment
+                    </p>
             </div>
             <div className="text-left sm:text-right">
               <p className="text-xl sm:text-2xl font-bold text-foreground">
@@ -359,7 +353,7 @@ const Dashboard = () => {
             {Object.entries(stats.onboardingStages).map(([stage, count]) => {
               const stageInfo = getStageInfo(stage);
               const IconComponent = stageInfo.icon;
-              const isPaymentStage = ['signup', 'verification', 'verified', 'accountCreated', 'paymentPending', 'paymentCompleted'].includes(stage);
+              const isPaymentStage = ['verification', 'verified', 'accountCreated', 'paymentPending', 'paymentCompleted'].includes(stage);
               
               if (!isPaymentStage) return null; // Only show payment stages
               
@@ -393,9 +387,9 @@ const Dashboard = () => {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
               <div>
                 <p className="text-2xl font-bold text-blue-600">
-                  {stats.onboardingStages.signup}
+                  {stats.onboardingStages.verification}
                 </p>
-                <p className="text-sm text-gray-600">Total Signups</p>
+                <p className="text-sm text-gray-600">Verification Sent</p>
               </div>
               <div>
                 <p className="text-2xl font-bold text-orange-600">

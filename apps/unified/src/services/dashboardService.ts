@@ -29,7 +29,6 @@ export interface HubBreakdown {
 }
 
 export interface OnboardingStageStats {
-  signup: number;           // User submitted signup form
   verification: number;     // Verification code sent
   verified: number;         // Verification completed
   accountCreated: number;   // User profile and company created
@@ -491,7 +490,7 @@ class DashboardService {
 
   async getOnboardingStageStats(hubId: number): Promise<OnboardingStageStats> {
     try {
-      // Get verifications data to track signup and verification flow
+      // Get verifications data to track verification flow
       const { data: verifications, error: verificationsError } = await this.supabase
         .from("verifications")
         .select("id, verification_sent_at, verification_completed_at, created_at")
@@ -522,7 +521,6 @@ class DashboardService {
       if (onboardingError) throw onboardingError;
 
       const stageCounts = {
-        signup: 0,
         verification: 0,
         verified: 0,
         accountCreated: 0,
@@ -536,9 +534,6 @@ class DashboardService {
         onboardingComplete: 0,
       };
 
-      // Count signups (verifications created)
-      stageCounts.signup = verifications?.length || 0;
-
       // Count verification sent (verification_sent_at exists)
       stageCounts.verification = verifications?.filter(v => v.verification_sent_at).length || 0;
 
@@ -550,7 +545,7 @@ class DashboardService {
 
       // Count payment statuses
       companies?.forEach((company) => {
-        const paymentStatus = company.customers?.[0]?.payment_status;
+        const paymentStatus = (company.customers as any)?.[0]?.payment_status;
         if (paymentStatus === "completed") {
           stageCounts.paymentCompleted++;
         } else if (paymentStatus === "pending") {
@@ -593,7 +588,6 @@ class DashboardService {
       console.error("Error fetching onboarding stage stats:", error);
       // Return default values if there's an error
       return {
-        signup: 0,
         verification: 0,
         verified: 0,
         accountCreated: 0,
@@ -639,7 +633,7 @@ class DashboardService {
 
       return (
         companies?.map((company) => {
-          const paymentStatus = company.customers?.[0]?.payment_status;
+          const paymentStatus = (company.customers as any)?.[0]?.payment_status;
           const onboardingSubmission = company.onboarding_submissions?.[0];
           
           let stage = "accountCreated"; // Default to account created since company exists
@@ -678,7 +672,6 @@ class DashboardService {
           }
           
           const stageOrder = [
-            "signup",
             "verification", 
             "verified",
             "accountCreated",
@@ -768,7 +761,7 @@ class DashboardService {
 
       return (
         companies?.map((company) => {
-          const paymentStatus = company.customers?.[0]?.payment_status;
+          const paymentStatus = (company.customers as any)?.[0]?.payment_status;
           const onboardingSubmission = company.onboarding_submissions?.[0];
           
           let stage = "accountCreated"; // Default to account created since company exists
@@ -807,7 +800,6 @@ class DashboardService {
           }
           
           const stageOrder = [
-            "signup",
             "verification", 
             "verified",
             "accountCreated",
@@ -909,7 +901,6 @@ class DashboardService {
       if (onboardingError) throw onboardingError;
 
       const stageCounts = {
-        signup: 0,
         verification: 0,
         verified: 0,
         accountCreated: 0,
@@ -923,9 +914,6 @@ class DashboardService {
         onboardingComplete: 0,
       };
 
-      // Count signups (verifications created)
-      stageCounts.signup = verifications?.length || 0;
-
       // Count verification sent (verification_sent_at exists)
       stageCounts.verification = verifications?.filter(v => v.verification_sent_at).length || 0;
 
@@ -937,7 +925,7 @@ class DashboardService {
 
       // Count payment statuses
       companies?.forEach((company) => {
-        const paymentStatus = company.customers?.[0]?.payment_status;
+        const paymentStatus = (company.customers as any)?.[0]?.payment_status;
         if (paymentStatus === "completed") {
           stageCounts.paymentCompleted++;
         } else if (paymentStatus === "pending") {
@@ -980,7 +968,6 @@ class DashboardService {
       console.error("Error fetching global onboarding stage stats:", error);
       // Return default values if there's an error
       return {
-        signup: 0,
         verification: 0,
         verified: 0,
         accountCreated: 0,

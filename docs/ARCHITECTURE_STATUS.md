@@ -11,6 +11,7 @@
 - **Authentication**: Supabase Auth with real PostgreSQL credentials + SMS OTP
 - **State Management**: React Query (TanStack Query)
 - **Type Safety**: TypeScript with shared types package
+- **Database**: PostgreSQL with comprehensive type definitions
 
 ### Simplified App Structure
 
@@ -27,7 +28,8 @@ sms-hub-monorepo/
 │   ├── supabase/    # Supabase client & queries
 │   ├── utils/       # Utility functions
 │   ├── hub-logic/   # Hub configuration & logic
-│   └── sms-auth/    # SMS authentication components
+│   ├── services/    # Shared service layer
+│   └── dev-auth/    # Development authentication
 └── supabase/
     ├── functions/   # Edge Functions (Deno)
     └── migrations/  # Database migrations
@@ -77,7 +79,7 @@ graph TD
 ### Authentication Methods
 
 1. **Real Authentication**: Supabase with PostgreSQL storage
-2. **Superadmin Access**: superadmin@sms-hub.com / SuperAdmin123!
+2. **Superadmin Access**: superadmin@gnymble.com / SuperAdmin123!
 3. **Development Mode**: Add ?superadmin=dev123 to URL (no persistence)
 4. **SMS OTP**: Available for additional verification
 
@@ -98,18 +100,21 @@ The `apps/unified` app now handles:
   - Contact management
   - Message history
   - Account settings
+  - Onboarding progress tracking
 
 - **Admin Functions**:
   - Company management  
   - User administration
   - System monitoring
   - Analytics dashboard
+  - **Data cleanup tools** (NEW)
 
 - **Superadmin Functions**:
   - Cross-hub access
   - System administration
   - Platform configuration
   - Global analytics
+  - **Payment track cleanup** (NEW)
 
 ### Role-Based UI
 
@@ -128,70 +133,73 @@ const DashboardContent = () => {
 };
 ```
 
-## 🔑 Key Technical Benefits
+## 🗄️ Database Schema (January 2025)
 
-### 1. Simplified Development
-- Single codebase for all authenticated functionality
-- Shared components and state management
-- Unified build and deployment process
+### Core Tables
 
-### 2. Better User Experience
-- No app switching for different roles
-- Consistent UI/UX across all functions
-- Faster navigation between features
+#### `verifications`
+- Stores verification requests and completion status
+- Links to user via `existing_user_id` after account creation
+- **Key fields**: `id`, `hub_id`, `email`, `mobile_phone`, `verification_code`, `verification_sent_at`, `verification_completed_at`
 
-### 3. Easier Maintenance
-- Single authentication system
-- Shared dependencies and configurations
-- Simplified testing and deployment
+#### `user_profiles`
+- User profile information
+- Links to Supabase Auth via `id`
+- **Key fields**: `id`, `email`, `first_name`, `last_name`, `signup_type`, `mobile_phone`
 
-### 4. Enhanced Security
-- Centralized access control
-- Single session management
-- Consistent security policies
+#### `companies`
+- Business entity information
+- Created by `created_by_user_id`
+- **Key fields**: `id`, `hub_id`, `public_name`, `legal_name`, `company_account_number`, `created_by_user_id`, `first_admin_user_id`
 
-## 📦 Package Structure
+#### `customers`
+- Paying entity information
+- Links to company via `company_id`
+- Contains payment status and Stripe information
+- **Key fields**: `id`, `company_id`, `user_id`, `billing_email`, `payment_status`, `payment_type`, `stripe_customer_id`
 
-### UI Components (`packages/ui`)
-- styled-components based components
-- **NO CSS file imports** allowed
-- Hub-aware theming via CSS custom properties
-- Reusable across all apps
+#### `memberships`
+- Links users to companies
+- Defines user roles within companies
+- **Key fields**: `id`, `user_id`, `company_id`, `hub_id`, `role`
 
-### Types (`packages/types`)
-- Database types generated from Supabase
-- Shared TypeScript interfaces
-- Hub configuration types
-- Authentication types
+#### `onboarding_submissions`
+- Tracks post-payment onboarding progress
+- Contains current step and completion status
+- **Key fields**: `id`, `user_id`, `company_id`, `current_step`, `step_data`, `completed_at`
 
-### Supabase Client (`packages/supabase`)
-- Factory pattern for Vite environment variables
-- React Query hooks for data fetching
-- Centralized database operations
-- Session management utilities
+### Schema Relationships
 
-## 🚀 Development Workflow
-
-### Environment Setup
-```bash
-# Install dependencies
-pnpm install
-
-# Set up environment variables
-cp .env.example .env.local
-# Add Supabase URL and keys
-
-# Run development servers
-pnpm dev  # Starts both web (3000) and unified (3001)
+```
+auth.users (Supabase Auth)
+    ↓
+user_profiles (1:1)
+    ↓
+memberships (1:many)
+    ↓
+companies (1:1)
+    ↓
+customers (1:1)
+    ↓
+onboarding_submissions (1:many)
 ```
 
-### Key Commands
-- `pnpm dev` - Start both web and unified apps
-- `pnpm dev --filter=@sms-hub/web` - Start only web app
-- `pnpm dev --filter=@sms-hub/unified` - Start only unified app
-- `pnpm build` - Build all applications
-- `pnpm lint` - ESLint across monorepo
-- `turbo run build` - Parallel builds with caching
+## 🔧 Edge Functions
+
+### Authentication & Verification
+- **`submit-verification`**: Creates verification record, sends SMS/email
+- **`verify-code`**: Verifies OTP code, updates completion timestamp
+- **`create-account`**: Creates user, profile, company, customer, membership records
+
+### Payment Processing
+- **`create-checkout-session`**: Creates Stripe checkout session
+- **`verify-payment`**: Verifies payment status, updates customer record
+- **`stripe-webhook`**: Handles Stripe webhook events
+
+### Admin Operations
+- **`create-superadmin`**: Creates superadmin user and records
+- **`superadmin-auth`**: Handles superadmin authentication
+- **`authenticate-after-payment`**: Post-payment authentication
 
 ## 🎨 Styling Standards
 
@@ -229,6 +237,7 @@ VITE_SUPABASE_ANON_KEY=[anon-key]
 
 # Development flags
 VITE_DEVELOPMENT_MODE=true
+VITE_DEV_AUTH_TOKEN=dev123
 ```
 
 ### Supabase Edge Functions
@@ -236,15 +245,18 @@ VITE_DEVELOPMENT_MODE=true
 # Edge Functions (Deno environment)
 SUPABASE_URL=https://vgpovgpwqkjnpnrjelyg.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=[service-role-key]
+ZAPIER_SMS_WEBHOOK_URL=[zapier-webhook-url]
+RESEND_API_KEY=[resend-api-key]
+STRIPE_SECRET_KEY=[stripe-secret-key]
 ```
 
 ## 📊 Multi-Tenancy (Hub System)
 
 ### Hub Configuration
-- **PercyTech**: Hub ID 1
-- **Gnymble**: Hub ID 2  
-- **PercyMD**: Hub ID 3
-- **PercyText**: Hub ID 4
+- **PercyTech**: Hub ID 0
+- **Gnymble**: Hub ID 1  
+- **PercyMD**: Hub ID 2
+- **PercyText**: Hub ID 3
 
 ### Database Operations
 ```typescript
@@ -252,9 +264,33 @@ SUPABASE_SERVICE_ROLE_KEY=[service-role-key]
 const { data } = await supabase
   .from("campaigns")
   .select("*")
-  .eq("hub_id", hubConfig.id)
+  .eq("hub_id", hubConfig.hubNumber)
   .eq("company_id", companyId);
 ```
+
+## 🚀 Development Workflow
+
+### Environment Setup
+```bash
+# Install dependencies
+pnpm install
+
+# Set up environment variables
+cp .env.example .env.local
+# Add Supabase URL and keys
+
+# Run development servers
+pnpm dev  # Starts both web (3000) and unified (3001)
+```
+
+### Key Commands
+- `pnpm dev` - Start both web and unified apps
+- `pnpm dev --filter=@sms-hub/web` - Start only web app
+- `pnpm dev --filter=@sms-hub/unified` - Start only unified app
+- `pnpm build` - Build all applications
+- `pnpm lint` - ESLint across monorepo
+- `pnpm type-check` - TypeScript type checking
+- `turbo run build` - Parallel builds with caching
 
 ## 🏁 Production Readiness
 
@@ -270,6 +306,46 @@ const { data } = await supabase
 - Code splitting in Vite
 - React Query data caching
 - Styled-components runtime optimization
+
+## 🎯 Recent Major Updates (January 2025)
+
+### Schema Alignment & Type Safety
+1. **Database Schema Cleanup**:
+   - Separated `companies` (business entities) from `customers` (paying entities)
+   - Moved `billing_email`, `payment_status`, `payment_type` to `customers` table
+   - Removed redundant fields from `companies` table
+   - Added proper foreign key relationships
+
+2. **Type System Overhaul**:
+   - Updated all TypeScript types to match current database schema
+   - Fixed 125+ type errors across the codebase
+   - Service layer now uses correct database types
+   - Comprehensive type checking implemented
+
+3. **Payment Track Cleanup Tools**:
+   - Added dashboard cleanup functionality
+   - Preview mode shows what would be deleted
+   - Execute mode deletes all payment track data except superadmin
+   - Preserves hub records and superadmin data
+
+4. **Service Layer Updates**:
+   - Updated `companiesService.ts` to use correct schema
+   - Updated `customersService.ts` to use correct schema
+   - Updated `phoneNumbersService.ts` to use correct schema
+   - All services now align with database schema
+
+### Authentication & Security
+1. **Security Architecture**:
+   - Frontend uses ONLY anon key via `getSupabaseClient`
+   - Admin operations moved to Edge Functions
+   - Service role key never exposed in frontend
+   - RLS currently disabled (manual hub_id filtering required)
+
+2. **Authentication Methods**:
+   - Real Supabase authentication with PostgreSQL storage
+   - Superadmin access: superadmin@gnymble.com / SuperAdmin123!
+   - Development mode: `?superadmin=dev123` URL parameter
+   - SMS OTP available for additional verification
 
 ## 🎯 Future Considerations
 
@@ -295,7 +371,11 @@ const { data } = await supabase
 - ✅ **Build System**: Turbo + pnpm optimized
 - ✅ **Database**: PostgreSQL with real authentication
 - ✅ **Edge Functions**: Deployed and operational
+- ✅ **Schema Alignment**: Complete type safety implemented
+- ✅ **Payment Track Cleanup**: Dashboard tools implemented
 
 **Status**: ✅ **PRODUCTION READY** - Unified architecture is stable and deployed.
 
-The SMS Hub platform has successfully consolidated into a clean, maintainable architecture with clear separation between marketing/auth (web) and functionality (unified), while maintaining all the benefits of the monorepo structure.
+**Recent Achievement**: ✅ **SCHEMA ALIGNMENT COMPLETE** - All type mismatches resolved, comprehensive type checking implemented.
+
+The SMS Hub platform has successfully consolidated into a clean, maintainable architecture with comprehensive type safety and data cleanup tools. The foundation is solid for continued development.

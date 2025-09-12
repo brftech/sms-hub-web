@@ -1,48 +1,137 @@
 # SMS Hub Documentation
 
-This directory contains comprehensive documentation for the SMS Hub monorepo project.
+## 📚 Documentation Overview
 
-## 📚 Documentation Index
+This directory contains comprehensive documentation for the SMS Hub monorepo project. All documentation is kept up-to-date with the current state of the project.
+
+## 📖 Documentation Files
 
 ### Core Documentation
+- **[PROJECT_SUMMARY.md](./PROJECT_SUMMARY.md)** - Comprehensive project overview
+- **[ARCHITECTURE_STATUS.md](./ARCHITECTURE_STATUS.md)** - Current architecture status
+- **[ONBOARDING_FLOW.md](./ONBOARDING_FLOW.md)** - Complete user onboarding process
+- **[QUICK_START.md](./QUICK_START.md)** - Quick start guide for new developers
+- **[PORT_ASSIGNMENTS.md](./PORT_ASSIGNMENTS.md)** - Port configuration and usage
 
-- **[PROJECT_SUMMARY.md](./PROJECT_SUMMARY.md)** - Complete project overview, tech stack, and database schema
-- **[ARCHITECTURE_STATUS.md](./ARCHITECTURE_STATUS.md)** - Current architecture state and consolidation status
-- **[AUTHENTICATION_ARCHITECTURE.md](./AUTHENTICATION_ARCHITECTURE.md)** - Security architecture and authentication flows
+### Development Guides
+- **[CLAUDE.md](../CLAUDE.md)** - Main development instructions (in root)
+- **[README.md](../README.md)** - Project README (in root)
 
-### Reference Documents
+## 🎯 Documentation Purpose
 
-- **[PORT_ASSIGNMENTS.md](./PORT_ASSIGNMENTS.md)** - Port assignments for all applications
-- **[CIGAR_LANDING_PAGE.md](./CIGAR_LANDING_PAGE.md)** - Landing page implementation details
+### For New Developers
+- **QUICK_START.md**: Get up and running quickly
+- **PROJECT_SUMMARY.md**: Understand the project scope
+- **ARCHITECTURE_STATUS.md**: Learn the current architecture
 
-### Historical Documents
+### For Experienced Developers
+- **ONBOARDING_FLOW.md**: Understand the complete user journey
+- **PORT_ASSIGNMENTS.md**: Configure development environment
+- **CLAUDE.md**: Detailed development guidelines
 
-- **[2025-01-authentication-fixes.md](./2025-01-authentication-fixes.md)** - Authentication system fixes and updates
-- **[2025-01-layout-comparison.md](./2025-01-layout-comparison.md)** - Comparison of legacy vs unified app layouts
+### For Project Managers
+- **PROJECT_SUMMARY.md**: High-level project overview
+- **ARCHITECTURE_STATUS.md**: Current development status
+- **ONBOARDING_FLOW.md**: User experience documentation
 
-## 🚀 Quick Start
+## 🔄 Documentation Updates
 
-1. Start with [PROJECT_SUMMARY.md](./PROJECT_SUMMARY.md) for an overview
-2. Review [ARCHITECTURE_STATUS.md](./ARCHITECTURE_STATUS.md) for current state
-3. Check [AUTHENTICATION_ARCHITECTURE.md](./AUTHENTICATION_ARCHITECTURE.md) for security guidelines
+### When to Update
+- After major architectural changes
+- When adding new features
+- When fixing critical bugs
+- When changing development workflow
 
-## 🔐 Key Security Notes
+### How to Update
+1. Update the relevant documentation file
+2. Update the main CLAUDE.md file
+3. Update this README if needed
+4. Commit with descriptive message
 
-- Frontend apps use ONLY the anon key
-- Service role key is restricted to Edge Functions and backend API
-- All admin operations must go through Edge Functions
-- RLS is currently disabled - manual hub_id filtering required
+## 📊 Documentation Status
 
-## 📝 Documentation Standards
+### Current Status (January 2025)
+- ✅ **PROJECT_SUMMARY.md**: Up-to-date with current architecture
+- ✅ **ARCHITECTURE_STATUS.md**: Reflects recent schema alignment
+- ✅ **ONBOARDING_FLOW.md**: Complete user journey documented
+- ✅ **QUICK_START.md**: Ready for new developers
+- ✅ **PORT_ASSIGNMENTS.md**: Current port configuration
+- ✅ **CLAUDE.md**: Comprehensive development guide
 
-- Use Markdown for all documentation
-- Include diagrams where helpful (Mermaid supported)
-- Keep documents up-to-date with code changes
-- Date historical documents for context
+### Recent Updates
+- **Schema Alignment**: Updated all docs to reflect new database schema
+- **Payment Track Cleanup**: Added documentation for new admin tools
+- **Type Safety**: Updated to reflect comprehensive TypeScript implementation
+- **Architecture Consolidation**: Updated to reflect unified app structure
 
-## 🔄 Recent Updates (2025-09-11)
+## 🎯 Key Information
 
-- Added AUTHENTICATION_ARCHITECTURE.md for security guidelines
-- Updated all documents to reflect current architecture
-- Clarified frontend/backend security separation
-- Updated superadmin credentials to use @gnymble.com
+### Project Status
+- **Architecture**: ✅ Production Ready
+- **Schema Alignment**: ✅ Complete
+- **Type Safety**: ✅ Comprehensive
+- **Payment Track Cleanup**: ✅ Implemented
+- **UI Component Updates**: 🚧 In Progress
+
+### Development Focus
+- **Immediate**: Update UI components to match new schema
+- **Short Term**: Improve error handling and testing
+- **Long Term**: Mobile apps and advanced analytics
+
+### Critical Rules
+1. **NO CSS files** - Use styled-components only
+2. **Always include hub_id** in database operations
+3. **Use import.meta.env** in Vite apps
+4. **Never expose service role key** in frontend
+5. **Always handle errors** gracefully
+
+## 🔧 Quick Reference
+
+### Start Development
+```bash
+pnpm install
+pnpm dev
+```
+
+### Access Points
+- **Web App**: http://localhost:3000
+- **Unified App**: http://localhost:3001
+- **Superadmin**: http://localhost:3001/?superadmin=dev123
+
+### Key Commands
+- `pnpm type-check` - TypeScript validation
+- `pnpm lint` - Code linting
+- `pnpm build` - Build all apps
+- `supabase db push` - Run database migrations
+
+## 📚 Additional Resources
+
+### External Documentation
+- [Supabase Documentation](https://supabase.com/docs)
+- [React Documentation](https://react.dev)
+- [Vite Documentation](https://vitejs.dev)
+- [Styled Components](https://styled-components.com)
+
+### Internal Resources
+- `packages/types/src/database-comprehensive.ts` - Database types
+- `packages/ui/src/` - Component library
+- `supabase/functions/` - Edge Functions
+- `supabase/migrations/` - Database migrations
+
+## 🤝 Contributing to Documentation
+
+### Guidelines
+1. **Keep it current**: Update docs when making changes
+2. **Be comprehensive**: Include all relevant information
+3. **Use clear language**: Write for developers of all levels
+4. **Include examples**: Show, don't just tell
+5. **Test instructions**: Verify all commands and steps work
+
+### Documentation Standards
+- Use markdown formatting consistently
+- Include code examples where helpful
+- Keep file names descriptive
+- Update this README when adding new docs
+- Cross-reference related documentation
+
+This documentation is maintained to help developers understand and work effectively with the SMS Hub platform. Keep it updated and comprehensive!

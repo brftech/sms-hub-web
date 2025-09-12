@@ -289,7 +289,7 @@ const Dashboard = () => {
       
       const { data: debugVerifications } = await supabase
         .from('verifications')
-        .select('id, existing_user_id, mobile_phone_number');
+        .select('id, existing_user_id, mobile_phone, is_existing_user');
       preview += `Verifications table: ${JSON.stringify(debugVerifications, null, 2)}\n\n`;
 
       // Count records that would be deleted
@@ -323,16 +323,12 @@ const Dashboard = () => {
               .eq('id', superadminUserId);
             superadminCount = superadminUserCount || 0;
           } else if (table.name === 'companies') {
-            // Check if this is the superadmin company
-            if (superadminCompanyId) {
-              const { count: superadminCompanyCount } = await supabase
-                .from(table.name)
-                .select('*', { count: 'exact', head: true })
-                .eq('id', superadminCompanyId);
-              superadminCount = superadminCompanyCount || 0;
-            } else {
-              superadminCount = 0;
-            }
+            // Check for companies where either created_by_user_id OR first_admin_user_id matches superadmin
+            const { count: superadminCompanyCount } = await supabase
+              .from(table.name)
+              .select('*', { count: 'exact', head: true })
+              .or(`created_by_user_id.eq.${superadminUserId},first_admin_user_id.eq.${superadminUserId}`);
+            superadminCount = superadminCompanyCount || 0;
           } else if (table.name === 'verifications') {
             // Verifications table uses existing_user_id, not user_id
             const { count: superadminVerificationCount } = await supabase
@@ -346,17 +342,7 @@ const Dashboard = () => {
               .from(table.name)
               .select('*', { count: 'exact', head: true })
               .eq('user_id', superadminUserId);
-            // Also check for customers that belong to superadmin companies
-            const { count: superadminCustomerCount2 } = await supabase
-              .from(table.name)
-              .select('*', { count: 'exact', head: true })
-              .in('company_id', 
-                supabase
-                  .from('companies')
-                  .select('id')
-                  .or('public_name.like.%superadmin%,public_name.like.%Gnymble Support%')
-              );
-            superadminCount = (superadminCustomerCount1 || 0) + (superadminCustomerCount2 || 0);
+            superadminCount = superadminCustomerCount1 || 0;
           } else {
             // For other tables, check user_id
             const { count: superadminRecordCount } = await supabase

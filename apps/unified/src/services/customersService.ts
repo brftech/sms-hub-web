@@ -1,19 +1,11 @@
 import { getSupabaseClient } from "../lib/supabaseSingleton";
+import type { Customer } from "@sms-hub/types";
 
-export interface Customer {
-  id: string;
-  company_id: string | null;
-  user_id: string | null;
-  billing_email: string;
-  customer_type: string;
-  hub_id: number;
-  stripe_customer_id: string | null;
-  subscription_status: string | null;
-  subscription_tier: string | null;
-  is_active: boolean | null;
-  trial_ends_at: string | null;
-  created_at: string | null;
-  updated_at: string | null;
+// Re-export for components that import from this service
+export type { Customer };
+
+// Extended Customer type with joined data
+export interface CustomerWithJoins extends Customer {
   // Joined data
   company: {
     id: string;
@@ -42,7 +34,7 @@ export interface CustomerFilters {
 class CustomersService {
   private supabase = getSupabaseClient();
 
-  async getCustomers(filters: CustomerFilters = {}): Promise<Customer[]> {
+  async getCustomers(filters: CustomerFilters = {}): Promise<CustomerWithJoins[]> {
     try {
       let query = this.supabase.from("customers").select(`
           *,
@@ -155,7 +147,7 @@ class CustomersService {
     }
   }
 
-  async createCustomer(customerData: Partial<Customer>): Promise<Customer> {
+  async createCustomer(customerData: Partial<Customer>): Promise<CustomerWithJoins> {
     try {
       const { data, error } = await this.supabase
         .from("customers")
@@ -205,7 +197,7 @@ class CustomersService {
   async updateCustomer(
     id: string,
     updates: Partial<Customer>
-  ): Promise<Customer> {
+  ): Promise<CustomerWithJoins> {
     try {
       const { data, error } = await this.supabase
         .from("customers")

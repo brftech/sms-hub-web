@@ -2,16 +2,16 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { createAuthService } from "./auth";
 import { createSupabaseClient } from "./client";
 import { Company, UserProfile } from "@sms-hub/types";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 // Create a single supabase client instance
-const getSupabaseClient = () => {
+const getSupabaseClient = (): SupabaseClient => {
   // Get from window if available (set by user app)
   if (
     typeof window !== "undefined" &&
-    (window as { __supabaseClient?: unknown }).__supabaseClient
+    (window as { __supabaseClient?: SupabaseClient }).__supabaseClient
   ) {
-    return (window as { __supabaseClient: unknown })
-      .__supabaseClient as unknown;
+    return (window as any).__supabaseClient as SupabaseClient;
   }
 
   // Otherwise create a new one
@@ -218,7 +218,7 @@ export const useCreateVerification = () => {
 
   return useMutation({
     mutationFn: (data: Record<string, unknown>) =>
-      authService.createVerification(data as Record<string, unknown>),
+      authService.createVerification(data as any),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["verifications"] });
     },
@@ -232,7 +232,7 @@ export const useVerifyCode = () => {
 
   return useMutation({
     mutationFn: (data: Record<string, unknown>) =>
-      authService.verifyCode(data as Record<string, unknown>),
+      authService.verifyCode(data as any),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user-profile"] });
     },

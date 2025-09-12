@@ -191,7 +191,7 @@ export const validate = <T>(
 };
 
 export const validatePartial = <T>(
-  schema: z.ZodSchema<T>,
+  _schema: z.ZodSchema<T>,
   data: unknown,
   context?: Record<string, unknown>
 ): Partial<T> => {

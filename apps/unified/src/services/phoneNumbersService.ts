@@ -1,14 +1,10 @@
 import { getSupabaseClient } from "../lib/supabaseSingleton";
+import type { Database } from "@sms-hub/types";
 
-export interface PhoneNumber {
-  id: string;
-  hub_id: number;
-  company_id: string | null;
-  phone_number: string;
-  assigned_to_campaign: string | null;
-  campaign_id?: string;
-  created_at: string | null;
-  updated_at: string | null;
+// Base PhoneNumber type from database
+type PhoneNumberBase = Database["public"]["Tables"]["phone_numbers"]["Row"];
+
+export interface PhoneNumber extends PhoneNumberBase {
   // Joined data
   company: {
     id: string;

@@ -1,37 +1,9 @@
 import { getSupabaseClient } from "../lib/supabaseSingleton";
 import type { SupabaseClient } from "@sms-hub/supabase";
+import type { Company } from "@sms-hub/types";
 
-export interface Company {
-  id: string;
-  hub_id: number;
-  public_name: string;
-  legal_name?: string | null;
-  company_account_number: string;
-  billing_email: string;
-  company_phone_number?: string | null;
-  point_of_contact_email?: string | null;
-  website?: string | null;
-  address?: string | null;
-  address_street?: string | null;
-  city?: string | null;
-  state_region?: string | null;
-  postal_code?: string | null;
-  country_of_registration?: string | null;
-  industry?: string | null;
-  vertical_type?: string | null;
-  size?: string | null;
-  legal_form?: string | null;
-  ein?: string | null;
-  tax_issuing_country?: string | null;
-  billing_address?: any | null;
-  stripe_customer_id?: string | null;
-  subscription_status?: string | null;
-  is_active?: boolean | null;
-  account_onboarding_step?: string | null;
-  created_by_profile_id?: string | null;
-  created_at?: string | null;
-  updated_at?: string | null;
-}
+// Re-export for components that import from this service
+export type { Company };
 
 export interface CompanyStats {
   total: number;
@@ -106,7 +78,7 @@ class CompaniesService {
 
     if (options?.search) {
       query = query.or(
-        `public_name.ilike.%${options.search}%,legal_name.ilike.%${options.search}%,billing_email.ilike.%${options.search}%,company_account_number.ilike.%${options.search}%`
+        `public_name.ilike.%${options.search}%,legal_name.ilike.%${options.search}%,company_account_number.ilike.%${options.search}%`
       );
     }
 
@@ -159,15 +131,15 @@ class CompaniesService {
       bySubscriptionTier: {},
     };
 
-    // Calculate industry distribution
+    // Calculate industry distribution (field removed from schema)
     companies.forEach((company) => {
-      const industry = company.industry || "Unknown";
+      const industry = "Unknown"; // Field removed from schema
       stats.byIndustry[industry] = (stats.byIndustry[industry] || 0) + 1;
     });
 
-    // Calculate size distribution
+    // Calculate size distribution (field removed from schema)
     companies.forEach((company) => {
-      const size = company.size || "Unknown";
+      const size = "Unknown"; // Field removed from schema
       stats.bySize[size] = (stats.bySize[size] || 0) + 1;
     });
 
@@ -273,15 +245,15 @@ class CompaniesService {
         bySubscriptionTier: {},
       };
 
-      // Calculate industry distribution
+      // Calculate industry distribution (field removed from schema)
       companies?.forEach((company) => {
-        const industry = company.industry || "Unknown";
+        const industry = "Unknown"; // Field removed from schema
         stats.byIndustry[industry] = (stats.byIndustry[industry] || 0) + 1;
       });
 
-      // Calculate size distribution
+      // Calculate size distribution (field removed from schema)
       companies?.forEach((company) => {
-        const size = company.size || "Unknown";
+        const size = "Unknown"; // Field removed from schema
         stats.bySize[size] = (stats.bySize[size] || 0) + 1;
       });
 
@@ -343,7 +315,7 @@ class CompaniesService {
     try {
       const { error } = await this.supabase
         .from("companies")
-        .update({ account_onboarding_step: onboardingStep })
+        .update({ /* account_onboarding_step field removed from schema */ })
         .eq("id", companyId);
 
       if (error) {
@@ -375,7 +347,7 @@ class CompaniesService {
             public_name: company.public_name || "Unnamed Company",
             company_account_number:
               company.company_account_number || `COMP-${Date.now()}`,
-            billing_email: company.billing_email || "billing@example.com",
+            // billing_email moved to customers table
             ...company,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),

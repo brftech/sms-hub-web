@@ -317,6 +317,13 @@ const Dashboard = () => {
               .select('*', { count: 'exact', head: true })
               .eq('first_admin_user_id', superadminUserId);
             superadminCount = (superadminCompanyCount1 || 0) + (superadminCompanyCount2 || 0);
+          } else if (table.name === 'verifications') {
+            // Verifications table uses existing_user_id, not user_id
+            const { count: superadminVerificationCount } = await supabase
+              .from(table.name)
+              .select('*', { count: 'exact', head: true })
+              .eq('existing_user_id', superadminUserId);
+            superadminCount = superadminVerificationCount || 0;
           } else {
             // For other tables, check user_id
             const { count: superadminRecordCount } = await supabase
@@ -377,6 +384,9 @@ const Dashboard = () => {
             deleteQuery = deleteQuery
               .neq('created_by_user_id', superadminUserId)
               .neq('first_admin_user_id', superadminUserId);
+          } else if (op.table === 'verifications') {
+            // Verifications table uses existing_user_id, not user_id
+            deleteQuery = deleteQuery.neq('existing_user_id', superadminUserId);
           } else {
             deleteQuery = deleteQuery.neq('user_id', superadminUserId);
           }

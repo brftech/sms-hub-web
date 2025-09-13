@@ -23,6 +23,7 @@ import Demo from "./pages/Demo";
 // Import auth pages
 import { Login } from "./pages/Login";
 import { Signup } from "./pages/Signup";
+import { CheckEmail } from "./pages/CheckEmail";
 import { VerifyOtp } from "./pages/VerifyOtp";
 import { VerifyCode } from "./pages/VerifyCode";
 import { TestAuth } from "./pages/TestAuth";
@@ -224,6 +225,14 @@ const AppRoutes = () => {
         element={
           <PageTransition>
             <Signup />
+          </PageTransition>
+        }
+      />
+      <Route
+        path="/check-email"
+        element={
+          <PageTransition>
+            <CheckEmail />
           </PageTransition>
         }
       />

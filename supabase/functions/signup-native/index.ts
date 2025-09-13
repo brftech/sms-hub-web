@@ -335,17 +335,19 @@ serve(async (req) => {
       }
     }
 
-    // Generate a session for immediate login
-    const { data: sessionData, error: sessionError } = await supabaseAdmin.auth.admin.generateLink({
-      type: "magiclink",
+    // Send magic link email via Supabase (this will actually send the email through Resend)
+    const { data: sessionData, error: sessionError } = await supabaseAdmin.auth.signInWithOtp({
       email: authData.user.email!,
       options: {
-        redirectTo: `${Deno.env.get("PUBLIC_SITE_URL") || "http://localhost:3001"}/payment-setup`,
+        shouldCreateUser: false, // User already exists
+        emailRedirectTo: `${Deno.env.get("PUBLIC_SITE_URL") || "http://localhost:3001"}/payment-setup`,
       },
     });
 
     if (sessionError) {
-      console.error("Failed to generate session:", sessionError);
+      console.error("Failed to send magic link email:", sessionError);
+    } else {
+      console.log("✅ Magic link email sent successfully via Resend");
     }
 
     console.log("✅ Signup completed successfully");
@@ -356,7 +358,7 @@ serve(async (req) => {
         user_id: authData.user.id,
         company_id: companyId,
         customer_id: customerId,
-        magic_link: sessionData?.properties?.action_link,
+        magic_link_sent: !sessionError,
         email: email,
         hub_id: invitationData ? invitationData.hub_id : hub_id,
         customer_type: customer_type,

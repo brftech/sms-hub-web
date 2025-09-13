@@ -276,15 +276,18 @@ export function Signup() {
         })
       );
 
-      // Use the magic link to authenticate as the new user
-      if (result.magic_link) {
-        console.log("Using magic link for authentication:", result.magic_link);
-        window.location.href = result.magic_link;
+      // Check if magic link email was sent successfully
+      if (result.magic_link_sent) {
+        console.log("Magic link email sent successfully to:", result.email);
+        
+        // Store email for the check-email page
+        sessionStorage.setItem('signup_email', result.email);
+        
+        // Redirect to check email page
+        window.location.href = '/check-email';
       } else {
-        // Fallback to direct redirect (shouldn't happen)
-        console.warn("No magic link returned, using direct redirect");
-        const unifiedAppUrl = import.meta.env.VITE_UNIFIED_APP_URL || "http://localhost:3001";
-        window.location.href = `${unifiedAppUrl}/payment-setup`;
+        console.warn("Magic link email failed to send");
+        setError("Account created but email failed to send. Please contact support or try logging in directly.");
       }
 
     } catch (err: unknown) {

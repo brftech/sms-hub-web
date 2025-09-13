@@ -4,6 +4,13 @@ import {
   UserViewModal,
   UserEditModal,
   UserDeleteModal,
+  BaseModal,
+  ModalSection,
+  ModalButtonGroup,
+  ModalButton,
+  ModalFormLayout,
+  ModalFormColumn,
+  ModalStepIndicator,
 } from "@sms-hub/ui";
 import { useGlobalView } from "../../contexts/GlobalViewContext";
 // Removed getSupabaseAdminClient import - admin operations should use Edge Functions or API endpoints
@@ -40,6 +47,18 @@ const Users = () => {
   const [selectedCompanyId, setSelectedCompanyId] = useState<string>("");
   const [createNewCompany, setCreateNewCompany] = useState(false);
   const [newCompanyName, setNewCompanyName] = useState("");
+  const [createUserStep, setCreateUserStep] = useState(0);
+  
+  // Form field state for multi-step form
+  const [createUserFormData, setCreateUserFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    password: "",
+    confirmPassword: "",
+    role: "MEMBER",
+  });
 
   // Modal states
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
@@ -137,6 +156,16 @@ const Users = () => {
     setSelectedCompanyId("");
     setCreateNewCompany(false);
     setNewCompanyName("");
+    setCreateUserStep(0);
+    setCreateUserFormData({
+      firstName: "",
+      lastName: "",
+      email: "",
+      phone: "",
+      password: "",
+      confirmPassword: "",
+      role: "MEMBER",
+    });
   };
 
   const handleCloseCreateModal = () => {
@@ -373,13 +402,10 @@ const Users = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground">
-            {isGlobalView ? "Global Users" : "Users"}
+            {isGlobalView 
+              ? "Global Users" 
+              : `${currentHub.charAt(0).toUpperCase() + currentHub.slice(1)} Users`}
           </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {isGlobalView
-              ? "Manage users from all hubs"
-              : `Manage users from ${currentHub} hub`}
-          </p>
         </div>
         <div className="flex items-center space-x-3">
           <div className="relative max-w-xs">
@@ -393,7 +419,11 @@ const Users = () => {
             />
           </div>
           <button
-            onClick={() => setIsCreateModalOpen(true)}
+            onClick={async () => {
+              setIsCreateModalOpen(true);
+              // Fetch companies for the default hub (PercyTech)
+              await fetchCompanies(0);
+            }}
             className="inline-flex items-center px-3 py-2 border border-transparent shadow-sm text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
           >
             <UserPlus className="w-4 h-4 mr-2" />
@@ -672,172 +702,275 @@ const Users = () => {
       </div>
 
       {/* Create User Modal */}
-      {isCreateModalOpen && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-            <div className="mt-3">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">
-                Create New User
-              </h3>
-              <form
-                autoComplete="off"
-                onSubmit={async (e) => {
-                  e.preventDefault();
-                  const formData = new FormData(e.target as any);
-                  const email = formData.get("email") as string;
-                  const password = formData.get("password") as string;
-                  const firstName = formData.get("firstName") as string;
-                  const lastName = formData.get("lastName") as string;
-                  const role = formData.get("role") as string;
+      <BaseModal
+        isOpen={isCreateModalOpen}
+        onClose={handleCloseCreateModal}
+        title="Create New User"
+        subtitle={createUserStep === 0 ? "Personal Information" : createUserStep === 1 ? "Account Settings" : "Organization"}
+        icon={<UserPlus className="w-5 h-5" />}
+        variant="default"
+        size="md"
+      >
+        <form
+          id="create-user-form"
+          autoComplete="off"
+          onSubmit={async (e) => {
+            e.preventDefault();
+            
+            if (createUserStep < 2) {
+              setCreateUserStep(createUserStep + 1);
+              return;
+            }
+            
+            // Validate passwords match
+            if (createUserFormData.password !== createUserFormData.confirmPassword) {
+              alert("Passwords do not match!");
+              setCreateUserStep(1); // Go back to password step
+              return;
+            }
 
-                  try {
-                    setIsUpdating(true);
+            // Prevent multiple submissions
+            if (isUpdating) {
+              console.log("Already submitting, ignoring duplicate request");
+              return;
+            }
 
-                    let companyId = selectedCompanyId;
+            try {
+              setIsUpdating(true);
 
-                    // Create new company if requested
-                    if (createNewCompany && newCompanyName.trim()) {
-                      console.log("Creating new company:", newCompanyName);
-                      const companyResult =
-                        await companiesService.instance.createCompany({
-                          public_name: newCompanyName.trim(),
-                          hub_id: selectedHubId,
-                          is_active: true,
-                        });
+              let companyId = selectedCompanyId;
 
-                      if (!companyResult.success) {
-                        throw new Error(
-                          `Failed to create company: ${companyResult.error}`
-                        );
-                      }
+              // Create new company if requested
+              if (createNewCompany && newCompanyName.trim()) {
+                console.log("Creating new company:", newCompanyName);
+                
+                // First check if company already exists
+                const existingCompanies = await companiesService.instance.getCompanies({
+                  hub_id: selectedHubId,
+                  search: newCompanyName.trim(),
+                });
+                
+                const exactMatch = existingCompanies.find(
+                  c => c.public_name.toLowerCase() === newCompanyName.trim().toLowerCase()
+                );
+                
+                if (exactMatch) {
+                  console.log("Company already exists, using existing:", exactMatch.id);
+                  companyId = exactMatch.id;
+                } else {
+                  const companyResult =
+                    await companiesService.instance.createCompany({
+                      public_name: newCompanyName.trim(),
+                      hub_id: selectedHubId,
+                      is_active: true,
+                    });
 
-                      companyId = companyResult.data?.id || "";
-                      console.log("Company created with ID:", companyId);
-                    }
-
-                    // Call the create-admin-user Edge Function
-                    const response = await fetch(
-                      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-admin-user`,
-                      {
-                        method: "POST",
-                        headers: {
-                          "Content-Type": "application/json",
-                          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-                        },
-                        body: JSON.stringify({
-                          email,
-                          password,
-                          first_name: firstName,
-                          last_name: lastName,
-                          role,
-                          hub_id: selectedHubId,
-                          company_id: companyId || undefined,
-                        }),
-                      }
+                  if (!companyResult.success) {
+                    throw new Error(
+                      `Failed to create company: ${companyResult.error}`
                     );
-
-                    const result = await response.json();
-
-                    if (!response.ok) {
-                      throw new Error(result.error || "Failed to create user");
-                    }
-
-                    console.log("User created successfully:", result);
-                    alert(
-                      `User created successfully! Account number: ${result.user.account_number}`
-                    );
-
-                    // Refresh the users list
-                    await fetchData();
-                    handleCloseCreateModal();
-                  } catch (error: unknown) {
-                    console.error("Error creating user:", error);
-                    const errorMessage =
-                      error instanceof Error ? error.message : "Unknown error";
-                    alert(`Failed to create user: ${errorMessage}`);
-                  } finally {
-                    setIsUpdating(false);
                   }
-                }}
-              >
-                <div className="space-y-4">
+
+                  companyId = companyResult.data?.id || "";
+                  console.log("Company created with ID:", companyId);
+                }
+              }
+
+              console.log("Creating user with data:", {
+                email: createUserFormData.email,
+                first_name: createUserFormData.firstName,
+                last_name: createUserFormData.lastName,
+                role: createUserFormData.role,
+                hub_id: selectedHubId,
+                company_id: companyId,
+                mobile_phone_number: createUserFormData.phone,
+              });
+
+              // Call the create-user Edge Function
+              const response = await fetch(
+                `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-user`,
+                {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+                  },
+                  body: JSON.stringify({
+                    email: createUserFormData.email,
+                    password: createUserFormData.password,
+                    first_name: createUserFormData.firstName,
+                    last_name: createUserFormData.lastName,
+                    role: createUserFormData.role,
+                    hub_id: selectedHubId,
+                    company_id: companyId || undefined,
+                    mobile_phone_number: createUserFormData.phone || undefined,
+                  }),
+                }
+              );
+
+              const result = await response.json();
+
+              if (!response.ok) {
+                throw new Error(result.error || "Failed to create user");
+              }
+
+              console.log("User created successfully:", result);
+              alert(
+                `User created successfully! Account number: ${result.user.account_number}`
+              );
+
+              // Refresh the users list
+              await fetchData();
+              handleCloseCreateModal();
+            } catch (error: unknown) {
+              console.error("Error creating user:", error);
+              const errorMessage =
+                error instanceof Error ? error.message : "Unknown error";
+              alert(`Failed to create user: ${errorMessage}`);
+            } finally {
+              setIsUpdating(false);
+            }
+          }}
+        >
+          <div>
+            <ModalStepIndicator currentStep={createUserStep} totalSteps={3} />
+            
+            {/* Step 0: Personal Information */}
+            {createUserStep === 0 && (
+              <ModalFormLayout>
+                <ModalFormColumn>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Email
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      First Name
+                    </label>
+                    <input
+                      type="text"
+                      name="firstName"
+                      value={createUserFormData.firstName}
+                      onChange={(e) => setCreateUserFormData({...createUserFormData, firstName: e.target.value})}
+                      required
+                      autoComplete="off"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors"
+                      placeholder="John"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Last Name
+                    </label>
+                    <input
+                      type="text"
+                      name="lastName"
+                      value={createUserFormData.lastName}
+                      onChange={(e) => setCreateUserFormData({...createUserFormData, lastName: e.target.value})}
+                      required
+                      autoComplete="off"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors"
+                      placeholder="Doe"
+                    />
+                  </div>
+                </ModalFormColumn>
+                <ModalFormColumn>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Email Address
                     </label>
                     <input
                       type="email"
                       name="email"
+                      value={createUserFormData.email}
+                      onChange={(e) => setCreateUserFormData({...createUserFormData, email: e.target.value})}
                       required
                       autoComplete="off"
-                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors"
+                      placeholder="user@example.com"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Phone Number (Optional)
+                    </label>
+                    <input
+                      type="tel"
+                      name="phone"
+                      value={createUserFormData.phone}
+                      onChange={(e) => setCreateUserFormData({...createUserFormData, phone: e.target.value})}
+                      autoComplete="off"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors"
+                      placeholder="+1 (555) 000-0000"
+                    />
+                  </div>
+                </ModalFormColumn>
+              </ModalFormLayout>
+            )}
+            
+            {/* Step 1: Account Settings */}
+            {createUserStep === 1 && (
+              <ModalFormLayout>
+                <ModalFormColumn>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
                       Password
                     </label>
                     <input
                       type="password"
                       name="password"
+                      value={createUserFormData.password}
+                      onChange={(e) => setCreateUserFormData({...createUserFormData, password: e.target.value})}
                       required
                       autoComplete="new-password"
-                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors"
+                      placeholder="Enter secure password"
                     />
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">
-                        First Name
-                      </label>
-                      <input
-                        type="text"
-                        name="firstName"
-                        required
-                        autoComplete="off"
-                        className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">
-                        Last Name
-                      </label>
-                      <input
-                        type="text"
-                        name="lastName"
-                        required
-                        autoComplete="off"
-                        className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
-                      />
-                    </div>
-                  </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Confirm Password
+                    </label>
+                    <input
+                      type="password"
+                      name="confirmPassword"
+                      value={createUserFormData.confirmPassword}
+                      onChange={(e) => setCreateUserFormData({...createUserFormData, confirmPassword: e.target.value})}
+                      required
+                      autoComplete="new-password"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors"
+                      placeholder="Confirm password"
+                    />
+                  </div>
+                </ModalFormColumn>
+                <ModalFormColumn>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
                       Role
                     </label>
                     <select
                       name="role"
+                      value={createUserFormData.role}
+                      onChange={(e) => setCreateUserFormData({...createUserFormData, role: e.target.value})}
                       required
-                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors"
                     >
-                      <option value="SUPERADMIN">Super Admin</option>
-                      <option value="ADMIN">Admin</option>
-                      <option value="SUPPORT">Support</option>
-                      <option value="VIEWER">Viewer</option>
                       <option value="MEMBER">Member</option>
+                      <option value="VIEWER">Viewer</option>
+                      <option value="SUPPORT">Support</option>
+                      <option value="ADMIN">Admin</option>
+                      <option value="SUPERADMIN">Super Admin</option>
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Hub
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Hub Assignment
                     </label>
                     <select
                       value={selectedHubId}
-                      onChange={(e) => {
-                        setSelectedHubId(Number(e.target.value));
+                      onChange={async (e) => {
+                        const newHubId = Number(e.target.value);
+                        setSelectedHubId(newHubId);
                         setSelectedCompanyId(""); // Reset company when hub changes
+                        await fetchCompanies(newHubId); // Fetch companies for the new hub
                       }}
-                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors"
                     >
                       <option value={0}>PercyTech</option>
                       <option value={1}>Gnymble</option>
@@ -845,85 +978,114 @@ const Users = () => {
                       <option value={3}>PercyText</option>
                     </select>
                   </div>
-                  <div>
-                    <div className="flex items-center space-x-2 mb-2">
-                      <input
-                        type="checkbox"
-                        id="createNewCompany"
-                        checked={createNewCompany}
-                        onChange={(e) => {
-                          setCreateNewCompany(e.target.checked);
-                          if (e.target.checked) {
-                            setSelectedCompanyId("");
-                          }
-                        }}
-                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                      />
-                      <label
-                        htmlFor="createNewCompany"
-                        className="text-sm font-medium text-gray-700"
-                      >
-                        Create New Company
-                      </label>
-                    </div>
-
-                    {createNewCompany ? (
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                          Company Name
-                        </label>
-                        <input
-                          type="text"
-                          value={newCompanyName}
-                          onChange={(e) => setNewCompanyName(e.target.value)}
-                          placeholder="Enter company name"
-                          className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
-                          required={createNewCompany}
-                        />
-                      </div>
-                    ) : (
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                          Company (Optional)
-                        </label>
-                        <select
-                          value={selectedCompanyId}
-                          onChange={(e) => setSelectedCompanyId(e.target.value)}
-                          className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
-                        >
-                          <option value="">No Company</option>
-                          {companies.map((company) => (
-                            <option key={company.id} value={company.id}>
-                              {company.public_name} (
-                              {company.company_account_number})
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    )}
+                </ModalFormColumn>
+              </ModalFormLayout>
+            )}
+            
+            {/* Step 2: Organization */}
+            {createUserStep === 2 && (
+              <ModalFormLayout>
+                <ModalFormColumn span={2}>
+                  <div className="flex items-center space-x-2 mb-4">
+                    <input
+                      type="checkbox"
+                      id="createNewCompany"
+                      checked={createNewCompany}
+                      onChange={(e) => {
+                        setCreateNewCompany(e.target.checked);
+                        if (e.target.checked) {
+                          setSelectedCompanyId("");
+                        }
+                      }}
+                      className="h-4 w-4 text-gray-900 focus:ring-gray-500 border-gray-300 rounded"
+                    />
+                    <label
+                      htmlFor="createNewCompany"
+                      className="text-sm font-medium text-gray-700"
+                    >
+                      Create New Company
+                    </label>
                   </div>
-                </div>
-                <div className="flex justify-end space-x-3 mt-6">
-                  <button
-                    type="button"
-                    onClick={handleCloseCreateModal}
-                    className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={isUpdating}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
-                  >
+
+                  {createNewCompany ? (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Company Name
+                      </label>
+                      <input
+                        type="text"
+                        value={newCompanyName}
+                        onChange={(e) => setNewCompanyName(e.target.value)}
+                        placeholder="Enter company name"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors"
+                        required={createNewCompany}
+                      />
+                    </div>
+                  ) : (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Select Company (Optional)
+                      </label>
+                      <select
+                        value={selectedCompanyId}
+                        onChange={(e) => setSelectedCompanyId(e.target.value)}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors"
+                      >
+                        <option value="">No Company</option>
+                        {companies.map((company) => (
+                          <option key={company.id} value={company.id}>
+                            {company.public_name} ({company.company_account_number})
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+                </ModalFormColumn>
+              </ModalFormLayout>
+            )}
+          </div>
+
+          <div className="flex justify-between items-center pt-6 border-t border-gray-200">
+            <div>
+              {createUserStep > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setCreateUserStep(createUserStep - 1)}
+                  className="px-5 py-2.5 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium text-sm"
+                >
+                  Back
+                </button>
+              )}
+            </div>
+            <div className="flex space-x-3">
+              <button
+                type="button"
+                onClick={handleCloseCreateModal}
+                className="px-5 py-2.5 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium text-sm"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={isUpdating}
+                className="px-5 py-2.5 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-all font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              >
+                {isUpdating && (
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                )}
+                {createUserStep < 2 ? (
+                  <>Next</>
+                ) : (
+                  <>
+                    <UserPlus className="w-4 h-4" />
                     {isUpdating ? "Creating..." : "Create User"}
-                  </button>
-                </div>
-              </form>
+                  </>
+                )}
+              </button>
             </div>
           </div>
-        </div>
-      )}
+        </form>
+      </BaseModal>
 
       {/* Shared Modal Components */}
       <UserViewModal

@@ -534,7 +534,7 @@ class DashboardService {
           public_name, 
           created_at,
           updated_at,
-          customers!inner(
+          customers(
             payment_status
           ),
           onboarding_submissions(
@@ -663,7 +663,7 @@ class DashboardService {
           created_at,
           updated_at,
           hub_id,
-          customers!inner(
+          customers(
             payment_status
           ),
           onboarding_submissions(

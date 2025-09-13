@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate, Link, useSearchParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import {
   useHub,
   Button,
@@ -11,7 +11,7 @@ import {
   HubLogo,
 } from "@sms-hub/ui";
 import { Input, Label, Alert, AlertDescription } from "@sms-hub/ui";
-import { Mail, Phone, User, Building, Key, UserPlus } from "lucide-react";
+import { Mail, Phone, User, Building, Key, UserPlus, ChevronLeft, ChevronRight } from "lucide-react";
 import styled from "styled-components";
 
 const SignupContainer = styled.div`
@@ -21,6 +21,7 @@ const SignupContainer = styled.div`
   align-items: center;
   justify-content: center;
   padding: 1rem;
+  overflow-x: hidden;
 `;
 
 const StyledLabel = styled(Label)`
@@ -30,18 +31,57 @@ const StyledLabel = styled(Label)`
   color: var(--foreground);
 `;
 
-const FieldRow = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+const StepIndicator = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
   gap: 1rem;
+`;
+
+const Step = styled.div<{ active: boolean; completed: boolean }>`
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  
+  ${props => props.active && `
+    background: var(--hub-primary);
+    color: white;
+    border: 2px solid var(--hub-primary);
+  `}
+  
+  ${props => props.completed && !props.active && `
+    background: #10b981;
+    color: white;
+    border: 2px solid #10b981;
+  `}
+  
+  ${props => !props.active && !props.completed && `
+    background: transparent;
+    color: #6b7280;
+    border: 2px solid #6b7280;
+  `}
+`;
+
+const StepConnector = styled.div<{ completed: boolean }>`
+  width: 40px;
+  height: 2px;
+  background: ${props => props.completed ? '#10b981' : '#6b7280'};
+  margin-top: 19px;
 `;
 
 export function Signup() {
   const { hubConfig } = useHub();
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [currentStep, setCurrentStep] = useState(1);
+  const [isFormReady, setIsFormReady] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     phone: "",
@@ -90,33 +130,103 @@ export function Signup() {
     return `+1${withoutCountryCode}`;
   };
 
+  const validateStep = (step: number) => {
+    setError("");
+    
+    switch (step) {
+      case 1:
+        if (!formData.companyName.trim()) {
+          setError("Please enter your company name");
+          return false;
+        }
+        if (!formData.email.trim()) {
+          setError("Please enter your email address");
+          return false;
+        }
+        if (!formData.phone.trim()) {
+          setError("Please enter your phone number");
+          return false;
+        }
+        {
+          const phoneDigits = formData.phone.replace(/\D/g, "");
+          if (phoneDigits.length !== 10) {
+            setError("Please enter a valid 10-digit phone number");
+            return false;
+          }
+        }
+        return true;
+      
+      case 2:
+        if (!formData.firstName.trim()) {
+          setError("Please enter your first name");
+          return false;
+        }
+        if (!formData.lastName.trim()) {
+          setError("Please enter your last name");
+          return false;
+        }
+        return true;
+      
+      case 3:
+        if (!formData.password) {
+          setError("Please enter a password");
+          return false;
+        }
+        if (formData.password.length < 6) {
+          setError("Password must be at least 6 characters");
+          return false;
+        }
+        if (formData.password !== formData.confirmPassword) {
+          setError("Passwords do not match");
+          return false;
+        }
+        return true;
+      
+      default:
+        return true;
+    }
+  };
+
+  const nextStep = () => {
+    if (validateStep(currentStep)) {
+      setCurrentStep(prev => Math.min(prev + 1, 3));
+    }
+  };
+
+  const prevStep = () => {
+    setCurrentStep(prev => Math.max(prev - 1, 1));
+    setError("");
+  };
+
+  // Set form as ready when hub config is loaded
+  useEffect(() => {
+    if (hubConfig && hubConfig.id) {
+      const timer = setTimeout(() => {
+        setIsFormReady(true);
+      }, 100);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [hubConfig]);
+
+  // Handle focus for the first field of each step
+  useEffect(() => {
+    if (!isFormReady) return;
+    
+    const timer = setTimeout(() => {
+      const firstInput = document.querySelector('input[type="text"], input[type="email"], input[type="tel"], input[type="password"]') as HTMLInputElement;
+      if (firstInput) {
+        firstInput.focus();
+      }
+    }, 100);
+    
+    return () => clearTimeout(timer);
+  }, [currentStep, isFormReady]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validate form
-    if (!formData.email || !formData.phone || !formData.firstName || !formData.lastName) {
-      setError("Please fill in all required fields");
-      return;
-    }
-
-    if (!formData.companyName) {
-      setError("Please enter your company name");
-      return;
-    }
-
-    if (formData.password.length < 6) {
-      setError("Password must be at least 6 characters");
-      return;
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match");
-      return;
-    }
-
-    const phoneDigits = formData.phone.replace(/\D/g, "");
-    if (phoneDigits.length !== 10) {
-      setError("Please enter a valid 10-digit phone number");
+    if (!validateStep(3)) {
       return;
     }
 
@@ -170,37 +280,21 @@ export function Signup() {
       const unifiedAppUrl = import.meta.env.VITE_UNIFIED_APP_URL || "http://localhost:3001";
       window.location.href = `${unifiedAppUrl}/payment-setup`;
 
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Signup error:", err);
-      setError(err.message || "Failed to create account");
+      const errorMessage = err instanceof Error ? err.message : "Failed to create account";
+      setError(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  return (
-    <SignupContainer>
-      <Card className="w-full max-w-lg">
-        <CardHeader>
-          <div className="text-center mb-6">
-            <HubLogo
-              hubType={hubConfig.id}
-              variant="icon"
-              size="md"
-              className="mx-auto mb-4"
-            />
-            <CardTitle className="text-2xl font-bold">
-              Create Your Account
-            </CardTitle>
-            <CardDescription>
-              Start your business with {hubConfig.displayName}
-            </CardDescription>
-          </div>
-        </CardHeader>
-
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
+  const renderStepContent = () => {
+    switch (currentStep) {
+      case 1:
+        return (
+          <>
+            <div className="space-y-2">
               <StyledLabel htmlFor="companyName">
                 <Building className="w-4 h-4 inline mr-1" />
                 Company Name
@@ -214,43 +308,11 @@ export function Signup() {
                 }
                 placeholder="Enter your company name"
                 required
-                autoFocus
+                className="w-full bg-white text-black border-gray-300 focus:border-orange-500 focus:ring-orange-500"
               />
             </div>
 
-            <FieldRow>
-              <div>
-                <StyledLabel htmlFor="firstName">
-                  <User className="w-4 h-4 inline mr-1" />
-                  First Name
-                </StyledLabel>
-                <Input
-                  id="firstName"
-                  type="text"
-                  value={formData.firstName}
-                  onChange={(e) =>
-                    setFormData({ ...formData, firstName: e.target.value })
-                  }
-                  placeholder="John"
-                  required
-                />
-              </div>
-              <div>
-                <StyledLabel htmlFor="lastName">Last Name</StyledLabel>
-                <Input
-                  id="lastName"
-                  type="text"
-                  value={formData.lastName}
-                  onChange={(e) =>
-                    setFormData({ ...formData, lastName: e.target.value })
-                  }
-                  placeholder="Doe"
-                  required
-                />
-              </div>
-            </FieldRow>
-
-            <div>
+            <div className="space-y-2">
               <StyledLabel htmlFor="email">
                 <Mail className="w-4 h-4 inline mr-1" />
                 Email Address
@@ -265,10 +327,11 @@ export function Signup() {
                 placeholder="john@company.com"
                 required
                 autoComplete="email"
+                className="w-full bg-white text-black border-gray-300 focus:border-orange-500 focus:ring-orange-500"
               />
             </div>
 
-            <div>
+            <div className="space-y-2">
               <StyledLabel htmlFor="phone">
                 <Phone className="w-4 h-4 inline mr-1" />
                 Phone Number
@@ -280,42 +343,188 @@ export function Signup() {
                 onChange={handlePhoneChange}
                 placeholder="(555) 123-4567"
                 required
+                className="w-full bg-white text-black border-gray-300 focus:border-orange-500 focus:ring-orange-500"
+              />
+            </div>
+          </>
+        );
+
+      case 2:
+        return (
+          <>
+            <div className="space-y-2">
+              <StyledLabel htmlFor="firstName">
+                <User className="w-4 h-4 inline mr-1" />
+                First Name
+              </StyledLabel>
+              <Input
+                id="firstName"
+                type="text"
+                value={formData.firstName}
+                onChange={(e) =>
+                  setFormData({ ...formData, firstName: e.target.value })
+                }
+                placeholder="John"
+                required
+                className="w-full bg-white text-black border-gray-300 focus:border-orange-500 focus:ring-orange-500"
               />
             </div>
 
-            <FieldRow>
-              <div>
-                <StyledLabel htmlFor="password">
-                  <Key className="w-4 h-4 inline mr-1" />
-                  Password
-                </StyledLabel>
-                <Input
-                  id="password"
-                  type="password"
-                  value={formData.password}
-                  onChange={(e) =>
-                    setFormData({ ...formData, password: e.target.value })
-                  }
-                  placeholder="Min. 6 characters"
-                  required
-                  autoComplete="new-password"
-                />
-              </div>
-              <div>
-                <StyledLabel htmlFor="confirmPassword">Confirm Password</StyledLabel>
-                <Input
-                  id="confirmPassword"
-                  type="password"
-                  value={formData.confirmPassword}
-                  onChange={(e) =>
-                    setFormData({ ...formData, confirmPassword: e.target.value })
-                  }
-                  placeholder="Confirm password"
-                  required
-                  autoComplete="new-password"
-                />
-              </div>
-            </FieldRow>
+            <div className="space-y-2">
+              <StyledLabel htmlFor="lastName">
+                <User className="w-4 h-4 inline mr-1" />
+                Last Name
+              </StyledLabel>
+              <Input
+                id="lastName"
+                type="text"
+                value={formData.lastName}
+                onChange={(e) =>
+                  setFormData({ ...formData, lastName: e.target.value })
+                }
+                placeholder="Doe"
+                required
+                className="w-full bg-white text-black border-gray-300 focus:border-orange-500 focus:ring-orange-500"
+              />
+            </div>
+          </>
+        );
+
+      case 3:
+        return (
+          <>
+            <div className="space-y-2">
+              <StyledLabel htmlFor="password">
+                <Key className="w-4 h-4 inline mr-1" />
+                Password
+              </StyledLabel>
+              <Input
+                id="password"
+                type="password"
+                value={formData.password}
+                onChange={(e) =>
+                  setFormData({ ...formData, password: e.target.value })
+                }
+                placeholder="Min. 6 characters"
+                required
+                autoComplete="new-password"
+                className="w-full bg-white text-black border-gray-300 focus:border-orange-500 focus:ring-orange-500"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <StyledLabel htmlFor="confirmPassword">
+                <Key className="w-4 h-4 inline mr-1" />
+                Confirm Password
+              </StyledLabel>
+              <Input
+                id="confirmPassword"
+                type="password"
+                value={formData.confirmPassword}
+                onChange={(e) =>
+                  setFormData({ ...formData, confirmPassword: e.target.value })
+                }
+                placeholder="Confirm password"
+                required
+                autoComplete="new-password"
+                className="w-full bg-white text-black border-gray-300 focus:border-orange-500 focus:ring-orange-500"
+              />
+            </div>
+          </>
+        );
+
+      default:
+        return null;
+    }
+  };
+
+  const getStepTitle = () => {
+    switch (currentStep) {
+      case 1:
+        return "Company Information";
+      case 2:
+        return "Personal Information";
+      case 3:
+        return "Create Password";
+      default:
+        return "Create Your Account";
+    }
+  };
+
+  const getStepDescription = () => {
+    switch (currentStep) {
+      case 1:
+        return "Tell us about your company";
+      case 2:
+        return "Tell us about yourself";
+      case 3:
+        return "Secure your account";
+      default:
+        return "Start your business with " + hubConfig.displayName;
+    }
+  };
+
+  if (!isFormReady) {
+    return (
+      <SignupContainer>
+        <Card className="w-full max-w-md mx-auto">
+          <CardHeader>
+            <div className="text-center mb-6">
+              <HubLogo
+                hubType={hubConfig.id}
+                variant="icon"
+                size="md"
+                className="mx-auto mb-4"
+              />
+              <CardTitle className="text-2xl font-bold">
+                Create Your Account
+              </CardTitle>
+              <CardDescription>
+                Loading...
+              </CardDescription>
+            </div>
+          </CardHeader>
+          <CardContent className="px-4 sm:px-6">
+            <div className="flex justify-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
+            </div>
+          </CardContent>
+        </Card>
+      </SignupContainer>
+    );
+  }
+
+  return (
+    <SignupContainer>
+      <Card className="w-full max-w-md mx-auto">
+        <CardHeader>
+          <div className="text-center mb-6">
+            <HubLogo
+              hubType={hubConfig.id}
+              variant="icon"
+              size="md"
+              className="mx-auto mb-4"
+            />
+            <CardTitle className="text-2xl font-bold">
+              {getStepTitle()}
+            </CardTitle>
+            <CardDescription>
+              {getStepDescription()}
+            </CardDescription>
+          </div>
+          
+          <StepIndicator>
+            <Step active={currentStep === 1} completed={currentStep > 1}>1</Step>
+            <StepConnector completed={currentStep > 1} />
+            <Step active={currentStep === 2} completed={currentStep > 2}>2</Step>
+            <StepConnector completed={currentStep > 2} />
+            <Step active={currentStep === 3} completed={false}>3</Step>
+          </StepIndicator>
+        </CardHeader>
+
+        <CardContent className="px-4 sm:px-6">
+          <form onSubmit={currentStep === 3 ? handleSubmit : (e) => { e.preventDefault(); nextStep(); }} className="space-y-4 sm:space-y-6">
+            {renderStepContent()}
 
             {error && (
               <Alert variant="destructive">
@@ -323,14 +532,32 @@ export function Signup() {
               </Alert>
             )}
 
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full hub-bg-primary hover:hub-bg-primary/90"
-            >
-              {isSubmitting ? "Creating Account..." : "Create Account"}
-              <UserPlus className="w-4 h-4 ml-2" />
-            </Button>
+            <div className="flex gap-3">
+              {currentStep > 1 && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={prevStep}
+                  className="flex-1"
+                >
+                  <ChevronLeft className="w-4 h-4 mr-1" />
+                  Back
+                </Button>
+              )}
+              
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className={`${currentStep === 1 ? 'w-full' : 'flex-1'} hub-bg-primary hover:hub-bg-primary/90`}
+              >
+                {isSubmitting ? "Creating Account..." : currentStep === 3 ? "Create Account" : "Next"}
+                {currentStep === 3 ? (
+                  <UserPlus className="w-4 h-4 ml-2" />
+                ) : (
+                  <ChevronRight className="w-4 h-4 ml-1" />
+                )}
+              </Button>
+            </div>
           </form>
 
           <div className="text-center mt-6 pt-6 border-t">

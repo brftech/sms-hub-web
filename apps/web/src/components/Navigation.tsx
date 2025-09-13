@@ -98,20 +98,9 @@ const Navigation = () => {
             </button>
           </div>
 
-          {/* Right side - SignUp and Contact buttons (Desktop only) */}
+          {/* Right side - SignUp and Login buttons (Desktop only) */}
           <div className="hidden md:flex items-center space-x-4">
             <HubSwitcher />
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                // Navigate to unified app in same tab for better UX
-                window.location.href = "http://localhost:3001/?superadmin=dev123";
-              }}
-              className="transition-all duration-300 backdrop-blur-sm px-4 py-1.5 text-xs bg-black/50 text-white border border-orange-500/50 hover:bg-orange-500/10 hover:border-orange-400"
-            >
-              Superadmin
-            </Button>
             <Button
               variant="outline"
               size="sm"

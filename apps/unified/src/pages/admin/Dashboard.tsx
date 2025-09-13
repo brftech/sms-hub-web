@@ -472,33 +472,11 @@ const Dashboard = () => {
       {/* Page Header */}
       <div className="flex items-start justify-between">
         <div>
-          <div className="flex items-center space-x-3">
-            <h1 className="text-xl sm:text-2xl font-bold text-foreground">
-              {isGlobalView ? "Global Dashboard" : "Dashboard"}
-            </h1>
-            <div
-              className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                isGlobalView ? "badge-info" : "badge-success"
-              }`}
-            >
-              {isGlobalView ? (
-                <>
-                  <Globe className="w-3 h-3 mr-1" />
-                  Global View
-                </>
-              ) : (
-                <>
-                  <Building className="w-3 h-3 mr-1" />
-                  Hub View
-                </>
-              )}
-            </div>
-          </div>
-          <p className="mt-1 text-xs sm:text-sm text-muted-foreground">
-            {isGlobalView
-              ? "Overview of all hubs combined - see total numbers and cross-hub insights"
-              : `Overview of ${currentHub} hub activity and performance - hub-specific data only`}
-          </p>
+          <h1 className="text-xl sm:text-2xl font-bold text-foreground">
+            {isGlobalView 
+              ? "Global Dashboard" 
+              : `${currentHub.charAt(0).toUpperCase() + currentHub.slice(1)} Dashboard`}
+          </h1>
         </div>
 
         {/* Refresh Button */}

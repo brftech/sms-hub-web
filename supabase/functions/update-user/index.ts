@@ -115,6 +115,7 @@ serve(async (req) => {
     console.log("✅ User profile updated:", profileData.id);
 
     // Update email in Supabase Auth if provided
+    let finalEmail = profileData.email;
     if (email) {
       try {
         const { error: authError } =
@@ -134,13 +135,40 @@ serve(async (req) => {
 
         if (authError) {
           console.warn("Auth email update failed:", authError);
-          // Don't fail the entire operation for auth email update failure
+          return new Response(
+            JSON.stringify({
+              error: `Failed to update email: ${authError.message}`,
+            }),
+            {
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+              status: 400,
+            }
+          );
         } else {
           console.log("✅ Auth email updated");
+          finalEmail = email;
+          
+          // Also update the email in the profile to keep them in sync
+          const { error: profileEmailError } = await supabaseAdmin
+            .from("user_profiles")
+            .update({ email, updated_at: new Date().toISOString() })
+            .eq("id", user_id);
+            
+          if (profileEmailError) {
+            console.warn("Profile email sync failed:", profileEmailError);
+          }
         }
       } catch (error) {
         console.warn("Auth update error:", error);
-        // Don't fail the entire operation for auth update failure
+        return new Response(
+          JSON.stringify({
+            error: `Failed to update email: ${error.message}`,
+          }),
+          {
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+            status: 500,
+          }
+        );
       }
     }
 
@@ -164,7 +192,7 @@ serve(async (req) => {
         success: true,
         user: {
           id: profileData.id,
-          email: profileData.email,
+          email: finalEmail,  // Use the final email (either updated or existing)
           first_name: profileData.first_name,
           last_name: profileData.last_name,
           role: profileData.role,

@@ -231,13 +231,10 @@ export function Leads() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground">
-            {isGlobalView ? "Global Leads" : "Leads"}
+            {isGlobalView 
+              ? "Global Leads" 
+              : `${currentHub.charAt(0).toUpperCase() + currentHub.slice(1)} Leads`}
           </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {isGlobalView
-              ? "Manage leads from all hubs"
-              : `Manage leads from ${currentHub} hub`}
-          </p>
         </div>
         <div className="flex items-center space-x-3">
           <div className="relative max-w-xs">

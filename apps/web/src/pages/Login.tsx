@@ -208,6 +208,7 @@ export function Login() {
                 required
                 autoComplete="email"
                 autoFocus
+                className="bg-white text-black border-gray-300 focus:border-orange-500 focus:ring-orange-500"
               />
             </div>
 
@@ -226,6 +227,7 @@ export function Login() {
                 placeholder="Enter your password"
                 required
                 autoComplete="current-password"
+                className="bg-white text-black border-gray-300 focus:border-orange-500 focus:ring-orange-500"
               />
               <ForgotPasswordLink to="/forgot-password">
                 Forgot your password?
@@ -258,17 +260,6 @@ export function Login() {
                 Sign Up
               </Link>
             </p>
-          </div>
-
-          <div className="text-center mt-4">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate("/superadmin-login")}
-              className="text-muted-foreground hover:text-foreground"
-            >
-              Superadmin Login
-            </Button>
           </div>
         </CardContent>
       </Card>

@@ -1,5 +1,7 @@
 import React from "react";
-import { X, Edit } from "lucide-react";
+import { Edit } from "lucide-react";
+import { BaseModal, ModalSection, ModalButtonGroup, ModalButton, ModalFormLayout, ModalFormColumn, ModalField } from "./BaseModal";
+
 
 interface UserProfile {
   id: string;
@@ -47,9 +49,9 @@ export const UserEditModal: React.FC<UserEditModalProps> = ({
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const formData = new FormData(e.target as HTMLFormElement);
+    const formData = new FormData(e.currentTarget as HTMLFormElement);
     const updates = {
       first_name: formData.get("firstName") as string,
       last_name: formData.get("lastName") as string,
@@ -60,185 +62,144 @@ export const UserEditModal: React.FC<UserEditModalProps> = ({
     await onSave(updates);
   };
 
+  const handleFormSubmit = () => {
+    const form = document.querySelector('form');
+    if (form) {
+      const formData = new FormData(form);
+      const updates = {
+        first_name: formData.get("firstName") as string,
+        last_name: formData.get("lastName") as string,
+        email: formData.get("email") as string,
+        role: formData.get("role") as string,
+        is_active: formData.get("isActive") === "true",
+      } as Partial<UserProfile>;
+      onSave(updates);
+    }
+  };
+
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4">
-      <div className="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
-        {/* Header */}
-        <div className="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4 text-white">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                <Edit className="w-5 h-5" />
+    <BaseModal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Edit User"
+      subtitle={`Update ${user.first_name} ${user.last_name}'s information`}
+      icon={<Edit className="w-5 h-5" />}
+      variant="edit"
+      size="md"
+      footer={
+        <ModalButtonGroup>
+          <ModalButton onClick={onClose} variant="secondary">
+            Cancel
+          </ModalButton>
+          <ModalButton
+            onClick={handleFormSubmit}
+            variant="primary"
+            loading={isUpdating}
+            disabled={isUpdating}
+          >
+            <Edit className="w-4 h-4" />
+            Update User
+          </ModalButton>
+        </ModalButtonGroup>
+      }
+    >
+      <form onSubmit={handleSubmit}>
+        <ModalFormLayout>
+          {/* Left Column */}
+          <ModalFormColumn>
+            <ModalSection title="Personal Information">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  First Name
+                </label>
+                <input
+                  type="text"
+                  name="firstName"
+                  defaultValue={user.first_name || ""}
+                  required
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors"
+                  placeholder="Enter first name"
+                />
               </div>
               <div>
-                <h3 className="text-xl font-semibold">Edit User</h3>
-                <p className="text-green-100 text-sm">
-                  Update {user.first_name} {user.last_name}'s information
-                </p>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Last Name
+                </label>
+                <input
+                  type="text"
+                  name="lastName"
+                  defaultValue={user.last_name || ""}
+                  required
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors"
+                  placeholder="Enter last name"
+                />
               </div>
-            </div>
-            <button
-              onClick={onClose}
-              className="text-white/80 hover:text-white transition-colors p-2 hover:bg-white/10 rounded-lg"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-        </div>
-
-        {/* Content */}
-        <form onSubmit={handleSubmit} className="p-6">
-          <div className="space-y-6">
-            {/* Personal Information */}
-            <div>
-              <h4 className="text-lg font-semibold text-gray-900 mb-4 border-b border-gray-200 pb-2">
-                Personal Information
-              </h4>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    First Name
-                  </label>
-                  <input
-                    type="text"
-                    name="firstName"
-                    defaultValue={user.first_name || ""}
-                    required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
-                    placeholder="Enter first name"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Last Name
-                  </label>
-                  <input
-                    type="text"
-                    name="lastName"
-                    defaultValue={user.last_name || ""}
-                    required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
-                    placeholder="Enter last name"
-                  />
-                </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  defaultValue={user.email}
+                  required
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors"
+                  placeholder="Enter email address"
+                />
               </div>
-            </div>
+            </ModalSection>
+          </ModalFormColumn>
 
-            {/* Account Information */}
-            <div>
-              <h4 className="text-lg font-semibold text-gray-900 mb-4 border-b border-gray-200 pb-2">
-                Account Information
-              </h4>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Email Address
-                  </label>
-                  <input
-                    type="email"
-                    name="email"
-                    defaultValue={user.email}
-                    required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
-                    placeholder="Enter email address"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Role
-                    </label>
-                    <select
-                      name="role"
-                      defaultValue={
-                        user.role === "superadmin"
-                          ? "SUPERADMIN"
-                          : user.role === "admin"
-                            ? "ADMIN"
-                            : user.role === "support"
-                              ? "SUPPORT"
-                              : user.role === "viewer"
-                                ? "VIEWER"
-                                : user.role === "member"
-                                  ? "MEMBER"
-                                  : user.role?.toUpperCase() || "USER"
-                      }
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
-                    >
-                      <option value="SUPERADMIN">Super Admin</option>
-                      <option value="ADMIN">Admin</option>
-                      <option value="SUPPORT">Support</option>
-                      <option value="VIEWER">Viewer</option>
-                      <option value="MEMBER">Member</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Status
-                    </label>
-                    <select
-                      name="isActive"
-                      defaultValue={user.is_active ? "true" : "false"}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
-                    >
-                      <option value="true">Active</option>
-                      <option value="false">Inactive</option>
-                    </select>
-                  </div>
-                </div>
+          {/* Right Column */}
+          <ModalFormColumn>
+            <ModalSection title="Account Settings">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Role
+                </label>
+                <select
+                  name="role"
+                  defaultValue={
+                    user.role === "superadmin"
+                      ? "SUPERADMIN"
+                      : user.role === "admin"
+                        ? "ADMIN"
+                        : user.role === "support"
+                          ? "SUPPORT"
+                          : user.role === "viewer"
+                            ? "VIEWER"
+                            : user.role === "member"
+                              ? "MEMBER"
+                              : user.role?.toUpperCase() || "USER"
+                  }
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors"
+                >
+                  <option value="SUPERADMIN">Super Admin</option>
+                  <option value="ADMIN">Admin</option>
+                  <option value="SUPPORT">Support</option>
+                  <option value="VIEWER">Viewer</option>
+                  <option value="MEMBER">Member</option>
+                </select>
               </div>
-            </div>
-
-            {/* Account Details (Read-only) */}
-            <div className="bg-gray-50 rounded-lg p-4">
-              <h4 className="text-sm font-semibold text-gray-700 mb-3">
-                Account Details
-              </h4>
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <span className="text-gray-500">Account Number:</span>
-                  <p className="font-mono text-gray-900">
-                    {user.account_number || "N/A"}
-                  </p>
-                </div>
-                <div>
-                  <span className="text-gray-500">Hub:</span>
-                  <p className="text-gray-900">{getHubName(user.hub_id)}</p>
-                </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Status
+                </label>
+                <select
+                  name="isActive"
+                  defaultValue={user.is_active ? "true" : "false"}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors"
+                >
+                  <option value="true">Active</option>
+                  <option value="false">Inactive</option>
+                </select>
               </div>
-            </div>
-          </div>
-
-          {/* Footer */}
-          <div className="flex justify-end space-x-3 mt-8 pt-6 border-t border-gray-200">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-6 py-3 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={isUpdating}
-              className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 transition-colors font-medium flex items-center space-x-2"
-            >
-              {isUpdating ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  <span>Updating...</span>
-                </>
-              ) : (
-                <>
-                  <Edit className="w-4 h-4" />
-                  <span>Update User</span>
-                </>
-              )}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+              <ModalField label="Account Number" value={user.account_number || "N/A"} />
+              <ModalField label="Hub Assignment" value={getHubName(user.hub_id)} />
+            </ModalSection>
+          </ModalFormColumn>
+        </ModalFormLayout>
+      </form>
+    </BaseModal>
   );
 };

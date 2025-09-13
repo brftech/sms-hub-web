@@ -1,10 +1,9 @@
 import { useState, useEffect } from "react";
-import { Card, CardContent } from "@sms-hub/ui";
-import { Button } from "@sms-hub/ui";
-import { Badge } from "@sms-hub/ui";
 import { useHub } from "@sms-hub/ui";
+import { AccountViewModal, AccountEditModal, AccountDeleteModal } from "@sms-hub/ui";
 import { useGlobalView } from "../../contexts/GlobalViewContext";
 import { customersService, Customer } from "../../services/customersService";
+import { companiesService, Company } from "../../services/companiesService";
 import {
   Building2,
   Search,
@@ -21,23 +20,53 @@ import {
   ChevronDown,
   RefreshCw,
   Shield,
+  Trash2,
 } from "lucide-react";
+
+// Unified account type that combines companies and customers
+interface UnifiedAccount {
+  id: string;
+  type: 'company' | 'customer' | 'company_customer';
+  name: string;
+  email: string;
+  status: string;
+  payment_status?: string;
+  payment_type?: string;
+  service_type?: string;
+  hub_id: number;
+  created_at: string;
+  // Original data
+  company?: Company;
+  customer?: Customer;
+  user_count?: number;
+  has_texting?: boolean;
+  has_other_services?: boolean;
+}
 
 export function Accounts() {
   const { currentHub } = useHub();
   const { isGlobalView } = useGlobalView();
-  const [accounts, setAccounts] = useState<Customer[]>([]);
-  const [filteredAccounts, setFilteredAccounts] = useState<Customer[]>([]);
+  const [accounts, setAccounts] = useState<UnifiedAccount[]>([]);
+  const [filteredAccounts, setFilteredAccounts] = useState<UnifiedAccount[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [typeFilter, setTypeFilter] = useState<string>("all");
+  const [entityFilter, setEntityFilter] = useState<string>("all");
   const [sortBy, setSortBy] = useState<string>("created_at");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  
+  // Modal states
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedAccount, setSelectedAccount] = useState<UnifiedAccount | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
 
-  // Fetch customers from database
+  // Fetch all entities (companies and customers) from database
   const fetchData = async () => {
     try {
       setIsLoading(true);
@@ -70,15 +99,75 @@ export function Accounts() {
         filterOptions.hub_id = hubId;
       }
 
-      // Fetch customers with filters
-      const fetchedCustomers =
-        await customersService.instance.getCustomers(filterOptions);
+      // Fetch both companies and customers in parallel
+      const [fetchedCompanies, fetchedCustomers] = await Promise.all([
+        companiesService.instance.getCompanies(filterOptions),
+        customersService.instance.getCustomers(filterOptions),
+      ]);
 
-      console.log("Accounts: Fetched customers:", fetchedCustomers);
-      console.log("Accounts: Count:", fetchedCustomers.length);
+      console.log("Accounts: Fetched companies:", fetchedCompanies.length);
+      console.log("Accounts: Fetched customers:", fetchedCustomers.length);
 
-      setAccounts(fetchedCustomers);
-      setFilteredAccounts(fetchedCustomers);
+      // Create a map of company IDs that have customers
+      const companiesWithCustomers = new Set(
+        fetchedCustomers
+          .filter(c => c.company_id)
+          .map(c => c.company_id)
+      );
+
+      // Merge companies and customers into unified accounts
+      const unifiedAccounts: UnifiedAccount[] = [];
+
+      // Add companies
+      fetchedCompanies.forEach(company => {
+        const hasCustomer = companiesWithCustomers.has(company.id);
+        const customer = fetchedCustomers.find(c => c.company_id === company.id);
+        
+        unifiedAccounts.push({
+          id: company.id,
+          type: hasCustomer ? 'company_customer' : 'company',
+          name: company.public_name || 'Unnamed Company',
+          email: customer?.billing_email || company.contact_email || '-',
+          status: company.is_active ? 'active' : 'inactive',
+          payment_status: customer?.payment_status || 'none',
+          payment_type: customer?.payment_type || 'none',
+          service_type: hasCustomer ? 'texting' : 'other',
+          hub_id: company.hub_id,
+          created_at: company.created_at || '',
+          company: company,
+          customer: customer,
+          user_count: 0, // TODO: Calculate from memberships
+          has_texting: hasCustomer,
+          has_other_services: !hasCustomer,
+        });
+      });
+
+      // Add standalone customers (not linked to companies)
+      fetchedCustomers
+        .filter(customer => !customer.company_id)
+        .forEach(customer => {
+          unifiedAccounts.push({
+            id: customer.id,
+            type: 'customer',
+            name: customer.billing_email.split('@')[0], // Use email prefix as name
+            email: customer.billing_email,
+            status: customer.is_active ? 'active' : 'inactive',
+            payment_status: customer.payment_status || 'pending',
+            payment_type: customer.payment_type || 'none',
+            service_type: 'texting',
+            hub_id: customer.hub_id,
+            created_at: customer.created_at || '',
+            customer: customer,
+            user_count: 0,
+            has_texting: true,
+            has_other_services: false,
+          });
+        });
+
+      console.log("Accounts: Total unified accounts:", unifiedAccounts.length);
+
+      setAccounts(unifiedAccounts);
+      setFilteredAccounts(unifiedAccounts);
     } catch (err) {
       console.error("Error fetching data:", err);
       setError(err instanceof Error ? err.message : "Failed to fetch data");
@@ -94,6 +183,94 @@ export function Accounts() {
     setIsRefreshing(false);
   };
 
+  // Modal handlers
+  const handleViewAccount = (account: UnifiedAccount) => {
+    setSelectedAccount(account);
+    setIsViewModalOpen(true);
+  };
+
+  const handleEditAccount = (account: UnifiedAccount) => {
+    setSelectedAccount(account);
+    setIsViewModalOpen(false);
+    setIsEditModalOpen(true);
+  };
+
+  const handleDeleteAccount = (account: UnifiedAccount) => {
+    setSelectedAccount(account);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleUpdateAccount = async (updates: Partial<UnifiedAccount>) => {
+    if (!selectedAccount) return;
+
+    try {
+      setIsUpdating(true);
+
+      // Update based on account type
+      if (selectedAccount.company && updates.company) {
+        await companiesService.instance.updateCompany(
+          selectedAccount.company.id,
+          updates.company
+        );
+      }
+
+      if (selectedAccount.customer && updates.customer) {
+        await customersService.instance.updateCustomer(
+          selectedAccount.customer.id,
+          updates.customer
+        );
+      }
+
+      alert("Account updated successfully!");
+      await fetchData();
+      setIsEditModalOpen(false);
+    } catch (error) {
+      console.error("Error updating account:", error);
+      alert("Failed to update account");
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleConfirmDelete = async (permanent: boolean) => {
+    if (!selectedAccount) return;
+
+    try {
+      setIsDeleting(true);
+
+      if (permanent) {
+        // Delete based on account type
+        if (selectedAccount.customer) {
+          await customersService.instance.deleteCustomer(selectedAccount.customer.id);
+        }
+        if (selectedAccount.company) {
+          await companiesService.instance.deleteCompany(selectedAccount.company.id);
+        }
+      } else {
+        // Deactivate
+        if (selectedAccount.company) {
+          await companiesService.instance.updateCompany(selectedAccount.company.id, {
+            is_active: false,
+          });
+        }
+        if (selectedAccount.customer) {
+          await customersService.instance.updateCustomer(selectedAccount.customer.id, {
+            is_active: false,
+          });
+        }
+      }
+
+      alert(permanent ? "Account deleted successfully!" : "Account deactivated successfully!");
+      await fetchData();
+      setIsDeleteModalOpen(false);
+    } catch (error) {
+      console.error("Error deleting account:", error);
+      alert("Failed to delete account");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   // Initial data fetch
   useEffect(() => {
     fetchData();
@@ -104,40 +281,48 @@ export function Accounts() {
     fetchData();
   }, [searchQuery, isGlobalView]);
 
-  // Apply filters and sorting to customers
+  // Apply filters and sorting to accounts
   useEffect(() => {
     let filtered = [...accounts];
 
-    // Apply status filter (map subscription_status to status)
-    if (statusFilter !== "all") {
-      filtered = filtered.filter((customer) => {
-        if (statusFilter === "active") return customer.is_active;
-        if (statusFilter === "inactive") return !customer.is_active;
-        if (statusFilter === "suspended")
-          return customer.subscription_status === "cancelled";
-        if (statusFilter === "pending")
-          return customer.subscription_status === "inactive";
+    // Apply entity filter
+    if (entityFilter !== "all") {
+      filtered = filtered.filter((account) => {
+        if (entityFilter === "company") return account.type === 'company';
+        if (entityFilter === "customer") return account.type === 'customer';
+        if (entityFilter === "company_customer") return account.type === 'company_customer';
+        if (entityFilter === "texting") return account.has_texting;
+        if (entityFilter === "other") return account.has_other_services;
         return true;
       });
     }
 
-    // Apply type filter (map customer_type to type)
+    // Apply status filter
+    if (statusFilter !== "all") {
+      filtered = filtered.filter((account) => {
+        if (statusFilter === "active") return account.status === 'active';
+        if (statusFilter === "inactive") return account.status === 'inactive';
+        if (statusFilter === "paid") return account.payment_status === 'completed';
+        if (statusFilter === "pending") return account.payment_status === 'pending';
+        return true;
+      });
+    }
+
+    // Apply type filter (payment type)
     if (typeFilter !== "all") {
-      filtered = filtered.filter(
-        (customer) => customer.customer_type === typeFilter
-      );
+      filtered = filtered.filter((account) => {
+        if (typeFilter === "stripe") return account.payment_type === 'stripe';
+        if (typeFilter === "barter") return account.payment_type === 'barter';
+        if (typeFilter === "courtesy") return account.payment_type === 'courtesy';
+        if (typeFilter === "none") return account.payment_type === 'none';
+        return true;
+      });
     }
 
     // Apply sorting
     filtered.sort((a, b) => {
-      let aVal: any = a[sortBy as keyof Customer];
-      let bVal: any = b[sortBy as keyof Customer];
-
-      // Handle nested properties
-      if (sortBy === "name") {
-        aVal = a.company?.public_name || "";
-        bVal = b.company?.public_name || "";
-      }
+      let aVal: any = a[sortBy as keyof UnifiedAccount];
+      let bVal: any = b[sortBy as keyof UnifiedAccount];
 
       if (typeof aVal === "string") {
         aVal = aVal.toLowerCase();
@@ -152,22 +337,35 @@ export function Accounts() {
     });
 
     setFilteredAccounts(filtered);
-  }, [accounts, statusFilter, typeFilter, sortBy, sortOrder]);
+  }, [accounts, statusFilter, typeFilter, entityFilter, sortBy, sortOrder]);
 
-  const getStatusColor = (customer: Customer) => {
-    if (customer.is_active) return "bg-green-100 text-green-800";
-    if (customer.subscription_status === "cancelled")
-      return "bg-red-100 text-red-800";
-    if (customer.subscription_status === "inactive")
-      return "bg-yellow-100 text-yellow-800";
+  const getStatusColor = (account: UnifiedAccount) => {
+    if (account.status === 'active') return "bg-green-100 text-green-800";
+    if (account.status === 'inactive') return "bg-gray-100 text-gray-800";
     return "bg-gray-100 text-gray-800";
   };
 
-  const getStatusText = (customer: Customer) => {
-    if (customer.is_active) return "active";
-    if (customer.subscription_status === "cancelled") return "suspended";
-    if (customer.subscription_status === "inactive") return "pending";
-    return "inactive";
+  const getEntityTypeColor = (account: UnifiedAccount) => {
+    if (account.type === 'company_customer') return "bg-purple-100 text-purple-800";
+    if (account.type === 'company') return "bg-blue-100 text-blue-800";
+    if (account.type === 'customer') return "bg-orange-100 text-orange-800";
+    return "bg-gray-100 text-gray-800";
+  };
+
+  const getPaymentStatusColor = (status: string) => {
+    switch (status) {
+      case "completed":
+      case "active":
+        return "bg-green-100 text-green-800";
+      case "pending":
+        return "bg-yellow-100 text-yellow-800";
+      case "failed":
+        return "bg-red-100 text-red-800";
+      case "none":
+        return "bg-gray-100 text-gray-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
   };
 
   const getBillingStatusColor = (subscriptionStatus: string) => {
@@ -263,13 +461,10 @@ export function Accounts() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground">
-            {isGlobalView ? "Global Accounts" : "Accounts"}
+            {isGlobalView 
+              ? "Global Accounts" 
+              : `${currentHub.charAt(0).toUpperCase() + currentHub.slice(1)} Accounts`}
           </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {isGlobalView
-              ? "Manage customer accounts from all hubs"
-              : `Manage customer accounts from ${currentHub} hub`}
-          </p>
         </div>
         <div className="flex items-center space-x-3">
           <div className="relative max-w-xs">
@@ -315,6 +510,20 @@ export function Accounts() {
           <div className="flex items-center space-x-3">
             <div className="flex items-center space-x-2">
               <Filter className="w-4 h-4 text-gray-400" />
+              
+              <select
+                value={entityFilter}
+                onChange={(e) => setEntityFilter(e.target.value)}
+                className="text-xs border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              >
+                <option value="all">All Entities</option>
+                <option value="company_customer">Texting Platform</option>
+                <option value="company">Company Only</option>
+                <option value="customer">Customer Only</option>
+                <option value="texting">Has Texting</option>
+                <option value="other">Other Services</option>
+              </select>
+              
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
@@ -323,7 +532,7 @@ export function Accounts() {
                 <option value="all">All Status</option>
                 <option value="active">Active</option>
                 <option value="inactive">Inactive</option>
-                <option value="suspended">Suspended</option>
+                <option value="paid">Paid</option>
                 <option value="pending">Pending</option>
               </select>
 
@@ -332,9 +541,11 @@ export function Accounts() {
                 onChange={(e) => setTypeFilter(e.target.value)}
                 className="text-xs border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-orange-500 focus:border-transparent"
               >
-                <option value="all">All Types</option>
-                <option value="company">Company</option>
-                <option value="individual">Individual</option>
+                <option value="all">All Payment</option>
+                <option value="stripe">Stripe</option>
+                <option value="barter">Barter</option>
+                <option value="courtesy">Courtesy</option>
+                <option value="none">None</option>
               </select>
 
               <select
@@ -363,144 +574,188 @@ export function Accounts() {
         </div>
 
         <div className="overflow-x-auto overflow-y-auto flex-1">
-          <div className="space-y-2 p-4">
-            {filteredAccounts.length === 0 ? (
-              <Card>
-                <CardContent className="p-8 text-center">
-                  <Building2 className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    No accounts found
-                  </h3>
-                  <p className="text-gray-600 mb-4">
-                    {searchQuery
-                      ? "Try adjusting your search criteria"
-                      : "Add your first account to get started"}
-                  </p>
-                  <Button className="bg-orange-500 hover:bg-orange-600 text-white">
-                    <Plus className="w-4 h-4 mr-2" />
-                    Add Account
-                  </Button>
-                </CardContent>
-              </Card>
-            ) : (
-              filteredAccounts.map((customer) => (
-                <Card
-                  key={customer.id}
-                  className="hover:shadow-md transition-shadow"
-                >
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-4 flex-1">
-                        <div className="flex-shrink-0">
-                          <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                            <Building2 className="w-6 h-6 text-orange-600" />
-                          </div>
+          {filteredAccounts.length === 0 ? (
+            <div className="text-center py-12">
+              <Building2 className="mx-auto h-12 w-12 text-gray-400" />
+              <h3 className="mt-2 text-sm font-medium text-gray-900">
+                No accounts found
+              </h3>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {searchQuery
+                  ? "Try adjusting your search or filter criteria."
+                  : "No accounts have been created yet."}
+              </p>
+            </div>
+          ) : (
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50 sticky top-0 z-10">
+                <tr>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Account
+                  </th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Type
+                  </th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Email
+                  </th>
+                  {isGlobalView && (
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Hub
+                    </th>
+                  )}
+                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Payment
+                  </th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Services
+                  </th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {filteredAccounts.map((account) => (
+                  <tr key={account.id} className="hover:bg-gray-50">
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      <div>
+                        <div className="text-sm font-medium text-gray-900">
+                          {account.name}
                         </div>
-
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center space-x-2 mb-1">
-                            <h3 className="font-semibold text-gray-900 truncate">
-                              {customer.company?.public_name ||
-                                "Unknown Company"}
-                            </h3>
-                            <Badge
-                              variant="outline"
-                              className={getStatusColor(customer)}
-                            >
-                              {getStatusText(customer)}
-                            </Badge>
-                            <Badge
-                              variant="outline"
-                              className={getBillingStatusColor(
-                                customer.subscription_status || "unknown"
-                              )}
-                            >
-                              {(
-                                customer.subscription_status || "unknown"
-                              ).replace("_", " ")}
-                            </Badge>
-                            {customer.subscription_tier && (
-                              <Badge
-                                variant="outline"
-                                className={getSubscriptionTierColor(
-                                  customer.subscription_tier
-                                )}
-                              >
-                                {customer.subscription_tier}
-                              </Badge>
-                            )}
+                        {account.company?.company_account_number && (
+                          <div className="text-xs text-gray-500 font-mono">
+                            {account.company.company_account_number}
                           </div>
-
-                          <p className="text-sm text-gray-600 mb-2">
-                            {customer.customer_type} •{" "}
-                            {customer.hub?.name || `Hub ${customer.hub_id}`}
-                          </p>
-
-                          <div className="flex items-center space-x-4 text-sm text-gray-500 mb-2">
-                            <div className="flex items-center space-x-1">
-                              <Mail className="w-4 h-4" />
-                              <span>{customer.billing_email}</span>
-                            </div>
-                            {customer.company?.company_account_number && (
-                              <div className="flex items-center space-x-1">
-                                <Building2 className="w-4 h-4" />
-                                <span>
-                                  {customer.company.company_account_number}
-                                </span>
-                              </div>
-                            )}
-                          </div>
-
-                          <div className="flex items-center space-x-6 text-sm text-gray-500">
-                            <div className="flex items-center space-x-1">
-                              <Users className="w-4 h-4" />
-                              <span>{customer.user_count || 0} users</span>
-                            </div>
-                            <div className="flex items-center space-x-1">
-                              <MessageSquare className="w-4 h-4" />
-                              <span>
-                                {(customer.message_count || 0).toLocaleString()}{" "}
-                                messages
-                              </span>
-                            </div>
-                            <div className="flex items-center space-x-1">
-                              <Phone className="w-4 h-4" />
-                              <span>
-                                {customer.phone_numbers || 0} phone numbers
-                              </span>
-                            </div>
-                            <div className="flex items-center space-x-1">
-                              <Calendar className="w-4 h-4" />
-                              <span>
-                                Created{" "}
-                                {customer.created_at
-                                  ? getRelativeTime(customer.created_at)
-                                  : "Unknown"}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
+                        )}
                       </div>
-
-                      <div className="flex items-center space-x-2">
-                        <Button variant="ghost" size="sm">
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                        account.type === 'company_customer' ? 'bg-purple-100 text-purple-800' :
+                        account.type === 'company' ? 'bg-blue-100 text-blue-800' :
+                        'bg-orange-100 text-orange-800'
+                      }`}>
+                        {account.type === 'company_customer' ? 'Platform' : 
+                         account.type === 'company' ? 'Company' : 'Customer'}
+                      </span>
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap text-xs text-gray-600">
+                      {account.email}
+                    </td>
+                    {isGlobalView && (
+                      <td className="px-4 py-2 whitespace-nowrap">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                          {account.hub_id === 0 ? "PercyTech" :
+                           account.hub_id === 1 ? "Gnymble" :
+                           account.hub_id === 2 ? "PercyMD" :
+                           account.hub_id === 3 ? "PercyText" :
+                           "Unknown"}
+                        </span>
+                      </td>
+                    )}
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      <div className="flex items-center space-x-1">
+                        {account.payment_type && account.payment_type !== 'none' && (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                            {account.payment_type}
+                          </span>
+                        )}
+                        {account.payment_status && account.payment_status !== 'none' && (
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                            account.payment_status === 'active' || account.payment_status === 'completed' 
+                              ? 'bg-green-100 text-green-800' 
+                              : account.payment_status === 'pending'
+                              ? 'bg-yellow-100 text-yellow-800'
+                              : 'bg-gray-100 text-gray-800'
+                          }`}>
+                            {account.payment_status}
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      <div className="flex items-center space-x-1">
+                        {account.has_texting && (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            SMS
+                          </span>
+                        )}
+                        {account.has_other_services && (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                            Other
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                        account.status === 'active'
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-red-100 text-red-800'
+                      }`}>
+                        {account.status === 'active' ? 'Active' : 'Inactive'}
+                      </span>
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap text-sm font-medium">
+                      <div className="flex items-center space-x-3">
+                        <button
+                          onClick={() => handleViewAccount(account)}
+                          className="text-blue-600 hover:text-blue-900"
+                          title="View Details"
+                        >
                           <Eye className="w-4 h-4" />
-                        </Button>
-                        <Button variant="ghost" size="sm">
+                        </button>
+                        <button
+                          onClick={() => handleEditAccount(account)}
+                          className="text-green-600 hover:text-green-900"
+                          title="Edit Account"
+                        >
                           <Edit className="w-4 h-4" />
-                        </Button>
-                        <Button variant="ghost" size="sm">
-                          <MoreVertical className="w-4 h-4" />
-                        </Button>
+                        </button>
+                        <button
+                          onClick={() => handleDeleteAccount(account)}
+                          className="text-red-600 hover:text-red-900"
+                          title="Delete Account"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))
-            )}
-          </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
+
+      {/* Modals */}
+      <AccountViewModal
+        isOpen={isViewModalOpen}
+        onClose={() => setIsViewModalOpen(false)}
+        onEdit={handleEditAccount}
+        account={selectedAccount}
+      />
+
+      <AccountEditModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        onSave={handleUpdateAccount}
+        account={selectedAccount}
+        isUpdating={isUpdating}
+      />
+
+      <AccountDeleteModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleConfirmDelete}
+        account={selectedAccount}
+        isDeleting={isDeleting}
+      />
     </div>
   );
 }

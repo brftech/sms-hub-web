@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
-import { useGlobalView } from "../../contexts/GlobalViewContext";
-import { useHub, HubSwitcher, HubLogo } from "@sms-hub/ui";
+import { useHub, HubLogo } from "@sms-hub/ui";
 import { useCompany } from "../../hooks/useCompany";
 import { DevAdminBanner } from "../DevAdminBanner";
+import { AdminHubSwitcher } from "../AdminHubSwitcher";
 import {
   getUserDisplayName,
   getInitials,
@@ -34,7 +34,6 @@ interface AdminLayoutProps {
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
   const { user, logout } = useAuth();
-  const { isGlobalView, toggleGlobalView } = useGlobalView();
   const { currentHub } = useHub();
   const { company } = useCompany();
 
@@ -82,7 +81,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       bgColor: "bg-emerald-100",
     },
     {
-      name: "gPhone Numbers",
+      name: "Phone Numbers",
       href: "/admin/phone-numbers",
       icon: Phone,
       description: "Manage phone number inventory",
@@ -147,29 +146,18 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               <Menu className="w-5 h-5" />
             </button>
 
-            {/* Company Name */}
-            {company && (
-              <div className="hidden lg:block">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  {company.public_name}
-                </h3>
-              </div>
-            )}
-
-            {/* Hub / Global View Toggle */}
-            <button
-              onClick={toggleGlobalView}
-              className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
-                isGlobalView
-                  ? "bg-purple-100 text-purple-700 hover:bg-purple-200"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }`}
-            >
-              {isGlobalView ? "Global View" : "Hub View"}
-            </button>
+            {/* Super Admin Label */}
+            <div className="hidden lg:block">
+              <h3 className="text-lg font-semibold text-gray-900">
+                Super Admin
+              </h3>
+            </div>
           </div>
 
           <div className="flex items-center space-x-4">
+            {/* Hub Switcher with Global Option */}
+            <AdminHubSwitcher className="mr-4" />
+
             {/* Search */}
             <div className="relative hidden md:block">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -221,13 +209,6 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                     <Settings className="w-4 h-4" />
                     <span className="text-sm">Settings</span>
                   </button>
-                  {/* Hub Switcher - always show for admin users */}
-                  <div className="px-4 py-2 border-b border-gray-200">
-                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
-                      Hub Selection
-                    </p>
-                    <HubSwitcher />
-                  </div>
                   <button
                     onClick={handleLogout}
                     className="w-full flex items-center space-x-3 px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"

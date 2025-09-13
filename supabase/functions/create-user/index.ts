@@ -18,7 +18,7 @@ serve(async (req) => {
     return new Response("ok", { headers: corsHeaders });
   }
 
-  console.log("🔄 Admin user creation request received");
+  console.log("🔄 User creation request received");
 
   try {
     const {
@@ -60,7 +60,7 @@ serve(async (req) => {
       );
     }
 
-    // Create admin client
+    // Create service role client
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 
@@ -126,7 +126,7 @@ serve(async (req) => {
         mobile_phone_number,
         account_number: accountNumber,
         is_active: true,
-        signup_type: "admin_created",
+        signup_type: "system_created",
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       })
@@ -152,9 +152,30 @@ serve(async (req) => {
 
     console.log("✅ User profile created:", profileData.id);
 
-    // If user has a company_id, update the company's user count
+    // If user has a company_id, create membership and update the company
     if (company_id) {
       try {
+        // Create membership record to link user to company
+        const { error: membershipError } = await supabaseAdmin
+          .from("memberships")
+          .insert({
+            user_id: authData.user.id,
+            company_id: company_id,
+            hub_id: hub_id,
+            role: role.toLowerCase(), // Use the user's role for the membership
+            is_active: true,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          });
+
+        if (membershipError) {
+          console.warn("Failed to create membership:", membershipError);
+          // Don't fail the user creation for this, but log it
+        } else {
+          console.log("✅ Membership created linking user to company");
+        }
+
+        // Update company timestamp
         await supabaseAdmin
           .from("companies")
           .update({
@@ -162,7 +183,7 @@ serve(async (req) => {
           })
           .eq("id", company_id);
       } catch (error) {
-        console.warn("Failed to update company timestamp:", error);
+        console.warn("Failed to create membership or update company:", error);
         // Don't fail the user creation for this
       }
     }
@@ -261,7 +282,7 @@ serve(async (req) => {
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
-    console.error("Error in create-admin-user:", error);
+    console.error("Error in create-user:", error);
     return new Response(
       JSON.stringify({
         error: error.message || "An unexpected error occurred",

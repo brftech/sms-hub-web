@@ -1,39 +1,43 @@
 import React, { useState } from "react";
-import { Trash2, AlertTriangle, Info } from "lucide-react";
-import { BaseModal, ModalSection, ModalField, ModalButtonGroup, ModalButton, ModalFormLayout, ModalFormColumn } from "./BaseModal";
+import { Trash2, AlertTriangle } from "lucide-react";
+import { BaseModal, ModalButtonGroup, ModalButton } from "./BaseModal";
 
-interface UserProfile {
+interface UnifiedAccount {
   id: string;
+  type: 'company' | 'customer' | 'company_customer';
+  name: string;
   email: string;
-  first_name?: string | null;
-  last_name?: string | null;
-  account_number: string;
-  role?: string | null;
-  is_active?: boolean | null;
+  status: string;
+  payment_status?: string;
+  payment_type?: string;
+  service_type?: string;
   hub_id: number;
-  mobile_phone_number?: string | null;
-  created_at?: string | null;
-  updated_at?: string | null;
+  created_at: string;
+  company?: any;
+  customer?: any;
+  user_count?: number;
+  has_texting?: boolean;
+  has_other_services?: boolean;
 }
 
-interface UserDeleteModalProps {
+interface AccountDeleteModalProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: (permanent: boolean) => Promise<void>;
-  user: UserProfile | null;
+  account: UnifiedAccount | null;
   isDeleting?: boolean;
 }
 
-export const UserDeleteModal: React.FC<UserDeleteModalProps> = ({
+export const AccountDeleteModal: React.FC<AccountDeleteModalProps> = ({
   isOpen,
   onClose,
-  user,
   onConfirm,
+  account,
   isDeleting = false,
 }) => {
   const [deletePermanent, setDeletePermanent] = useState(false);
 
-  if (!isOpen || !user) return null;
+  if (!isOpen || !account) return null;
 
   const handleConfirm = async () => {
     await onConfirm(deletePermanent);
@@ -44,12 +48,21 @@ export const UserDeleteModal: React.FC<UserDeleteModalProps> = ({
     onClose();
   };
 
+  const getEntityTypeLabel = () => {
+    switch (account.type) {
+      case 'company_customer': return 'platform account';
+      case 'company': return 'company';
+      case 'customer': return 'customer';
+      default: return 'account';
+    }
+  };
+
   return (
     <BaseModal
       isOpen={isOpen}
       onClose={handleClose}
-      title="Delete User"
-      subtitle={`Remove ${user.first_name} ${user.last_name} from the system`}
+      title="Delete Account"
+      subtitle={`Remove ${account.name} from the system`}
       icon={<Trash2 className="w-5 h-5" />}
       variant="delete"
       size="md"
@@ -65,30 +78,37 @@ export const UserDeleteModal: React.FC<UserDeleteModalProps> = ({
             disabled={isDeleting}
           >
             <Trash2 className="w-4 h-4" />
-            {deletePermanent ? "Permanently Delete" : "Deactivate User"}
+            {deletePermanent ? "Permanently Delete" : "Deactivate Account"}
           </ModalButton>
         </ModalButtonGroup>
       }
     >
       <div className="space-y-6">
-        {/* User Profile Card */}
+        {/* Account Info Card */}
         <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-6 border border-gray-200">
           <div className="flex items-center space-x-4">
             <div className="w-16 h-16 bg-gray-900 rounded-full flex items-center justify-center text-white font-semibold text-xl">
-              {(user.first_name?.[0] || user.email[0]).toUpperCase()}
+              {account.name.charAt(0).toUpperCase()}
             </div>
             <div className="flex-1">
               <h3 className="text-lg font-semibold text-gray-900">
-                {user.first_name || ""} {user.last_name || ""}
+                {account.name}
               </h3>
-              <p className="text-sm text-gray-600">{user.email}</p>
+              <p className="text-sm text-gray-600">{account.email}</p>
               <div className="flex items-center space-x-4 mt-2">
                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-200 text-gray-800">
-                  {user.role?.toUpperCase() || "USER"}
+                  {getEntityTypeLabel().toUpperCase()}
                 </span>
-                <span className="text-xs text-gray-500">
-                  Account: {user.account_number || "N/A"}
-                </span>
+                {account.payment_type && account.payment_type !== 'none' && (
+                  <span className="text-xs text-gray-500">
+                    Payment: {account.payment_type}
+                  </span>
+                )}
+                {account.user_count && account.user_count > 0 && (
+                  <span className="text-xs text-gray-500">
+                    {account.user_count} users
+                  </span>
+                )}
               </div>
             </div>
           </div>
@@ -113,13 +133,13 @@ export const UserDeleteModal: React.FC<UserDeleteModalProps> = ({
             />
             <div className="ml-3 flex-1">
               <div className="flex items-center">
-                <span className="text-sm font-medium text-gray-900">Deactivate User</span>
+                <span className="text-sm font-medium text-gray-900">Deactivate Account</span>
                 <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
                   Recommended
                 </span>
               </div>
               <p className="text-xs text-gray-600 mt-1">
-                Temporarily disable access. User can be reactivated later and all data will be preserved.
+                Temporarily disable access. Account can be reactivated later and all data will be preserved.
               </p>
             </div>
           </label>
@@ -143,7 +163,7 @@ export const UserDeleteModal: React.FC<UserDeleteModalProps> = ({
                 </span>
               </div>
               <p className="text-xs text-gray-600 mt-1">
-                Completely remove user from the system. This action cannot be undone.
+                Completely remove {getEntityTypeLabel()} from the system. This action cannot be undone.
               </p>
             </div>
           </label>
@@ -169,10 +189,21 @@ export const UserDeleteModal: React.FC<UserDeleteModalProps> = ({
                 deletePermanent ? "text-red-700" : "text-amber-700"
               }`}>
                 {deletePermanent 
-                  ? "This will permanently delete all user data, including their profile, permissions, and activity history. This action cannot be reversed."
-                  : "The user will lose access immediately but their account and data will remain in the system for future reactivation if needed."
+                  ? `This will permanently delete all data associated with this ${getEntityTypeLabel()}, including ${
+                      account.type === 'company_customer' ? 'company records, customer billing data, and all user associations' :
+                      account.type === 'company' ? 'company information and all user associations' :
+                      'customer billing data and subscription information'
+                    }. This action cannot be reversed.`
+                  : `The ${getEntityTypeLabel()} will lose access immediately but all data will remain in the system for future reactivation if needed.`
                 }
               </p>
+              {account.user_count && account.user_count > 0 && (
+                <p className={`text-sm mt-2 font-medium ${
+                  deletePermanent ? "text-red-800" : "text-amber-800"
+                }`}>
+                  ⚠️ This will affect {account.user_count} associated user{account.user_count > 1 ? 's' : ''}.
+                </p>
+              )}
             </div>
           </div>
         </div>

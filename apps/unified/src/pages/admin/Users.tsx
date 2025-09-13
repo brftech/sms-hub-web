@@ -478,16 +478,6 @@ const Users = () => {
                 <option value="user">User</option>
               </select>
 
-              <select
-                value={paymentFilter}
-                onChange={(e) => setPaymentFilter(e.target.value)}
-                className="text-xs border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value="all">All Payment</option>
-                <option value="paid">Paid</option>
-                <option value="pending">Pending</option>
-                <option value="failed">Failed</option>
-              </select>
             </div>
           </div>
         </div>
@@ -692,8 +682,7 @@ const Users = () => {
             <p className="mt-1 text-sm text-muted-foreground">
               {searchQuery ||
               statusFilter !== "all" ||
-              roleFilter !== "all" ||
-              paymentFilter !== "all"
+              roleFilter !== "all"
                 ? "Try adjusting your search or filter criteria."
                 : "No users have been created yet."}
             </p>

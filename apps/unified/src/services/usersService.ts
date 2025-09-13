@@ -10,6 +10,10 @@ export interface UserProfile {
   last_name?: string | null;
   mobile_phone_number?: string | null;
   company_id?: string | null;
+  company?: { 
+    id: string;
+    company_name: string;
+  } | null;
   lead_id?: string | null;
   role?: "admin" | "user" | "manager" | null;
   is_active?: boolean | null;
@@ -74,7 +78,13 @@ class UsersService {
   }): Promise<UserProfile[]> {
     let query = this.supabase
       .from("user_profiles")
-      .select("*")
+      .select(`
+        *,
+        company:companies!company_id (
+          id,
+          company_name
+        )
+      `)
       .order("created_at", { ascending: false });
 
     // Apply filters

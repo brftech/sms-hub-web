@@ -181,7 +181,7 @@ const Dashboard = () => {
       onboardingSubmissions: {
         icon: FileText,
         color: "text-teal-600",
-        label: "Onboarding Submissions",
+        label: "Onboarding",
       },
       brandSubmission: {
         icon: FileText,
@@ -511,12 +511,12 @@ const Dashboard = () => {
                 {stats.onboardingStages.onboardingSubmissions}
               </p>
               <p className="text-xs sm:text-sm text-muted-foreground">
-                Onboarding Submissions
+                Onboarding
               </p>
             </div>
           </div>
 
-          <div className="grid grid-cols-7 gap-2 sm:gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 sm:gap-3">
             {Object.entries(stats.onboardingStages).map(([stage, count]) => {
               const stageInfo = getStageInfo(stage);
               const IconComponent = stageInfo.icon;

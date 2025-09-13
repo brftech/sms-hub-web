@@ -467,6 +467,12 @@ export function Accounts() {
     }
   };
 
+  // Check if an account is protected from deletion
+  const isProtectedAccount = (account: UnifiedAccount): boolean => {
+    const protectedEmails = ["superadmin@percytech.com", "superadmin@gnymble.com"];
+    return protectedEmails.includes(account.email.toLowerCase());
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       month: "short",
@@ -786,9 +792,18 @@ export function Accounts() {
                           <Edit className="w-4 h-4" />
                         </button>
                         <button
-                          onClick={() => handleDeleteAccount(account)}
-                          className="text-red-600 hover:text-red-900"
-                          title="Delete Account"
+                          onClick={() => !isProtectedAccount(account) && handleDeleteAccount(account)}
+                          className={
+                            isProtectedAccount(account)
+                              ? "text-gray-400 cursor-not-allowed opacity-50"
+                              : "text-red-600 hover:text-red-900"
+                          }
+                          title={
+                            isProtectedAccount(account)
+                              ? "Cannot delete protected account"
+                              : "Delete Account"
+                          }
+                          disabled={isProtectedAccount(account)}
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>

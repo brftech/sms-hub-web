@@ -14,7 +14,7 @@ const GlobalViewContext = createContext<GlobalViewContextType | undefined>(
 export const GlobalViewProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const [isGlobalView, setIsGlobalView] = useState(false);
+  const [isGlobalView, setIsGlobalView] = useState(true);
 
   const toggleGlobalView = () => {
     setIsGlobalView(!isGlobalView);

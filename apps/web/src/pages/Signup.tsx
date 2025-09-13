@@ -276,9 +276,16 @@ export function Signup() {
         })
       );
 
-      // Redirect to payment setup
-      const unifiedAppUrl = import.meta.env.VITE_UNIFIED_APP_URL || "http://localhost:3001";
-      window.location.href = `${unifiedAppUrl}/payment-setup`;
+      // Use the magic link to authenticate as the new user
+      if (result.magic_link) {
+        console.log("Using magic link for authentication:", result.magic_link);
+        window.location.href = result.magic_link;
+      } else {
+        // Fallback to direct redirect (shouldn't happen)
+        console.warn("No magic link returned, using direct redirect");
+        const unifiedAppUrl = import.meta.env.VITE_UNIFIED_APP_URL || "http://localhost:3001";
+        window.location.href = `${unifiedAppUrl}/payment-setup`;
+      }
 
     } catch (err: unknown) {
       console.error("Signup error:", err);

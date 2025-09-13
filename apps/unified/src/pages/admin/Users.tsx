@@ -189,6 +189,25 @@ const Users = () => {
     setIsDeleteModalOpen(true);
   };
 
+  // Check if a user is protected from deletion
+  const isProtectedUser = (user: UserProfile): boolean => {
+    const protectedEmails = ["superadmin@percytech.com", "superadmin@gnymble.com"];
+    const userEmail = user.email?.toLowerCase() || "";
+    const isProtected = protectedEmails.includes(userEmail);
+    
+    // Debug logging for all users to see what's happening
+    console.log('Checking protection for user:', {
+      email: user.email,
+      emailLower: userEmail,
+      role: user.role,
+      protectedEmails,
+      isProtected,
+      userId: user.id
+    });
+    
+    return isProtected;
+  };
+
   const handleUpdateUser = async (updatedUser: Partial<UserProfile>) => {
     if (!editingUser) return;
 
@@ -660,9 +679,18 @@ const Users = () => {
                         <Edit className="w-4 h-4" />
                       </button>
                       <button
-                        onClick={() => handleDeleteUser(user)}
-                        className="text-red-600 hover:text-red-900"
-                        title="Delete User"
+                        onClick={() => !isProtectedUser(user) && handleDeleteUser(user)}
+                        className={
+                          isProtectedUser(user)
+                            ? "text-gray-400 cursor-not-allowed opacity-50"
+                            : "text-red-600 hover:text-red-900"
+                        }
+                        title={
+                          isProtectedUser(user)
+                            ? "Cannot delete protected user"
+                            : "Delete User"
+                        }
+                        disabled={isProtectedUser(user)}
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>

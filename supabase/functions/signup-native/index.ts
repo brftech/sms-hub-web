@@ -30,12 +30,11 @@ serve(async (req) => {
       { auth: { persistSession: false } }
     );
 
-    // Check if user already exists
-    const { data: existingUsers } = await supabaseAdmin.auth.admin.listUsers({
-      filter: `email.eq.${email}`
-    });
+    // Check if user already exists in auth
+    const { data: existingUsers } = await supabaseAdmin.auth.admin.listUsers();
+    const existingUser = existingUsers?.users?.find(user => user.email === email);
 
-    if (existingUsers && existingUsers.users.length > 0) {
+    if (existingUser) {
       console.log("User already exists with email:", email);
       return new Response(
         JSON.stringify({ 
@@ -159,7 +158,7 @@ serve(async (req) => {
           last_name: last_name,
           signup_type: customer_type || "company",
           is_active: true,
-          role: invitationData ? invitationData.role : "MEMBER",
+          role: invitationData ? invitationData.role : "USER",
           onboarding_completed: false,
         },
       ])

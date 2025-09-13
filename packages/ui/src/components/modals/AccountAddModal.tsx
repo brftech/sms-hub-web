@@ -119,7 +119,7 @@ export const AccountAddModal: React.FC<AccountAddModalProps> = ({
       subtitle={`Create a new account for ${hubName}`}
       icon={<Plus className="w-5 h-5" />}
       variant="edit"
-      size="lg"
+      size="md"
     >
       <form onSubmit={handleSubmit} className="space-y-6">
         {error && (
@@ -129,126 +129,109 @@ export const AccountAddModal: React.FC<AccountAddModalProps> = ({
         )}
 
         {/* Company Information Section */}
-        <div>
-          <h3 className="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2">
-            <Building2 className="w-4 h-4" />
-            Company Information
-          </h3>
-          <ModalFormLayout>
-            <ModalFormColumn>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Company Name *
-                </label>
-                <input
-                  type="text"
-                  name="companyName"
-                  value={formData.companyName}
-                  onChange={handleInputChange}
-                  placeholder="Enter company name"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors"
-                  required
-                />
-              </div>
-            </ModalFormColumn>
-            <ModalFormColumn>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Legal Name
-                </label>
-                <input
-                  type="text"
-                  name="legalName"
-                  value={formData.legalName}
-                  onChange={handleInputChange}
-                  placeholder="Legal entity name (optional)"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors"
-                />
-              </div>
-            </ModalFormColumn>
-          </ModalFormLayout>
-        </div>
+        <ModalFormLayout>
+          <ModalFormColumn span={2}>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Company Name *
+              </label>
+              <input
+                type="text"
+                name="companyName"
+                value={formData.companyName}
+                onChange={handleInputChange}
+                placeholder="Enter company name"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors text-sm"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Legal Name
+              </label>
+              <input
+                type="text"
+                name="legalName"
+                value={formData.legalName}
+                onChange={handleInputChange}
+                placeholder="Legal entity name (optional)"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors text-sm"
+              />
+            </div>
+          </ModalFormColumn>
+        </ModalFormLayout>
 
         {/* Billing Information Section */}
-        <div>
-          <h3 className="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2">
-            <CreditCard className="w-4 h-4" />
-            Billing Information
-          </h3>
-          <ModalFormLayout>
-            <ModalFormColumn span={2}>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Billing Email *
-                </label>
-                <input
-                  type="email"
-                  name="billingEmail"
-                  value={formData.billingEmail}
-                  onChange={handleInputChange}
-                  placeholder="billing@company.com"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors"
-                  required
-                />
-              </div>
-            </ModalFormColumn>
-            <ModalFormColumn>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Subscription Tier
-                </label>
-                <select
-                  name="subscriptionTier"
-                  value={formData.subscriptionTier}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors"
-                >
-                  <option value="FREE">Free</option>
-                  <option value="STARTER">Starter</option>
-                  <option value="PRO">Pro</option>
-                  <option value="ENTERPRISE">Enterprise</option>
-                </select>
-              </div>
-            </ModalFormColumn>
-            <ModalFormColumn>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Payment Status
-                </label>
-                <select
-                  name="paymentStatus"
-                  value={formData.paymentStatus}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors"
-                >
-                  <option value="PENDING">Pending</option>
-                  <option value="ACTIVE">Active</option>
-                  <option value="PAST_DUE">Past Due</option>
-                  <option value="CANCELED">Canceled</option>
-                </select>
-              </div>
-            </ModalFormColumn>
-          </ModalFormLayout>
-        </div>
+        <ModalFormLayout>
+          <ModalFormColumn span={2}>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Billing Email *
+              </label>
+              <input
+                type="email"
+                name="billingEmail"
+                value={formData.billingEmail}
+                onChange={handleInputChange}
+                placeholder="billing@company.com"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors text-sm"
+                required
+              />
+            </div>
+          </ModalFormColumn>
+        </ModalFormLayout>
+
+        <ModalFormLayout>
+          <ModalFormColumn>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Subscription Tier
+              </label>
+              <select
+                name="subscriptionTier"
+                value={formData.subscriptionTier}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors text-sm"
+              >
+                <option value="FREE">Free</option>
+                <option value="STARTER">Starter</option>
+                <option value="PRO">Pro</option>
+                <option value="ENTERPRISE">Enterprise</option>
+              </select>
+            </div>
+          </ModalFormColumn>
+          <ModalFormColumn>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Payment Status
+              </label>
+              <select
+                name="paymentStatus"
+                value={formData.paymentStatus}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors text-sm"
+              >
+                <option value="PENDING">Pending</option>
+                <option value="ACTIVE">Active</option>
+                <option value="PAST_DUE">Past Due</option>
+                <option value="CANCELED">Canceled</option>
+              </select>
+            </div>
+          </ModalFormColumn>
+        </ModalFormLayout>
 
         {/* Initial User Section */}
-        <div>
-          <h3 className="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2">
-            <User className="w-4 h-4" />
-            Initial User (Optional)
-          </h3>
-          <div className="mb-4">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                name="createUser"
-                checked={formData.createUser}
-                onChange={handleInputChange}
-                className="w-4 h-4 text-gray-600 border-gray-300 rounded focus:ring-gray-500"
-              />
-              <span className="text-sm text-gray-700">Create an initial user for this account</span>
-            </label>
-          </div>
+        <div className="border-t pt-4">
+          <label className="flex items-center gap-2 cursor-pointer mb-4">
+            <input
+              type="checkbox"
+              name="createUser"
+              checked={formData.createUser}
+              onChange={handleInputChange}
+              className="w-4 h-4 text-gray-600 border-gray-300 rounded focus:ring-gray-500"
+            />
+            <span className="text-sm font-medium text-gray-700">Create an initial user (optional)</span>
+          </label>
 
           {formData.createUser && (
             <ModalFormLayout>
@@ -263,7 +246,7 @@ export const AccountAddModal: React.FC<AccountAddModalProps> = ({
                     value={formData.firstName}
                     onChange={handleInputChange}
                     placeholder="John"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors text-sm"
                   />
                 </div>
                 <div>
@@ -276,7 +259,7 @@ export const AccountAddModal: React.FC<AccountAddModalProps> = ({
                     value={formData.userEmail}
                     onChange={handleInputChange}
                     placeholder="user@company.com"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors text-sm"
                     required={formData.createUser}
                   />
                 </div>
@@ -290,7 +273,7 @@ export const AccountAddModal: React.FC<AccountAddModalProps> = ({
                     value={formData.phoneNumber}
                     onChange={handleInputChange}
                     placeholder="+1234567890"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors text-sm"
                   />
                 </div>
               </ModalFormColumn>
@@ -305,7 +288,7 @@ export const AccountAddModal: React.FC<AccountAddModalProps> = ({
                     value={formData.lastName}
                     onChange={handleInputChange}
                     placeholder="Doe"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors text-sm"
                   />
                 </div>
                 <div>
@@ -318,7 +301,7 @@ export const AccountAddModal: React.FC<AccountAddModalProps> = ({
                     value={formData.userPassword}
                     onChange={handleInputChange}
                     placeholder="Leave blank to send invite"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors text-sm"
                   />
                 </div>
                 <div>
@@ -329,7 +312,7 @@ export const AccountAddModal: React.FC<AccountAddModalProps> = ({
                     name="role"
                     value={formData.role}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors text-sm"
                   >
                     <option value="MEMBER">Member</option>
                     <option value="VIEWER">Viewer</option>

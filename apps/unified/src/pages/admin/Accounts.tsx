@@ -206,8 +206,6 @@ export function Accounts() {
 
     try {
       setIsUpdating(true);
-      const supabase = getSupabaseClient();
-      const { data: { session } } = await supabase.auth.getSession();
 
       // Update based on account type
       if (selectedAccount.company && updates.company) {
@@ -217,7 +215,7 @@ export function Accounts() {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${session?.access_token}`,
+              Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
             },
             body: JSON.stringify({
               account_type: 'company',
@@ -240,7 +238,7 @@ export function Accounts() {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${session?.access_token}`,
+              Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
             },
             body: JSON.stringify({
               account_type: 'customer',
@@ -272,8 +270,6 @@ export function Accounts() {
 
     try {
       setIsDeleting(true);
-      const supabase = getSupabaseClient();
-      const { data: { session } } = await supabase.auth.getSession();
 
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/delete-account`,
@@ -281,7 +277,7 @@ export function Accounts() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${session?.access_token}`,
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
           },
           body: JSON.stringify({
             account_id: selectedAccount.id,

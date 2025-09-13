@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useHub } from "@sms-hub/ui";
 import { AccountViewModal, AccountEditModal, AccountDeleteModal } from "@sms-hub/ui";
 import { useGlobalView } from "../../contexts/GlobalViewContext";
+import { getSupabaseClient } from "../../lib/supabaseSingleton";
 import { customersService, Customer } from "../../services/customersService";
 import { companiesService, Company } from "../../services/companiesService";
 import {

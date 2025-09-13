@@ -62,13 +62,15 @@ serve(async (req) => {
       const companyUpdates: any = {};
       
       if (updates.public_name !== undefined) companyUpdates.public_name = updates.public_name;
-      if (updates.company_name !== undefined) companyUpdates.company_name = updates.company_name;
+      // company_name doesn't exist in companies table, map to public_name
+      if (updates.company_name !== undefined) companyUpdates.public_name = updates.company_name;
       if (updates.legal_company_name !== undefined) companyUpdates.legal_company_name = updates.legal_company_name;
       if (updates.legal_name !== undefined) companyUpdates.legal_name = updates.legal_name;
       if (updates.contact_email !== undefined) companyUpdates.primary_contact_email = updates.contact_email;
       if (updates.contact_phone !== undefined) companyUpdates.primary_contact_phone = updates.contact_phone;
       if (updates.company_account_number !== undefined) companyUpdates.company_account_number = updates.company_account_number;
-      if (updates.tax_id !== undefined) companyUpdates.tax_id = updates.tax_id;
+      if (updates.tax_id !== undefined) companyUpdates.ein = updates.tax_id;  // Map tax_id to ein field
+      if (updates.ein !== undefined) companyUpdates.ein = updates.ein;  // Also support direct ein field
       if (updates.industry_vertical !== undefined) companyUpdates.industry_vertical = updates.industry_vertical;
       if (updates.is_active !== undefined) companyUpdates.is_active = updates.is_active;
 

@@ -5,7 +5,7 @@
 Please ensure the following environment variables are set in your Supabase dashboard:
 https://supabase.com/dashboard/project/vgpovgpwqkjnpnrjelyg/settings/vault
 
-**Note**: All Edge Functions have been updated with enhanced validation and security measures (January 2025). Ensure all environment variables are properly set for the enhanced authentication and account creation flow.
+**Note**: All Edge Functions have been updated with enhanced validation and security measures (September 2025). Ensure all environment variables are properly set for the enhanced authentication and account creation flow.
 
 ### SMS/Communication Variables
 - [ ] `ZAPIER_SMS_WEBHOOK_URL` - Your Zapier webhook URL for SMS via PercyTech
@@ -43,7 +43,7 @@ VITE_DEV_AUTH_TOKEN=your-secure-dev-token
 VITE_DEVELOPMENT_MODE=true
 ```
 
-## Recent Updates (January 2025)
+## Recent Updates (September 2025)
 
 ### Enhanced Edge Functions
 All Edge Functions have been updated with:

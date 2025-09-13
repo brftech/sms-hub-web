@@ -4,7 +4,7 @@
 
 This document provides a comprehensive walkthrough of the SMS Hub onboarding process, from initial signup with **magic link authentication** to payment completion and post-payment onboarding. This is essential for understanding the complete user journey and debugging any issues.
 
-**Recent Updates (January 2025)**: Magic link authentication implementation, role management fixes (USER instead of MEMBER), superadmin protection, and enhanced B2B/B2C account creation.
+**Recent Updates (September 2025)**: Magic link authentication implementation, role management fixes (USER instead of MEMBER), superadmin protection, and enhanced B2B/B2C account creation.
 
 ## 📋 Onboarding Process Flow
 
@@ -319,7 +319,7 @@ verifications → user_profiles → companies → customers → onboarding_submi
 - Test in both development and production
 - Document any new variables needed
 
-## 🔄 Recent Enhancements Summary (January 2025)
+## 🔄 Recent Enhancements Summary (September 2025)
 
 ### Authentication Flow Improvements
 1. **Magic Link Authentication**: Prevents session carryover and ensures proper isolation

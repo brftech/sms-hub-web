@@ -205,20 +205,54 @@ export function Accounts() {
 
     try {
       setIsUpdating(true);
+      const supabase = getSupabaseClient();
+      const { data: { session } } = await supabase.auth.getSession();
 
       // Update based on account type
       if (selectedAccount.company && updates.company) {
-        await companiesService.instance.updateCompany(
-          selectedAccount.company.id,
-          updates.company
+        const response = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/update-account`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${session?.access_token}`,
+            },
+            body: JSON.stringify({
+              account_type: 'company',
+              account_id: selectedAccount.company.id,
+              updates: updates.company,
+            }),
+          }
         );
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.error || "Failed to update company");
+        }
       }
 
       if (selectedAccount.customer && updates.customer) {
-        await customersService.instance.updateCustomer(
-          selectedAccount.customer.id,
-          updates.customer
+        const response = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/update-account`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${session?.access_token}`,
+            },
+            body: JSON.stringify({
+              account_type: 'customer',
+              account_id: selectedAccount.customer.id,
+              updates: updates.customer,
+            }),
+          }
         );
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.error || "Failed to update customer");
+        }
       }
 
       alert("Account updated successfully!");
@@ -226,7 +260,7 @@ export function Accounts() {
       setIsEditModalOpen(false);
     } catch (error) {
       console.error("Error updating account:", error);
-      alert("Failed to update account");
+      alert(error.message || "Failed to update account");
     } finally {
       setIsUpdating(false);
     }
@@ -237,35 +271,39 @@ export function Accounts() {
 
     try {
       setIsDeleting(true);
+      const supabase = getSupabaseClient();
+      const { data: { session } } = await supabase.auth.getSession();
 
-      if (permanent) {
-        // Delete based on account type
-        if (selectedAccount.customer) {
-          await customersService.instance.deleteCustomer(selectedAccount.customer.id);
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/delete-account`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session?.access_token}`,
+          },
+          body: JSON.stringify({
+            account_id: selectedAccount.id,
+            account_type: selectedAccount.type,
+            permanent: permanent,
+            company_id: selectedAccount.company?.id,
+            customer_id: selectedAccount.customer?.id,
+          }),
         }
-        if (selectedAccount.company) {
-          await companiesService.instance.deleteCompany(selectedAccount.company.id);
-        }
-      } else {
-        // Deactivate
-        if (selectedAccount.company) {
-          await companiesService.instance.updateCompany(selectedAccount.company.id, {
-            is_active: false,
-          });
-        }
-        if (selectedAccount.customer) {
-          await customersService.instance.updateCustomer(selectedAccount.customer.id, {
-            is_active: false,
-          });
-        }
+      );
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to delete account");
       }
 
-      alert(permanent ? "Account deleted successfully!" : "Account deactivated successfully!");
+      const result = await response.json();
+      alert(result.message);
       await fetchData();
       setIsDeleteModalOpen(false);
     } catch (error) {
       console.error("Error deleting account:", error);
-      alert("Failed to delete account");
+      alert(error.message || "Failed to delete account");
     } finally {
       setIsDeleting(false);
     }

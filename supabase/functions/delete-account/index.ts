@@ -51,44 +51,57 @@ serve(async (req) => {
     if (permanent) {
       // Permanent deletion - CASCADE DELETE EVERYTHING
       if (company_id) {
-        // Get all users associated with this company (via profiles or memberships)
+        // IMPORTANT: Must clear ALL foreign key references before deleting company
+        
+        // 1. First, get all profiles with this company_id
         const { data: profiles } = await supabaseAdmin
           .from("profiles")
           .select("id")
           .eq("company_id", company_id);
 
-        const { data: memberships } = await supabaseAdmin
-          .from("memberships")
-          .select("user_id")
+        // 2. Clear company_id from ALL profiles (even if we plan to delete them)
+        // This prevents foreign key constraint errors
+        const { error: clearError } = await supabaseAdmin
+          .from("profiles")
+          .update({ company_id: null })
           .eq("company_id", company_id);
+        
+        if (clearError) {
+          console.error("Failed to clear company_id from profiles:", clearError);
+        }
 
-        // Collect all unique user IDs
-        const userIds = new Set<string>();
-        profiles?.forEach(p => userIds.add(p.id));
-        memberships?.forEach(m => userIds.add(m.user_id));
+        // 3. Delete all memberships for this company
+        const { error: membershipError } = await supabaseAdmin
+          .from("memberships")
+          .delete()
+          .eq("company_id", company_id);
+        
+        if (membershipError) {
+          console.error("Failed to delete memberships:", membershipError);
+        }
 
-        // Delete all user data in correct order to avoid foreign key constraints
-        for (const userId of userIds) {
-          // 1. Delete memberships for this user
-          await supabaseAdmin
-            .from("memberships")
-            .delete()
-            .eq("user_id", userId);
+        // 4. Now delete each user completely (profiles + auth)
+        if (profiles && profiles.length > 0) {
+          for (const profile of profiles) {
+            // Delete profile
+            const { error: profileError } = await supabaseAdmin
+              .from("profiles")
+              .delete()
+              .eq("id", profile.id);
+            
+            if (profileError) {
+              console.error(`Failed to delete profile ${profile.id}:`, profileError);
+            }
 
-          // 2. Delete profile
-          await supabaseAdmin
-            .from("profiles")
-            .delete()
-            .eq("id", userId);
-
-          // 3. Delete auth user (this will cascade to auth.users)
-          const { error: authError } = await supabaseAdmin.auth.admin.deleteUser(userId);
-          if (authError) {
-            console.error(`Failed to delete auth for user ${userId}:`, authError);
+            // Delete auth user
+            const { error: authError } = await supabaseAdmin.auth.admin.deleteUser(profile.id);
+            if (authError) {
+              console.error(`Failed to delete auth for user ${profile.id}:`, authError);
+            }
           }
         }
 
-        // Finally, delete the company itself
+        // 5. Finally, delete the company itself
         const { error: companyError } = await supabaseAdmin
           .from("companies")
           .delete()

@@ -53,21 +53,53 @@ serve(async (req) => {
       if (company_id) {
         // IMPORTANT: Must clear ALL foreign key references before deleting company
         
-        // 1. First, get all profiles with this company_id
+        // 1. First, get all user profiles with this company_id
         const { data: profiles } = await supabaseAdmin
-          .from("profiles")
+          .from("user_profiles")
           .select("id")
           .eq("company_id", company_id);
 
-        // 2. Clear company_id from ALL profiles (even if we plan to delete them)
+        // 2. Clear company_id from ALL tables that reference it
         // This prevents foreign key constraint errors
-        const { error: clearError } = await supabaseAdmin
-          .from("profiles")
+        
+        // Clear from user_profiles
+        const { error: clearProfilesError } = await supabaseAdmin
+          .from("user_profiles")
           .update({ company_id: null })
           .eq("company_id", company_id);
         
-        if (clearError) {
-          console.error("Failed to clear company_id from profiles:", clearError);
+        if (clearProfilesError) {
+          console.error("Failed to clear company_id from user_profiles:", clearProfilesError);
+        }
+
+        // Clear from customers table
+        const { error: clearCustomersError } = await supabaseAdmin
+          .from("customers")
+          .update({ company_id: null })
+          .eq("company_id", company_id);
+        
+        if (clearCustomersError) {
+          console.error("Failed to clear company_id from customers:", clearCustomersError);
+        }
+
+        // Clear from contacts table if it exists
+        const { error: clearContactsError } = await supabaseAdmin
+          .from("contacts")
+          .update({ company_id: null })
+          .eq("company_id", company_id);
+        
+        if (clearContactsError) {
+          console.error("Failed to clear company_id from contacts:", clearContactsError);
+        }
+
+        // Clear from brands table if it exists
+        const { error: clearBrandsError } = await supabaseAdmin
+          .from("brands")
+          .update({ company_id: null })
+          .eq("company_id", company_id);
+        
+        if (clearBrandsError) {
+          console.error("Failed to clear company_id from brands:", clearBrandsError);
         }
 
         // 3. Delete all memberships for this company
@@ -80,12 +112,12 @@ serve(async (req) => {
           console.error("Failed to delete memberships:", membershipError);
         }
 
-        // 4. Now delete each user completely (profiles + auth)
+        // 4. Now delete each user completely (user_profiles + auth)
         if (profiles && profiles.length > 0) {
           for (const profile of profiles) {
-            // Delete profile
+            // Delete user profile
             const { error: profileError } = await supabaseAdmin
-              .from("profiles")
+              .from("user_profiles")
               .delete()
               .eq("id", profile.id);
             
@@ -101,7 +133,17 @@ serve(async (req) => {
           }
         }
 
-        // 5. Finally, delete the company itself
+        // 5. Delete related customer records that were linked to this company
+        const { error: deleteCustomersError } = await supabaseAdmin
+          .from("customers")
+          .delete()
+          .or(`company_id.eq.${company_id},company_id.is.null`);
+        
+        if (deleteCustomersError) {
+          console.error("Failed to delete customer records:", deleteCustomersError);
+        }
+
+        // 6. Finally, delete the company itself
         const { error: companyError } = await supabaseAdmin
           .from("companies")
           .delete()
@@ -112,8 +154,8 @@ serve(async (req) => {
         }
       }
 
-      if (customer_id) {
-        // Delete the customer
+      if (customer_id && !company_id) {
+        // Only delete the customer if we're not already deleting the company
         const { error: customerError } = await supabaseAdmin
           .from("customers")
           .delete()

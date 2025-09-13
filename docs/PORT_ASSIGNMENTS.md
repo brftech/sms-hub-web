@@ -148,13 +148,20 @@ For external access:
 ## 🔄 Recent Changes
 
 ### Port Consolidation (January 2025)
-- **Unified App**: Consolidated admin and user functions
+- **Unified App**: Consolidated admin and user functions with enhanced security
 - **Legacy Apps**: Being migrated to Unified app
 - **Port Reduction**: From 6 apps to 3 production apps
+- **Enhanced Authentication**: Magic link flow implemented across Web → Unified app flow
 
-### Current Focus
-- **Web App (3000)**: Marketing and authentication
-- **Unified App (3001)**: All authenticated functionality
-- **API Server (3002)**: Backend services
+### Current Focus (Updated January 2025)
+- **Web App (3000)**: Marketing and **magic link authentication** gateway
+- **Unified App (3001)**: All authenticated functionality with **global view default** and **superadmin protection**
+- **API Server (3002)**: Backend services with enhanced Edge Functions
+
+### Recent Improvements
+- **Magic Link Authentication**: Prevents session carryover between Web (3000) and Unified (3001) apps
+- **Enhanced Security**: Superadmin protection and proper session isolation
+- **Global View Default**: Admin dashboard defaults to global view for better cross-hub management
+- **Responsive UI**: Improved mobile experience across all port endpoints
 
 This port assignment strategy provides a clean, maintainable architecture with clear separation of concerns and efficient development workflow.

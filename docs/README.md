@@ -13,6 +13,9 @@ This directory contains comprehensive documentation for the SMS Hub monorepo pro
 - **[QUICK_START.md](./QUICK_START.md)** - Quick start guide for new developers
 - **[PORT_ASSIGNMENTS.md](./PORT_ASSIGNMENTS.md)** - Port configuration and usage
 
+### Configuration & Setup
+- **[ENVIRONMENT_VARIABLES_CHECKLIST.md](./ENVIRONMENT_VARIABLES_CHECKLIST.md)** - Environment setup guide
+
 ### Development Guides
 - **[CLAUDE.md](../CLAUDE.md)** - Main development instructions (in root)
 - **[README.md](../README.md)** - Project README (in root)
@@ -51,15 +54,23 @@ This directory contains comprehensive documentation for the SMS Hub monorepo pro
 ## 📊 Documentation Status
 
 ### Current Status (January 2025)
-- ✅ **PROJECT_SUMMARY.md**: Up-to-date with current architecture
-- ✅ **ARCHITECTURE_STATUS.md**: Reflects recent schema alignment
-- ✅ **ONBOARDING_FLOW.md**: Complete user journey documented
+- ✅ **PROJECT_SUMMARY.md**: Up-to-date with enhanced authentication and security
+- ✅ **ARCHITECTURE_STATUS.md**: Reflects magic link authentication and recent improvements
+- ✅ **ONBOARDING_FLOW.md**: Complete user journey with magic link flow documented
 - ✅ **QUICK_START.md**: Ready for new developers
-- ✅ **PORT_ASSIGNMENTS.md**: Current port configuration
-- ✅ **CLAUDE.md**: Comprehensive development guide
+- ✅ **PORT_ASSIGNMENTS.md**: Current port configuration with recent updates
+- ✅ **ENVIRONMENT_VARIABLES_CHECKLIST.md**: Environment setup guide
+- ✅ **CLAUDE.md**: Comprehensive development guide with latest changes
 
-### Recent Updates
-- **Schema Alignment**: Updated all docs to reflect new database schema
+### Recent Updates (January 2025)
+- **Magic Link Authentication**: Fixed signup flow with proper session isolation
+- **Role Management**: Corrected USER role assignment (was MEMBER)
+- **Superadmin Protection**: Added account protection for critical system users
+- **B2B/B2C Enhancement**: Comprehensive account creation support
+- **Global View Default**: Admin dashboard improvements
+- **UI Improvements**: Responsive design and better user experience
+- **Enhanced Security**: Better session management and validation
+- **Schema Alignment**: Updated all docs to reflect new database schema (completed)
 - **Payment Track Cleanup**: Added documentation for new admin tools
 - **Type Safety**: Updated to reflect comprehensive TypeScript implementation
 - **Architecture Consolidation**: Updated to reflect unified app structure
@@ -67,16 +78,21 @@ This directory contains comprehensive documentation for the SMS Hub monorepo pro
 ## 🎯 Key Information
 
 ### Project Status
-- **Architecture**: ✅ Production Ready
+- **Architecture**: ✅ Production Ready with Enhanced Security
+- **Authentication**: ✅ Magic Link Flow Implemented
+- **Role Management**: ✅ Fixed USER Role Assignment
+- **Superadmin Protection**: ✅ Account Protection Implemented
+- **B2B/B2C Support**: ✅ Comprehensive Account Creation
 - **Schema Alignment**: ✅ Complete
 - **Type Safety**: ✅ Comprehensive
-- **Payment Track Cleanup**: ✅ Implemented
-- **UI Component Updates**: 🚧 In Progress
+- **Payment Track Cleanup**: ✅ Implemented with Protection
+- **Global View**: ✅ Admin Dashboard Default Updated
+- **UI Improvements**: ✅ Responsive Design Implemented
 
-### Development Focus
-- **Immediate**: Update UI components to match new schema
-- **Short Term**: Improve error handling and testing
-- **Long Term**: Mobile apps and advanced analytics
+### Development Focus (Updated)
+- **Current**: All major authentication and security improvements completed
+- **Short Term**: Continued UI refinements and testing improvements
+- **Long Term**: Mobile apps, advanced analytics, and additional security features
 
 ### Critical Rules
 1. **NO CSS files** - Use styled-components only
@@ -94,9 +110,12 @@ pnpm dev
 ```
 
 ### Access Points
-- **Web App**: http://localhost:3000
-- **Unified App**: http://localhost:3001
-- **Superadmin**: http://localhost:3001/?superadmin=dev123
+- **Web App** (Marketing + Magic Link Auth): http://localhost:3000
+- **Unified App** (Main Authenticated Platform): http://localhost:3001
+- **Development Superadmin**: http://localhost:3001/?superadmin=dev123
+- **Protected Superadmin Accounts**: 
+  - superadmin@percytech.com
+  - superadmin@gnymble.com
 
 ### Key Commands
 - `pnpm type-check` - TypeScript validation

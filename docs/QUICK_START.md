@@ -24,9 +24,12 @@ pnpm dev
 ```
 
 ### Access Points
-- **Web App**: http://localhost:3000 (marketing, auth)
-- **Unified App**: http://localhost:3001 (main app)
-- **Superadmin**: http://localhost:3001/?superadmin=dev123
+- **Web App**: http://localhost:3000 (marketing, **magic link auth**)
+- **Unified App**: http://localhost:3001 (main app with **global view default**)
+- **Development Superadmin**: http://localhost:3001/?superadmin=dev123
+- **Protected Superadmin Accounts**:
+  - superadmin@percytech.com (protected from deletion)
+  - superadmin@gnymble.com (protected from deletion)
 
 ## 🔑 Key Concepts
 
@@ -36,14 +39,20 @@ pnpm dev
 - **PercyMD**: Hub ID 2
 - **PercyText**: Hub ID 3
 
-### User Roles
-- **User**: Basic SMS functionality
-- **Admin**: Company management
-- **Superadmin**: Cross-hub access
+### User Roles (Fixed Hierarchy)
+- **User**: Basic SMS functionality (corrected from MEMBER role)
+- **Onboarded**: Full access after completing onboarding
+- **Admin**: Company management with **global view default**
+- **Superadmin**: Cross-hub access with **account protection**
 
-### Authentication
-- **Real Auth**: superadmin@gnymble.com / SuperAdmin123!
-- **Dev Mode**: Add `?superadmin=dev123` to URL
+### Authentication (Enhanced)
+- **Magic Link Auth**: Enhanced signup flow prevents session carryover
+- **Protected Superadmin Access**: 
+  - superadmin@percytech.com (protected from deletion)
+  - superadmin@gnymble.com (protected from deletion)
+- **Development Mode**: Add `?superadmin=dev123` to URL (bypass auth)
+- **B2B/B2C Support**: Comprehensive account creation for both business models
+- **Enhanced Security**: Proper session isolation and validation
 
 ## 🛠️ Common Tasks
 
@@ -61,25 +70,39 @@ supabase gen types typescript --project-id vgpovgpwqkjnpnrjelyg > packages/types
 supabase db push
 ```
 
-### Clean Up Data
-1. Go to admin dashboard
+### Clean Up Data (Enhanced Protection)
+1. Go to admin dashboard (defaults to **global view**)
 2. Scroll to "Data Cleanup" section
 3. Click "Preview Cleanup" to see what would be deleted
 4. Click "Execute Cleanup" to delete payment track data
+5. **Protected accounts** (superadmin@percytech.com, superadmin@gnymble.com) are automatically preserved
+6. **Delete buttons disabled** for protected accounts in user management
 
-## 🐛 Common Issues
+## 🐛 Common Issues (Updated)
+
+### "Magic link authentication failed"
+**Solution**: Clear browser storage, ensure proper session isolation, avoid mixing auth methods
+
+### "Incorrect role assignment (MEMBER instead of USER)"
+**Solution**: **FIXED** - Edge Functions now properly assign USER role
 
 ### "Multiple GoTrueClient instances"
-**Solution**: Use `getSupabaseClient()` singleton
+**Solution**: Use `getSupabaseClient()` singleton in Unified app
 
 ### Type errors after schema changes
 **Solution**: Run `pnpm type-check` and update service files
 
+### "Superadmin account deletion blocked"
+**Solution**: **WORKING AS INTENDED** - Protected accounts cannot be deleted
+
 ### SMS not working
-**Solution**: Check Zapier webhook configuration
+**Solution**: Check Zapier webhook configuration and Edge Function logs
 
 ### Payment issues
-**Solution**: Verify Stripe configuration and webhook setup
+**Solution**: Verify Stripe configuration, webhook setup, and enhanced validation logic
+
+### "Session carryover between users"
+**Solution**: **FIXED** - Magic link authentication prevents this issue
 
 ## 📁 Key Files
 
@@ -96,12 +119,14 @@ supabase db push
 4. **Never expose service role key** in frontend
 5. **Always handle errors** gracefully
 
-## 📚 Documentation
+## 📚 Documentation (Updated)
 
-- `CLAUDE.md` - Complete development guide
-- `docs/ONBOARDING_FLOW.md` - User journey documentation
-- `docs/ARCHITECTURE_STATUS.md` - Current architecture
-- `docs/PROJECT_SUMMARY.md` - Comprehensive overview
+- `CLAUDE.md` - Complete development guide with latest changes
+- `docs/ONBOARDING_FLOW.md` - User journey with **magic link authentication**
+- `docs/ARCHITECTURE_STATUS.md` - Current architecture with **security enhancements**
+- `docs/PROJECT_SUMMARY.md` - Comprehensive overview with **recent improvements**
+- `docs/ENVIRONMENT_VARIABLES_CHECKLIST.md` - Environment setup guide
+- `docs/PORT_ASSIGNMENTS.md` - Port configuration with **recent updates**
 
 ## 🔧 Environment Variables
 
@@ -121,12 +146,27 @@ RESEND_API_KEY=[your-resend-key]
 STRIPE_SECRET_KEY=[your-stripe-key]
 ```
 
-## 🎯 Current Status
+## 🎯 Current Status (January 2025)
 
-- ✅ **Schema Alignment**: Complete
+### Recently Completed ✅
+- **Magic Link Authentication**: Prevents session carryover, enhanced security
+- **Role Management Fix**: USER role correctly assigned (was MEMBER)
+- **Superadmin Protection**: Account deletion prevention implemented
+- **B2B/B2C Enhancement**: Comprehensive account creation support
+- **Global View Default**: Admin dashboard improved UX
+- **UI Improvements**: Responsive design and better user experience
+- **Enhanced Edge Functions**: Comprehensive validation and error handling
+- **Schema Alignment**: Complete with type safety
+- **Payment Track Cleanup**: Implemented with protection
+
+### Development Status
+- ✅ **Authentication & Security**: Enhanced and production-ready
+- ✅ **Role Management**: Fixed and working correctly
+- ✅ **Account Protection**: Superadmin accounts protected
+- ✅ **UI/UX**: Responsive and improved
 - ✅ **Type Safety**: Comprehensive
-- ✅ **Payment Track Cleanup**: Implemented
-- 🚧 **UI Component Updates**: In progress
-- 🚧 **Error Handling**: Improvements needed
+- ✅ **Database**: Aligned with enhanced validation
 
-**Ready for development!** 🚀
+**Status: PRODUCTION READY with Enhanced Security!** 🚀
+
+**Latest Achievement**: Magic link authentication, role fixes, and comprehensive security enhancements implemented.

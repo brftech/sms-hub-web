@@ -1,6 +1,6 @@
 # SMS Hub Monorepo - Current Architecture Status
 
-## 🏗️ Current Architecture (Unified)
+## 🏗️ Current Architecture (January 2025)
 
 ### Technology Stack
 
@@ -8,10 +8,12 @@
 - **Frontend Framework**: React 19 with Vite
 - **Styling**: styled-components (CSS-in-JS) - **NO CSS file imports**
 - **Backend**: Supabase (PostgreSQL + Auth + Edge Functions)
-- **Authentication**: Supabase Auth with real PostgreSQL credentials + SMS OTP
+- **Authentication**: Supabase Auth with PostgreSQL + Magic Link flow
 - **State Management**: React Query (TanStack Query)
-- **Type Safety**: TypeScript with shared types package
-- **Database**: PostgreSQL with comprehensive type definitions
+- **Type Safety**: TypeScript with comprehensive shared types
+- **Database**: PostgreSQL with full schema alignment and type safety
+- **Admin Features**: Global view default, protected superadmin accounts
+- **Account Creation**: B2B and B2C support with proper role management
 
 ### Simplified App Structure
 
@@ -78,10 +80,29 @@ graph TD
 
 ### Authentication Methods
 
-1. **Real Authentication**: Supabase with PostgreSQL storage
-2. **Superadmin Access**: superadmin@gnymble.com / SuperAdmin123!
-3. **Development Mode**: Add ?superadmin=dev123 to URL (no persistence)
-4. **SMS OTP**: Available for additional verification
+1. **Production Authentication**: Supabase Auth with **magic link flow**
+   - Prevents session carryover between different user types
+   - Ensures proper session isolation and security
+   - Email-based magic link authentication for secure access
+
+2. **Superadmin Access** (Protected Accounts): 
+   - **superadmin@percytech.com** (protected from deletion)
+   - **superadmin@gnymble.com** (protected from deletion)
+   - Delete buttons disabled for these accounts in admin dashboard
+   - Enhanced security measures for admin operations
+
+3. **Development Mode**: Add `?superadmin=dev123` to URL (bypass auth)
+   - Quick access for development and testing
+   - Bypasses normal authentication flow
+   - Should only be used in development environment
+
+4. **Account Creation** (Enhanced B2B/B2C Support): 
+   - **B2B**: Company + Customer + User creation with proper business entity setup
+   - **B2C**: Individual Customer + User creation for personal accounts
+   - **Fixed Role Assignment**: USER → ONBOARDED → ADMIN → SUPERADMIN (corrected from MEMBER)
+   - Comprehensive validation and error handling via Edge Functions
+
+5. **SMS OTP**: Available for additional verification and two-factor authentication
 
 ### Session Management
 
@@ -103,18 +124,20 @@ The `apps/unified` app now handles:
   - Onboarding progress tracking
 
 - **Admin Functions**:
-  - Company management  
-  - User administration
-  - System monitoring
-  - Analytics dashboard
-  - **Data cleanup tools** (NEW)
+  - Company management with enhanced validation
+  - User administration with role management fixes
+  - System monitoring and analytics
+  - **Global view default** (changed from PercyTech hub)
+  - **Data cleanup tools** with preview and execute modes
+  - **Protected account management** (superadmin deletion prevention)
 
 - **Superadmin Functions**:
-  - Cross-hub access
-  - System administration
-  - Platform configuration
-  - Global analytics
-  - **Payment track cleanup** (NEW)
+  - **Cross-hub global access** with improved default view
+  - System administration with enhanced security
+  - Platform configuration and management
+  - **Global analytics and reporting**
+  - **Payment track cleanup** with superadmin protection
+  - **Account protection controls** for critical system accounts
 
 ### Role-Based UI
 
@@ -309,7 +332,49 @@ pnpm dev  # Starts both web (3000) and unified (3001)
 
 ## 🎯 Recent Major Updates (January 2025)
 
-### Schema Alignment & Type Safety
+### Authentication & Signup Flow Improvements
+1. **Magic Link Authentication**: 
+   - Fixed signup flow to use magic link authentication instead of direct redirect
+   - Prevents superadmin session carryover issues
+   - Ensures proper session isolation between users
+
+2. **Role Management Fixed**:
+   - Corrected USER role assignment (was incorrectly MEMBER)
+   - Proper role hierarchy: USER → ONBOARDED → ADMIN → SUPERADMIN
+   - Fixed role-based access control across the platform
+
+3. **Account Creation Enhancement**:
+   - Added comprehensive B2B and B2C account creation support via Edge Functions
+   - Complete data creation flow with proper validation
+   - Handles both company and individual customer scenarios
+
+4. **Superadmin Protection**:
+   - Delete buttons disabled for protected accounts (superadmin@percytech.com, superadmin@gnymble.com)
+   - Enhanced security measures for admin accounts
+   - Prevents accidental deletion of critical accounts
+
+5. **Admin Dashboard Improvements**:
+   - Global view now set as default instead of PercyTech hub
+   - Better cross-hub data visibility for administrators
+   - Updated "Onboarding Submissions" label to simply "Onboarding"
+
+6. **UI Enhancements**:
+   - Payment track cards now have responsive layout
+   - Improved mobile experience across dashboard
+   - Better visual hierarchy and spacing
+
+### Edge Functions Updates
+1. **Enhanced signup-native Function**:
+   - Comprehensive validation and error handling
+   - Proper data creation flow for all account types
+   - Improved security measures
+
+2. **Updated delete-account Function**:
+   - Added protection for superadmin accounts
+   - Enhanced validation before deletion
+   - Better error messaging and logging
+
+### Schema Alignment & Type Safety (Completed)
 1. **Database Schema Cleanup**:
    - Separated `companies` (business entities) from `customers` (paying entities)
    - Moved `billing_email`, `payment_status`, `payment_type` to `customers` table
@@ -334,18 +399,21 @@ pnpm dev  # Starts both web (3000) and unified (3001)
    - Updated `phoneNumbersService.ts` to use correct schema
    - All services now align with database schema
 
-### Authentication & Security
+### Security & Authentication Architecture
 1. **Security Architecture**:
    - Frontend uses ONLY anon key via `getSupabaseClient`
    - Admin operations moved to Edge Functions
    - Service role key never exposed in frontend
-   - RLS currently disabled (manual hub_id filtering required)
+   - Magic link authentication prevents session carryover
 
 2. **Authentication Methods**:
-   - Real Supabase authentication with PostgreSQL storage
-   - Superadmin access: superadmin@gnymble.com / SuperAdmin123!
-   - Development mode: `?superadmin=dev123` URL parameter
-   - SMS OTP available for additional verification
+   - **Real Supabase authentication** with PostgreSQL storage and magic link flow
+   - **Protected Superadmin Access**: 
+     - superadmin@percytech.com (protected from deletion)
+     - superadmin@gnymble.com (protected from deletion)
+   - **Development Mode**: `?superadmin=dev123` URL parameter (bypass auth)
+   - **SMS OTP**: Available for additional verification
+   - **Proper Session Management**: No session carryover between different user types
 
 ## 🎯 Future Considerations
 
@@ -363,19 +431,24 @@ pnpm dev  # Starts both web (3000) and unified (3001)
 ## ✅ Architecture Status Summary
 
 - ✅ **App Consolidation**: Complete (6 apps → 3 apps)
-- ✅ **Authentication Flow**: Gateway pattern implemented
-- ✅ **Role-Based Access**: Working in unified app
-- ✅ **Session Management**: Cross-app persistence working
+- ✅ **Authentication Flow**: **Magic link authentication** with gateway pattern implemented
+- ✅ **Role-Based Access**: **Fixed role hierarchy** working in unified app (USER → ONBOARDED → ADMIN → SUPERADMIN)
+- ✅ **Session Management**: **Enhanced session isolation** preventing carryover between user types
 - ✅ **Styling Migration**: All CSS-in-JS, no file imports
 - ✅ **Package Architecture**: Clean separation of concerns
 - ✅ **Build System**: Turbo + pnpm optimized
-- ✅ **Database**: PostgreSQL with real authentication
-- ✅ **Edge Functions**: Deployed and operational
+- ✅ **Database**: PostgreSQL with **protected superadmin accounts**
+- ✅ **Edge Functions**: **Updated with comprehensive validation** and deployed
 - ✅ **Schema Alignment**: Complete type safety implemented
-- ✅ **Payment Track Cleanup**: Dashboard tools implemented
+- ✅ **Payment Track Cleanup**: Dashboard tools with **superadmin protection** implemented
+- ✅ **Account Creation**: **B2B and B2C support** with proper validation via Edge Functions
+- ✅ **Admin Dashboard**: **Global view default** and enhanced UI responsiveness
+- ✅ **Security Enhancements**: **Protected account deletion** and improved authentication flow
 
-**Status**: ✅ **PRODUCTION READY** - Unified architecture is stable and deployed.
+**Status**: ✅ **PRODUCTION READY** - Unified architecture is stable and deployed with enhanced security.
 
-**Recent Achievement**: ✅ **SCHEMA ALIGNMENT COMPLETE** - All type mismatches resolved, comprehensive type checking implemented.
+**Recent Achievement**: ✅ **AUTHENTICATION & SECURITY ENHANCED** - Magic link flow implemented, role management fixed, superadmin protection added, and comprehensive B2B/B2C account creation.
 
-The SMS Hub platform has successfully consolidated into a clean, maintainable architecture with comprehensive type safety and data cleanup tools. The foundation is solid for continued development.
+**Previous Achievement**: ✅ **SCHEMA ALIGNMENT COMPLETE** - All type mismatches resolved, comprehensive type checking implemented.
+
+The SMS Hub platform has successfully consolidated into a clean, maintainable architecture with comprehensive type safety, enhanced security measures, and robust account management. The foundation is solid for continued development with improved user experience and security.

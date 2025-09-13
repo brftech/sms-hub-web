@@ -49,11 +49,11 @@ Each hub has:
 - Isolated data and users
 - Hub-specific features and configurations
 
-### User Roles & Access
-- **User**: Basic SMS functionality, contact management
-- **Onboarded**: Full access to all features
-- **Admin**: Company management, user administration
-- **Superadmin**: Cross-hub access, system administration
+### User Roles & Access (Fixed Hierarchy)
+- **User**: Basic SMS functionality, contact management (corrected from MEMBER role)
+- **Onboarded**: Full access to all features after completing onboarding
+- **Admin**: Company management, user administration with enhanced controls
+- **Superadmin**: Cross-hub access, system administration with global view default and account protection
 
 ### Core Functionality
 - **SMS Campaign Management**: Create, send, and track SMS campaigns
@@ -64,37 +64,39 @@ Each hub has:
 - **Payment Processing**: Stripe integration for subscriptions
 - **Data Cleanup Tools**: Admin tools for data management
 
-## 🔄 User Journey
+## 🔄 User Journey (Enhanced Flow)
 
 ### 1. Marketing & Discovery
 - User visits marketing site (Port 3000)
-- Views hub-specific landing pages
-- Learns about SMS services
-- Initiates signup process
+- Views hub-specific landing pages with updated branding
+- Learns about SMS services and pricing
+- Initiates signup process with clear B2B/B2C options
 
-### 2. Authentication & Verification
-- User signs up with email/phone
-- Receives SMS/email verification
-- Verifies identity with OTP code
-- Redirected to unified app
+### 2. Authentication & Verification (Magic Link)
+- User signs up with email/phone using **magic link authentication**
+- Receives **magic link email** instead of direct redirect (prevents session carryover)
+- Verifies identity through secure magic link
+- **Proper session isolation** ensures clean authentication state
 
-### 3. Account Setup
-- User provides company details
-- Creates password
-- Account and company records created
-- Payment processing initiated
+### 3. Account Setup (Enhanced B2B/B2C)
+- User provides company details (B2B) or individual information (B2C)
+- Creates secure password with validation
+- **Comprehensive account creation** via updated Edge Functions
+- Account, company, customer, and membership records created
+- **Fixed role assignment** (USER instead of incorrect MEMBER role)
 
 ### 4. Payment & Onboarding
-- User completes payment via Stripe
-- Payment status updated
-- Onboarding process begins
-- User gains full platform access
+- User completes payment via Stripe with enhanced validation
+- Payment status updated in customer record
+- Post-payment onboarding process begins
+- User gains access based on proper role hierarchy
 
-### 5. Platform Usage
-- User accesses unified app (Port 3001)
-- Manages SMS campaigns
-- Tracks performance and analytics
-- Manages contacts and settings
+### 5. Platform Usage (Enhanced Dashboard)
+- User accesses unified app (Port 3001) with **global view default**
+- Manages SMS campaigns with improved UI responsiveness
+- Tracks performance and analytics with better data visualization
+- Manages contacts and settings with enhanced user experience
+- **Protected superadmin accounts** prevent accidental deletion of critical users
 
 ## 🗄️ Database Schema
 
@@ -174,11 +176,15 @@ Each hub has distinct:
 
 ## 🔐 Security & Authentication
 
-### Authentication Methods
-1. **Real Authentication**: Supabase with PostgreSQL storage
-2. **Superadmin Access**: superadmin@gnymble.com / SuperAdmin123!
-3. **Development Mode**: `?superadmin=dev123` URL parameter
-4. **SMS OTP**: Available for additional verification
+### Authentication Methods (Enhanced Security)
+1. **Real Authentication**: Supabase with PostgreSQL storage using **magic link flow**
+2. **Protected Superadmin Access**: 
+   - superadmin@percytech.com (protected from deletion)
+   - superadmin@gnymble.com (protected from deletion)
+   - Delete buttons disabled for these accounts in admin dashboard
+3. **Development Mode**: `?superadmin=dev123` URL parameter for testing
+4. **SMS OTP**: Available for additional two-factor verification
+5. **Enhanced Session Management**: Prevents session carryover between different user types
 
 ### Security Measures
 - **Frontend Security**: Only anon key exposed in frontend
@@ -227,7 +233,38 @@ pnpm dev
 
 ## 🎯 Recent Achievements (January 2025)
 
-### Schema Alignment & Type Safety
+### Authentication & Security Enhancements (Latest)
+1. **Magic Link Authentication**:
+   - **Fixed signup flow** to use magic link instead of direct redirect
+   - **Prevents superadmin session carryover** issues between different user types
+   - **Enhanced session isolation** for improved security
+
+2. **Role Management Fixes**:
+   - **Corrected USER role assignment** (was incorrectly MEMBER)
+   - **Proper role hierarchy**: USER → ONBOARDED → ADMIN → SUPERADMIN
+   - **Fixed role-based access control** across the platform
+
+3. **Account Creation Enhancement**:
+   - **Comprehensive B2B and B2C support** via updated Edge Functions
+   - **Complete data creation flow** with proper validation
+   - **Enhanced error handling** and user feedback
+
+4. **Superadmin Protection**:
+   - **Delete buttons disabled** for protected accounts (superadmin@percytech.com, superadmin@gnymble.com)
+   - **Enhanced security measures** for admin account management
+   - **Prevents accidental deletion** of critical system accounts
+
+5. **Admin Dashboard Improvements**:
+   - **Global view set as default** instead of PercyTech hub
+   - **Better cross-hub data visibility** for administrators
+   - **UI improvements**: "Onboarding Submissions" → "Onboarding", responsive payment cards
+
+6. **Edge Functions Updates**:
+   - **Enhanced signup-native function** with comprehensive validation
+   - **Updated delete-account function** with superadmin protection
+   - **Improved error handling** and security measures
+
+### Schema Alignment & Type Safety (Completed)
 1. **Database Schema Cleanup**:
    - Separated `companies` (business entities) from `customers` (paying entities)
    - Moved payment-related fields to `customers` table
@@ -240,21 +277,22 @@ pnpm dev
    - Comprehensive type checking implemented
 
 3. **Payment Track Cleanup Tools**:
-   - Added dashboard cleanup functionality
+   - Added dashboard cleanup functionality with **superadmin protection**
    - Preview mode shows what would be deleted
-   - Execute mode deletes all payment track data except superadmin
+   - Execute mode deletes all payment track data except protected accounts
    - Preserves hub records and superadmin data
 
-### Authentication & Security
-1. **Security Architecture**:
+### Security Architecture (Enhanced)
+1. **Frontend Security**:
    - Frontend uses ONLY anon key via `getSupabaseClient`
    - Admin operations moved to Edge Functions
    - Service role key never exposed in frontend
+   - **Magic link authentication** prevents session issues
 
 2. **Authentication Methods**:
-   - Real Supabase authentication with PostgreSQL storage
-   - Superadmin access with proper credentials
-   - Development mode for testing
+   - **Real Supabase authentication** with PostgreSQL storage and magic link flow
+   - **Protected superadmin access** with deletion prevention
+   - **Development mode** for testing with proper isolation
 
 ## 🔍 Monitoring & Debugging
 
@@ -299,11 +337,13 @@ pnpm dev
 
 ## ✅ Production Status
 
-**Status**: ✅ **PRODUCTION READY** - Core architecture is stable and deployed.
+**Status**: ✅ **PRODUCTION READY** - Core architecture is stable and deployed with enhanced security.
 
-**Recent Achievement**: ✅ **SCHEMA ALIGNMENT COMPLETE** - All type mismatches resolved, comprehensive type checking implemented.
+**Latest Achievement**: ✅ **AUTHENTICATION & SECURITY ENHANCED** - Magic link authentication implemented, role management fixed, superadmin protection added, and comprehensive B2B/B2C account creation with global view improvements.
 
-The SMS Hub platform has successfully consolidated into a clean, maintainable architecture with comprehensive type safety and data cleanup tools. The foundation is solid for continued development and scaling.
+**Previous Achievement**: ✅ **SCHEMA ALIGNMENT COMPLETE** - All type mismatches resolved, comprehensive type checking implemented.
+
+The SMS Hub platform has successfully evolved into a robust, secure, and maintainable architecture with comprehensive type safety, enhanced authentication flow, protected account management, and improved user experience. The foundation is solid for continued development and scaling with enterprise-grade security measures.
 
 ## 🤝 Contributing
 

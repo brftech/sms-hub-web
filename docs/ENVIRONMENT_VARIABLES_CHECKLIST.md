@@ -5,6 +5,8 @@
 Please ensure the following environment variables are set in your Supabase dashboard:
 https://supabase.com/dashboard/project/vgpovgpwqkjnpnrjelyg/settings/vault
 
+**Note**: All Edge Functions have been updated with enhanced validation and security measures (January 2025). Ensure all environment variables are properly set for the enhanced authentication and account creation flow.
+
 ### SMS/Communication Variables
 - [ ] `ZAPIER_SMS_WEBHOOK_URL` - Your Zapier webhook URL for SMS via PercyTech
 - [ ] `RESEND_API_KEY` - Resend API key for email notifications
@@ -38,4 +40,23 @@ For local development, ensure these are in your `.env.local` file:
 VITE_SUPABASE_URL=https://vgpovgpwqkjnpnrjelyg.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-key
 VITE_DEV_AUTH_TOKEN=your-secure-dev-token
+VITE_DEVELOPMENT_MODE=true
 ```
+
+## Recent Updates (January 2025)
+
+### Enhanced Edge Functions
+All Edge Functions have been updated with:
+- **Enhanced validation** and error handling
+- **Magic link authentication** support
+- **B2B/B2C account creation** capabilities
+- **Superadmin protection** measures
+- **Improved security** and session management
+
+### Environment Variable Usage
+- **Magic Link Authentication**: Uses existing Supabase Auth with enhanced flow
+- **Protected Accounts**: Built-in protection for superadmin@percytech.com and superadmin@gnymble.com
+- **Enhanced Validation**: All Edge Functions now include comprehensive input validation
+- **Development Mode**: Enhanced development experience with proper session isolation
+
+All environment variables remain the same, but the underlying functionality has been significantly enhanced for better security and user experience.

@@ -2,7 +2,9 @@
 
 ## 🎯 Overview
 
-This document provides a comprehensive walkthrough of the SMS Hub onboarding process, from initial signup to payment completion and post-payment onboarding. This is essential for understanding the complete user journey and debugging any issues.
+This document provides a comprehensive walkthrough of the SMS Hub onboarding process, from initial signup with **magic link authentication** to payment completion and post-payment onboarding. This is essential for understanding the complete user journey and debugging any issues.
+
+**Recent Updates (January 2025)**: Magic link authentication implementation, role management fixes (USER instead of MEMBER), superadmin protection, and enhanced B2B/B2C account creation.
 
 ## 📋 Onboarding Process Flow
 
@@ -25,16 +27,17 @@ This document provides a comprehensive walkthrough of the SMS Hub onboarding pro
 
 ## 🔄 Detailed Process Walkthrough
 
-### 1. Signup Process
+### 1. Signup Process (Enhanced B2B/B2C)
 
 **File**: `apps/web/src/pages/Signup.tsx`
 
 **What happens**:
-- User enters email, phone, and selects signup type (company/individual)
+- User enters email, phone, and selects signup type (company/individual) with **enhanced B2B/B2C support**
 - Data is stored in `sessionStorage` as backup
-- Calls `submit-verification` Edge Function
-- Creates record in `verifications` table
-- Sends SMS via Zapier webhook or email via Resend
+- Calls **updated** `submit-verification` Edge Function with comprehensive validation
+- Creates record in `verifications` table with proper hub_id mapping
+- Sends SMS via Zapier webhook or email via Resend with improved error handling
+- **Enhanced validation** ensures data integrity and proper role assignment
 
 **Database changes**:
 ```sql
@@ -49,15 +52,17 @@ INSERT INTO verifications (
 - Zapier SMS webhook (if SMS selected)
 - Resend email service (if email selected)
 
-### 2. Verification Process
+### 2. Verification Process (Magic Link Authentication)
 
 **File**: `apps/web/src/pages/VerifyOtp.tsx`
 
 **What happens**:
 - User enters verification code
-- Calls `verify-code` Edge Function
+- Calls `verify-code` Edge Function with enhanced validation
 - Updates `verifications` table with completion timestamp
-- Redirects to account details page
+- **Magic link authentication** initiated instead of direct redirect
+- **Prevents session carryover** between different user types
+- Redirects to account details page with **proper session isolation**
 
 **Database changes**:
 ```sql
@@ -69,25 +74,28 @@ WHERE id = verification_id AND verification_code = entered_code
 **Key functions called**:
 - `verify-code` Edge Function
 
-### 3. Account Details Process
+### 3. Account Details Process (Enhanced Creation)
 
 **File**: `apps/unified/src/pages/user/AccountDetails.tsx`
 
 **What happens**:
-- User enters company name, first name, last name, password
-- Calls `create-account` Edge Function directly
-- Creates Supabase Auth user
-- Creates user profile, company, customer, and membership records
-- Links verification to user profile
+- User enters company name, first name, last name, password with **enhanced validation**
+- Calls **updated** `create-account` Edge Function with comprehensive B2B/B2C support
+- Creates Supabase Auth user with **magic link authentication**
+- Creates user profile, company, customer, and membership records with **proper role assignment**
+- **Fixed role assignment**: USER role (corrected from incorrect MEMBER role)
+- Links verification to user profile with enhanced data integrity
+- **Comprehensive error handling** and user feedback
 
 **Database changes**:
 ```sql
--- Creates auth.users record (via Supabase Auth)
--- Creates user_profiles record
--- Creates companies record
--- Creates customers record
--- Creates memberships record
--- Updates verifications with existing_user_id
+-- Creates auth.users record (via Supabase Auth with magic link)
+-- Creates user_profiles record with proper validation
+-- Creates companies record (B2B) or enhanced customer record (B2C)
+-- Creates customers record with proper payment tracking setup
+-- Creates memberships record with corrected USER role (not MEMBER)
+-- Updates verifications with existing_user_id and completion status
+-- Enhanced foreign key relationships and data integrity
 ```
 
 **Key functions called**:
@@ -165,42 +173,63 @@ WHERE billing_email = customer_email
 - Updates verification completion timestamp
 - **Location**: `supabase/functions/verify-code/index.ts`
 
-### `create-account`
-- Creates Supabase Auth user
-- Creates all related database records
-- Links verification to user
+### `create-account` (Enhanced)
+- Creates Supabase Auth user with **magic link authentication**
+- Creates all related database records with **comprehensive B2B/B2C support**
+- Links verification to user with enhanced validation
+- **Fixed role assignment**: USER role (corrected from MEMBER)
+- **Enhanced error handling** and validation
+- **Superadmin protection** measures
 - **Location**: `supabase/functions/create-account/index.ts`
 
 ### `create-checkout-session`
 - Creates Stripe checkout session
 - **Location**: `supabase/functions/create-checkout-session/index.ts`
 
-### `verify-payment`
-- Verifies Stripe payment status
-- Updates customer payment information
+### `verify-payment` (Enhanced)
+- Verifies Stripe payment status with enhanced validation
+- Updates customer payment information with proper data integrity
+- **Improved error handling** and status tracking
+- **Enhanced logging** for better debugging
 - **Location**: `supabase/functions/verify-payment/index.ts`
 
-## 🐛 Common Issues & Debugging
+## 🐛 Common Issues & Debugging (Updated)
+
+### Issue: "Magic link authentication failed"
+**Cause**: Session carryover from previous user or invalid magic link
+**Solution**: Clear browser storage and ensure proper magic link flow, check for session isolation
+
+### Issue: "Role assignment incorrect (MEMBER instead of USER)"
+**Cause**: Legacy role assignment in Edge Functions
+**Solution**: **FIXED** - Edge Functions now properly assign USER role in membership creation
 
 ### Issue: "Dev auth configuration error"
 **Cause**: Missing `VITE_DEV_AUTH_TOKEN` environment variable
-**Solution**: Add to `.env.local` or use real authentication
+**Solution**: Add to `.env.local` or use real magic link authentication
 
 ### Issue: "Failed to create user profile"
-**Cause**: Schema mismatch in `create-account` Edge Function
-**Solution**: Check that all required fields are provided and match database schema
+**Cause**: Schema mismatch in `create-account` Edge Function or validation failure
+**Solution**: Check that all required fields are provided, match database schema, and review enhanced validation logic
 
 ### Issue: "Verification not showing up"
 **Cause**: Hub ID mismatch between signup and verification pages
-**Solution**: Ensure consistent hub ID mapping across all components
+**Solution**: Ensure consistent hub ID mapping across all components and check enhanced validation
 
 ### Issue: "SMS not received"
-**Cause**: Zapier webhook payload format mismatch
-**Solution**: Check `submit-verification` function payload format
+**Cause**: Zapier webhook payload format mismatch or service issues
+**Solution**: Check `submit-verification` function payload format and Zapier webhook logs
 
 ### Issue: "Payment verification failed"
-**Cause**: Stripe session not found or payment not completed
-**Solution**: Check Stripe dashboard and verify session ID
+**Cause**: Stripe session not found, payment not completed, or validation error
+**Solution**: Check Stripe dashboard, verify session ID, and review enhanced payment validation logic
+
+### Issue: "Superadmin account protection triggered"
+**Cause**: Attempt to delete protected superadmin accounts
+**Solution**: **WORKING AS INTENDED** - Protection prevents deletion of superadmin@percytech.com and superadmin@gnymble.com
+
+### Issue: "B2B/B2C account creation failure"
+**Cause**: Enhanced validation requirements not met
+**Solution**: Review Edge Function logs for specific validation errors and ensure all required fields are provided
 
 ## 🔍 Debugging Tools
 
@@ -242,28 +271,33 @@ verifications → user_profiles → companies → customers → onboarding_submi
    SMS/Email    Auth User     Company Data   Payment Data  Progress Tracking
 ```
 
-## 🎯 Success Criteria
+## 🎯 Success Criteria (Enhanced)
 
 ### Pre-Payment Success
-- ✅ Verification record created
-- ✅ SMS/email sent successfully
-- ✅ Verification code verified
-- ✅ User profile created
-- ✅ Company record created
-- ✅ Customer record created
-- ✅ Membership record created
-- ✅ Verification linked to user
+- ✅ Verification record created with proper hub_id
+- ✅ SMS/email sent successfully with enhanced error handling
+- ✅ Verification code verified with magic link flow
+- ✅ **Magic link authentication** completed without session carryover
+- ✅ User profile created with proper validation
+- ✅ Company record created (B2B) or enhanced customer setup (B2C)
+- ✅ Customer record created with proper payment tracking
+- ✅ **Membership record created with correct USER role** (not MEMBER)
+- ✅ Verification linked to user with enhanced data integrity
+- ✅ **Proper session isolation** maintained throughout process
 
 ### Payment Success
-- ✅ Stripe checkout session created
-- ✅ Payment completed successfully
-- ✅ Customer payment status updated
-- ✅ Stripe customer ID stored
+- ✅ Stripe checkout session created with enhanced validation
+- ✅ Payment completed successfully with improved tracking
+- ✅ Customer payment status updated with proper data integrity
+- ✅ Stripe customer ID stored with enhanced security
+- ✅ **Payment validation** with comprehensive error handling
 
 ### Post-Payment Success
-- ✅ Onboarding submission created
-- ✅ User can access onboarding steps
-- ✅ Progress tracked correctly
+- ✅ Onboarding submission created with proper role-based access
+- ✅ User can access onboarding steps based on **correct USER role**
+- ✅ Progress tracked correctly with enhanced UI ("Onboarding" instead of "Onboarding Submissions")
+- ✅ **Global view default** for admin users
+- ✅ **Protected accounts** cannot be accidentally deleted
 
 ## 🔄 Maintenance & Updates
 
@@ -285,4 +319,25 @@ verifications → user_profiles → companies → customers → onboarding_submi
 - Test in both development and production
 - Document any new variables needed
 
-This documentation should help any developer understand the complete onboarding flow and debug any issues that arise.
+## 🔄 Recent Enhancements Summary (January 2025)
+
+### Authentication Flow Improvements
+1. **Magic Link Authentication**: Prevents session carryover and ensures proper isolation
+2. **Enhanced B2B/B2C Support**: Comprehensive account creation for different business models
+3. **Role Management Fix**: Corrected USER role assignment (was incorrectly MEMBER)
+4. **Superadmin Protection**: Protected accounts cannot be deleted via dashboard
+5. **Global View Default**: Admin dashboard defaults to global view instead of specific hub
+
+### Technical Improvements
+1. **Enhanced Edge Functions**: Comprehensive validation and error handling
+2. **Improved UI**: Responsive design and better labeling
+3. **Better Error Handling**: More informative error messages and logging
+4. **Data Integrity**: Enhanced validation throughout the creation process
+
+### Security Enhancements
+1. **Session Isolation**: Prevents authentication issues between different user types
+2. **Account Protection**: Critical system accounts protected from deletion
+3. **Enhanced Validation**: Comprehensive input validation and sanitization
+4. **Improved Logging**: Better tracking and debugging capabilities
+
+This documentation should help any developer understand the complete enhanced onboarding flow and debug any issues that arise. The recent improvements provide a more robust, secure, and user-friendly experience while maintaining backward compatibility.

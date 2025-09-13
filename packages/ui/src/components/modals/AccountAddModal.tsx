@@ -1,169 +1,7 @@
 import React, { useState } from "react";
-import styled from "styled-components";
-import { X, Plus, Building2, Mail, User, Phone, Lock, CreditCard } from "lucide-react";
-import { BaseModal } from "./BaseModal";
-import { Button } from "../button";
+import { Plus, Building2, Mail, User, Phone, Lock, CreditCard } from "lucide-react";
+import { BaseModal, ModalFormLayout, ModalFormColumn } from "./BaseModal";
 import { HubType } from "@sms-hub/types";
-
-const ModalContent = styled.div`
-  padding: 24px;
-`;
-
-const Header = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-`;
-
-const Title = styled.h2`
-  font-size: 20px;
-  font-weight: 600;
-  color: white;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-`;
-
-const CloseButton = styled.button`
-  background: transparent;
-  border: none;
-  color: #9ca3af;
-  cursor: pointer;
-  padding: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 4px;
-  transition: all 0.2s;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-  }
-`;
-
-const Form = styled.form`
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-`;
-
-const Section = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-`;
-
-const SectionTitle = styled.h3`
-  font-size: 14px;
-  font-weight: 600;
-  color: #9ca3af;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 8px;
-`;
-
-const FormGroup = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-`;
-
-const Label = styled.label`
-  font-size: 14px;
-  font-weight: 500;
-  color: #e5e7eb;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-`;
-
-const Input = styled.input`
-  background: #1f2937;
-  border: 1px solid #374151;
-  border-radius: 6px;
-  color: white;
-  padding: 10px 12px;
-  font-size: 14px;
-  transition: all 0.2s;
-
-  &:focus {
-    outline: none;
-    border-color: var(--hub-primary);
-    background: #111827;
-  }
-
-  &::placeholder {
-    color: #6b7280;
-  }
-`;
-
-const Select = styled.select`
-  background: #1f2937;
-  border: 1px solid #374151;
-  border-radius: 6px;
-  color: white;
-  padding: 10px 12px;
-  font-size: 14px;
-  transition: all 0.2s;
-  cursor: pointer;
-
-  &:focus {
-    outline: none;
-    border-color: var(--hub-primary);
-    background: #111827;
-  }
-
-  option {
-    background: #1f2937;
-    color: white;
-  }
-`;
-
-const Row = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-`;
-
-const Footer = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  margin-top: 24px;
-  padding-top: 20px;
-  border-top: 1px solid #374151;
-`;
-
-const ErrorMessage = styled.div`
-  background: #7f1d1d;
-  border: 1px solid #991b1b;
-  border-radius: 6px;
-  padding: 12px;
-  color: #fca5a5;
-  font-size: 14px;
-  margin-bottom: 16px;
-`;
-
-const CheckboxGroup = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 8px;
-`;
-
-const Checkbox = styled.input`
-  width: 16px;
-  height: 16px;
-  accent-color: var(--hub-primary);
-`;
-
-const CheckboxLabel = styled.label`
-  font-size: 14px;
-  color: #e5e7eb;
-  cursor: pointer;
-`;
 
 export interface AccountAddModalProps {
   isOpen: boolean;
@@ -271,231 +109,263 @@ export const AccountAddModal: React.FC<AccountAddModalProps> = ({
     }
   };
 
+  if (!isOpen) return null;
+
   return (
-    <BaseModal isOpen={isOpen} onClose={onClose} maxWidth="600px">
-      <ModalContent>
-        <Header>
-          <Title>
-            <Plus size={20} />
-            Add New Account
-          </Title>
-          <CloseButton onClick={onClose}>
-            <X size={20} />
-          </CloseButton>
-        </Header>
+    <BaseModal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Add New Account"
+      subtitle={`Create a new account for ${hubName}`}
+      icon={<Plus className="w-5 h-5" />}
+      variant="create"
+      size="lg"
+    >
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700 text-sm">
+            {error}
+          </div>
+        )}
 
-        {error && <ErrorMessage>{error}</ErrorMessage>}
+        {/* Company Information Section */}
+        <div>
+          <h3 className="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <Building2 className="w-4 h-4" />
+            Company Information
+          </h3>
+          <ModalFormLayout>
+            <ModalFormColumn>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Company Name *
+                </label>
+                <input
+                  type="text"
+                  name="companyName"
+                  value={formData.companyName}
+                  onChange={handleInputChange}
+                  placeholder="Enter company name"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors"
+                  required
+                />
+              </div>
+            </ModalFormColumn>
+            <ModalFormColumn>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Legal Name
+                </label>
+                <input
+                  type="text"
+                  name="legalName"
+                  value={formData.legalName}
+                  onChange={handleInputChange}
+                  placeholder="Legal entity name (optional)"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors"
+                />
+              </div>
+            </ModalFormColumn>
+          </ModalFormLayout>
+        </div>
 
-        <Form onSubmit={handleSubmit}>
-          <Section>
-            <SectionTitle>Company Information</SectionTitle>
-            
-            <FormGroup>
-              <Label>
-                <Building2 size={14} />
-                Company Name *
-              </Label>
-              <Input
-                type="text"
-                name="companyName"
-                value={formData.companyName}
-                onChange={handleInputChange}
-                placeholder="Enter company name"
-                required
-              />
-            </FormGroup>
-
-            <FormGroup>
-              <Label>Legal Name</Label>
-              <Input
-                type="text"
-                name="legalName"
-                value={formData.legalName}
-                onChange={handleInputChange}
-                placeholder="Enter legal name (optional)"
-              />
-            </FormGroup>
-          </Section>
-
-          <Section>
-            <SectionTitle>Billing Information</SectionTitle>
-            
-            <FormGroup>
-              <Label>
-                <Mail size={14} />
-                Billing Email *
-              </Label>
-              <Input
-                type="email"
-                name="billingEmail"
-                value={formData.billingEmail}
-                onChange={handleInputChange}
-                placeholder="billing@company.com"
-                required
-              />
-            </FormGroup>
-
-            <Row>
-              <FormGroup>
-                <Label>
-                  <CreditCard size={14} />
+        {/* Billing Information Section */}
+        <div>
+          <h3 className="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <CreditCard className="w-4 h-4" />
+            Billing Information
+          </h3>
+          <ModalFormLayout>
+            <ModalFormColumn span={2}>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Billing Email *
+                </label>
+                <input
+                  type="email"
+                  name="billingEmail"
+                  value={formData.billingEmail}
+                  onChange={handleInputChange}
+                  placeholder="billing@company.com"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors"
+                  required
+                />
+              </div>
+            </ModalFormColumn>
+            <ModalFormColumn>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Subscription Tier
-                </Label>
-                <Select
+                </label>
+                <select
                   name="subscriptionTier"
                   value={formData.subscriptionTier}
                   onChange={handleInputChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors"
                 >
                   <option value="FREE">Free</option>
                   <option value="STARTER">Starter</option>
                   <option value="PRO">Pro</option>
                   <option value="ENTERPRISE">Enterprise</option>
-                </Select>
-              </FormGroup>
-
-              <FormGroup>
-                <Label>Payment Status</Label>
-                <Select
+                </select>
+              </div>
+            </ModalFormColumn>
+            <ModalFormColumn>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Payment Status
+                </label>
+                <select
                   name="paymentStatus"
                   value={formData.paymentStatus}
                   onChange={handleInputChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors"
                 >
                   <option value="PENDING">Pending</option>
                   <option value="ACTIVE">Active</option>
                   <option value="PAST_DUE">Past Due</option>
                   <option value="CANCELED">Canceled</option>
-                </Select>
-              </FormGroup>
-            </Row>
-          </Section>
+                </select>
+              </div>
+            </ModalFormColumn>
+          </ModalFormLayout>
+        </div>
 
-          <Section>
-            <SectionTitle>Initial User (Optional)</SectionTitle>
-            
-            <CheckboxGroup>
-              <Checkbox
+        {/* Initial User Section */}
+        <div>
+          <h3 className="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <User className="w-4 h-4" />
+            Initial User (Optional)
+          </h3>
+          <div className="mb-4">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
                 type="checkbox"
-                id="createUser"
                 name="createUser"
                 checked={formData.createUser}
                 onChange={handleInputChange}
+                className="w-4 h-4 text-gray-600 border-gray-300 rounded focus:ring-gray-500"
               />
-              <CheckboxLabel htmlFor="createUser">
-                Create an initial user for this account
-              </CheckboxLabel>
-            </CheckboxGroup>
+              <span className="text-sm text-gray-700">Create an initial user for this account</span>
+            </label>
+          </div>
 
-            {formData.createUser && (
-              <>
-                <Row>
-                  <FormGroup>
-                    <Label>
-                      <User size={14} />
-                      First Name
-                    </Label>
-                    <Input
-                      type="text"
-                      name="firstName"
-                      value={formData.firstName}
-                      onChange={handleInputChange}
-                      placeholder="John"
-                    />
-                  </FormGroup>
-
-                  <FormGroup>
-                    <Label>Last Name</Label>
-                    <Input
-                      type="text"
-                      name="lastName"
-                      value={formData.lastName}
-                      onChange={handleInputChange}
-                      placeholder="Doe"
-                    />
-                  </FormGroup>
-                </Row>
-
-                <FormGroup>
-                  <Label>
-                    <Mail size={14} />
+          {formData.createUser && (
+            <ModalFormLayout>
+              <ModalFormColumn>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    First Name
+                  </label>
+                  <input
+                    type="text"
+                    name="firstName"
+                    value={formData.firstName}
+                    onChange={handleInputChange}
+                    placeholder="John"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     User Email *
-                  </Label>
-                  <Input
+                  </label>
+                  <input
                     type="email"
                     name="userEmail"
                     value={formData.userEmail}
                     onChange={handleInputChange}
                     placeholder="user@company.com"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors"
                     required={formData.createUser}
                   />
-                </FormGroup>
-
-                <Row>
-                  <FormGroup>
-                    <Label>
-                      <Lock size={14} />
-                      Password
-                    </Label>
-                    <Input
-                      type="password"
-                      name="userPassword"
-                      value={formData.userPassword}
-                      onChange={handleInputChange}
-                      placeholder="Leave blank to send invite"
-                    />
-                  </FormGroup>
-
-                  <FormGroup>
-                    <Label>
-                      <Phone size={14} />
-                      Phone Number
-                    </Label>
-                    <Input
-                      type="tel"
-                      name="phoneNumber"
-                      value={formData.phoneNumber}
-                      onChange={handleInputChange}
-                      placeholder="+1234567890"
-                    />
-                  </FormGroup>
-                </Row>
-
-                <FormGroup>
-                  <Label>User Role</Label>
-                  <Select
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Phone Number
+                  </label>
+                  <input
+                    type="tel"
+                    name="phoneNumber"
+                    value={formData.phoneNumber}
+                    onChange={handleInputChange}
+                    placeholder="+1234567890"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors"
+                  />
+                </div>
+              </ModalFormColumn>
+              <ModalFormColumn>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Last Name
+                  </label>
+                  <input
+                    type="text"
+                    name="lastName"
+                    value={formData.lastName}
+                    onChange={handleInputChange}
+                    placeholder="Doe"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Password
+                  </label>
+                  <input
+                    type="password"
+                    name="userPassword"
+                    value={formData.userPassword}
+                    onChange={handleInputChange}
+                    placeholder="Leave blank to send invite"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    User Role
+                  </label>
+                  <select
                     name="role"
                     value={formData.role}
                     onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors"
                   >
                     <option value="MEMBER">Member</option>
                     <option value="VIEWER">Viewer</option>
                     <option value="SUPPORT">Support</option>
                     <option value="ADMIN">Admin</option>
                     <option value="OWNER">Owner</option>
-                  </Select>
-                </FormGroup>
-              </>
-            )}
-          </Section>
+                  </select>
+                </div>
+              </ModalFormColumn>
+            </ModalFormLayout>
+          )}
+        </div>
 
-          <Footer>
-            <Button
-              variant="outline"
-              onClick={onClose}
-              type="button"
-              disabled={isLoading}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="primary"
-              type="submit"
-              disabled={isLoading}
-            >
-              {isLoading ? "Creating..." : "Create Account"}
-            </Button>
-          </Footer>
-        </Form>
-      </ModalContent>
+        {/* Form Actions */}
+        <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={isLoading}
+            className="px-5 py-2.5 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium text-sm"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="px-5 py-2.5 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-all font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+          >
+            {isLoading && (
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            )}
+            <Plus className="w-4 h-4" />
+            {isLoading ? "Creating..." : "Create Account"}
+          </button>
+        </div>
+      </form>
     </BaseModal>
   );
 };

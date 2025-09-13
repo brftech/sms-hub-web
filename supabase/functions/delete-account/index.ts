@@ -51,7 +51,13 @@ serve(async (req) => {
     if (permanent) {
       // Permanent deletion
       if (company_id) {
-        // Delete all memberships first
+        // First, clear company_id from all user_profiles to avoid foreign key constraint
+        await supabaseAdmin
+          .from("profiles")
+          .update({ company_id: null })
+          .eq("company_id", company_id);
+
+        // Delete all memberships
         await supabaseAdmin
           .from("memberships")
           .delete()

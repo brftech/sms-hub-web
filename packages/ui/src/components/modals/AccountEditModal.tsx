@@ -86,14 +86,8 @@ export const AccountEditModal: React.FC<AccountEditModalProps> = ({
 
     if (account.type === 'customer' || account.type === 'company_customer') {
       // Update customer fields
-      // For customers, we need to split the name into first and last
-      const nameParts = formData.name.split(' ');
-      const firstName = nameParts[0] || '';
-      const lastName = nameParts.slice(1).join(' ') || '';
-      
+      // Note: Customers table doesn't have first_name/last_name - those are in user_profiles
       updates.customer = {
-        first_name: firstName,
-        last_name: lastName,
         billing_email: formData.email,
         payment_type: formData.payment_type,
         payment_status: formData.payment_status,

@@ -10,9 +10,9 @@ export interface UserProfile {
   last_name?: string | null;
   mobile_phone_number?: string | null;
   company_id?: string | null;
-  company?: { 
+  companies?: { 
     id: string;
-    company_name: string;
+    public_name: string;
   } | null;
   lead_id?: string | null;
   role?: "admin" | "user" | "manager" | null;
@@ -80,15 +80,15 @@ class UsersService {
       .from("user_profiles")
       .select(`
         *,
-        company:companies!company_id (
+        companies:user_profiles_company_id_fkey (
           id,
-          company_name
+          public_name
         )
       `)
       .order("created_at", { ascending: false });
 
     // Apply filters
-    if (options?.hub_id) {
+    if (options?.hub_id !== undefined) {
       query = query.eq("hub_id", options.hub_id);
     }
 

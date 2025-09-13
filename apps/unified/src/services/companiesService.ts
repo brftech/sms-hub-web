@@ -60,7 +60,7 @@ class CompaniesService {
       .order("created_at", { ascending: false });
 
     // Apply filters
-    if (options?.hub_id) {
+    if (options?.hub_id !== undefined) {
       query = query.eq("hub_id", options.hub_id);
     }
 

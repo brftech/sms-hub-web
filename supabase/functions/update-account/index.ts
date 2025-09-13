@@ -61,8 +61,12 @@ serve(async (req) => {
       // Update company
       const companyUpdates: any = {};
       
+      if (updates.public_name !== undefined) companyUpdates.public_name = updates.public_name;
       if (updates.company_name !== undefined) companyUpdates.company_name = updates.company_name;
       if (updates.legal_company_name !== undefined) companyUpdates.legal_company_name = updates.legal_company_name;
+      if (updates.legal_name !== undefined) companyUpdates.legal_name = updates.legal_name;
+      if (updates.contact_email !== undefined) companyUpdates.primary_contact_email = updates.contact_email;
+      if (updates.contact_phone !== undefined) companyUpdates.primary_contact_phone = updates.contact_phone;
       if (updates.company_account_number !== undefined) companyUpdates.company_account_number = updates.company_account_number;
       if (updates.tax_id !== undefined) companyUpdates.tax_id = updates.tax_id;
       if (updates.industry_vertical !== undefined) companyUpdates.industry_vertical = updates.industry_vertical;
@@ -87,6 +91,7 @@ serve(async (req) => {
       if (updates.first_name !== undefined) customerUpdates.first_name = updates.first_name;
       if (updates.last_name !== undefined) customerUpdates.last_name = updates.last_name;
       if (updates.email !== undefined) customerUpdates.email = updates.email;
+      if (updates.billing_email !== undefined) customerUpdates.billing_email = updates.billing_email;
       if (updates.payment_type !== undefined) customerUpdates.payment_type = updates.payment_type;
       if (updates.payment_status !== undefined) customerUpdates.payment_status = updates.payment_status;
       if (updates.stripe_customer_id !== undefined) customerUpdates.stripe_customer_id = updates.stripe_customer_id;

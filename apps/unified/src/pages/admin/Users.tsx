@@ -301,10 +301,10 @@ const Users = () => {
     }
   }, [isCreateModalOpen, selectedHubId]);
 
-  // Filter users when search query or global view changes
+  // Filter users when search query, global view, or hub changes
   useEffect(() => {
     fetchData();
-  }, [searchQuery, isGlobalView]);
+  }, [searchQuery, isGlobalView, currentHub]);
 
   // Apply filters and sorting to users
   useEffect(() => {
@@ -622,9 +622,15 @@ const Users = () => {
                     </span>
                   </td>
                   <td className="px-4 py-2 whitespace-nowrap">
-                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                      {user.payment_status || "None"}
-                    </span>
+                    {user.companies ? (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        {user.companies.public_name}
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-500">
+                        No Company
+                      </span>
+                    )}
                   </td>
                   <td className="px-4 py-2 whitespace-nowrap">
                     <span

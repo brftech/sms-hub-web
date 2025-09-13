@@ -12,6 +12,11 @@ interface UserProfile {
   is_active?: boolean | null;
   hub_id: number;
   mobile_phone_number?: string | null;
+  company_id?: string | null;
+  companies?: {
+    id: string;
+    public_name: string;
+  } | null;
   created_at?: string | null;
   updated_at?: string | null;
 }
@@ -121,6 +126,17 @@ export const UserViewModal: React.FC<UserViewModalProps> = ({
             {user.mobile_phone_number && (
               <ModalField label="Phone Number" value={user.mobile_phone_number} />
             )}
+            <ModalField label="Company">
+              {user.companies ? (
+                <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">
+                  {user.companies.public_name}
+                </span>
+              ) : (
+                <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-500">
+                  No Company
+                </span>
+              )}
+            </ModalField>
           </ModalSection>
         </ModalFormColumn>
 

@@ -75,6 +75,7 @@ export const AccountEditModal: React.FC<AccountEditModalProps> = ({
     if (account.type === 'company' || account.type === 'company_customer') {
       // Update company fields
       updates.company = {
+        public_name: formData.name,  // Add the name field here
         contact_email: formData.contact_email,
         contact_phone: formData.contact_phone,
         legal_name: formData.legal_name,
@@ -85,7 +86,14 @@ export const AccountEditModal: React.FC<AccountEditModalProps> = ({
 
     if (account.type === 'customer' || account.type === 'company_customer') {
       // Update customer fields
+      // For customers, we need to split the name into first and last
+      const nameParts = formData.name.split(' ');
+      const firstName = nameParts[0] || '';
+      const lastName = nameParts.slice(1).join(' ') || '';
+      
       updates.customer = {
+        first_name: firstName,
+        last_name: lastName,
         billing_email: formData.email,
         payment_type: formData.payment_type,
         payment_status: formData.payment_status,
@@ -118,7 +126,7 @@ export const AccountEditModal: React.FC<AccountEditModalProps> = ({
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors"
-                disabled
+                required
               />
             </div>
             <div>

@@ -4,7 +4,6 @@ import { HubType, HUB_CONFIGS } from "@sms-hub/types";
 import { cn } from "@sms-hub/utils";
 import { useHub, HubLogo } from "@sms-hub/ui";
 import { useGlobalView } from "../contexts/GlobalViewContext";
-import { useLocation, useNavigate } from "react-router-dom";
 import {
   Button,
   Command,
@@ -30,8 +29,6 @@ export const AdminHubSwitcher: React.FC<AdminHubSwitcherProps> = ({
   const { currentHub, switchHub } = useHub();
   const { isGlobalView, setIsGlobalView } = useGlobalView();
   const [open, setOpen] = useState(false);
-  const navigate = useNavigate();
-  const location = useLocation();
 
   const hubs = Object.values(HUB_CONFIGS);
 
@@ -45,10 +42,7 @@ export const AdminHubSwitcher: React.FC<AdminHubSwitcherProps> = ({
     }
     setOpen(false);
     
-    // Navigate to the same route to trigger data refresh
-    navigate(location.pathname, { replace: true });
-    
-    // Also trigger the optional callback
+    // Trigger the optional callback if provided
     if (onHubChange) {
       onHubChange();
     }

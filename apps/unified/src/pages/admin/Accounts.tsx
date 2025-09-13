@@ -306,10 +306,10 @@ export function Accounts() {
     }
   };
 
-  // Initial data fetch
+  // Initial data fetch and refresh when hub or global view changes
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [currentHub, isGlobalView]);
 
   // Filter customers when search query or global view changes
   useEffect(() => {

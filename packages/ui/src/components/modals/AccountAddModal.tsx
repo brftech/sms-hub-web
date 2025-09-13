@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Plus, Building2, Mail, User, Phone, Lock, CreditCard } from "lucide-react";
+import { Plus, Building2, User, CreditCard } from "lucide-react";
 import { BaseModal, ModalFormLayout, ModalFormColumn } from "./BaseModal";
 import { HubType } from "@sms-hub/types";
 
@@ -18,23 +18,29 @@ export const AccountAddModal: React.FC<AccountAddModalProps> = ({
   hubId,
   hubName,
 }) => {
+  const [accountType, setAccountType] = useState<'business' | 'individual'>('business');
   const [formData, setFormData] = useState({
-    // Company fields
+    // Company fields (B2B)
     companyName: "",
     legalName: "",
     
-    // Customer fields
+    // Individual fields (B2C)
+    firstName: "",
+    lastName: "",
+    phoneNumber: "",
+    
+    // Common customer fields
     billingEmail: "",
     subscriptionTier: "FREE",
     paymentStatus: "PENDING",
     
-    // Initial user fields
+    // Initial user fields (for B2B)
     createUser: false,
     userEmail: "",
     userPassword: "",
-    firstName: "",
-    lastName: "",
-    phoneNumber: "",
+    userFirstName: "",
+    userLastName: "",
+    userPhoneNumber: "",
     role: "MEMBER",
   });
 
@@ -51,56 +57,88 @@ export const AccountAddModal: React.FC<AccountAddModalProps> = ({
     }
   };
 
+  const handleAccountTypeChange = (type: 'business' | 'individual') => {
+    setAccountType(type);
+    // Reset form when switching types
+    setFormData({
+      companyName: "",
+      legalName: "",
+      firstName: "",
+      lastName: "",
+      phoneNumber: "",
+      billingEmail: "",
+      subscriptionTier: "FREE",
+      paymentStatus: "PENDING",
+      createUser: false,
+      userEmail: "",
+      userPassword: "",
+      userFirstName: "",
+      userLastName: "",
+      userPhoneNumber: "",
+      role: "MEMBER",
+    });
+    setError(null);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setIsLoading(true);
 
     try {
-      // Validate required fields
-      if (!formData.companyName || !formData.billingEmail) {
-        throw new Error("Company name and billing email are required");
-      }
-
-      if (formData.createUser && !formData.userEmail) {
-        throw new Error("User email is required when creating a user");
-      }
-
-      // Prepare data for submission
-      const accountData = {
+      let accountData: any = {
         hub_id: hubId,
-        companyName: formData.companyName,
-        legalName: formData.legalName || formData.companyName,
-        billingEmail: formData.billingEmail,
+        accountType: accountType,
         subscriptionTier: formData.subscriptionTier,
         paymentStatus: formData.paymentStatus,
-        ...(formData.createUser && {
-          userEmail: formData.userEmail,
-          userPassword: formData.userPassword,
+      };
+
+      if (accountType === 'business') {
+        // B2B Account
+        if (!formData.companyName || !formData.billingEmail) {
+          throw new Error("Company name and billing email are required");
+        }
+
+        if (formData.createUser && !formData.userEmail) {
+          throw new Error("User email is required when creating a user");
+        }
+
+        accountData = {
+          ...accountData,
+          companyName: formData.companyName,
+          legalName: formData.legalName || formData.companyName,
+          billingEmail: formData.billingEmail,
+          ...(formData.createUser && {
+            userEmail: formData.userEmail,
+            userPassword: formData.userPassword,
+            firstName: formData.userFirstName,
+            lastName: formData.userLastName,
+            phoneNumber: formData.userPhoneNumber,
+            role: formData.role,
+          }),
+        };
+      } else {
+        // B2C Individual Account
+        if (!formData.firstName || !formData.lastName || !formData.billingEmail) {
+          throw new Error("Name and email are required for individual accounts");
+        }
+
+        accountData = {
+          ...accountData,
           firstName: formData.firstName,
           lastName: formData.lastName,
           phoneNumber: formData.phoneNumber,
-          role: formData.role,
-        }),
-      };
+          billingEmail: formData.billingEmail,
+          // For B2C, we create both customer and user with same info
+          userEmail: formData.billingEmail,
+          userPassword: formData.userPassword,
+        };
+      }
 
       await onAdd(accountData);
       
       // Reset form and close modal on success
-      setFormData({
-        companyName: "",
-        legalName: "",
-        billingEmail: "",
-        subscriptionTier: "FREE",
-        paymentStatus: "PENDING",
-        createUser: false,
-        userEmail: "",
-        userPassword: "",
-        firstName: "",
-        lastName: "",
-        phoneNumber: "",
-        role: "MEMBER",
-      });
+      handleAccountTypeChange('business'); // Reset to default
       onClose();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to create account");
@@ -121,70 +159,274 @@ export const AccountAddModal: React.FC<AccountAddModalProps> = ({
       variant="edit"
       size="md"
     >
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-4">
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700 text-sm">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-red-700 text-sm">
             {error}
           </div>
         )}
 
-        {/* Company Information Section */}
-        <ModalFormLayout>
-          <ModalFormColumn span={2}>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Company Name *
-              </label>
-              <input
-                type="text"
-                name="companyName"
-                value={formData.companyName}
-                onChange={handleInputChange}
-                placeholder="Enter company name"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors text-sm"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Legal Name
-              </label>
-              <input
-                type="text"
-                name="legalName"
-                value={formData.legalName}
-                onChange={handleInputChange}
-                placeholder="Legal entity name (optional)"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors text-sm"
-              />
-            </div>
-          </ModalFormColumn>
-        </ModalFormLayout>
+        {/* Account Type Toggle */}
+        <div className="flex space-x-2 p-1 bg-gray-100 rounded-lg">
+          <button
+            type="button"
+            onClick={() => handleAccountTypeChange('business')}
+            className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-all ${
+              accountType === 'business'
+                ? 'bg-white text-gray-900 shadow-sm'
+                : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            <Building2 className="w-4 h-4" />
+            Business Account
+          </button>
+          <button
+            type="button"
+            onClick={() => handleAccountTypeChange('individual')}
+            className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-all ${
+              accountType === 'individual'
+                ? 'bg-white text-gray-900 shadow-sm'
+                : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            <User className="w-4 h-4" />
+            Individual Account
+          </button>
+        </div>
 
-        {/* Billing Information Section */}
-        <ModalFormLayout>
-          <ModalFormColumn span={2}>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Billing Email *
-              </label>
-              <input
-                type="email"
-                name="billingEmail"
-                value={formData.billingEmail}
-                onChange={handleInputChange}
-                placeholder="billing@company.com"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors text-sm"
-                required
-              />
-            </div>
-          </ModalFormColumn>
-        </ModalFormLayout>
+        {accountType === 'business' ? (
+          <>
+            {/* Business Account Fields */}
+            <ModalFormLayout>
+              <ModalFormColumn span={2}>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Company Name *
+                  </label>
+                  <input
+                    type="text"
+                    name="companyName"
+                    value={formData.companyName}
+                    onChange={handleInputChange}
+                    placeholder="Enter company name"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors text-sm"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Legal Name
+                  </label>
+                  <input
+                    type="text"
+                    name="legalName"
+                    value={formData.legalName}
+                    onChange={handleInputChange}
+                    placeholder="Legal entity name (optional)"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors text-sm"
+                  />
+                </div>
+              </ModalFormColumn>
+            </ModalFormLayout>
 
+            {/* Billing Information */}
+            <ModalFormLayout>
+              <ModalFormColumn span={2}>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Billing Email *
+                  </label>
+                  <input
+                    type="email"
+                    name="billingEmail"
+                    value={formData.billingEmail}
+                    onChange={handleInputChange}
+                    placeholder="billing@company.com"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors text-sm"
+                    required
+                  />
+                </div>
+              </ModalFormColumn>
+            </ModalFormLayout>
+
+            {/* Optional Initial User for B2B */}
+            <div className="border-t pt-4">
+              <label className="flex items-center gap-2 cursor-pointer mb-4">
+                <input
+                  type="checkbox"
+                  name="createUser"
+                  checked={formData.createUser}
+                  onChange={handleInputChange}
+                  className="w-4 h-4 text-gray-600 border-gray-300 rounded focus:ring-gray-500"
+                />
+                <span className="text-sm font-medium text-gray-700">Create an initial user (optional)</span>
+              </label>
+
+              {formData.createUser && (
+                <ModalFormLayout>
+                  <ModalFormColumn>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        First Name
+                      </label>
+                      <input
+                        type="text"
+                        name="userFirstName"
+                        value={formData.userFirstName}
+                        onChange={handleInputChange}
+                        placeholder="John"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        User Email *
+                      </label>
+                      <input
+                        type="email"
+                        name="userEmail"
+                        value={formData.userEmail}
+                        onChange={handleInputChange}
+                        placeholder="user@company.com"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors text-sm"
+                        required={formData.createUser}
+                      />
+                    </div>
+                  </ModalFormColumn>
+                  <ModalFormColumn>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Last Name
+                      </label>
+                      <input
+                        type="text"
+                        name="userLastName"
+                        value={formData.userLastName}
+                        onChange={handleInputChange}
+                        placeholder="Doe"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        User Role
+                      </label>
+                      <select
+                        name="role"
+                        value={formData.role}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors text-sm"
+                      >
+                        <option value="MEMBER">Member</option>
+                        <option value="VIEWER">Viewer</option>
+                        <option value="SUPPORT">Support</option>
+                        <option value="ADMIN">Admin</option>
+                        <option value="OWNER">Owner</option>
+                      </select>
+                    </div>
+                  </ModalFormColumn>
+                </ModalFormLayout>
+              )}
+            </div>
+          </>
+        ) : (
+          <>
+            {/* Individual Account Fields */}
+            <ModalFormLayout>
+              <ModalFormColumn>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    First Name *
+                  </label>
+                  <input
+                    type="text"
+                    name="firstName"
+                    value={formData.firstName}
+                    onChange={handleInputChange}
+                    placeholder="John"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors text-sm"
+                    required
+                  />
+                </div>
+              </ModalFormColumn>
+              <ModalFormColumn>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Last Name *
+                  </label>
+                  <input
+                    type="text"
+                    name="lastName"
+                    value={formData.lastName}
+                    onChange={handleInputChange}
+                    placeholder="Doe"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors text-sm"
+                    required
+                  />
+                </div>
+              </ModalFormColumn>
+            </ModalFormLayout>
+
+            <ModalFormLayout>
+              <ModalFormColumn>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Email Address *
+                  </label>
+                  <input
+                    type="email"
+                    name="billingEmail"
+                    value={formData.billingEmail}
+                    onChange={handleInputChange}
+                    placeholder="john.doe@example.com"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors text-sm"
+                    required
+                  />
+                </div>
+              </ModalFormColumn>
+              <ModalFormColumn>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Phone Number
+                  </label>
+                  <input
+                    type="tel"
+                    name="phoneNumber"
+                    value={formData.phoneNumber}
+                    onChange={handleInputChange}
+                    placeholder="+1234567890"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors text-sm"
+                  />
+                </div>
+              </ModalFormColumn>
+            </ModalFormLayout>
+
+            <ModalFormLayout>
+              <ModalFormColumn span={2}>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Password (optional)
+                  </label>
+                  <input
+                    type="password"
+                    name="userPassword"
+                    value={formData.userPassword}
+                    onChange={handleInputChange}
+                    placeholder="Leave blank to send an invite"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors text-sm"
+                  />
+                </div>
+              </ModalFormColumn>
+            </ModalFormLayout>
+          </>
+        )}
+
+        {/* Common Subscription Fields */}
         <ModalFormLayout>
           <ModalFormColumn>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
+                <CreditCard className="w-3 h-3 inline mr-1" />
                 Subscription Tier
               </label>
               <select
@@ -220,114 +462,8 @@ export const AccountAddModal: React.FC<AccountAddModalProps> = ({
           </ModalFormColumn>
         </ModalFormLayout>
 
-        {/* Initial User Section */}
-        <div className="border-t pt-4">
-          <label className="flex items-center gap-2 cursor-pointer mb-4">
-            <input
-              type="checkbox"
-              name="createUser"
-              checked={formData.createUser}
-              onChange={handleInputChange}
-              className="w-4 h-4 text-gray-600 border-gray-300 rounded focus:ring-gray-500"
-            />
-            <span className="text-sm font-medium text-gray-700">Create an initial user (optional)</span>
-          </label>
-
-          {formData.createUser && (
-            <ModalFormLayout>
-              <ModalFormColumn>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    First Name
-                  </label>
-                  <input
-                    type="text"
-                    name="firstName"
-                    value={formData.firstName}
-                    onChange={handleInputChange}
-                    placeholder="John"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors text-sm"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    User Email *
-                  </label>
-                  <input
-                    type="email"
-                    name="userEmail"
-                    value={formData.userEmail}
-                    onChange={handleInputChange}
-                    placeholder="user@company.com"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors text-sm"
-                    required={formData.createUser}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Phone Number
-                  </label>
-                  <input
-                    type="tel"
-                    name="phoneNumber"
-                    value={formData.phoneNumber}
-                    onChange={handleInputChange}
-                    placeholder="+1234567890"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors text-sm"
-                  />
-                </div>
-              </ModalFormColumn>
-              <ModalFormColumn>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Last Name
-                  </label>
-                  <input
-                    type="text"
-                    name="lastName"
-                    value={formData.lastName}
-                    onChange={handleInputChange}
-                    placeholder="Doe"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors text-sm"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Password
-                  </label>
-                  <input
-                    type="password"
-                    name="userPassword"
-                    value={formData.userPassword}
-                    onChange={handleInputChange}
-                    placeholder="Leave blank to send invite"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors text-sm"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    User Role
-                  </label>
-                  <select
-                    name="role"
-                    value={formData.role}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors text-sm"
-                  >
-                    <option value="MEMBER">Member</option>
-                    <option value="VIEWER">Viewer</option>
-                    <option value="SUPPORT">Support</option>
-                    <option value="ADMIN">Admin</option>
-                    <option value="OWNER">Owner</option>
-                  </select>
-                </div>
-              </ModalFormColumn>
-            </ModalFormLayout>
-          )}
-        </div>
-
         {/* Form Actions */}
-        <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+        <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200">
           <button
             type="button"
             onClick={onClose}
@@ -345,7 +481,7 @@ export const AccountAddModal: React.FC<AccountAddModalProps> = ({
               <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
             )}
             <Plus className="w-4 h-4" />
-            {isLoading ? "Creating..." : "Create Account"}
+            {isLoading ? "Creating..." : `Create ${accountType === 'business' ? 'Business' : 'Individual'} Account`}
           </button>
         </div>
       </form>

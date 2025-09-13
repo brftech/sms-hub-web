@@ -65,6 +65,9 @@ serve(async (req) => {
 
     // Parse request body
     const {
+      // Account type
+      accountType = "business",
+      
       // Company fields
       companyName,
       legalName,
@@ -75,7 +78,7 @@ serve(async (req) => {
       subscriptionTier = "FREE",
       paymentStatus = "PENDING",
       
-      // Initial user fields
+      // User fields (B2B initial user or B2C individual)
       userEmail,
       userPassword,
       firstName,
@@ -84,53 +87,75 @@ serve(async (req) => {
       role = "MEMBER",
     } = await req.json();
 
-    // Validate required fields
-    if (!companyName || !hub_id || !billingEmail) {
-      return new Response(
-        JSON.stringify({
-          error: "Missing required fields: companyName, hub_id, and billingEmail are required",
-        }),
-        {
-          status: 400,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        }
-      );
+    // Validate required fields based on account type
+    if (accountType === "business") {
+      if (!companyName || !hub_id || !billingEmail) {
+        return new Response(
+          JSON.stringify({
+            error: "Missing required fields: companyName, hub_id, and billingEmail are required for business accounts",
+          }),
+          {
+            status: 400,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          }
+        );
+      }
+    } else if (accountType === "individual") {
+      if (!firstName || !lastName || !hub_id || !billingEmail) {
+        return new Response(
+          JSON.stringify({
+            error: "Missing required fields: firstName, lastName, hub_id, and billingEmail are required for individual accounts",
+          }),
+          {
+            status: 400,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          }
+        );
+      }
     }
 
     // Generate unique identifiers
-    const companyId = crypto.randomUUID();
-    const accountNumber = `ACC-${Date.now()}`;
     const timestamp = new Date().toISOString();
+    let companyId = null;
+    let company = null;
 
     // Start transaction-like operations
     try {
-      // Step 1: Create company
-      const { data: company, error: companyError } = await supabaseAdmin
-        .from("companies")
-        .insert([{
-          id: companyId,
-          hub_id: hub_id,
-          public_name: companyName,
-          legal_name: legalName || companyName,
-          company_account_number: accountNumber,
-          is_active: true,
-          created_at: timestamp,
-          updated_at: timestamp,
-        }])
-        .select()
-        .single();
+      // Step 1: Create company (only for B2B accounts)
+      if (accountType === "business") {
+        companyId = crypto.randomUUID();
+        const accountNumber = `ACC-${Date.now()}`;
+        
+        const { data: companyData, error: companyError } = await supabaseAdmin
+          .from("companies")
+          .insert([{
+            id: companyId,
+            hub_id: hub_id,
+            public_name: companyName,
+            legal_name: legalName || companyName,
+            company_account_number: accountNumber,
+            is_active: true,
+            created_at: timestamp,
+            updated_at: timestamp,
+          }])
+          .select()
+          .single();
 
-      if (companyError) {
-        throw new Error(`Failed to create company: ${companyError.message}`);
+        if (companyError) {
+          throw new Error(`Failed to create company: ${companyError.message}`);
+        }
+        
+        company = companyData;
       }
 
       // Step 2: Create customer record
+      const customerId = crypto.randomUUID();
       const { data: customer, error: customerError } = await supabaseAdmin
         .from("customers")
         .insert([{
-          id: crypto.randomUUID(),
+          id: customerId,
           hub_id: hub_id,
-          company_id: companyId,
+          company_id: companyId, // null for B2C
           billing_email: billingEmail,
           subscription_tier: subscriptionTier,
           payment_status: paymentStatus,
@@ -142,28 +167,39 @@ serve(async (req) => {
         .single();
 
       if (customerError) {
-        // Rollback company creation
-        await supabaseAdmin.from("companies").delete().eq("id", companyId);
+        // Rollback company creation if it was created
+        if (companyId) {
+          await supabaseAdmin.from("companies").delete().eq("id", companyId);
+        }
         throw new Error(`Failed to create customer: ${customerError.message}`);
       }
 
-      // Step 3: Create auth user and profile if email provided
+      // Step 3: Create auth user and profile
       let authUser = null;
       let userProfile = null;
       
-      if (userEmail) {
+      // For B2C, always create user with customer info
+      // For B2B, only create if userEmail is provided
+      const shouldCreateUser = accountType === "individual" || userEmail;
+      const userEmailToUse = accountType === "individual" ? billingEmail : userEmail;
+      const userFirstName = accountType === "individual" ? firstName : (userEmail ? firstName : null);
+      const userLastName = accountType === "individual" ? lastName : (userEmail ? lastName : null);
+      
+      if (shouldCreateUser && userEmailToUse) {
         // Create auth user with Supabase Auth
         if (userPassword) {
           const { data: newAuthUser, error: createUserError } = await supabaseAdmin.auth.admin.createUser({
-            email: userEmail,
+            email: userEmailToUse,
             password: userPassword,
             email_confirm: true, // Auto-confirm email
             user_metadata: {
-              first_name: firstName,
-              last_name: lastName,
+              first_name: userFirstName,
+              last_name: userLastName,
               phone_number: phoneNumber,
               hub_id: hub_id,
               company_id: companyId,
+              customer_id: customerId,
+              account_type: accountType,
             },
           });
 
@@ -179,13 +215,13 @@ serve(async (req) => {
               .insert([{
                 id: authUser.user.id, // Use auth user ID for profile
                 hub_id: hub_id,
-                company_id: companyId,
+                company_id: companyId, // null for B2C
                 account_number: `USR-${Date.now()}`,
-                email: userEmail,
-                first_name: firstName,
-                last_name: lastName,
+                email: userEmailToUse,
+                first_name: userFirstName,
+                last_name: userLastName,
                 mobile_phone_number: phoneNumber,
-                role: role,
+                role: accountType === "individual" ? "MEMBER" : role, // B2C users are members
                 is_active: true,
                 created_at: timestamp,
                 updated_at: timestamp,
@@ -207,13 +243,13 @@ serve(async (req) => {
             .insert([{
               id: crypto.randomUUID(),
               hub_id: hub_id,
-              company_id: companyId,
+              company_id: companyId, // null for B2C
               account_number: `USR-${Date.now()}`,
-              email: userEmail,
-              first_name: firstName,
-              last_name: lastName,
+              email: userEmailToUse,
+              first_name: userFirstName,
+              last_name: userLastName,
               mobile_phone_number: phoneNumber,
-              role: role,
+              role: accountType === "individual" ? "MEMBER" : role,
               is_active: true,
               created_at: timestamp,
               updated_at: timestamp,

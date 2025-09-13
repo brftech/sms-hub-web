@@ -118,7 +118,7 @@ export const AccountAddModal: React.FC<AccountAddModalProps> = ({
       title="Add New Account"
       subtitle={`Create a new account for ${hubName}`}
       icon={<Plus className="w-5 h-5" />}
-      variant="create"
+      variant="edit"
       size="lg"
     >
       <form onSubmit={handleSubmit} className="space-y-6">

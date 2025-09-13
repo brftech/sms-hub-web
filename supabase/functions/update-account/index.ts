@@ -61,6 +61,21 @@ serve(async (req) => {
       // Update company
       const companyUpdates: any = {};
       
+      // Helper function to format EIN
+      const formatEIN = (ein: string | undefined | null): string | null => {
+        if (!ein) return null;
+        // Remove any non-numeric characters
+        const cleanEIN = ein.replace(/\D/g, '');
+        // Check if it's 9 digits
+        if (cleanEIN.length !== 9) {
+          // If not 9 digits, return null to avoid constraint violation
+          console.warn(`Invalid EIN length: ${cleanEIN.length} digits (expected 9)`);
+          return null;
+        }
+        // Format as XX-XXXXXXX
+        return `${cleanEIN.slice(0, 2)}-${cleanEIN.slice(2)}`;
+      };
+      
       if (updates.public_name !== undefined) companyUpdates.public_name = updates.public_name;
       // company_name doesn't exist in companies table, map to public_name
       if (updates.company_name !== undefined) companyUpdates.public_name = updates.company_name;
@@ -69,8 +84,14 @@ serve(async (req) => {
       if (updates.contact_email !== undefined) companyUpdates.primary_contact_email = updates.contact_email;
       if (updates.contact_phone !== undefined) companyUpdates.primary_contact_phone = updates.contact_phone;
       if (updates.company_account_number !== undefined) companyUpdates.company_account_number = updates.company_account_number;
-      if (updates.tax_id !== undefined) companyUpdates.ein = updates.tax_id;  // Map tax_id to ein field
-      if (updates.ein !== undefined) companyUpdates.ein = updates.ein;  // Also support direct ein field
+      
+      // Handle EIN with proper formatting
+      if (updates.tax_id !== undefined) {
+        companyUpdates.ein = formatEIN(updates.tax_id);
+      } else if (updates.ein !== undefined) {
+        companyUpdates.ein = formatEIN(updates.ein);
+      }
+      
       if (updates.industry_vertical !== undefined) companyUpdates.industry_vertical = updates.industry_vertical;
       if (updates.is_active !== undefined) companyUpdates.is_active = updates.is_active;
 

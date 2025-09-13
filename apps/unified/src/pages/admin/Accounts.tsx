@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useHub } from "@sms-hub/ui";
-import { AccountViewModal, AccountEditModal, AccountDeleteModal } from "@sms-hub/ui";
+import { AccountViewModal, AccountEditModal, AccountDeleteModal, AccountAddModal } from "@sms-hub/ui";
 import { useGlobalView } from "../../contexts/GlobalViewContext";
 import { getSupabaseClient } from "../../lib/supabaseSingleton";
 import { customersService, Customer } from "../../services/customersService";
@@ -63,6 +63,7 @@ export function Accounts() {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState<UnifiedAccount | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -199,6 +200,41 @@ export function Accounts() {
   const handleDeleteAccount = (account: UnifiedAccount) => {
     setSelectedAccount(account);
     setIsDeleteModalOpen(true);
+  };
+
+  const handleAddAccount = async (accountData: any) => {
+    try {
+      const supabase = getSupabaseClient();
+      
+      // Call the Edge Function to create the account
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-account`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+          },
+          body: JSON.stringify(accountData),
+        }
+      );
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to create account");
+      }
+
+      const result = await response.json();
+      
+      // Refresh the accounts list
+      await fetchData();
+      
+      // Close the modal
+      setIsAddModalOpen(false);
+    } catch (error) {
+      console.error("Error creating account:", error);
+      throw error;
+    }
   };
 
   const handleUpdateAccount = async (updates: Partial<UnifiedAccount>) => {
@@ -513,9 +549,7 @@ export function Accounts() {
             />
           </div>
           <button
-            onClick={() => {
-              /* Add account functionality */
-            }}
+            onClick={() => setIsAddModalOpen(true)}
             className="inline-flex items-center px-3 py-2 border border-transparent shadow-sm text-sm leading-4 font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors"
           >
             <Plus className="w-4 h-4 mr-2" />
@@ -790,6 +824,14 @@ export function Accounts() {
         onConfirm={handleConfirmDelete}
         account={selectedAccount}
         isDeleting={isDeleting}
+      />
+
+      <AccountAddModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onAdd={handleAddAccount}
+        hubId={currentHub === "gnymble" ? 1 : currentHub === "percymd" ? 2 : currentHub === "percytext" ? 3 : currentHub === "percytech" ? 0 : 1}
+        hubName={currentHub.charAt(0).toUpperCase() + currentHub.slice(1)}
       />
     </div>
   );

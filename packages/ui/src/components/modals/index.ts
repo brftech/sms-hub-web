@@ -5,3 +5,4 @@ export { UserDeleteModal } from "./UserDeleteModal";
 export { AccountViewModal } from "./AccountViewModal";
 export { AccountEditModal } from "./AccountEditModal";
 export { AccountDeleteModal } from "./AccountDeleteModal";
+export { AccountAddModal } from "./AccountAddModal";

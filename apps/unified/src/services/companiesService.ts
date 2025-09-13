@@ -425,6 +425,136 @@ class CompaniesService {
     }
   }
 
+  // Add a complete account (company + customer + initial user)
+  async addAccount(accountData: {
+    // Company fields
+    companyName: string;
+    legalName?: string;
+    hub_id: number;
+    
+    // Customer fields  
+    billingEmail: string;
+    subscriptionTier?: string;
+    paymentStatus?: string;
+    
+    // Initial user fields
+    userEmail: string;
+    firstName?: string;
+    lastName?: string;
+    phoneNumber?: string;
+    role?: string;
+  }): Promise<{ 
+    success: boolean; 
+    data?: {
+      company?: Company;
+      customerId?: string;
+      userId?: string;
+    };
+    error?: string 
+  }> {
+    try {
+      // Generate unique identifiers
+      const companyId = crypto.randomUUID();
+      const accountNumber = `ACC-${Date.now()}`;
+      
+      // Step 1: Create company
+      const { data: company, error: companyError } = await this.supabase
+        .from("companies")
+        .insert([{
+          id: companyId,
+          hub_id: accountData.hub_id,
+          public_name: accountData.companyName,
+          legal_name: accountData.legalName || accountData.companyName,
+          company_account_number: accountNumber,
+          is_active: true,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        }])
+        .select()
+        .single();
+
+      if (companyError) {
+        console.error("Error creating company:", companyError);
+        return { success: false, error: `Failed to create company: ${companyError.message}` };
+      }
+
+      // Step 2: Create customer record if billing email provided
+      let customerId = null;
+      if (accountData.billingEmail) {
+        const { data: customer, error: customerError } = await this.supabase
+          .from("customers")
+          .insert([{
+            id: crypto.randomUUID(),
+            hub_id: accountData.hub_id,
+            company_id: companyId,
+            billing_email: accountData.billingEmail,
+            subscription_tier: accountData.subscriptionTier || 'FREE',
+            payment_status: accountData.paymentStatus || 'PENDING',
+            is_active: true,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          }])
+          .select()
+          .single();
+
+        if (customerError) {
+          console.error("Error creating customer:", customerError);
+          // Rollback company creation
+          await this.supabase.from("companies").delete().eq("id", companyId);
+          return { success: false, error: `Failed to create customer: ${customerError.message}` };
+        }
+        
+        customerId = customer?.id;
+      }
+
+      // Step 3: Create initial user profile if email provided
+      let userId = null;
+      if (accountData.userEmail) {
+        // Note: This creates a profile but not auth - that needs Edge Function
+        const { data: profile, error: profileError } = await this.supabase
+          .from("user_profiles")
+          .insert([{
+            id: crypto.randomUUID(),
+            hub_id: accountData.hub_id,
+            company_id: companyId,
+            account_number: `USR-${Date.now()}`,
+            email: accountData.userEmail,
+            first_name: accountData.firstName,
+            last_name: accountData.lastName,
+            mobile_phone_number: accountData.phoneNumber,
+            role: accountData.role || 'MEMBER',
+            is_active: true,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          }])
+          .select()
+          .single();
+
+        if (profileError) {
+          console.error("Error creating user profile:", profileError);
+          // Note: Not rolling back company/customer as they might still be useful
+        } else {
+          userId = profile?.id;
+        }
+      }
+
+      return { 
+        success: true, 
+        data: {
+          company: company as Company,
+          customerId,
+          userId
+        }
+      };
+    } catch (error) {
+      console.error("Error in addAccount:", error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
+  }
+
   // Get users for a company
   async getCompanyUsers(companyId: string): Promise<any[]> {
     try {

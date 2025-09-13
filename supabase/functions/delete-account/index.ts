@@ -49,21 +49,46 @@ serve(async (req) => {
     let result = { success: false, message: "" };
 
     if (permanent) {
-      // Permanent deletion
+      // Permanent deletion - CASCADE DELETE EVERYTHING
       if (company_id) {
-        // First, clear company_id from all user_profiles to avoid foreign key constraint
-        await supabaseAdmin
+        // Get all users associated with this company (via profiles or memberships)
+        const { data: profiles } = await supabaseAdmin
           .from("profiles")
-          .update({ company_id: null })
+          .select("id")
           .eq("company_id", company_id);
 
-        // Delete all memberships
-        await supabaseAdmin
+        const { data: memberships } = await supabaseAdmin
           .from("memberships")
-          .delete()
+          .select("user_id")
           .eq("company_id", company_id);
 
-        // Delete the company
+        // Collect all unique user IDs
+        const userIds = new Set<string>();
+        profiles?.forEach(p => userIds.add(p.id));
+        memberships?.forEach(m => userIds.add(m.user_id));
+
+        // Delete all user data in correct order to avoid foreign key constraints
+        for (const userId of userIds) {
+          // 1. Delete memberships for this user
+          await supabaseAdmin
+            .from("memberships")
+            .delete()
+            .eq("user_id", userId);
+
+          // 2. Delete profile
+          await supabaseAdmin
+            .from("profiles")
+            .delete()
+            .eq("id", userId);
+
+          // 3. Delete auth user (this will cascade to auth.users)
+          const { error: authError } = await supabaseAdmin.auth.admin.deleteUser(userId);
+          if (authError) {
+            console.error(`Failed to delete auth for user ${userId}:`, authError);
+          }
+        }
+
+        // Finally, delete the company itself
         const { error: companyError } = await supabaseAdmin
           .from("companies")
           .delete()

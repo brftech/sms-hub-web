@@ -184,15 +184,15 @@ export const AccountDeleteModal: React.FC<AccountDeleteModalProps> = ({
                 deletePermanent ? "text-red-700" : "text-amber-700"
               }`}>
                 {deletePermanent 
-                  ? `This will permanently delete all data for this ${getEntityTypeLabel()}. This cannot be reversed.`
-                  : `The ${getEntityTypeLabel()} will lose access immediately but all data will remain in the system for future reactivation if needed.`
+                  ? `This will permanently delete the ${getEntityTypeLabel()} AND all associated users, removing them completely from the system. This cannot be reversed.`
+                  : `The ${getEntityTypeLabel()} will lose access immediately but all data and users will remain in the system for future reactivation if needed.`
                 }
               </p>
               {account.user_count > 0 && (
                 <p className={`text-xs mt-1 font-medium ${
                   deletePermanent ? "text-red-800" : "text-amber-800"
                 }`}>
-                  ⚠️ This will affect {account.user_count} user{account.user_count > 1 ? 's' : ''}.
+                  ⚠️ This will {deletePermanent ? 'DELETE' : 'deactivate'} {account.user_count} user{account.user_count > 1 ? 's' : ''}.
                 </p>
               )}
             </div>

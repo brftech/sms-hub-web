@@ -6,6 +6,7 @@ import { useHub, HubSwitcher, HubLogo } from "@sms-hub/ui";
 import { useCompany } from "../../hooks/useCompany";
 import { DevAdminBanner } from "../DevAdminBanner";
 import { UserRole } from "../../types/roles";
+import { hasAnyRole } from "../../utils/roleUtils";
 import {
   getUserDisplayName,
   getInitials,
@@ -37,9 +38,8 @@ export default function UserLayout({ children }: UserLayoutProps) {
   const { company } = useCompany();
 
   // Check if user is admin
-  const isAdmin =
-    user?.role === UserRole.ADMIN || user?.role === UserRole.SUPERADMIN;
-  const isSuperAdmin = user?.role === UserRole.SUPERADMIN;
+  const isAdmin = hasAnyRole(user, [UserRole.ADMIN, UserRole.SUPERADMIN]);
+  const isSuperAdmin = hasAnyRole(user, [UserRole.SUPERADMIN]);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -135,16 +135,6 @@ export default function UserLayout({ children }: UserLayoutProps) {
             >
               <Menu className="w-5 h-5" />
             </button>
-
-            {/* Hub Logo */}
-            <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center">
-              <HubLogo
-                hubType={currentHub}
-                variant="icon"
-                size="sm"
-                className="w-full h-full"
-              />
-            </div>
 
             {/* Company Name */}
             {company && (

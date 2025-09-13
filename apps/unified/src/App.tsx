@@ -5,8 +5,12 @@ import AdminLayout from "./components/layout/AdminLayout";
 import UserLayout from "./components/layout/UserLayout";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { UserRole } from "./types/roles";
+import { hasAnyRole } from "./utils/roleUtils";
 import ClearAuth from "./pages/ClearAuth";
 import { DebugAuth } from "./pages/DebugAuth";
+import { AuthCallback } from "./pages/AuthCallback";
+import { AuthDebug } from "./pages/AuthDebug";
+import { Landing } from "./pages/Landing";
 // import DevLogin from './pages/DevLogin'
 import { useAuth } from "./hooks/useAuth";
 import { GlobalViewProvider } from "./contexts/GlobalViewContext";
@@ -16,15 +20,31 @@ import { DynamicFavicon } from "./components/DynamicFavicon";
 const DashboardRouter = () => {
   // Show appropriate dashboard based on user role
   const { user } = useAuth();
+  console.log("[DashboardRouter] User:", user);
+  console.log("[DashboardRouter] User role:", user?.role);
+  console.log(
+    "[DashboardRouter] Is admin?",
+    user?.role === UserRole.ADMIN || user?.role === UserRole.SUPERADMIN
+  );
 
-  if (user?.role === UserRole.ADMIN || user?.role === UserRole.SUPERADMIN) {
+  if (hasAnyRole(user, [UserRole.ADMIN])) {
+    console.log("[DashboardRouter] Rendering AdminLayout for Admin");
     // Admin users see admin dashboard
     return (
       <AdminLayout>
         <AdminDashboard />
       </AdminLayout>
     );
+  } else if (hasAnyRole(user, [UserRole.SUPERADMIN])) {
+    console.log("[DashboardRouter] Rendering UserLayout for Superadmin");
+    // Superadmin users see user conversations view
+    return (
+      <UserLayout>
+        <UserConversations />
+      </UserLayout>
+    );
   } else {
+    console.log("[DashboardRouter] Rendering UserLayout for regular user");
     // Regular users see conversations as the default user view
     return (
       <UserLayout>
@@ -108,29 +128,25 @@ const Unauthorized = () => (
 );
 
 function App() {
+  console.log("[App] Rendering App component");
+
   return (
     <ErrorBoundary>
-      <HubProvider environment={unifiedEnvironment} defaultHub="gnymble">
+      <HubProvider environment={unifiedEnvironment} defaultHub="percytech">
         <DynamicFavicon />
         <GlobalViewProvider>
           <Routes>
             {/* Public routes - accessible without authentication */}
             <Route path="/clear-auth" element={<ClearAuth />} />
             <Route path="/debug-auth" element={<DebugAuth />} />
+            <Route path="/auth-callback" element={<AuthCallback />} />
+            <Route path="/auth-debug" element={<AuthDebug />} />
             {/* <Route path="/dev-login" element={<DevLogin />} /> */}
-            {/* Redirect root to dashboard - preserve query params */}
-            <Route
-              path="/"
-              element={
-                <Navigate to={`/dashboard${window.location.search}`} replace />
-              }
-            />
+            {/* Landing page for unauthenticated users */}
+            <Route path="/" element={<Landing />} />
 
-            {/* Redirect old signup route to dashboard */}
-            <Route
-              path="/signup"
-              element={<Navigate to="/dashboard" replace />}
-            />
+            {/* Redirect old signup route to landing */}
+            <Route path="/signup" element={<Navigate to="/" replace />} />
 
             {/* Dashboard Route - show different dashboards based on role */}
             <Route
@@ -138,6 +154,7 @@ function App() {
               element={
                 <ProtectedRoute
                   requiredRoles={[
+                    UserRole.USER,
                     UserRole.ONBOARDED,
                     UserRole.ADMIN,
                     UserRole.SUPERADMIN,
@@ -147,6 +164,26 @@ function App() {
                 </ProtectedRoute>
               }
             />
+
+            {/* User View Route - forces UserLayout regardless of role */}
+            <Route
+              path="/user-view"
+              element={
+                <ProtectedRoute
+                  requiredRoles={[
+                    UserRole.USER,
+                    UserRole.ONBOARDED,
+                    UserRole.ADMIN,
+                    UserRole.SUPERADMIN,
+                  ]}
+                >
+                  <UserLayout>
+                    <UserConversations />
+                  </UserLayout>
+                </ProtectedRoute>
+              }
+            />
+
             <Route
               path="/campaigns"
               element={

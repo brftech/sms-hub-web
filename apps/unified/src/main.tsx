@@ -10,6 +10,8 @@ import './index.css'
 
 const queryClient = new QueryClient()
 
+console.log("[UNIFIED APP] Starting unified app...");
+
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <HelmetProvider>

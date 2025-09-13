@@ -171,7 +171,8 @@ const Companies = () => {
     if (!deletingCompanyId) return;
 
     try {
-      const result = await companiesService.instance.deleteCompany(deletingCompanyId);
+      const result =
+        await companiesService.instance.deleteCompany(deletingCompanyId);
 
       if (result.success) {
         await fetchData();

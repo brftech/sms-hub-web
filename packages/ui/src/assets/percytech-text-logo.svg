@@ -1,17 +1,18 @@
-<svg width="188" height="34" viewBox="0 0 188 34" xmlns="http://www.w3.org/2000/svg">
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="32" viewBox="0 0 160 32">
   <defs>
     <linearGradient id="percytechGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#8B0000" />
-      <stop offset="100%" stop-color="#1E40AF" />
+      <stop offset="0%" style="stop-color:#dc2626;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#ef4444;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f87171;stop-opacity:1" />
     </linearGradient>
   </defs>
   
-  <!-- percytech - Centered with 6px top padding -->
+  <!-- PercyTech text only -->
   <text
-    x="94"
-    y="25"
+    x="80"
+    y="24"
     font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
-    font-size="32"
+    font-size="28"
     font-weight="900"
     fill="url(#percytechGradient)"
     letter-spacing="-0.025em"

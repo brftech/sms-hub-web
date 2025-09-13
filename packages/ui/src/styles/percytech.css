@@ -24,22 +24,22 @@
   --ring: 0 0% 3.9%;
 
   /* Hub-specific colors */
-  --hub-primary: #1F2937; /* gray-800 */
-  --hub-secondary: #6B7280; /* gray-500 */
-  --hub-accent: #3B82F6; /* blue-500 */
-  --hub-primary-rgb: 31, 41, 55;
-  --hub-secondary-rgb: 107, 114, 128;
-  --hub-accent-rgb: 59, 130, 246;
+  --hub-primary: #dc2626; /* red-600 */
+  --hub-secondary: #ef4444; /* red-500 */
+  --hub-accent: #f87171; /* red-400 */
+  --hub-primary-rgb: 220, 38, 38;
+  --hub-secondary-rgb: 239, 68, 68;
+  --hub-accent-rgb: 248, 113, 113;
 
   /* PercyTech-specific gradients */
-  --gradient-primary: linear-gradient(135deg, #1F2937 0%, #3B82F6 100%);
-  --gradient-hero: linear-gradient(135deg, #F8FAFC 0%, #E2E8F0 100%);
-  --gradient-card: linear-gradient(145deg, #FFFFFF 0%, #F1F5F9 100%);
+  --gradient-primary: linear-gradient(135deg, #dc2626 0%, #f87171 100%);
+  --gradient-hero: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+  --gradient-card: linear-gradient(145deg, #ffffff 0%, #fef2f2 100%);
 
   /* PercyTech-specific shadows */
-  --shadow-primary: 0 4px 20px -4px rgba(31, 41, 55, 0.1);
-  --shadow-glow: 0 0 20px rgba(59, 130, 246, 0.05);
-  --shadow-elegant: 0 8px 32px -8px rgba(31, 41, 55, 0.1);
+  --shadow-primary: 0 4px 20px -4px rgba(220, 38, 38, 0.1);
+  --shadow-glow: 0 0 20px rgba(220, 38, 38, 0.05);
+  --shadow-elegant: 0 8px 32px -8px rgba(220, 38, 38, 0.1);
 
   /* Animation timing */
   --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);

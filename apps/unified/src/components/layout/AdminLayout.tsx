@@ -22,7 +22,6 @@ import {
   Menu,
   X,
   ChevronDown,
-  Globe,
   ArrowLeft,
   LayoutDashboard,
   Shield,
@@ -109,6 +108,14 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   ];
 
   const isActive = (path: string) => {
+    // Special case for dashboard - also match the root /dashboard path
+    if (path === "/admin/dashboard") {
+      return (
+        location.pathname === path ||
+        location.pathname.startsWith(path + "/") ||
+        location.pathname === "/dashboard"
+      );
+    }
     return (
       location.pathname === path || location.pathname.startsWith(path + "/")
     );
@@ -148,6 +155,18 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 </h3>
               </div>
             )}
+
+            {/* Hub / Global View Toggle */}
+            <button
+              onClick={toggleGlobalView}
+              className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                isGlobalView
+                  ? "bg-purple-100 text-purple-700 hover:bg-purple-200"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              }`}
+            >
+              {isGlobalView ? "Global View" : "Hub View"}
+            </button>
           </div>
 
           <div className="flex items-center space-x-4">
@@ -209,22 +228,6 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                     </p>
                     <HubSwitcher />
                   </div>
-                  <button
-                    onClick={() => {
-                      toggleGlobalView();
-                      setIsProfileOpen(false);
-                    }}
-                    className={`w-full flex items-center space-x-3 px-4 py-2 transition-colors ${
-                      isGlobalView
-                        ? "bg-purple-100 text-purple-700"
-                        : "text-gray-700 hover:bg-gray-100"
-                    }`}
-                  >
-                    <Globe className="w-4 h-4" />
-                    <span className="text-sm">
-                      {isGlobalView ? "Global View (All Hubs)" : "Hub View"}
-                    </span>
-                  </button>
                   <button
                     onClick={handleLogout}
                     className="w-full flex items-center space-x-3 px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
@@ -326,7 +329,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           {/* Back to User View */}
           <div className="p-4 border-t border-slate-700">
             <button
-              onClick={() => navigate("/dashboard")}
+              onClick={() => navigate("/user-view")}
               className="relative w-full flex items-center justify-center px-4 py-3 rounded-lg transition-all duration-200 group"
             >
               <div className="p-2 rounded-xl bg-slate-800 transition-all duration-200 hover:bg-orange-500/20 hover:scale-105">

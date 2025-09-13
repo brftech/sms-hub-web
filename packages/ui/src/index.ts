@@ -53,6 +53,9 @@ export * from "./components/hub-themed-button";
 export * from "./components/hub-logo";
 export * from "./components/hub-switcher";
 
+// Modal components
+export * from "./components/modals";
+
 // Dev mode components
 export * from "./components/DevAdminBanner";
 export * from "./components/DevAuthToggle";

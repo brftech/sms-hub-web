@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, Link, useSearchParams } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import {
   useHub,
   Button,
@@ -11,17 +11,10 @@ import {
   HubLogo,
 } from "@sms-hub/ui";
 import { Input, Label, Alert, AlertDescription } from "@sms-hub/ui";
-import {
-  Mail,
-  Phone,
-  CheckCircle,
-  Shield,
-  Lock,
-  Eye,
-  EyeOff,
-} from "lucide-react";
+import { Mail, Key, LogIn } from "lucide-react";
 import styled from "styled-components";
 import { getSupabaseClient } from "../lib/supabaseSingleton";
+// Removed dev auth imports - using real Supabase authentication
 
 const LoginContainer = styled.div`
   min-height: 100vh;
@@ -32,318 +25,155 @@ const LoginContainer = styled.div`
   padding: 1rem;
 `;
 
-const FormGroup = styled.div`
-  margin-bottom: 1rem;
-`;
-
 const StyledLabel = styled(Label)`
   display: block;
-  margin-bottom: 0.25rem;
-  font-weight: 500;
-  color: #374151;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: var(--foreground);
+`;
+
+// Removed StyledInput - using Input directly from UI package
+
+const ForgotPasswordLink = styled(Link)`
+  display: inline-block;
+  text-align: right;
   font-size: 0.875rem;
-`;
-
-const StyledInput = styled(Input)`
-  width: 100%;
-  height: 36px;
-  font-size: 0.875rem;
-`;
-
-const NameRow = styled.div`
-  display: flex;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
-`;
-
-const NameField = styled.div`
-  flex: 1;
-`;
-
-const VerificationMethod = styled.div`
-  margin-bottom: 1rem;
-`;
-
-const PasswordInputWrapper = styled.div`
-  position: relative;
-  display: flex;
-  align-items: center;
-`;
-
-const PasswordToggleButton = styled.button`
-  position: absolute;
-  right: 0.75rem;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0.25rem;
-  color: #6b7280;
-  transition: color 0.2s;
-
+  color: var(--hub-primary);
+  margin-top: 0.5rem;
   &:hover {
-    color: #374151;
-  }
-
-  &:focus {
-    outline: none;
+    text-decoration: underline;
   }
 `;
+
+const supabase = getSupabaseClient();
 
 export function Login() {
   const { hubConfig } = useHub();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-
-  // Prepopulate with superadmin credentials in dev mode
-  const isDev = import.meta.env.DEV;
-  const [email, setEmail] = useState(isDev ? "superadmin@gnymble.com" : "");
-  const [phone, setPhone] = useState("");
-  const [password, setPassword] = useState(isDev ? "SuperAdmin123!" : "");
-  const [showPassword, setShowPassword] = useState(false);
-  const [authMethod, setAuthMethod] = useState<"sms" | "email">("email");
-  const [loginType, setLoginType] = useState<"verification" | "password">(
-    "password"
-  );
-  const [isLoading, setIsLoading] = useState(false);
+  // Removed devAuth - using real Supabase authentication
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
-  const [successMessage, setSuccessMessage] = useState("");
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
 
-
-  const formatPhoneNumber = (value: string) => {
-    const cleaned = value.replace(/\D/g, "");
-    const withoutCountryCode = cleaned.startsWith("1")
-      ? cleaned.slice(1)
-      : cleaned;
-    const limited = withoutCountryCode.slice(0, 10);
-
-    if (limited.length === 10) {
-      const match = limited.match(/^(\d{3})(\d{3})(\d{4})$/);
-      if (match) {
-        return `(${match[1]}) ${match[2]}-${match[3]}`;
-      }
-    } else if (limited.length >= 6) {
-      const match = limited.match(/^(\d{3})(\d{3})(\d{0,4})$/);
-      if (match) {
-        return `(${match[1]}) ${match[2]}-${match[3]}`;
-      }
-    } else if (limited.length >= 3) {
-      const match = limited.match(/^(\d{3})(\d{0,3})$/);
-      if (match) {
-        return `(${match[1]}) ${match[2]}`;
-      }
-    }
-
-    return limited;
-  };
-
-  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const formatted = formatPhoneNumber(e.target.value);
-    setPhone(formatted);
-  };
-
-  const getPhoneForAPI = (phone: string) => {
-    const cleaned = phone.replace(/\D/g, "");
-    const withoutCountryCode = cleaned.startsWith("1")
-      ? cleaned.slice(1)
-      : cleaned;
-    return `+1${withoutCountryCode}`;
-  };
-
-  const handleSuperadminLogin = () => {
-    // Dev bypass - no Supabase auth, just redirect with the dev token
-    window.location.href = "http://localhost:3001/?superadmin=dev123";
-  };
+  // Dev auth removed - using real Supabase authentication
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("=== LOGIN FORM SUBMITTED ===");
+    console.log("Email:", formData.email);
+    console.log("Environment:", {
+      VITE_SUPABASE_URL: import.meta.env.VITE_SUPABASE_URL,
+      VITE_UNIFIED_APP_URL: import.meta.env.VITE_UNIFIED_APP_URL,
+    });
 
-    if (loginType === "password") {
-      // Legacy password login
-      if (!email || !password) {
-        setError("Please enter both email and password");
-        return;
+    if (!formData.email || !formData.password) {
+      setError("Please enter your email and password");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setError("");
+
+    try {
+      // Call the login-native Edge Function
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/login-native`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({
+            email: formData.email,
+            password: formData.password,
+          }),
+        }
+      );
+
+      const result = await response.json();
+      console.log("Login response:", response.status, result);
+      console.log("Full result object:", JSON.stringify(result, null, 2));
+
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to log in");
       }
 
-      setIsLoading(true);
-      setError("");
+      console.log("Response is OK, checking session...");
+      console.log("Session exists?", !!result.session);
+      console.log("Access token exists?", !!result.session?.access_token);
 
-      try {
-        const supabase = getSupabaseClient();
-
-        if (!supabase) {
-          throw new Error("Failed to initialize Supabase client");
-        }
-
-        console.log("Attempting login with:", {
-          email,
-          password: password.substring(0, 3) + "***",
+      // Set the session in the Supabase client
+      if (result.session) {
+        console.log("Setting session in Supabase client...");
+        const { error: sessionError } = await supabase.auth.setSession({
+          access_token: result.session.access_token,
+          refresh_token: result.session.refresh_token,
         });
-        console.log("Supabase URL:", import.meta.env.VITE_SUPABASE_URL);
-        console.log(
-          "Supabase Key (first 20 chars):",
-          import.meta.env.VITE_SUPABASE_ANON_KEY?.substring(0, 20)
-        );
 
-        const { data, error: signInError } =
-          await supabase.auth.signInWithPassword({
-            email,
-            password,
-          });
-
-        if (signInError) throw signInError;
-
-        // Update last login method (with error handling)
-        if (data.user) {
-          try {
-            const { error: updateError } = await supabase
-              .from("user_profiles")
-              .update({
-                last_login_method: "password",
-                updated_at: new Date().toISOString(),
-              })
-              .eq("id", data.user.id);
-
-            if (updateError) {
-              console.warn("Failed to update user profile:", updateError);
-              // Don't throw here - just log the warning and continue
-            }
-          } catch (err) {
-            console.warn("Error updating user profile:", err);
-            // Don't throw here - just log the warning and continue
-          }
+        if (sessionError) {
+          console.error("Failed to set session:", sessionError);
+          throw new Error("Failed to establish session");
         }
+        console.log("Session set successfully!");
+      } else {
+        console.error("No session in response!");
+      }
 
-        // Redirect to user app dashboard or specified redirect URL
-        const redirectUrl =
-          searchParams.get("redirect") ||
-          "http://localhost:3001/?superadmin=dev123";
-        window.location.href = redirectUrl;
-      } catch (err: unknown) {
-        console.error("Password login error:", err);
-        console.error("Error details:", {
-          message: err instanceof Error ? err.message : String(err),
-          status: (err as { status?: unknown })?.status,
-          statusText: (err as { statusText?: unknown })?.statusText,
-          details: (err as { details?: unknown })?.details,
-          hint: (err as { hint?: unknown })?.hint,
-          code: (err as { code?: unknown })?.code,
+      // Store user data for the app
+      console.log("Storing user data in sessionStorage...");
+      sessionStorage.setItem(
+        "user_data",
+        JSON.stringify({
+          user_id: result.user.id,
+          email: result.user.email,
+          hub_id: result.user.hub_id,
+          role: result.user.role,
+          company_id: result.user.company_id,
+          first_name: result.user.first_name,
+          last_name: result.user.last_name,
+        })
+      );
+
+      // Always redirect to dashboard after successful login
+      const unifiedAppUrl =
+        import.meta.env.VITE_UNIFIED_APP_URL || "http://localhost:3001";
+      const redirectPath = result.redirect_to || "/dashboard";
+
+      console.log("About to redirect...");
+      console.log("Unified app URL:", unifiedAppUrl);
+      console.log("Redirect path:", redirectPath);
+      console.log("Full redirect URL:", `${unifiedAppUrl}${redirectPath}`);
+
+      // Add a small delay to ensure everything is saved
+      setTimeout(() => {
+        console.log("Executing redirect now!");
+        // Pass the session tokens in the URL so the unified app can set them
+        const params = new URLSearchParams({
+          access_token: result.session.access_token,
+          refresh_token: result.session.refresh_token,
+          redirect: redirectPath,
         });
-        setError(
-          err instanceof Error ? err.message : "Invalid email or password"
+
+        // Use window.location.assign instead of window.location.href for better control
+        window.location.assign(
+          `${unifiedAppUrl}/auth-callback?${params.toString()}`
         );
-
-        // If error suggests no account, show helpful message
-        if (
-          err instanceof Error &&
-          err.message?.includes("Invalid login credentials")
-        ) {
-          setError(
-            "Invalid email or password. New users should sign up first."
-          );
-        }
-      } finally {
-        setIsLoading(false);
-      }
-    } else {
-      // Modern verification login
-      if (!email || !phone) {
-        setError("Please enter both email and phone number");
-        return;
-      }
-
-      setIsLoading(true);
-      setError("");
-
-      try {
-        // Use the submit-verify function for login
-        const response = await fetch(
-          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/submit-verify`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-            },
-            body: JSON.stringify({
-              action: "send",
-              email: email,
-              mobile_phone_number: getPhoneForAPI(phone),
-              auth_method: authMethod,
-              is_login: true,
-            }),
-          }
-        );
-
-        const result = await response.json();
-        if (!response.ok) {
-          // If user not found, suggest they might need password login
-          if (result.error?.includes("No account found")) {
-            setError(
-              "No account found. Are you a returning user? Try password login below."
-            );
-            return;
-          }
-          throw new Error(result.error || "Failed to send verification");
-        }
-
-        setSuccessMessage("Verification code sent! Check your phone or email for the code.");
-        setSuccess(true);
-
-        // Store data for verification page
-        sessionStorage.setItem(
-          "signup_data",
-          JSON.stringify({
-            email,
-            phone: getPhoneForAPI(phone),
-            authMethod,
-            verificationId: result.id,
-            isLogin: true,
-          })
-        );
-
-        // Redirect to verification page
-        setTimeout(() => {
-          navigate(`/verify?id=${result.id}`);
-        }, 2000);
-      } catch (err: unknown) {
-        console.error("Login error:", err);
-        setError(
-          err instanceof Error
-            ? err.message
-            : "Failed to send verification code"
-        );
-      } finally {
-        setIsLoading(false);
-      }
+      }, 100);
+    } catch (err: any) {
+      console.error("Login error:", err);
+      setError(err.message || "Failed to log in");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  if (success) {
-    return (
-      <LoginContainer>
-        <Card className="w-full max-w-md">
-          <CardContent className="text-center py-12">
-            <CheckCircle className="w-16 h-16 text-green-600 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold mb-2 text-gray-900">
-              {successMessage.includes("Password reset") ? "Email Sent!" : "Verification Sent!"}
-            </h2>
-            <p className="text-gray-600 mb-4">
-              {successMessage}
-            </p>
-            {!successMessage.includes("Password reset") && (
-              <p className="text-sm text-gray-500">
-                Redirecting to verification page...
-              </p>
-            )}
-          </CardContent>
-        </Card>
-      </LoginContainer>
-    );
-  }
-
   return (
     <LoginContainer>
+      {/* Dev auth toggle removed - using real Supabase authentication */}
       <Card className="w-full max-w-md">
         <CardHeader>
           <div className="text-center mb-6">
@@ -353,210 +183,54 @@ export function Login() {
               size="md"
               className="mx-auto mb-4"
             />
-            <CardTitle className="text-2xl text-gray-900">
-              Welcome Back
-            </CardTitle>
-            <CardDescription className="text-gray-700 font-medium">
-              Login to your {hubConfig.displayName} account
+            <CardTitle className="text-2xl font-bold">Welcome Back</CardTitle>
+            <CardDescription>
+              Log in to your {hubConfig.displayName} account
             </CardDescription>
           </div>
         </CardHeader>
 
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {loginType === "verification" ? (
-              <>
-                <NameRow>
-                  <NameField>
-                    <StyledLabel htmlFor="phone">Phone Number *</StyledLabel>
-                    <StyledInput
-                      id="phone"
-                      type="tel"
-                      placeholder="(555) 123-4567"
-                      value={phone}
-                      onChange={handlePhoneChange}
-                      disabled={isLoading}
-                      style={{
-                        backgroundColor: "white",
-                        color: "#374151",
-                        border: "1px solid #d1d5db"
-                      }}
-                      autoFocus
-                    />
-                  </NameField>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <StyledLabel htmlFor="email">
+                <Mail className="w-4 h-4 inline mr-1" />
+                Email Address
+              </StyledLabel>
+              <Input
+                id="email"
+                type="email"
+                value={formData.email}
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
+                placeholder="john@company.com"
+                required
+                autoComplete="email"
+                autoFocus
+              />
+            </div>
 
-                  <NameField>
-                    <StyledLabel htmlFor="email">Email Address *</StyledLabel>
-                    <StyledInput
-                      id="email"
-                      type="email"
-                      placeholder="john@company.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      disabled={isLoading}
-                      style={{
-                        backgroundColor: "white",
-                        color: "#374151",
-                        border: "1px solid #d1d5db"
-                      }}
-                    />
-                  </NameField>
-                </NameRow>
-              </>
-            ) : (
-              <>
-                <FormGroup>
-                  <StyledLabel htmlFor="email">Email Address *</StyledLabel>
-                  <StyledInput
-                    id="email"
-                    type="email"
-                    placeholder="john@company.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    disabled={isLoading}
-                    style={{
-                      backgroundColor: "white",
-                      color: "#374151",
-                      border: "1px solid #d1d5db"
-                    }}
-                    // autoFocus removed - don't activate email field automatically
-                  />
-                </FormGroup>
-
-                <FormGroup>
-                  <StyledLabel htmlFor="password">Password *</StyledLabel>
-                  <PasswordInputWrapper>
-                    <StyledInput
-                      id="password"
-                      type={showPassword ? "text" : "password"}
-                      placeholder="Enter your password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      disabled={isLoading}
-                      style={{ 
-                        paddingRight: "2.5rem",
-                        backgroundColor: "white",
-                        color: "#374151",
-                        border: "1px solid #d1d5db"
-                      }}
-                    />
-                    <PasswordToggleButton
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      tabIndex={-1}
-                    >
-                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                    </PasswordToggleButton>
-                  </PasswordInputWrapper>
-                </FormGroup>
-
-                {/* Forgot Password Link */}
-                <div className="text-right">
-                  <button
-                    type="button"
-                    onClick={async () => {
-                      if (!email) {
-                        setError("Please enter your email address first");
-                        return;
-                      }
-                      
-                      setIsLoading(true);
-                      setError("");
-                      
-                      try {
-                        const supabase = getSupabaseClient();
-                        if (!supabase) {
-                          throw new Error("Failed to initialize Supabase client");
-                        }
-
-                        const { error } = await supabase.auth.resetPasswordForEmail(email, {
-                          redirectTo: `${window.location.origin}/reset-password`,
-                        });
-
-                        if (error) throw error;
-
-                        setSuccessMessage("Password reset email sent! Check your inbox and follow the link to reset your password.");
-                        setSuccess(true);
-                        setError("");
-                      } catch (err: unknown) {
-                        console.error("Password reset error:", err);
-                        setError(
-                          err instanceof Error 
-                            ? err.message 
-                            : "Failed to send password reset email"
-                        );
-                      } finally {
-                        setIsLoading(false);
-                      }
-                    }}
-                    disabled={isLoading}
-                    className="text-sm text-gray-600 hover:text-gray-800 hover:underline disabled:opacity-50"
-                  >
-                    {isLoading ? "Sending..." : "Forgot your password?"}
-                  </button>
-                </div>
-
-                {/* Moved Superadmin button after submit button */}
-              </>
-            )}
-
-            {loginType === "verification" && (
-              <VerificationMethod>
-                <StyledLabel>Verification Method</StyledLabel>
-                <div className="space-y-3 mt-3">
-                  <label
-                    className={`flex items-start space-x-3 p-3 border rounded-lg cursor-pointer transition-all hover:border-orange-300 ${authMethod === "sms" ? "border-orange-500 bg-orange-50" : "border-gray-200"}`}
-                  >
-                    <input
-                      type="radio"
-                      name="auth_method"
-                      value="sms"
-                      checked={authMethod === "sms"}
-                      onChange={() => setAuthMethod("sms")}
-                      className="mt-1 w-4 h-4 text-orange-600 border-gray-300 focus:ring-orange-500"
-                    />
-                    <div className="flex-1">
-                      <div className="flex items-center">
-                        <Phone className="w-4 h-4 mr-1.5 text-orange-600" />
-                        <span className="font-medium text-orange-600">
-                          SMS Verification
-                        </span>
-                        <span className="ml-2 text-xs bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full">
-                          Faster
-                        </span>
-                      </div>
-                      <p className="text-xs text-gray-600 mt-1">
-                        Receive your code instantly via SMS
-                      </p>
-                    </div>
-                  </label>
-
-                  <label
-                    className={`flex items-start space-x-3 p-3 border rounded-lg cursor-pointer transition-all hover:border-gray-300 ${authMethod === "email" ? "border-gray-500 bg-gray-50" : "border-gray-200"}`}
-                  >
-                    <input
-                      type="radio"
-                      name="auth_method"
-                      value="email"
-                      checked={authMethod === "email"}
-                      onChange={() => setAuthMethod("email")}
-                      className="mt-1 w-4 h-4 text-gray-600 border-gray-300 focus:ring-gray-500"
-                    />
-                    <div className="flex-1">
-                      <div className="flex items-center">
-                        <Mail className="w-4 h-4 mr-1.5 text-gray-600" />
-                        <span className="font-medium text-gray-700">
-                          Email Verification
-                        </span>
-                      </div>
-                      <p className="text-xs text-gray-600 mt-1">
-                        Receive your code via email
-                      </p>
-                    </div>
-                  </label>
-                </div>
-              </VerificationMethod>
-            )}
+            <div>
+              <StyledLabel htmlFor="password">
+                <Key className="w-4 h-4 inline mr-1" />
+                Password
+              </StyledLabel>
+              <Input
+                id="password"
+                type="password"
+                value={formData.password}
+                onChange={(e) =>
+                  setFormData({ ...formData, password: e.target.value })
+                }
+                placeholder="Enter your password"
+                required
+                autoComplete="current-password"
+              />
+              <ForgotPasswordLink to="/forgot-password">
+                Forgot your password?
+              </ForgotPasswordLink>
+            </div>
 
             {error && (
               <Alert variant="destructive">
@@ -566,70 +240,35 @@ export function Login() {
 
             <Button
               type="submit"
-              disabled={isLoading}
+              disabled={isSubmitting}
               className="w-full hub-bg-primary hover:hub-bg-primary/90"
             >
-              {isLoading
-                ? "Loading..."
-                : loginType === "verification"
-                  ? "Send Verification Code"
-                  : "Login"}
-              {loginType === "verification" ? (
-                <Shield className="w-4 h-4 ml-2" />
-              ) : (
-                <Lock className="w-4 h-4 ml-2" />
-              )}
+              {isSubmitting ? "Logging in..." : "Log In"}
+              <LogIn className="w-4 h-4 ml-2" />
             </Button>
-
-            {/* Superadmin Login Button - bypasses Supabase auth */}
-            {loginType === "password" && (
-              <div className="mt-4">
-                <Button
-                  type="button"
-                  onClick={handleSuperadminLogin}
-                  disabled={isLoading}
-                  className="w-full bg-red-600 hover:bg-red-700 text-white"
-                >
-                  <Shield className="w-4 h-4 mr-2" />
-                  Superadmin Login
-                </Button>
-                <p className="text-xs text-gray-500 text-center mt-2">
-                  Dev mode: Opens unified app with ?superadmin=dev123 (bypasses
-                  Supabase)
-                </p>
-              </div>
-            )}
-
-            {/* Toggle between password and verification login */}
-            <div className="text-center">
-              <button
-                type="button"
-                onClick={() => {
-                  setLoginType(
-                    loginType === "verification" ? "password" : "verification"
-                  );
-                  setError("");
-                  setPassword("");
-                }}
-                className="text-sm hub-text-primary hover:underline"
-              >
-                {loginType === "verification"
-                  ? "Returning user? Login with password"
-                  : "Use verification code instead"}
-              </button>
-            </div>
           </form>
 
           <div className="text-center mt-6 pt-6 border-t">
-            <p className="text-sm text-gray-700 font-medium">
+            <p className="text-sm text-muted-foreground">
               Don't have an account?{" "}
               <Link
                 to="/signup"
                 className="hub-text-primary hover:underline font-semibold"
               >
-                Sign up
+                Sign Up
               </Link>
             </p>
+          </div>
+
+          <div className="text-center mt-4">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate("/superadmin-login")}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              Superadmin Login
+            </Button>
           </div>
         </CardContent>
       </Card>

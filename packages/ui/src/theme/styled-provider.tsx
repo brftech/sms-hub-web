@@ -6,12 +6,12 @@ import { useHub } from "../contexts/HubContext";
 // Hub color configurations
 const hubColors = {
   percytech: {
-    primary: "#1F2937",
-    secondary: "#6B7280",
-    accent: "#3B82F6",
-    primaryRgb: "31, 41, 55",
-    secondaryRgb: "107, 114, 128",
-    accentRgb: "59, 130, 246",
+    primary: "#DC2626",
+    secondary: "#EF4444",
+    accent: "#F87171",
+    primaryRgb: "220, 38, 38",
+    secondaryRgb: "239, 68, 68",
+    accentRgb: "248, 113, 113",
   },
   gnymble: {
     primary: "#059669",

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useHub } from "@sms-hub/ui";
 import {
   User,
@@ -38,6 +38,59 @@ export function Settings() {
 
   const [activeTab, setActiveTab] = useState<SettingsTab>("profile");
   const [showPassword, setShowPassword] = useState(false);
+
+  // Form state for profile tab
+  const [profileForm, setProfileForm] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phoneNumber: "",
+  });
+
+  // Form state for company tab
+  const [companyForm, setCompanyForm] = useState({
+    companyName: "",
+    billingEmail: "",
+  });
+
+  // Form state for security tab
+  const [securityForm, setSecurityForm] = useState({
+    currentPassword: "",
+    newPassword: "",
+  });
+
+  // Update form state when user profile data loads
+  useEffect(() => {
+    if (userProfile) {
+      setProfileForm({
+        firstName: userProfile.first_name || "",
+        lastName: userProfile.last_name || "",
+        email: userProfile.email || "",
+        phoneNumber: userProfile.mobile_phone_number || "",
+      });
+    }
+  }, [userProfile]);
+
+  // Update company form state when company data loads
+  useEffect(() => {
+    if (company) {
+      setCompanyForm({
+        companyName: company.public_name || "",
+        billingEmail: company.billing_email || "",
+      });
+    }
+  }, [company]);
+
+  // Clear password fields when security tab is accessed
+  useEffect(() => {
+    if (activeTab === "security") {
+      setSecurityForm({
+        currentPassword: "",
+        newPassword: "",
+      });
+      setShowPassword(false);
+    }
+  }, [activeTab]);
 
   const navigation = [
     {
@@ -96,7 +149,10 @@ export function Settings() {
           </label>
           <input
             type="text"
-            defaultValue={userProfile?.first_name || ""}
+            value={profileForm.firstName}
+            onChange={(e) =>
+              setProfileForm((prev) => ({ ...prev, firstName: e.target.value }))
+            }
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
@@ -107,7 +163,10 @@ export function Settings() {
           </label>
           <input
             type="text"
-            defaultValue={userProfile?.last_name || ""}
+            value={profileForm.lastName}
+            onChange={(e) =>
+              setProfileForm((prev) => ({ ...prev, lastName: e.target.value }))
+            }
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
@@ -118,7 +177,10 @@ export function Settings() {
           </label>
           <input
             type="email"
-            defaultValue={userProfile?.email || ""}
+            value={profileForm.email}
+            onChange={(e) =>
+              setProfileForm((prev) => ({ ...prev, email: e.target.value }))
+            }
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
@@ -129,7 +191,13 @@ export function Settings() {
           </label>
           <input
             type="tel"
-            defaultValue={userProfile?.mobile_phone_number || ""}
+            value={profileForm.phoneNumber}
+            onChange={(e) =>
+              setProfileForm((prev) => ({
+                ...prev,
+                phoneNumber: e.target.value,
+              }))
+            }
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
@@ -162,7 +230,13 @@ export function Settings() {
           </label>
           <input
             type="text"
-            defaultValue={company?.public_name || ""}
+            value={companyForm.companyName}
+            onChange={(e) =>
+              setCompanyForm((prev) => ({
+                ...prev,
+                companyName: e.target.value,
+              }))
+            }
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
@@ -173,7 +247,7 @@ export function Settings() {
           </label>
           <input
             type="text"
-            defaultValue={company?.company_account_number || ""}
+            value={company?.company_account_number || ""}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             readOnly
           />
@@ -185,7 +259,13 @@ export function Settings() {
           </label>
           <input
             type="email"
-            defaultValue={company?.billing_email || ""}
+            value={companyForm.billingEmail}
+            onChange={(e) =>
+              setCompanyForm((prev) => ({
+                ...prev,
+                billingEmail: e.target.value,
+              }))
+            }
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
@@ -365,7 +445,15 @@ export function Settings() {
           <div className="relative">
             <input
               type={showPassword ? "text" : "password"}
+              value={securityForm.currentPassword}
+              onChange={(e) =>
+                setSecurityForm((prev) => ({
+                  ...prev,
+                  currentPassword: e.target.value,
+                }))
+              }
               className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Enter your current password"
             />
             <button
               type="button"
@@ -387,7 +475,15 @@ export function Settings() {
           </label>
           <input
             type="password"
+            value={securityForm.newPassword}
+            onChange={(e) =>
+              setSecurityForm((prev) => ({
+                ...prev,
+                newPassword: e.target.value,
+              }))
+            }
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="Enter your new password"
           />
         </div>
       </div>

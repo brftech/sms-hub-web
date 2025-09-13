@@ -1,5 +1,10 @@
 import { useState, useEffect } from "react";
-import { useHub } from "@sms-hub/ui";
+import {
+  useHub,
+  UserViewModal,
+  UserEditModal,
+  UserDeleteModal,
+} from "@sms-hub/ui";
 import { useGlobalView } from "../../contexts/GlobalViewContext";
 // Removed getSupabaseAdminClient import - admin operations should use Edge Functions or API endpoints
 import {
@@ -17,6 +22,7 @@ import {
   Shield,
 } from "lucide-react";
 import { UserProfile, usersService } from "../../services/usersService";
+import { Company, companiesService } from "../../services/companiesService";
 
 const Users = () => {
   const { currentHub } = useHub();
@@ -29,6 +35,20 @@ const Users = () => {
   const [error, setError] = useState<string | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [companies, setCompanies] = useState<Company[]>([]);
+  const [selectedHubId, setSelectedHubId] = useState<number>(0);
+  const [selectedCompanyId, setSelectedCompanyId] = useState<string>("");
+  const [createNewCompany, setCreateNewCompany] = useState(false);
+  const [newCompanyName, setNewCompanyName] = useState("");
+
+  // Modal states
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
+  const [editingUser, setEditingUser] = useState<UserProfile | null>(null);
+  const [deletingUser, setDeletingUser] = useState<UserProfile | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Filtering states
   const [statusFilter, setStatusFilter] = useState<
@@ -40,6 +60,21 @@ const Users = () => {
   // Sorting states
   const [sortField, setSortField] = useState<keyof UserProfile>("created_at");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
+
+  // Fetch companies for the selected hub
+  const fetchCompanies = async (hubId: number) => {
+    try {
+      const fetchedCompanies = await companiesService.instance.getCompanies({
+        hub_id: hubId,
+        is_active: true,
+        limit: 1000,
+      });
+      setCompanies(fetchedCompanies);
+    } catch (err) {
+      console.error("Error fetching companies:", err);
+      setCompanies([]);
+    }
+  };
 
   // Fetch users from database
   const fetchData = async () => {
@@ -64,7 +99,7 @@ const Users = () => {
       console.log("Users: Using hub_id:", isGlobalView ? "ALL HUBS" : hubId);
 
       // Build filter options
-      const filterOptions: any = {
+      const filterOptions: Record<string, string | number | undefined> = {
         search: searchQuery || undefined,
         limit: 1000,
       };
@@ -97,77 +132,145 @@ const Users = () => {
     setIsRefreshing(false);
   };
 
-  const handleEditUser = (user: UserProfile) => {
-    // TODO: Implement edit functionality
-    console.log("Edit user:", user);
+  const resetCreateForm = () => {
+    setSelectedHubId(0);
+    setSelectedCompanyId("");
+    setCreateNewCompany(false);
+    setNewCompanyName("");
   };
 
-  // const handleUpdateUser = async () => {
-  //   if (!editingUser) return;
+  const handleCloseCreateModal = () => {
+    setIsCreateModalOpen(false);
+    resetCreateForm();
+  };
 
-  //   try {
-  //     setIsUpdating(true);
-  //     // TODO: Implement user update in service
-  //     // const result = await usersService.updateUser(editingUser.id, editingUser);
+  // CRUD Handler Functions
+  const handleViewUser = (user: UserProfile) => {
+    setSelectedUser(user);
+    setIsViewModalOpen(true);
+  };
 
-  //     // if (result.success) {
-  //     await fetchData();
-  //     handleCloseEditModal();
-  //     // } else {
-  //     //   alert(`Failed to update: ${result.error}`);
-  //     // }
-  //   } catch (error) {
-  //     console.error("Error updating user:", error);
-  //     alert("Failed to update user");
-  //   } finally {
-  //     setIsUpdating(false);
-  //   }
-  // };
+  const handleEditUser = (user: UserProfile) => {
+    setEditingUser(user);
+    setIsEditModalOpen(true);
+  };
 
-  // const handleDeleteUser = async () => {
-  //   if (!deletingUserId) return;
+  const handleDeleteUser = (user: UserProfile) => {
+    setDeletingUser(user);
+    setIsDeleteModalOpen(true);
+  };
 
-  //   try {
-  //     // TODO: Implement user deletion in service
-  //     // const result = await usersService.deleteUser(deletingUserId);
+  const handleUpdateUser = async (updatedUser: Partial<UserProfile>) => {
+    if (!editingUser) return;
 
-  //     // if (result.success) {
-  //     await fetchData();
-  //     setShowDeleteConfirm(false);
-  //     setDeletingUserId(null);
-  //     // } else {
-  //     //   alert(`Failed to delete: ${result.error}`);
-  //     // }
-  //   } catch (error) {
-  //     console.error("Error deleting user:", error);
-  //     alert("Failed to delete user");
-  //   }
-  // };
+    try {
+      setIsUpdating(true);
 
-  // const handleCreateUser = async (newUser: Partial<UserProfile>) => {
-  //   try {
-  //     setIsUpdating(true);
-  //     // TODO: Implement user creation in service
-  //     // const result = await usersService.createUser(newUser);
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/update-user`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({
+            user_id: editingUser.id,
+            ...updatedUser,
+          }),
+        }
+      );
 
-  //     // if (result.success) {
-  //     await fetchData();
-  //     setIsCreateModalOpen(false);
-  //     // } else {
-  //     //   alert(`Failed to create: ${result.error}`);
-  //     // }
-  //   } catch (error) {
-  //     console.error("Error creating user:", error);
-  //     alert("Failed to create user");
-  //   } finally {
-  //     setIsUpdating(false);
-  //   }
-  // };
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to update user");
+      }
+
+      console.log("User updated successfully:", result);
+      alert("User updated successfully!");
+      await fetchData();
+      handleCloseEditModal();
+    } catch (error: unknown) {
+      console.error("Error updating user:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+      alert(`Failed to update user: ${errorMessage}`);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleConfirmDelete = async (permanent: boolean) => {
+    if (!deletingUser) return;
+
+    try {
+      setIsDeleting(true);
+
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/delete-user`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({
+            user_id: deletingUser.id,
+            permanent,
+          }),
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to delete user");
+      }
+
+      console.log("User deleted successfully:", result);
+      alert(
+        `User ${permanent ? "permanently deleted" : "deactivated"} successfully!`
+      );
+      await fetchData();
+      handleCloseDeleteModal();
+    } catch (error: unknown) {
+      console.error("Error deleting user:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+      alert(`Failed to delete user: ${errorMessage}`);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  // Modal close handlers
+  const handleCloseViewModal = () => {
+    setIsViewModalOpen(false);
+    setSelectedUser(null);
+  };
+
+  const handleCloseEditModal = () => {
+    setIsEditModalOpen(false);
+    setEditingUser(null);
+  };
+
+  const handleCloseDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    setDeletingUser(null);
+  };
 
   // Initial data fetch
   useEffect(() => {
     fetchData();
   }, []);
+
+  // Fetch companies when modal opens or hub changes
+  useEffect(() => {
+    if (isCreateModalOpen) {
+      fetchCompanies(selectedHubId);
+    }
+  }, [isCreateModalOpen, selectedHubId]);
 
   // Filter users when search query or global view changes
   useEffect(() => {
@@ -517,7 +620,7 @@ const Users = () => {
                   <td className="px-4 py-2 whitespace-nowrap text-sm font-medium">
                     <div className="flex items-center space-x-3">
                       <button
-                        onClick={() => {}}
+                        onClick={() => handleViewUser(user)}
                         className="text-blue-600 hover:text-blue-900"
                         title="View Details"
                       >
@@ -531,9 +634,7 @@ const Users = () => {
                         <Edit className="w-4 h-4" />
                       </button>
                       <button
-                        onClick={() => {
-                          // TODO: Implement delete functionality
-                        }}
+                        onClick={() => handleDeleteUser(user)}
                         className="text-red-600 hover:text-red-900"
                         title="Delete User"
                       >
@@ -579,9 +680,10 @@ const Users = () => {
                 Create New User
               </h3>
               <form
+                autoComplete="off"
                 onSubmit={async (e) => {
                   e.preventDefault();
-                  const formData = new FormData(e.target as HTMLFormElement);
+                  const formData = new FormData(e.target as any);
                   const email = formData.get("email") as string;
                   const password = formData.get("password") as string;
                   const firstName = formData.get("firstName") as string;
@@ -591,14 +693,68 @@ const Users = () => {
                   try {
                     setIsUpdating(true);
 
-                    // TODO: Implement proper admin user creation through Edge Function
-                    // For now, show a message that this feature needs to be implemented
-                    alert("User creation through admin panel is not yet implemented. Please use the regular signup flow or contact system administrator.");
-                    
-                    setIsCreateModalOpen(false);
-                  } catch (error: any) {
+                    let companyId = selectedCompanyId;
+
+                    // Create new company if requested
+                    if (createNewCompany && newCompanyName.trim()) {
+                      console.log("Creating new company:", newCompanyName);
+                      const companyResult =
+                        await companiesService.instance.createCompany({
+                          public_name: newCompanyName.trim(),
+                          hub_id: selectedHubId,
+                          is_active: true,
+                        });
+
+                      if (!companyResult.success) {
+                        throw new Error(
+                          `Failed to create company: ${companyResult.error}`
+                        );
+                      }
+
+                      companyId = companyResult.data?.id || "";
+                      console.log("Company created with ID:", companyId);
+                    }
+
+                    // Call the create-admin-user Edge Function
+                    const response = await fetch(
+                      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-admin-user`,
+                      {
+                        method: "POST",
+                        headers: {
+                          "Content-Type": "application/json",
+                          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+                        },
+                        body: JSON.stringify({
+                          email,
+                          password,
+                          first_name: firstName,
+                          last_name: lastName,
+                          role,
+                          hub_id: selectedHubId,
+                          company_id: companyId || undefined,
+                        }),
+                      }
+                    );
+
+                    const result = await response.json();
+
+                    if (!response.ok) {
+                      throw new Error(result.error || "Failed to create user");
+                    }
+
+                    console.log("User created successfully:", result);
+                    alert(
+                      `User created successfully! Account number: ${result.user.account_number}`
+                    );
+
+                    // Refresh the users list
+                    await fetchData();
+                    handleCloseCreateModal();
+                  } catch (error: unknown) {
                     console.error("Error creating user:", error);
-                    alert(`Failed to create user: ${error.message}`);
+                    const errorMessage =
+                      error instanceof Error ? error.message : "Unknown error";
+                    alert(`Failed to create user: ${errorMessage}`);
                   } finally {
                     setIsUpdating(false);
                   }
@@ -613,6 +769,7 @@ const Users = () => {
                       type="email"
                       name="email"
                       required
+                      autoComplete="off"
                       className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
                     />
                   </div>
@@ -624,6 +781,7 @@ const Users = () => {
                       type="password"
                       name="password"
                       required
+                      autoComplete="new-password"
                       className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
                     />
                   </div>
@@ -636,6 +794,7 @@ const Users = () => {
                         type="text"
                         name="firstName"
                         required
+                        autoComplete="off"
                         className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
                       />
                     </div>
@@ -647,6 +806,7 @@ const Users = () => {
                         type="text"
                         name="lastName"
                         required
+                        autoComplete="off"
                         className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
                       />
                     </div>
@@ -664,13 +824,89 @@ const Users = () => {
                       <option value="ADMIN">Admin</option>
                       <option value="SUPPORT">Support</option>
                       <option value="VIEWER">Viewer</option>
+                      <option value="MEMBER">Member</option>
                     </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Hub
+                    </label>
+                    <select
+                      value={selectedHubId}
+                      onChange={(e) => {
+                        setSelectedHubId(Number(e.target.value));
+                        setSelectedCompanyId(""); // Reset company when hub changes
+                      }}
+                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+                    >
+                      <option value={0}>PercyTech</option>
+                      <option value={1}>Gnymble</option>
+                      <option value={2}>PercyMD</option>
+                      <option value={3}>PercyText</option>
+                    </select>
+                  </div>
+                  <div>
+                    <div className="flex items-center space-x-2 mb-2">
+                      <input
+                        type="checkbox"
+                        id="createNewCompany"
+                        checked={createNewCompany}
+                        onChange={(e) => {
+                          setCreateNewCompany(e.target.checked);
+                          if (e.target.checked) {
+                            setSelectedCompanyId("");
+                          }
+                        }}
+                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                      />
+                      <label
+                        htmlFor="createNewCompany"
+                        className="text-sm font-medium text-gray-700"
+                      >
+                        Create New Company
+                      </label>
+                    </div>
+
+                    {createNewCompany ? (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">
+                          Company Name
+                        </label>
+                        <input
+                          type="text"
+                          value={newCompanyName}
+                          onChange={(e) => setNewCompanyName(e.target.value)}
+                          placeholder="Enter company name"
+                          className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+                          required={createNewCompany}
+                        />
+                      </div>
+                    ) : (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">
+                          Company (Optional)
+                        </label>
+                        <select
+                          value={selectedCompanyId}
+                          onChange={(e) => setSelectedCompanyId(e.target.value)}
+                          className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+                        >
+                          <option value="">No Company</option>
+                          {companies.map((company) => (
+                            <option key={company.id} value={company.id}>
+                              {company.public_name} (
+                              {company.company_account_number})
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div className="flex justify-end space-x-3 mt-6">
                   <button
                     type="button"
-                    onClick={() => setIsCreateModalOpen(false)}
+                    onClick={handleCloseCreateModal}
                     className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
                   >
                     Cancel
@@ -688,6 +924,30 @@ const Users = () => {
           </div>
         </div>
       )}
+
+      {/* Shared Modal Components */}
+      <UserViewModal
+        isOpen={isViewModalOpen}
+        onClose={handleCloseViewModal}
+        onEdit={handleEditUser}
+        user={selectedUser}
+      />
+
+      <UserEditModal
+        isOpen={isEditModalOpen}
+        onClose={handleCloseEditModal}
+        onSave={handleUpdateUser}
+        user={editingUser}
+        isUpdating={isUpdating}
+      />
+
+      <UserDeleteModal
+        isOpen={isDeleteModalOpen}
+        onClose={handleCloseDeleteModal}
+        onConfirm={handleConfirmDelete}
+        user={deletingUser}
+        isDeleting={isDeleting}
+      />
     </div>
   );
 };

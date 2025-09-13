@@ -257,39 +257,44 @@ const Dashboard = () => {
   const handlePreviewCleanup = async () => {
     try {
       setCleanupResult("Loading preview...");
-      
+
       // Use the known superadmin user ID
-      const superadminUserId = '00000000-0000-0000-0000-000000000001';
+      const superadminUserId = "00000000-0000-0000-0000-000000000001";
       let preview = `=== CLEANUP PREVIEW ===\n`;
       preview += `Superadmin user ID: ${superadminUserId}\n\n`;
-      
+
       // Debug: Check what superadmin records actually exist
       preview += `=== DEBUG INFO ===\n`;
       const { data: debugUsers } = await supabase
-        .from('user_profiles')
-        .select('id, email, first_name, last_name')
-        .or('email.like.%superadmin%,email.like.%admin%');
+        .from("user_profiles")
+        .select("id, email, first_name, last_name")
+        .or("email.like.%superadmin%,email.like.%admin%");
       preview += `Superadmin users found: ${JSON.stringify(debugUsers, null, 2)}\n\n`;
-      
+
       // Debug: Check what's in each table
       const { data: debugCustomers } = await supabase
-        .from('customers')
-        .select('id, user_id, company_id, billing_email');
+        .from("customers")
+        .select("id, user_id, company_id, billing_email");
       preview += `Customers table: ${JSON.stringify(debugCustomers, null, 2)}\n`;
-      
+
       const { data: debugCompanies } = await supabase
-        .from('companies')
-        .select('id, created_by_user_id, first_admin_user_id, public_name');
+        .from("companies")
+        .select("id, created_by_user_id, first_admin_user_id, public_name");
       preview += `Companies table: ${JSON.stringify(debugCompanies, null, 2)}\n`;
-      
 
       // Count records that would be deleted
       const tables = [
-        { name: 'onboarding_submissions', condition: `user_id != '${superadminUserId}'` },
-        { name: 'memberships', condition: `user_id != '${superadminUserId}'` },
-        { name: 'customers', condition: `user_id != '${superadminUserId}'` },
-        { name: 'companies', condition: `created_by_user_id != '${superadminUserId}'` },
-        { name: 'user_profiles', condition: `id != '${superadminUserId}'` }
+        {
+          name: "onboarding_submissions",
+          condition: `user_id != '${superadminUserId}'`,
+        },
+        { name: "memberships", condition: `user_id != '${superadminUserId}'` },
+        { name: "customers", condition: `user_id != '${superadminUserId}'` },
+        {
+          name: "companies",
+          condition: `created_by_user_id != '${superadminUserId}'`,
+        },
+        { name: "user_profiles", condition: `id != '${superadminUserId}'` },
       ];
 
       for (const table of tables) {
@@ -297,7 +302,7 @@ const Dashboard = () => {
           // Get total count first
           const { count: totalCount, error: totalError } = await supabase
             .from(table.name)
-            .select('*', { count: 'exact', head: true });
+            .select("*", { count: "exact", head: true });
 
           if (totalError) {
             preview += `${table.name}: Error getting total count - ${totalError.message}\n`;
@@ -306,32 +311,34 @@ const Dashboard = () => {
 
           // Get superadmin count - check both the hardcoded ID and any superadmin email
           let superadminCount = 0;
-          if (table.name === 'user_profiles') {
+          if (table.name === "user_profiles") {
             const { count: superadminUserCount } = await supabase
               .from(table.name)
-              .select('*', { count: 'exact', head: true })
-              .eq('id', superadminUserId);
+              .select("*", { count: "exact", head: true })
+              .eq("id", superadminUserId);
             superadminCount = superadminUserCount || 0;
-          } else if (table.name === 'companies') {
+          } else if (table.name === "companies") {
             // Check for companies where either created_by_user_id OR first_admin_user_id matches superadmin
             const { count: superadminCompanyCount } = await supabase
               .from(table.name)
-              .select('*', { count: 'exact', head: true })
-              .or(`created_by_user_id.eq.${superadminUserId},first_admin_user_id.eq.${superadminUserId}`);
+              .select("*", { count: "exact", head: true })
+              .or(
+                `created_by_user_id.eq.${superadminUserId},first_admin_user_id.eq.${superadminUserId}`
+              );
             superadminCount = superadminCompanyCount || 0;
-          } else if (table.name === 'customers') {
+          } else if (table.name === "customers") {
             // Check user_id first
             const { count: superadminCustomerCount1 } = await supabase
               .from(table.name)
-              .select('*', { count: 'exact', head: true })
-              .eq('user_id', superadminUserId);
+              .select("*", { count: "exact", head: true })
+              .eq("user_id", superadminUserId);
             superadminCount = superadminCustomerCount1 || 0;
           } else {
             // For other tables, check user_id
             const { count: superadminRecordCount } = await supabase
               .from(table.name)
-              .select('*', { count: 'exact', head: true })
-              .eq('user_id', superadminUserId);
+              .select("*", { count: "exact", head: true })
+              .eq("user_id", superadminUserId);
             superadminCount = superadminRecordCount || 0;
           }
 
@@ -345,48 +352,58 @@ const Dashboard = () => {
       preview += `\n=== END PREVIEW ===`;
       setCleanupResult(preview);
     } catch (error) {
-      console.error('Error previewing cleanup:', error);
+      console.error("Error previewing cleanup:", error);
       setCleanupResult(`Error: ${error.message}`);
     }
   };
 
   const handleExecuteCleanup = async () => {
-    if (!confirm('Are you sure you want to delete all payment track data except superadmin records? This action cannot be undone.')) {
+    if (
+      !confirm(
+        "Are you sure you want to delete all payment track data except superadmin records? This action cannot be undone."
+      )
+    ) {
       return;
     }
 
     try {
       setIsExecutingCleanup(true);
       setCleanupResult("Executing cleanup...");
-      
+
       // Use the known superadmin user ID
-      const superadminUserId = '00000000-0000-0000-0000-000000000001';
+      const superadminUserId = "00000000-0000-0000-0000-000000000001";
       let result = `=== CLEANUP EXECUTION ===\n`;
       result += `Found superadmin user: ${superadminUserId}\n\n`;
 
       // Delete records from each table (except superadmin)
       const deleteOperations = [
-        { table: 'onboarding_submissions', condition: `user_id.neq.${superadminUserId}` },
-        { table: 'memberships', condition: `user_id.neq.${superadminUserId}` },
-        { table: 'customers', condition: `user_id.neq.${superadminUserId}` },
-        { table: 'companies', condition: `created_by_user_id.neq.${superadminUserId}` },
-        { table: 'user_profiles', condition: `id.neq.${superadminUserId}` }
+        {
+          table: "onboarding_submissions",
+          condition: `user_id.neq.${superadminUserId}`,
+        },
+        { table: "memberships", condition: `user_id.neq.${superadminUserId}` },
+        { table: "customers", condition: `user_id.neq.${superadminUserId}` },
+        {
+          table: "companies",
+          condition: `created_by_user_id.neq.${superadminUserId}`,
+        },
+        { table: "user_profiles", condition: `id.neq.${superadminUserId}` },
       ];
 
       for (const op of deleteOperations) {
         try {
           let deleteQuery = supabase.from(op.table).delete();
-          
+
           // Apply the correct filter based on table
-          if (op.table === 'user_profiles') {
-            deleteQuery = deleteQuery.neq('id', superadminUserId);
-          } else if (op.table === 'companies') {
+          if (op.table === "user_profiles") {
+            deleteQuery = deleteQuery.neq("id", superadminUserId);
+          } else if (op.table === "companies") {
             // Exclude companies created by or administered by superadmin
             deleteQuery = deleteQuery
-              .neq('created_by_user_id', superadminUserId)
-              .neq('first_admin_user_id', superadminUserId);
+              .neq("created_by_user_id", superadminUserId)
+              .neq("first_admin_user_id", superadminUserId);
           } else {
-            deleteQuery = deleteQuery.neq('user_id', superadminUserId);
+            deleteQuery = deleteQuery.neq("user_id", superadminUserId);
           }
 
           const { error } = await deleteQuery;
@@ -403,11 +420,11 @@ const Dashboard = () => {
 
       result += `\n=== CLEANUP COMPLETED ===`;
       setCleanupResult(result);
-      
+
       // Refresh dashboard data after cleanup
       await fetchDashboardData();
     } catch (error) {
-      console.error('Error executing cleanup:', error);
+      console.error("Error executing cleanup:", error);
       setCleanupResult(`Error: ${error.message}`);
     } finally {
       setIsExecutingCleanup(false);
@@ -507,9 +524,9 @@ const Dashboard = () => {
               <h2 className="text-base sm:text-lg font-medium text-foreground">
                 Payment Track
               </h2>
-                    <p className="text-xs sm:text-sm text-muted-foreground">
-                      Database Tables in Population Order
-                    </p>
+              <p className="text-xs sm:text-sm text-muted-foreground">
+                Database Tables in Population Order
+              </p>
             </div>
             <div className="text-left sm:text-right">
               <p className="text-xl sm:text-2xl font-bold text-foreground">
@@ -525,16 +542,23 @@ const Dashboard = () => {
             {Object.entries(stats.onboardingStages).map(([stage, count]) => {
               const stageInfo = getStageInfo(stage);
               const IconComponent = stageInfo.icon;
-              const isPaymentStage = ['userAuth', 'userProfiles', 'companies', 'customers', 'memberships', 'onboardingSubmissions'].includes(stage);
-              
+              const isPaymentStage = [
+                "userAuth",
+                "userProfiles",
+                "companies",
+                "customers",
+                "memberships",
+                "onboardingSubmissions",
+              ].includes(stage);
+
               if (!isPaymentStage) return null; // Only show payment stages
-              
+
               return (
                 <div key={stage} className="text-center">
                   <div
                     className={`p-2 sm:p-3 rounded-lg border-2 transition-all duration-200 hover:shadow-sm min-h-[80px] sm:min-h-[90px] lg:min-h-[100px] flex flex-col justify-center ${
-                      (count as number) > 0 
-                        ? "border-blue-200 bg-blue-50" 
+                      (count as number) > 0
+                        ? "border-blue-200 bg-blue-50"
                         : "border-gray-200 bg-gray-50"
                     }`}
                   >
@@ -553,7 +577,6 @@ const Dashboard = () => {
               );
             })}
           </div>
-          
         </div>
       )}
 
@@ -583,16 +606,23 @@ const Dashboard = () => {
             {Object.entries(stats.onboardingStages).map(([stage, count]) => {
               const stageInfo = getStageInfo(stage);
               const IconComponent = stageInfo.icon;
-              const isOnboardingStage = ['brandSubmission', 'privacySetup', 'campaignSubmission', 'gphoneProcurement', 'accountSetup', 'onboardingComplete'].includes(stage);
-              
+              const isOnboardingStage = [
+                "brandSubmission",
+                "privacySetup",
+                "campaignSubmission",
+                "gphoneProcurement",
+                "accountSetup",
+                "onboardingComplete",
+              ].includes(stage);
+
               if (!isOnboardingStage) return null; // Only show onboarding stages
-              
+
               return (
                 <div key={stage} className="text-center">
                   <div
                     className={`p-2 sm:p-3 rounded-lg border-2 transition-all duration-200 hover:shadow-sm min-h-[80px] sm:min-h-[90px] lg:min-h-[100px] flex flex-col justify-center ${
-                      (count as number) > 0 
-                        ? "border-green-200 bg-green-50" 
+                      (count as number) > 0
+                        ? "border-green-200 bg-green-50"
                         : "border-gray-200 bg-gray-50"
                     }`}
                   >
@@ -611,7 +641,7 @@ const Dashboard = () => {
               );
             })}
           </div>
-          
+
           {/* Onboarding Summary */}
           <div className="mt-6 p-4 bg-green-50 rounded-lg">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-center">
@@ -1104,7 +1134,8 @@ const Dashboard = () => {
           Data Cleanup
         </h3>
         <p className="text-sm text-muted-foreground mb-4">
-          Clean up payment track data while preserving superadmin and hub records.
+          Clean up payment track data while preserving superadmin and hub
+          records.
         </p>
         <div className="flex flex-col sm:flex-row gap-3">
           <button
@@ -1135,7 +1166,6 @@ const Dashboard = () => {
           </div>
         )}
       </div>
-
     </div>
   );
 };

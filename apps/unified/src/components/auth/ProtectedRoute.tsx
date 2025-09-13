@@ -22,6 +22,12 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   const { isAuthenticated, isLoading, user } = useAuth();
   const location = useLocation();
 
+  console.log("[ProtectedRoute] Auth state:", {
+    isAuthenticated,
+    isLoading,
+    hasUser: !!user,
+  });
+
   // Show loading spinner while checking authentication
   if (isLoading) {
     return (
@@ -39,6 +45,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
   // Show login prompt if not authenticated
   if (!isAuthenticated || !user) {
+    console.log("[ProtectedRoute] Not authenticated, redirecting to login");
     // Redirect to web app login with current URL as redirect parameter
     const currentUrl = window.location.href;
     const redirectUrl = `http://localhost:3000/login?redirect=${encodeURIComponent(currentUrl)}`;
@@ -47,15 +54,48 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     return null;
   }
 
+  console.log("[ProtectedRoute] User authenticated, checking route access");
+  console.log("[ProtectedRoute] Current path:", location.pathname);
+  console.log("[ProtectedRoute] User role:", user.role);
+
   // Check if user can access this specific route
-  if (!canAccessRoute(user, location.pathname)) {
+  const canAccess = canAccessRoute(user, location.pathname);
+  console.log("[ProtectedRoute] Can access route?", canAccess);
+  console.log("[ProtectedRoute] Checking canAccessRoute for user:", user);
+
+  // TEMPORARY: Skip route access check for SUPERADMIN and ADMIN
+  if (
+    user.role !== UserRole.SUPERADMIN &&
+    user.role !== UserRole.ADMIN &&
+    !canAccess
+  ) {
+    console.log(
+      "[ProtectedRoute] User cannot access route, redirecting to fallback"
+    );
     // Redirect to appropriate fallback or dashboard
     const fallback = fallbackPath || "/dashboard";
+    if (location.pathname === "/dashboard") {
+      // Prevent infinite redirect loop
+      console.error(
+        "[ProtectedRoute] Cannot redirect from dashboard to dashboard!"
+      );
+      return <div>Error: Cannot access dashboard</div>;
+    }
     return <Navigate to={fallback} replace />;
   }
 
+  console.log("[ProtectedRoute] Route access allowed, checking required roles");
+  console.log("[ProtectedRoute] Required roles:", requiredRoles);
+  console.log(
+    "[ProtectedRoute] Has any role?",
+    hasAnyRole(user, requiredRoles)
+  );
+
   // Check required roles
   if (requiredRoles.length > 0 && !hasAnyRole(user, requiredRoles)) {
+    console.log(
+      "[ProtectedRoute] User doesn't have required role, redirecting to unauthorized"
+    );
     return <Navigate to="/unauthorized" replace />;
   }
 
@@ -71,6 +111,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     }
   }
 
+  console.log("[ProtectedRoute] Rendering children");
   return <>{children}</>;
 };
 

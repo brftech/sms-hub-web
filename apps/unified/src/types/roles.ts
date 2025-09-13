@@ -84,7 +84,7 @@ export const routePermissions: RoutePermission[] = [
   },
   {
     path: "/dashboard",
-    roles: [UserRole.ONBOARDED, UserRole.ADMIN, UserRole.SUPERADMIN],
+    roles: [UserRole.USER, UserRole.ONBOARDED, UserRole.ADMIN, UserRole.SUPERADMIN],
     description: "Main dashboard",
   },
   {

@@ -50,11 +50,9 @@ export const HubSwitcher: React.FC<HubSwitcherProps> = ({
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[200px] p-0">
+      <PopoverContent className="w-[200px] p-0 bg-white">
         <Command>
-          <CommandInput placeholder="Search hubs..." />
           <CommandList>
-            <CommandEmpty>No hub found.</CommandEmpty>
             <CommandGroup>
               {hubs.map((hub) => (
                 <CommandItem

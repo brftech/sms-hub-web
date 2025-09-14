@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(find:*)",
-      "Bash(diff:*)"
+      "Bash(diff:*)",
+      "Bash(npx supabase functions deploy:*)"
     ],
     "deny": []
   }

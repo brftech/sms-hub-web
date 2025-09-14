@@ -2,6 +2,97 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { corsHeaders } from "../_shared/cors.ts";
 
+// Function to create business records
+async function createBusinessRecords(supabaseAdmin: any, user: any, data: any) {
+  try {
+    const timestamp = new Date().toISOString();
+    const companyId = crypto.randomUUID();
+    const accountNumber = `ACC-${Date.now()}`;
+
+    // Create company record
+    const { error: companyError } = await supabaseAdmin
+      .from('companies')
+      .insert([{
+        id: companyId,
+        hub_id: data.hub_id,
+        public_name: data.company_name,
+        legal_name: data.company_name,
+        company_account_number: accountNumber,
+        signup_type: data.signup_type,
+        is_active: true,
+        first_admin_user_id: user.id,
+        created_at: timestamp,
+        updated_at: timestamp,
+      }]);
+
+    if (companyError) throw companyError;
+
+    // Create user profile record
+    const { error: profileError } = await supabaseAdmin
+      .from('user_profiles')
+      .insert([{
+        id: user.id,
+        email: data.email,
+        account_number: `USR-${Date.now()}`,
+        hub_id: data.hub_id,
+        first_name: data.first_name,
+        last_name: data.last_name,
+        mobile_phone_number: data.phone_number,
+        role: 'USER',
+        signup_type: data.signup_type,
+        company_admin: true,
+        company_admin_since: timestamp,
+        company_id: companyId,
+        is_active: true,
+        created_at: timestamp,
+        updated_at: timestamp,
+      }]);
+
+    if (profileError) throw profileError;
+
+    // Create membership record
+    const { error: membershipError } = await supabaseAdmin
+      .from('memberships')
+      .insert([{
+        user_id: user.id,
+        company_id: companyId,
+        hub_id: data.hub_id,
+        role: 'USER',
+        permissions: { admin: true, manage_users: true, manage_settings: true },
+        is_active: true,
+        joined_at: timestamp,
+        created_at: timestamp,
+        updated_at: timestamp,
+      }]);
+
+    if (membershipError) {
+      console.warn('Failed to create membership:', membershipError);
+    }
+
+    // Create customer record
+    const { error: customerError } = await supabaseAdmin
+      .from('customers')
+      .insert([{
+        company_id: companyId,
+        user_id: user.id,
+        billing_email: data.email,
+        payment_status: 'pending',
+        created_at: timestamp,
+        updated_at: timestamp,
+      }]);
+
+    if (customerError) {
+      console.warn('Failed to create customer:', customerError);
+    }
+
+    console.log('✅ Business records created successfully');
+    return { success: true, companyId };
+  } catch (error) {
+    console.error('Failed to create business records:', error);
+    throw error;
+  }
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
@@ -109,34 +200,99 @@ serve(async (req) => {
       invitationData = invitation;
     }
 
+    // Detect environment
+    const environment = Deno.env.get("VERCEL_ENV") || Deno.env.get("ENVIRONMENT") || "development";
+    const isDevelopment = environment === "development";
+
+    // Determine the redirect URL based on hub
+    let publicSiteUrl = "";
+    const actualHubId = invitationData ? invitationData.hub_id : hub_id;
+
+    // Map hub_id to domain
+    const hubDomains = {
+      0: { // PercyTech
+        production: "https://www.percytech.com",
+        staging: "https://staging.percytech.com",
+        development: "http://localhost:3000"
+      },
+      1: { // Gnymble
+        production: "https://www.gnymble.com",
+        staging: "https://staging.gnymble.com",
+        development: "http://localhost:3000"
+      },
+      2: { // PercyMD
+        production: "https://www.percymd.com",
+        staging: "https://staging.percymd.com",
+        development: "http://localhost:3000"
+      },
+      3: { // PercyText
+        production: "https://www.percytext.com",
+        staging: "https://staging.percytext.com",
+        development: "http://localhost:3000"
+      }
+    };
+
+    // Get the appropriate domain
+    const hubConfig = hubDomains[actualHubId] || hubDomains[1]; // Default to Gnymble
+    if (isDevelopment) {
+      publicSiteUrl = hubConfig.development;
+    } else if (environment === "staging") {
+      publicSiteUrl = hubConfig.staging;
+    } else {
+      publicSiteUrl = hubConfig.production;
+    }
+
+    // Allow override from environment variable
+    publicSiteUrl = Deno.env.get("PUBLIC_SITE_URL") || publicSiteUrl;
+
     // Use standard Supabase signup (this automatically sends confirmation email)
     const { data: authData, error: authError } = await supabaseAdmin.auth.signUp({
       email: email,
       password: password,
       options: {
-        emailRedirectTo: `${Deno.env.get("PUBLIC_SITE_URL") || "http://localhost:3000"}/verify-auth`,
+        emailRedirectTo: `${publicSiteUrl}/verify-auth`,
         data: {
           hub_id: invitationData ? invitationData.hub_id : hub_id,
           signup_type: signup_type,
           customer_type: customer_type || "company",
           first_name: first_name,
           last_name: last_name,
+          company_name: company_name,
+          phone_number: phone_number,
         }
       }
     });
 
-    // TEMPORARY: For development, manually confirm the user to bypass email rate limits
-    if (authData?.user && !authData.user.email_confirmed_at) {
-      console.log("🔧 DEV MODE: Manually confirming user to bypass email rate limit");
-      const { error: confirmError } = await supabaseAdmin.auth.admin.updateUserById(
-        authData.user.id,
-        { email_confirm: true }
-      );
-      
-      if (confirmError) {
-        console.error("Failed to manually confirm user:", confirmError);
-      } else {
-        console.log("✅ User manually confirmed for development");
+    // Only auto-confirm in development environment
+    let autoConfirmed = false;
+    if (isDevelopment && authData?.user && !authData.user.email_confirmed_at) {
+      const skipEmailConfirmation = Deno.env.get("SKIP_EMAIL_CONFIRMATION") === "true";
+
+      if (skipEmailConfirmation) {
+        console.log("🔧 Development mode: Auto-confirming user (SKIP_EMAIL_CONFIRMATION=true)");
+        const { error: confirmError } = await supabaseAdmin.auth.admin.updateUserById(
+          authData.user.id,
+          { email_confirm: true }
+        );
+
+        if (confirmError) {
+          console.error("Failed to auto-confirm user:", confirmError);
+        } else {
+          console.log("✅ User auto-confirmed for development");
+          autoConfirmed = true;
+
+          // Create business records immediately in development
+          await createBusinessRecords(supabaseAdmin, authData.user, {
+            email,
+            first_name,
+            last_name,
+            company_name,
+            phone_number,
+            hub_id: invitationData ? invitationData.hub_id : hub_id,
+            signup_type,
+            customer_type,
+          });
+        }
       }
     }
 
@@ -166,11 +322,12 @@ serve(async (req) => {
         email: email,
         hub_id: invitationData ? invitationData.hub_id : hub_id,
         customer_type: customer_type,
-        confirmation_email_sent: authData.user.email_confirmed_at ? false : true,
-        message: authData.user.email_confirmed_at 
-          ? "Account created and confirmed! Redirecting to dashboard..." 
+        confirmation_email_sent: !autoConfirmed,
+        auto_confirmed: autoConfirmed,
+        message: autoConfirmed
+          ? "Account created and ready! Redirecting to dashboard..."
           : "Please check your email to confirm your account",
-        dev_mode: authData.user.email_confirmed_at ? true : false,
+        environment: environment,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );

@@ -1,0 +1,46 @@
+name: Deploy Pipeline
+
+on:
+  push:
+    branches:
+      - develop
+      - staging
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set Environment
+        id: set-env
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/develop" ]]; then
+            echo "environment=development" >> $GITHUB_OUTPUT
+            echo "deploy_message=Deployed to development" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
+            echo "environment=staging" >> $GITHUB_OUTPUT
+            echo "deploy_message=Deployed to staging" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "environment=production" >> $GITHUB_OUTPUT
+            echo "deploy_message=Deployed to production" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Notify Deployment Start
+        run: |
+          echo "🚀 Starting deployment to ${{ steps.set-env.outputs.environment }}"
+
+      # Vercel will handle the actual deployment via GitHub integration
+      # This workflow is for additional steps like notifications, tests, etc.
+
+      - name: Run Tests
+        if: github.ref == 'refs/heads/main'
+        run: |
+          # Add production smoke tests here
+          echo "Running production smoke tests..."
+
+      - name: Notify Deployment Complete
+        run: |
+          echo "✅ ${{ steps.set-env.outputs.deploy_message }}"

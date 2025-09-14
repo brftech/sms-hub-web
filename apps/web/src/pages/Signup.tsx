@@ -13,6 +13,7 @@ import {
 import { Input, Label, Alert, AlertDescription } from "@sms-hub/ui";
 import { Mail, Phone, User, Building, Key, UserPlus, ChevronLeft, ChevronRight } from "lucide-react";
 import styled from "styled-components";
+import { environmentConfig } from "../config/environment";
 
 const SignupContainer = styled.div`
   min-height: 100vh;
@@ -279,26 +280,33 @@ export function Signup() {
       // Check if confirmation email was sent successfully or if user is already confirmed (dev mode)
       if (result.confirmation_email_sent) {
         console.log("Confirmation email sent successfully to:", result.email);
-        
+
         // Store email for the check-email page
         sessionStorage.setItem('signup_email', result.email);
-        
+
         // Redirect to check email page
         window.location.href = '/check-email';
-      } else if (result.dev_mode) {
-        console.log("Dev mode: User already confirmed, creating business records...");
-        
-        // Store account data for immediate processing
-        sessionStorage.setItem('account_data', JSON.stringify({
-          email: formData.email,
-          companyName: formData.companyName,
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          hubId: hubConfig.hubNumber,
-        }));
-        
-        // Redirect directly to verify-auth to create business records
-        window.location.href = '/verify-auth?type=signup&dev_mode=true';
+      } else if (result.auto_confirmed && environmentConfig.isDevelopment) {
+        console.log("Development mode: User auto-confirmed, proceeding to dashboard...");
+
+        // Store success data with expiration
+        const successData = {
+          userId: result.user_id,
+          email: result.email,
+          timestamp: Date.now(),
+          expiresAt: Date.now() + (5 * 60 * 1000), // 5 minutes
+        };
+        sessionStorage.setItem('signup_success', JSON.stringify(successData));
+
+        // Clear sensitive data
+        sessionStorage.removeItem('account_data');
+
+        // Redirect to unified app with dev auth if enabled
+        const redirectUrl = environmentConfig.enableDevAuth && environmentConfig.devAuthToken
+          ? `${environmentConfig.unifiedAppUrl}/?superadmin=${environmentConfig.devAuthToken}`
+          : environmentConfig.unifiedAppUrl;
+
+        window.location.href = redirectUrl;
       } else {
         console.warn("Confirmation email failed to send");
         setError("Account created but email failed to send. Please contact support or try logging in directly.");

@@ -5,7 +5,6 @@ import { useGlobalView } from "../../contexts/GlobalViewContext";
 import { useHub, HubSwitcher, HubLogo } from "@sms-hub/ui";
 import { useCompany } from "../../hooks/useCompany";
 import { DevAdminBanner } from "../DevAdminBanner";
-import { UserRole } from "../../types/roles";
 import {
   hasAnyRole,
   getUserDisplayName,
@@ -38,8 +37,8 @@ export default function UserLayout({ children }: UserLayoutProps) {
   const { company } = useCompany();
 
   // Check if user is admin
-  const isAdmin = hasAnyRole(user?.role, [UserRole.ADMIN, UserRole.SUPERADMIN]);
-  const isSuperAdmin = hasAnyRole(user?.role, [UserRole.SUPERADMIN]);
+  const isAdmin = user && hasAnyRole(user as any, ['ADMIN', 'SUPERADMIN']);
+  const isSuperAdmin = user && hasAnyRole(user as any, ['SUPERADMIN']);
 
   const location = useLocation();
   const navigate = useNavigate();

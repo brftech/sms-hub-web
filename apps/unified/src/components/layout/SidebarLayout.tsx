@@ -44,16 +44,16 @@ const SidebarLayout: React.FC<{ children: React.ReactNode }> = ({
 
   // Determine user's primary role and permissions
   const isAdmin =
-    user && hasAnyRole(user, [UserRole.ADMIN, UserRole.SUPERADMIN]);
+    user && hasAnyRole(user as any, [UserRole.ADMIN, UserRole.SUPERADMIN]);
   const isSuperAdmin = user?.role === UserRole.SUPERADMIN;
   const isOnboarded =
     user &&
-    hasAnyRole(user, [UserRole.ONBOARDED, UserRole.ADMIN, UserRole.SUPERADMIN]);
+    hasAnyRole(user as any, [UserRole.ONBOARDED, UserRole.ADMIN, UserRole.SUPERADMIN]);
 
   // Get display information
   const userDisplayName = user ? getUserDisplayName(user) : "";
-  const roleDisplayName = user ? getRoleDisplayName(user.role) : "";
-  const roleColor = user ? getRoleColor(user.role) : "gray";
+  const roleDisplayName = user?.role ? getRoleDisplayName(user.role as UserRole) : "";
+  const roleColor = user?.role ? getRoleColor(user.role as UserRole) : "gray";
   const initials = user
     ? `${user.first_name?.[0] || ""}${user.last_name?.[0] || ""}`.toUpperCase() ||
       "U"

@@ -344,7 +344,7 @@ const Dashboard = () => {
           const recordsToDelete = (totalCount || 0) - superadminCount;
           preview += `${table.name}: ${recordsToDelete} records to delete (${totalCount || 0} total, ${superadminCount} superadmin preserved)\n`;
         } catch (err) {
-          preview += `${table.name}: Error - ${err.message}\n`;
+          preview += `${table.name}: Error - ${(err as Error).message}\n`;
         }
       }
 
@@ -391,7 +391,7 @@ const Dashboard = () => {
 
       for (const op of deleteOperations) {
         try {
-          let deleteQuery = supabase.from(op.table).delete();
+          let deleteQuery = supabase.from(op.table as any).delete();
 
           // Apply the correct filter based on table
           if (op.table === "user_profiles") {
@@ -413,7 +413,7 @@ const Dashboard = () => {
             result += `Deleted records from ${op.table}\n`;
           }
         } catch (err) {
-          result += `Error deleting from ${op.table}: ${err.message}\n`;
+          result += `Error deleting from ${op.table}: ${(err as Error).message}\n`;
         }
       }
 

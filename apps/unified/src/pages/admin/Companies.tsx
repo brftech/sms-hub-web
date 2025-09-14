@@ -636,58 +636,7 @@ const Companies = () => {
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Company Size
-                </label>
-                <select
-                  value={editingCompany.size || ""}
-                  onChange={(e) =>
-                    setEditingCompany({
-                      ...editingCompany,
-                      size: e.target.value,
-                    })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="">Select Size</option>
-                  <option value="1-10">1-10 employees</option>
-                  <option value="11-50">11-50 employees</option>
-                  <option value="51-200">51-200 employees</option>
-                  <option value="201-500">201-500 employees</option>
-                  <option value="500+">500+ employees</option>
-                </select>
-              </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Onboarding Step
-                </label>
-                <select
-                  value={editingCompany.account_onboarding_step || ""}
-                  onChange={(e) =>
-                    setEditingCompany({
-                      ...editingCompany,
-                      account_onboarding_step: e.target.value,
-                    })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="">Select Step</option>
-                  <option value="authentication">Authentication</option>
-                  <option value="payment">Payment</option>
-                  <option value="personalInfo">Personal Info</option>
-                  <option value="businessInfo">Business Info</option>
-                  <option value="brandSubmission">Brand Submission</option>
-                  <option value="privacySetup">Privacy Setup</option>
-                  <option value="campaignSubmission">
-                    Campaign Submission
-                  </option>
-                  <option value="gphoneProcurement">gPhone Procurement</option>
-                  <option value="accountSetup">Account Setup</option>
-                  <option value="completed">Completed</option>
-                </select>
-              </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -731,11 +680,11 @@ const Companies = () => {
                 </label>
                 <input
                   type="text"
-                  value={editingCompany.address_street || ""}
+                  value={editingCompany.address || ""}
                   onChange={(e) =>
                     setEditingCompany({
                       ...editingCompany,
-                      address_street: e.target.value,
+                      address: e.target.value,
                     })
                   }
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -766,11 +715,11 @@ const Companies = () => {
                 </label>
                 <input
                   type="text"
-                  value={editingCompany.state_region || ""}
+                  value={editingCompany.state || ""}
                   onChange={(e) =>
                     setEditingCompany({
                       ...editingCompany,
-                      state_region: e.target.value,
+                      state: e.target.value,
                     })
                   }
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -783,11 +732,11 @@ const Companies = () => {
                 </label>
                 <input
                   type="text"
-                  value={editingCompany.postal_code || ""}
+                  value={editingCompany.zip || ""}
                   onChange={(e) =>
                     setEditingCompany({
                       ...editingCompany,
-                      postal_code: e.target.value,
+                      zip: e.target.value,
                     })
                   }
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -800,11 +749,11 @@ const Companies = () => {
                 </label>
                 <input
                   type="text"
-                  value={editingCompany.country_of_registration || ""}
+                  value={editingCompany.country || ""}
                   onChange={(e) =>
                     setEditingCompany({
                       ...editingCompany,
-                      country_of_registration: e.target.value,
+                      country: e.target.value,
                     })
                   }
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"

@@ -12,7 +12,6 @@ import {
   Search,
   Shield,
   UserPlus,
-  Clock,
   Zap,
   Globe,
 } from "lucide-react";
@@ -54,7 +53,6 @@ export function Layout() {
   const [counts, setCounts] = useState<NavigationCounts>({
     companies: 0,
     users: 0,
-    verifications: 0,
     leads: 0,
   });
 

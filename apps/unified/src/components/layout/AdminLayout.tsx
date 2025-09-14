@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuthContext } from "@sms-hub/auth";
 import { useHub, HubLogo } from "@sms-hub/ui";
-import { useCompany } from "../../hooks/useCompany";
 import { DevAdminBanner } from "../DevAdminBanner";
 import { AdminHubSwitcher } from "../AdminHubSwitcher";
 import { getUserDisplayName, getInitials, formatUserRole } from "@sms-hub/auth";
@@ -20,7 +19,6 @@ import {
   ChevronDown,
   ArrowLeft,
   LayoutDashboard,
-  Shield,
   UserPlus,
 } from "lucide-react";
 
@@ -31,7 +29,6 @@ interface AdminLayoutProps {
 export default function AdminLayout({ children }: AdminLayoutProps) {
   const { user, signOut: logout } = useAuthContext();
   const { currentHub } = useHub();
-  const { company } = useCompany();
 
   // Check if user is super admin (currently unused but may be needed for future features)
   // const isSuperAdmin = user?.role === UserRole.SUPERADMIN;

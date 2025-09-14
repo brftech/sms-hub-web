@@ -6,11 +6,6 @@ import UserLayout from "./components/layout/UserLayout";
 import { hasAnyRole, useAuthContext } from "@sms-hub/auth";
 import { ProtectedRoute } from "./components/auth/ProtectedRouteWrapper";
 import { UserRole } from "./types/roles";
-import ClearAuth from "./pages/ClearAuth";
-import { AuthStateDebug } from "./pages/AuthStateDebug";
-import { DebugAuth } from "./pages/DebugAuth";
-import { AuthCallback } from "./pages/AuthCallback";
-import { AuthDebug } from "./pages/AuthDebug";
 import { Landing } from "./pages/Landing";
 // import DevLogin from './pages/DevLogin'
 import { GlobalViewProvider } from "./contexts/GlobalViewContext";
@@ -86,7 +81,6 @@ import AdminTesting from "./pages/admin/Testing";
 import AdminSettings from "./pages/admin/Settings";
 import { Analytics as AdminAnalytics } from "./pages/admin/Analytics";
 import { Messages as AdminMessages } from "./pages/admin/Messages";
-import { LayoutDemo as AdminLayoutDemo } from "./pages/admin/LayoutDemo";
 import { Accounts as AdminAccounts } from "./pages/admin/Accounts";
 import { PhoneNumbers as AdminPhoneNumbers } from "./pages/admin/PhoneNumbers";
 import { Voice as AdminVoice } from "./pages/admin/Voice";
@@ -137,12 +131,6 @@ function App() {
         <GlobalViewProvider>
           <Routes>
             {/* Public routes - accessible without authentication */}
-            <Route path="/clear-auth" element={<ClearAuth />} />
-            <Route path="/debug-auth" element={<DebugAuth />} />
-            <Route path="/auth-callback" element={<AuthCallback />} />
-            <Route path="/auth-debug" element={<AuthDebug />} />
-            <Route path="/auth-state-debug" element={<AuthStateDebug />} />
-            {/* <Route path="/dev-login" element={<DevLogin />} /> */}
             {/* Landing page for unauthenticated users */}
             <Route path="/" element={<Landing />} />
 
@@ -508,18 +496,6 @@ function App() {
               }
             />
             <Route
-              path="/admin/testing"
-              element={
-                <ProtectedRoute
-                  requiredRoles={[UserRole.ADMIN, UserRole.SUPERADMIN]}
-                >
-                  <AdminLayout>
-                    <AdminTesting />
-                  </AdminLayout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
               path="/admin/settings"
               element={
                 <ProtectedRoute
@@ -613,18 +589,6 @@ function App() {
                 >
                   <AdminLayout>
                     <AdminMessages />
-                  </AdminLayout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin/layout-demo"
-              element={
-                <ProtectedRoute
-                  requiredRoles={[UserRole.ADMIN, UserRole.SUPERADMIN]}
-                >
-                  <AdminLayout>
-                    <AdminLayoutDemo />
                   </AdminLayout>
                 </ProtectedRoute>
               }

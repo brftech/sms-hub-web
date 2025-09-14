@@ -10,7 +10,6 @@ import {
   Search,
   Filter,
   Plus,
-  Calendar,
   Edit,
   Eye,
   ChevronDown,
@@ -219,7 +218,7 @@ export function Accounts() {
         throw new Error(error.error || "Failed to create account");
       }
 
-      const result = await response.json();
+      await response.json();
       
       // Refresh the accounts list
       await fetchData();

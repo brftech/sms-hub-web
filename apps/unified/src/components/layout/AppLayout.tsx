@@ -5,6 +5,7 @@ import { useSupabase } from '../../providers/SupabaseProvider'
 import { getUserDisplayName } from '@sms-hub/auth'
 import { getAvailableNavigationItems, getRoleDisplayName, getRoleColor } from '../../utils/roleUtils'
 import { redirectToWebApp } from '@sms-hub/utils'
+import { UserRole } from '../../types/roles'
 
 const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -18,10 +19,10 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     return <div>Loading...</div>
   }
 
-  const navigationItems = getAvailableNavigationItems(user)
+  const navigationItems = getAvailableNavigationItems(user as any)
   const userDisplayName = getUserDisplayName(user)
-  const roleDisplayName = getRoleDisplayName(user.role)
-  const roleColor = getRoleColor(user.role)
+  const roleDisplayName = user.role ? getRoleDisplayName(user.role as UserRole) : 'User'
+  const roleColor = user.role ? getRoleColor(user.role as UserRole) : 'gray'
 
   const handleLogout = async () => {
     // Sign out from Supabase (this clears the session from localStorage)

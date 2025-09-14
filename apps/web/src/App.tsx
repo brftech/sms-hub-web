@@ -4,9 +4,15 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { Suspense, lazy } from "react";
 
-import { HubProvider, ErrorBoundary, PageTransition } from "@sms-hub/ui";
+import {
+  HubProvider,
+  ErrorBoundary,
+  PageTransition,
+  useHub,
+} from "@sms-hub/ui";
 import { useScrollToTop } from "@sms-hub/utils";
 import { webEnvironment } from "./config/webEnvironment";
+import { useEffect } from "react";
 
 // Import main pages directly (frequently accessed)
 import Home from "./pages/Home";
@@ -35,6 +41,20 @@ const FirstRoundAmmo = lazy(() => import("./pages/clients/FirstRoundAmmo"));
 const HarlemCigar = lazy(() => import("./pages/clients/HarlemCigar"));
 
 const queryClient = new QueryClient();
+
+// Component to set data-hub attribute on body
+const HubThemeWrapper = ({ children }: { children: React.ReactNode }) => {
+  const { currentHub } = useHub();
+
+  useEffect(() => {
+    document.body.setAttribute("data-hub", currentHub);
+    return () => {
+      document.body.removeAttribute("data-hub");
+    };
+  }, [currentHub]);
+
+  return <>{children}</>;
+};
 
 // AppRoutes component that uses the hub context and scroll-to-top
 const AppRoutes = () => {
@@ -273,14 +293,16 @@ const App = () => (
           <Toaster />
           <SonnerToaster />
           <HubProvider environment={webEnvironment} defaultHub="gnymble">
-            <BrowserRouter
-              future={{
-                v7_startTransition: true,
-                v7_relativeSplatPath: true,
-              }}
-            >
-              <AppRoutes />
-            </BrowserRouter>
+            <HubThemeWrapper>
+              <BrowserRouter
+                future={{
+                  v7_startTransition: true,
+                  v7_relativeSplatPath: true,
+                }}
+              >
+                <AppRoutes />
+              </BrowserRouter>
+            </HubThemeWrapper>
           </HubProvider>
         </TooltipProvider>
       </QueryClientProvider>

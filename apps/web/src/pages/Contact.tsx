@@ -8,6 +8,7 @@ import {
   useHub,
   SEO,
 } from "@sms-hub/ui";
+import { getHubColorClasses } from "@sms-hub/utils";
 import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";
 import { contactService } from "../services/contactService";
@@ -15,7 +16,8 @@ import { contactService } from "../services/contactService";
 import { CheckCircle, Loader2, Star, Shield, Zap } from "lucide-react";
 
 const Contact = () => {
-  const { hubConfig } = useHub();
+  const { hubConfig, currentHub } = useHub();
+  const hubColors = getHubColorClasses(currentHub);
   const [formData, setFormData] = useState<{
     firstName: string;
     lastName: string;
@@ -119,15 +121,21 @@ const Contact = () => {
       <div className="min-h-screen bg-black pt-20 pb-12 relative">
         {/* Subtle background elements */}
         <div className="absolute inset-0">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-orange-500/5 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-orange-500/5 rounded-full blur-3xl"></div>
+          <div
+            className={`absolute top-0 left-1/4 w-96 h-96 ${hubColors.bgLight} rounded-full blur-3xl`}
+          ></div>
+          <div
+            className={`absolute bottom-0 right-1/4 w-96 h-96 ${hubColors.bgLight} rounded-full blur-3xl`}
+          ></div>
         </div>
 
         <div className="relative z-10 max-w-6xl mx-auto px-6">
           {/* Hero Section - Matching Homepage Style */}
           <div className="text-center mb-20">
-            <div className="inline-flex items-center px-4 py-2 rounded-full bg-orange-500/20 border border-orange-500/30 mb-8">
-              <span className="text-sm font-medium text-orange-400">
+            <div
+              className={`inline-flex items-center px-4 py-2 rounded-full ${hubColors.bgLight} ${hubColors.borderLight} mb-8`}
+            >
+              <span className={`text-sm font-medium ${hubColors.text}`}>
                 GET IN TOUCH
               </span>
             </div>
@@ -137,7 +145,7 @@ const Contact = () => {
               style={{ fontFamily: "Inter, system-ui, sans-serif" }}
             >
               Ready to get
-              <span className="gradient-text block">SMS that works?</span>
+              <span className={`${hubColors.text} block`}>SMS that works?</span>
             </h1>
 
             <p
@@ -155,7 +163,9 @@ const Contact = () => {
             <div className="max-w-4xl mx-auto px-2 sm:px-0">
               <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-2xl sm:rounded-3xl border border-gray-700/50 p-4 sm:p-6 lg:p-8 shadow-2xl relative overflow-hidden">
                 {/* Background pattern */}
-                <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-purple-500/5"></div>
+                <div
+                  className={`absolute inset-0 bg-gradient-to-br ${hubColors.gradient} opacity-5`}
+                ></div>
 
                 <div className="relative z-10">
                   <FormContainerComponent
@@ -263,7 +273,9 @@ const Contact = () => {
 
           {/* Additional Info Section */}
           <div className="mb-20">
-            <div className="bg-gradient-to-r from-orange-500/10 to-purple-500/10 border border-orange-500/20 rounded-3xl p-12 backdrop-blur-sm">
+            <div
+              className={`bg-gradient-to-r ${hubColors.gradient} opacity-10 ${hubColors.borderLight} rounded-3xl p-12 backdrop-blur-sm`}
+            >
               <div className="text-center mb-12">
                 <h2
                   className="text-3xl md:text-4xl font-bold text-white mb-6"
@@ -282,8 +294,10 @@ const Contact = () => {
 
               <div className="grid md:grid-cols-3 gap-8">
                 <div className="text-center">
-                  <div className="w-16 h-16 bg-gradient-to-br from-orange-500/20 to-purple-500/20 border border-orange-500/30 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                    <Star className="w-8 h-8 text-orange-400" />
+                  <div
+                    className={`w-16 h-16 bg-gradient-to-br ${hubColors.gradient} opacity-20 ${hubColors.borderLight} rounded-2xl flex items-center justify-center mx-auto mb-6`}
+                  >
+                    <Star className={`w-8 h-8 ${hubColors.text}`} />
                   </div>
                   <h3
                     className="text-xl font-semibold text-white mb-3"
@@ -301,8 +315,10 @@ const Contact = () => {
                 </div>
 
                 <div className="text-center">
-                  <div className="w-16 h-16 bg-gradient-to-br from-orange-500/20 to-purple-500/20 border border-orange-500/30 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                    <Shield className="w-8 h-8 text-orange-400" />
+                  <div
+                    className={`w-16 h-16 bg-gradient-to-br ${hubColors.gradient} opacity-20 ${hubColors.borderLight} rounded-2xl flex items-center justify-center mx-auto mb-6`}
+                  >
+                    <Shield className={`w-8 h-8 ${hubColors.text}`} />
                   </div>
                   <h3
                     className="text-xl font-semibold text-white mb-3"
@@ -320,8 +336,10 @@ const Contact = () => {
                 </div>
 
                 <div className="text-center">
-                  <div className="w-16 h-16 bg-gradient-to-br from-orange-500/20 to-purple-500/20 border border-orange-500/30 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                    <Zap className="w-8 h-8 text-orange-400" />
+                  <div
+                    className={`w-16 h-16 bg-gradient-to-br ${hubColors.gradient} opacity-20 ${hubColors.borderLight} rounded-2xl flex items-center justify-center mx-auto mb-6`}
+                  >
+                    <Zap className={`w-8 h-8 ${hubColors.text}`} />
                   </div>
                   <h3
                     className="text-xl font-semibold text-white mb-3"
@@ -345,18 +363,18 @@ const Contact = () => {
 
       {/* Success Modal */}
       {showSuccess && (
-        <div 
-          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" 
-          style={{ 
-            position: 'fixed', 
-            top: 0, 
-            left: 0, 
-            right: 0, 
-            bottom: 0, 
-            width: '100vw', 
-            height: '100vh',
+        <div
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            width: "100vw",
+            height: "100vh",
             margin: 0,
-            padding: '1rem'
+            padding: "1rem",
           }}
         >
           <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl border border-gray-700/50 p-8 shadow-2xl max-w-md w-full text-center">

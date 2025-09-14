@@ -2,7 +2,6 @@ import { createSupabaseClient } from "@sms-hub/supabase";
 import type { SupabaseClient } from "@sms-hub/supabase";
 
 let supabaseInstance: SupabaseClient | null = null;
-let supabaseAdminInstance: SupabaseClient | null = null;
 
 export const getSupabaseClient = (): SupabaseClient => {
   if (!supabaseInstance) {

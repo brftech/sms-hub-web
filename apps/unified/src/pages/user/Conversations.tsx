@@ -145,7 +145,7 @@ export function Conversations() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="h-full flex flex-col space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -192,7 +192,7 @@ export function Conversations() {
       </Card>
 
       {/* Conversations List */}
-      <div className="space-y-2">
+      <div className="flex-1 overflow-y-auto space-y-2">
         {filteredConversations.length === 0 ? (
           <Card>
             <CardContent className="p-8 text-center">

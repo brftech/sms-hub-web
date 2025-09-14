@@ -372,9 +372,9 @@ export default function UserLayout({ children }: UserLayoutProps) {
       </div>
 
       {/* Main Content */}
-      <div className="lg:ml-16 pt-[73px]">
+      <div className="lg:ml-16 pt-[73px] h-screen overflow-hidden">
         {/* Page Content */}
-        <main className="p-6">
+        <main className="h-full overflow-y-auto p-6">
           <DevAdminBanner />
           {children}
         </main>

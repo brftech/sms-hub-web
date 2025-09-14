@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Plus, Building2, User, CreditCard } from "lucide-react";
 import { BaseModal, ModalFormLayout, ModalFormColumn } from "./BaseModal";
-import { HubType } from "@sms-hub/types";
+// import { HubType } from "@sms-hub/types"; // Not currently used
 
 export interface AccountAddModalProps {
   isOpen: boolean;

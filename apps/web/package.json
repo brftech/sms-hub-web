@@ -14,6 +14,7 @@
   "dependencies": {
     "@sms-hub/dev-auth": "workspace:*",
     "@sms-hub/hub-logic": "workspace:*",
+    "@sms-hub/logger": "workspace:*",
     "@sms-hub/services": "workspace:*",
     "@sms-hub/supabase": "workspace:*",
     "@sms-hub/ui": "workspace:*",

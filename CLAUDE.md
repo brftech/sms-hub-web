@@ -7,10 +7,10 @@ You are working on a **multi-tenant B2B SMS SaaS platform** built as a Turbo mon
 ### Core Architecture
 
 - **Monorepo Structure**: Turbo + pnpm workspaces for efficient builds and dependency management
-- **Database**: Supabase (PostgreSQL) with Row Level Security (RLS)
+- **Database**: Supabase (PostgreSQL) with (currently fully disabled) Row Level Security (RLS)
 - **Authentication**: **Magic link authentication** with enhanced security and session isolation
 - **Frontend**: React + Vite + TypeScript with styled-components
-- **Backend**: Supabase Edge Functions + Nest.js API
+- **Backend**: Supabase Edge Functions (primarily) + Nest.js API (in the future for texting)
 - **Multi-tenancy**: 4 distinct business hubs with isolated data
 
 ## 📁 Project Structure
@@ -61,6 +61,7 @@ sms-hub-monorepo/
 ### Recent Major Updates (September 2025)
 
 #### Latest Enhancements (Current)
+
 - ✅ **Magic Link Authentication**: Fixed signup flow to prevent session carryover issues
 - ✅ **Role Management Fix**: Corrected USER role assignment (was incorrectly MEMBER)
 - ✅ **Superadmin Protection**: Delete buttons disabled for protected accounts (superadmin@percytech.com, superadmin@gnymble.com)
@@ -70,6 +71,7 @@ sms-hub-monorepo/
 - ✅ **Enhanced Edge Functions**: Updated signup-native and delete-account with comprehensive validation
 
 #### Completed Foundation (Previous)
+
 - ✅ **Schema Alignment**: Fixed all type mismatches between database and TypeScript
 - ✅ **Payment Track Cleanup**: Added dashboard tools to clean payment data while preserving superadmin
 - ✅ **Database Migration**: Cleaned up company/customer schema redundancy
@@ -231,10 +233,11 @@ import { getSupabaseClient } from "../lib/supabaseSingleton";
 ### Frontend Security (CRITICAL)
 
 1. **NEVER expose service role key in frontend**
+
    ```typescript
    // ❌ WRONG - Security breach!
    const supabase = createClient(url, SERVICE_ROLE_KEY);
-   
+
    // ✅ CORRECT - Use anon key only
    const supabase = createClient(url, ANON_KEY);
    ```
@@ -268,6 +271,7 @@ import { getSupabaseClient } from "../lib/supabaseSingleton";
 9. ✅ **Payment Track Cleanup**: Complete - Dashboard tools with protection
 
 ### Development Focus
+
 - **Current**: All major authentication and security improvements completed
 - **Short Term**: Continued refinements and testing improvements
 - **Long Term**: Mobile apps and advanced analytics
@@ -437,6 +441,7 @@ import { getSupabaseClient } from "../lib/supabaseSingleton";
 ### Current Status & Known Issues
 
 #### ✅ Completed (All major issues resolved)
+
 - **Authentication & Security**: Magic link flow implemented, session carryover fixed
 - **Role Management**: USER role correctly assigned, hierarchy fixed
 - **Superadmin Protection**: Account deletion prevention implemented
@@ -447,6 +452,7 @@ import { getSupabaseClient } from "../lib/supabaseSingleton";
 - **Payment Track Cleanup**: Dashboard tools with superadmin protection
 
 #### 📝 Minor Items
+
 - **Legacy Apps**: Admin and User apps being migrated to Unified app
   - Workaround: Use Unified app at port 3001 (production ready)
   - Legacy apps will be removed after complete migration verification
@@ -481,6 +487,7 @@ Password: SuperAdmin123!
 **Previous Achievement**: ✅ **SCHEMA ALIGNMENT COMPLETE** - All type mismatches resolved, comprehensive type checking implemented.
 
 ### Key Improvements Completed
+
 1. **Magic Link Authentication**: Prevents session carryover, enhanced security
 2. **Role Management**: Fixed USER role assignment (was MEMBER)
 3. **Superadmin Protection**: Protected accounts cannot be deleted

@@ -1,7 +1,9 @@
-import { useAuth } from "../hooks/useAuth";
+import { useAuthContext } from "@sms-hub/auth";
 
 export const AuthDebug = () => {
-  const { isAuthenticated, isLoading, user, session } = useAuth();
+  const { user, session, loading } = useAuthContext();
+  const isAuthenticated = !!user;
+  const isLoading = loading;
   
   return (
     <div style={{ padding: "20px", fontFamily: "monospace" }}>

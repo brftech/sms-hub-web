@@ -4,14 +4,7 @@ import { HubType, HUB_CONFIGS } from "@sms-hub/types";
 import { cn } from "@sms-hub/utils";
 import { useHub } from "../contexts/HubContext";
 import { Button } from "./button";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "./command";
+import { Command, CommandGroup, CommandItem, CommandList } from "./command";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 import { HubLogo } from "./hub-logo";
 
@@ -24,12 +17,8 @@ export const HubSwitcher: React.FC<HubSwitcherProps> = ({
   className,
   disabled = false,
 }) => {
-  const { currentHub, switchHub, showHubSwitcher } = useHub();
   const [open, setOpen] = React.useState(false);
-
-  if (!showHubSwitcher) {
-    return null;
-  }
+  const { currentHub, switchHub } = useHub();
 
   const hubs = Object.values(HUB_CONFIGS);
 
@@ -50,7 +39,7 @@ export const HubSwitcher: React.FC<HubSwitcherProps> = ({
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[200px] p-0 bg-white">
+      <PopoverContent className="w-[200px] p-0">
         <Command>
           <CommandList>
             <CommandGroup>

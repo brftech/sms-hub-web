@@ -1,6 +1,7 @@
 import { getSupabaseClient } from "../lib/supabaseSingleton";
 import type { SupabaseClient } from "@sms-hub/supabase";
 import type { Company } from "@sms-hub/types";
+import { logger } from "@sms-hub/logger";
 
 // Re-export for components that import from this service
 export type { Company };
@@ -24,7 +25,7 @@ class CompaniesService {
   // Test database connection
   async testConnection(): Promise<boolean> {
     try {
-      console.log("CompaniesService: Testing database connection...");
+      logger.debug("CompaniesService: Testing database connection...");
 
       // Try a simple query to test connection
       const { error } = await this.supabase
@@ -33,14 +34,14 @@ class CompaniesService {
         .limit(1);
 
       if (error) {
-        console.error("CompaniesService: Connection test failed:", error);
+        logger.error("CompaniesService: Connection test failed", error);
         return false;
       }
 
-      console.log("CompaniesService: Connection test successful");
+      logger.info("CompaniesService: Connection test successful");
       return true;
     } catch (err) {
-      console.error("CompaniesService: Connection test error:", err);
+      logger.error("CompaniesService: Connection test error", err as Error);
       return false;
     }
   }
@@ -96,7 +97,7 @@ class CompaniesService {
     const { data, error } = await query;
 
     if (error) {
-      console.error("Error fetching companies:", error);
+      logger.error("Error fetching companies", error, { options });
       throw new Error("Failed to fetch companies");
     }
 
@@ -111,7 +112,7 @@ class CompaniesService {
       .single();
 
     if (error) {
-      console.error("Error fetching company:", error);
+      logger.error("Error fetching company", error, { companyId: id });
       throw new Error("Failed to fetch company");
     }
 
@@ -132,13 +133,13 @@ class CompaniesService {
     };
 
     // Calculate industry distribution (field removed from schema)
-    companies.forEach((company) => {
+    companies.forEach(() => {
       const industry = "Unknown"; // Field removed from schema
       stats.byIndustry[industry] = (stats.byIndustry[industry] || 0) + 1;
     });
 
     // Calculate size distribution (field removed from schema)
-    companies.forEach((company) => {
+    companies.forEach(() => {
       const size = "Unknown"; // Field removed from schema
       stats.bySize[size] = (stats.bySize[size] || 0) + 1;
     });
@@ -161,7 +162,7 @@ class CompaniesService {
       .eq("id", id);
 
     if (error) {
-      console.error("Error updating company status:", error);
+      logger.error("Error updating company status", error, { companyId: id, isActive });
       throw new Error("Failed to update company status");
     }
   }
@@ -181,7 +182,7 @@ class CompaniesService {
       .eq("id", id);
 
     if (error) {
-      console.error("Error updating company subscription:", error);
+      logger.error("Error updating company subscription", error, { companyId: id, subscriptionTier, subscriptionStatus });
       throw new Error("Failed to update company subscription");
     }
   }
@@ -189,37 +190,24 @@ class CompaniesService {
   async getUniqueIndustries(): Promise<string[]> {
     const { data, error } = await this.supabase
       .from("companies")
-      .select("industry")
-      .not("industry", "is", null);
+      .select("industry_vertical")
+      .not("industry_vertical", "is", null);
 
     if (error) {
-      console.error("Error fetching industries:", error);
+      logger.error("Error fetching industries", error);
       return [];
     }
 
     const industries =
       data
-        ?.map((item) => item.industry)
+        ?.map((item) => item.industry_vertical)
         .filter((industry): industry is string => industry !== null) || [];
     return [...new Set(industries)]; // Remove duplicates
   }
 
   async getUniqueSizes(): Promise<string[]> {
-    const { data, error } = await this.supabase
-      .from("companies")
-      .select("size")
-      .not("size", "is", null);
-
-    if (error) {
-      console.error("Error fetching sizes:", error);
-      return [];
-    }
-
-    const sizes =
-      data
-        ?.map((item) => item.size)
-        .filter((size): size is string => size !== null) || [];
-    return [...new Set(sizes)]; // Remove duplicates
+    // Size field removed from companies table
+    return [];
   }
 
   // Note: subscription_tier is in customers table, not companies table
@@ -232,7 +220,7 @@ class CompaniesService {
         .select("*");
 
       if (error) {
-        console.error("Error fetching global company stats:", error);
+        logger.error("Error fetching global company stats:", error);
         throw new Error("Failed to fetch global company stats");
       }
 
@@ -264,7 +252,7 @@ class CompaniesService {
 
       return stats;
     } catch (error) {
-      console.error("Error in getGlobalCompanyStats:", error);
+      logger.error("Error in getGlobalCompanyStats:", error);
       throw error;
     }
   }
@@ -272,42 +260,29 @@ class CompaniesService {
   async getGlobalUniqueIndustries(): Promise<string[]> {
     const { data, error } = await this.supabase
       .from("companies")
-      .select("industry")
-      .not("industry", "is", null);
+      .select("industry_vertical")
+      .not("industry_vertical", "is", null);
 
     if (error) {
-      console.error("Error fetching global industries:", error);
+      logger.error("Error fetching global industries:", error);
       return [];
     }
 
     const industries =
       data
-        ?.map((item) => item.industry)
+        ?.map((item) => item.industry_vertical)
         .filter((industry): industry is string => industry !== null) || [];
     return [...new Set(industries)]; // Remove duplicates
   }
 
   async getGlobalUniqueSizes(): Promise<string[]> {
-    const { data, error } = await this.supabase
-      .from("companies")
-      .select("size")
-      .not("size", "is", null);
-
-    if (error) {
-      console.error("Error fetching global sizes:", error);
-      return [];
-    }
-
-    const sizes =
-      data
-        ?.map((item) => item.size)
-        .filter((size): size is string => size !== null) || [];
-    return [...new Set(sizes)]; // Remove duplicates
+    // Size field no longer exists in companies table
+    return [];
   }
 
   // Note: subscription_tier is in customers table, not companies table
 
-  // Update company onboarding step
+  // Update company onboarding step (deprecated - field removed from schema)
   async updateCompanyOnboardingStep(
     companyId: string,
     onboardingStep: string
@@ -319,13 +294,13 @@ class CompaniesService {
         .eq("id", companyId);
 
       if (error) {
-        console.error("Error updating company onboarding step:", error);
+        logger.error("Error updating company onboarding step:", error);
         return { success: false, error: error.message };
       }
 
       return { success: true };
     } catch (error) {
-      console.error("Error updating company onboarding step:", error);
+      logger.error("Error updating company onboarding step:", error);
       return {
         success: false,
         error: error instanceof Error ? error.message : "Unknown error",
@@ -357,13 +332,13 @@ class CompaniesService {
         .single();
 
       if (error) {
-        console.error("Error creating company:", error);
+        logger.error("Error creating company:", error);
         return { success: false, error: error.message };
       }
 
       return { success: true, data: data as Company };
     } catch (error) {
-      console.error("Error creating company:", error);
+      logger.error("Error creating company:", error);
       return {
         success: false,
         error: error instanceof Error ? error.message : "Unknown error",
@@ -386,13 +361,13 @@ class CompaniesService {
         .eq("id", companyId);
 
       if (error) {
-        console.error("Error updating company:", error);
+        logger.error("Error updating company:", error);
         return { success: false, error: error.message };
       }
 
       return { success: true };
     } catch (error) {
-      console.error("Error updating company:", error);
+      logger.error("Error updating company:", error);
       return {
         success: false,
         error: error instanceof Error ? error.message : "Unknown error",
@@ -411,13 +386,13 @@ class CompaniesService {
         .eq("id", companyId);
 
       if (error) {
-        console.error("Error deleting company:", error);
+        logger.error("Error deleting company:", error);
         return { success: false, error: error.message };
       }
 
       return { success: true };
     } catch (error) {
-      console.error("Error deleting company:", error);
+      logger.error("Error deleting company:", error);
       return {
         success: false,
         error: error instanceof Error ? error.message : "Unknown error",
@@ -474,7 +449,7 @@ class CompaniesService {
         .single();
 
       if (companyError) {
-        console.error("Error creating company:", companyError);
+        logger.error("Error creating company:", companyError);
         return { success: false, error: `Failed to create company: ${companyError.message}` };
       }
 
@@ -498,7 +473,7 @@ class CompaniesService {
           .single();
 
         if (customerError) {
-          console.error("Error creating customer:", customerError);
+          logger.error("Error creating customer:", customerError);
           // Rollback company creation
           await this.supabase.from("companies").delete().eq("id", companyId);
           return { success: false, error: `Failed to create customer: ${customerError.message}` };
@@ -531,7 +506,7 @@ class CompaniesService {
           .single();
 
         if (profileError) {
-          console.error("Error creating user profile:", profileError);
+          logger.error("Error creating user profile:", profileError);
           // Note: Not rolling back company/customer as they might still be useful
         } else {
           userId = profile?.id;
@@ -547,7 +522,7 @@ class CompaniesService {
         }
       };
     } catch (error) {
-      console.error("Error in addAccount:", error);
+      logger.error("Error in addAccount:", error);
       return {
         success: false,
         error: error instanceof Error ? error.message : "Unknown error",
@@ -565,13 +540,13 @@ class CompaniesService {
         .order("created_at", { ascending: false });
 
       if (error) {
-        console.error("Error fetching company users:", error);
+        logger.error("Error fetching company users:", error);
         return [];
       }
 
       return data || [];
     } catch (error) {
-      console.error("Error fetching company users:", error);
+      logger.error("Error fetching company users:", error);
       return [];
     }
   }

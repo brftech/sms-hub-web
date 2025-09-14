@@ -36,7 +36,9 @@ export class ErrorBoundary extends Component<Props, State> {
     }
 
     // Log the error to console in development
-    if (process.env.NODE_ENV === "development") {
+    const isDevelopment = (typeof import.meta !== 'undefined' && import.meta.env?.MODE !== "production") ||
+                         (typeof process !== 'undefined' && process.env?.NODE_ENV === "development");
+    if (isDevelopment) {
       console.error("ErrorBoundary caught an error:", error, errorInfo);
     }
   }
@@ -75,6 +77,9 @@ export class ErrorBoundary extends Component<Props, State> {
       if (this.props.fallback) {
         return this.props.fallback;
       }
+
+      const isDevelopment = (typeof import.meta !== 'undefined' && import.meta.env?.MODE !== "production") ||
+                           (typeof process !== 'undefined' && process.env?.NODE_ENV === "development");
 
       // Default error UI
       return (
@@ -121,7 +126,7 @@ export class ErrorBoundary extends Component<Props, State> {
               </Button>
             </div>
 
-            {process.env.NODE_ENV === "development" && this.state.error && (
+            {isDevelopment && this.state.error && (
               <details className="mt-6 p-4 bg-gray-100 rounded-lg">
                 <summary className="cursor-pointer font-medium text-gray-700 mb-2">
                   Error Details (Development)

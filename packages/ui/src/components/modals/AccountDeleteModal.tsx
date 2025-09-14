@@ -100,7 +100,7 @@ export const AccountDeleteModal: React.FC<AccountDeleteModalProps> = ({
               <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-200 text-gray-800">
                 {getEntityTypeLabel().toUpperCase()}
               </span>
-              {account.user_count > 0 && (
+              {account.user_count && account.user_count > 0 && (
                 <span className="text-xs text-gray-500">
                   {account.user_count} users
                 </span>
@@ -188,11 +188,11 @@ export const AccountDeleteModal: React.FC<AccountDeleteModalProps> = ({
                   : `The ${getEntityTypeLabel()} will lose access immediately but all data and users will remain in the system for future reactivation if needed.`
                 }
               </p>
-              {account.user_count > 0 && (
+              {account.user_count && account.user_count > 0 && (
                 <p className={`text-xs mt-1 font-medium ${
                   deletePermanent ? "text-red-800" : "text-amber-800"
                 }`}>
-                  ⚠️ This will {deletePermanent ? 'DELETE' : 'deactivate'} {account.user_count} user{account.user_count > 1 ? 's' : ''}.
+                  ⚠️ This will {deletePermanent ? 'DELETE' : 'deactivate'} {account.user_count} user{account.user_count && account.user_count > 1 ? 's' : ''}.
                 </p>
               )}
             </div>

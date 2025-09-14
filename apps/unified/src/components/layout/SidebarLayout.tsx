@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "../../hooks/useAuth";
+import { useAuthContext } from "@sms-hub/auth";
 import { useSupabase } from "../../providers/SupabaseProvider";
 import { useGlobalView } from "../../contexts/GlobalViewContext";
 import { useHub, HubSwitcher } from "@sms-hub/ui";
 import { ThemeToggle } from "../ThemeToggle";
 import { DevAdminBanner } from "../DevAdminBanner";
+import { getUserDisplayName } from "@sms-hub/auth";
 import {
-  getUserDisplayName,
   getRoleDisplayName,
   getRoleColor,
   hasAnyRole,
@@ -34,7 +34,8 @@ const SidebarLayout: React.FC<{ children: React.ReactNode }> = ({
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const { user, isAuthenticated } = useAuth();
+  const { user } = useAuthContext();
+  const isAuthenticated = !!user;
   const { hubConfig } = useHub();
   const { isGlobalView, setIsGlobalView } = useGlobalView();
   const supabase = useSupabase();

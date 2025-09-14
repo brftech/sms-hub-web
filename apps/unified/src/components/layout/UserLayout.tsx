@@ -1,17 +1,17 @@
 import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "../../hooks/useAuth";
+import { useAuthContext } from "@sms-hub/auth";
 import { useGlobalView } from "../../contexts/GlobalViewContext";
 import { useHub, HubSwitcher, HubLogo } from "@sms-hub/ui";
 import { useCompany } from "../../hooks/useCompany";
 import { DevAdminBanner } from "../DevAdminBanner";
 import { UserRole } from "../../types/roles";
-import { hasAnyRole } from "../../utils/roleUtils";
 import {
+  hasAnyRole,
   getUserDisplayName,
   getInitials,
   formatUserRole,
-} from "../../utils/userUtils";
+} from "@sms-hub/auth";
 import {
   MessageSquare,
   Megaphone,
@@ -32,14 +32,14 @@ interface UserLayoutProps {
 }
 
 export default function UserLayout({ children }: UserLayoutProps) {
-  const { user, logout } = useAuth();
+  const { user, signOut: logout } = useAuthContext();
   const { isGlobalView, toggleGlobalView } = useGlobalView();
   const { currentHub } = useHub();
   const { company } = useCompany();
 
   // Check if user is admin
-  const isAdmin = hasAnyRole(user, [UserRole.ADMIN, UserRole.SUPERADMIN]);
-  const isSuperAdmin = hasAnyRole(user, [UserRole.SUPERADMIN]);
+  const isAdmin = hasAnyRole(user?.role, [UserRole.ADMIN, UserRole.SUPERADMIN]);
+  const isSuperAdmin = hasAnyRole(user?.role, [UserRole.SUPERADMIN]);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -313,11 +313,6 @@ export default function UserLayout({ children }: UserLayoutProps) {
                       }`}
                     />
                   </div>
-
-                  {/* Tooltip on hover */}
-                  <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-sm rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50">
-                    {item.name}
-                  </div>
                 </Link>
               );
             })}
@@ -360,11 +355,6 @@ export default function UserLayout({ children }: UserLayoutProps) {
                             active ? "text-orange-600" : item.color
                           }`}
                         />
-                      </div>
-
-                      {/* Tooltip on hover */}
-                      <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-sm rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50">
-                        {item.name}
                       </div>
                     </Link>
                   );

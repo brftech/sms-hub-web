@@ -101,4 +101,4 @@ export * from "./theme/styled-components";
 // import "@sms-hub/ui/styles/gnymble.css";
 // import "@sms-hub/ui/styles/percytech.css";
 // import "@sms-hub/ui/styles/percymd.css";
-// import "@sms-hub/ui/styles/percytext.css";
+import "@sms-hub/ui/styles/percytext.css";

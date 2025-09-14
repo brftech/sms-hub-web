@@ -188,11 +188,11 @@
 
   /* === HUB-SPECIFIC COLOR OVERRIDES === */
   [data-hub="percytech"] {
-    --primary: 217 91% 60%;
-    --accent: 217 91% 60%;
-    --hub-primary: #3b82f6;
-    --hub-secondary: #2563eb;
-    --hub-accent: #1d4ed8;
+    --primary: 0 84% 60%;
+    --accent: 0 84% 60%;
+    --hub-primary: #ef4444;
+    --hub-secondary: #dc2626;
+    --hub-accent: #b91c1c;
   }
 
   [data-hub="gnymble"] {
@@ -220,20 +220,32 @@
   }
 
   [data-hub="percymd"] {
-    --primary: 262 83% 58%;
-    --accent: 262 83% 58%;
-    --hub-primary: #9333ea;
-    --hub-secondary: #7e22ce;
-    --hub-accent: #6b21a8;
+    --primary: 217 91% 60%;
+    --accent: 217 91% 60%;
+    --hub-primary: #3b82f6;
+    --hub-secondary: #2563eb;
+    --hub-accent: #1d4ed8;
   }
 
   [data-hub="percytext"] {
-    --primary: 142 76% 36%;
-    --accent: 142 76% 36%;
-    --hub-primary: #22c55e;
-    --hub-secondary: #16a34a;
-    --hub-accent: #15803d;
+    --primary: 280 65% 60%;
+    --accent: 280 65% 60%;
+    --hub-primary: #a855f7;
+    --hub-secondary: #9333ea;
+    --hub-accent: #7c3aed;
   }
+}
+
+/* Ensure Gnymble uses primary color for accent in all contexts */
+[data-hub="gnymble"] .light {
+  --accent: 25 95% 53%;
+  --accent-foreground: 0 0% 100%;
+}
+
+/* Also ensure it works in light theme context */
+.light [data-hub="gnymble"] {
+  --accent: 25 95% 53%;
+  --accent-foreground: 0 0% 100%;
 }
 
 @layer components {
@@ -674,10 +686,15 @@
   }
 
   /* Typography improvements for better readability */
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-weight: 600;
   }
-  
+
   label {
     font-weight: 600;
   }

@@ -86,7 +86,7 @@ class LeadsService {
         contact_info: this.getContactInfo(lead),
         lead_age: this.getLeadAge(lead),
         status_color: this.getStatusColor(lead.status || "new"),
-        priority_color: this.getPriorityColor(lead.priority || "medium"),
+        priority_color: this.getPriorityColor("medium"), // Priority field removed from schema
       })) as unknown as Lead[];
 
       // Apply search filter after fetching
@@ -136,7 +136,7 @@ class LeadsService {
         contact_info: this.getContactInfo(data),
         lead_age: this.getLeadAge(data),
         status_color: this.getStatusColor(data.status || "new"),
-        priority_color: this.getPriorityColor(data.priority || "medium"),
+        priority_color: this.getPriorityColor("medium"), // Priority field removed from schema
       } as unknown as Lead;
     } catch (error) {
       console.error("Error in getLeadById:", error);
@@ -171,7 +171,7 @@ class LeadsService {
         contact_info: this.getContactInfo(data),
         lead_age: this.getLeadAge(data),
         status_color: this.getStatusColor(data.status || "new"),
-        priority_color: this.getPriorityColor(data.priority || "medium"),
+        priority_color: this.getPriorityColor("medium"), // Priority field removed from schema
       } as unknown as Lead;
     } catch (error) {
       console.error("Error in createLead:", error);
@@ -207,7 +207,7 @@ class LeadsService {
         contact_info: this.getContactInfo(data),
         lead_age: this.getLeadAge(data),
         status_color: this.getStatusColor(data.status || "new"),
-        priority_color: this.getPriorityColor(data.priority || "medium"),
+        priority_color: this.getPriorityColor("medium"), // Priority field removed from schema
       } as unknown as Lead;
     } catch (error) {
       console.error("Error in updateLead:", error);

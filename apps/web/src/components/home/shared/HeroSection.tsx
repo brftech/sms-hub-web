@@ -99,12 +99,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-20 md:mb-24">
           <a
-            href="/contact"
-            className="bg-orange-600 hover:bg-orange-700 text-white font-bold py-4 px-8 rounded-lg transition-colors duration-200 text-lg"
-          >
-            Get Started
-          </a>
-          <a
             href="/demo"
             className="border-2 border-orange-600 text-orange-400 hover:bg-orange-600 hover:text-white font-bold py-4 px-8 rounded-lg transition-colors duration-200 text-lg"
           >

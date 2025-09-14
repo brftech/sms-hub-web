@@ -202,7 +202,7 @@ const AppRoutes = () => {
           </PageTransition>
         }
       />
-      
+
       {/* Auth routes */}
       <Route
         path="/test-auth"
@@ -252,7 +252,7 @@ const AppRoutes = () => {
           </PageTransition>
         }
       />
-      
+
       <Route
         path="*"
         element={

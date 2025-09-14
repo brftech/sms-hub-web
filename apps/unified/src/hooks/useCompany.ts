@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from './useAuth';
+import { useAuthContext } from '@sms-hub/auth';
 import { companiesService, Company } from '../services/companiesService';
 
 export function useCompany() {
-  const { user } = useAuth();
+  const { user } = useAuthContext();
   const [company, setCompany] = useState<Company | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

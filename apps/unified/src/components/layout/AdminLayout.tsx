@@ -1,15 +1,11 @@
 import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "../../hooks/useAuth";
+import { useAuthContext } from "@sms-hub/auth";
 import { useHub, HubLogo } from "@sms-hub/ui";
 import { useCompany } from "../../hooks/useCompany";
 import { DevAdminBanner } from "../DevAdminBanner";
 import { AdminHubSwitcher } from "../AdminHubSwitcher";
-import {
-  getUserDisplayName,
-  getInitials,
-  formatUserRole,
-} from "../../utils/userUtils";
+import { getUserDisplayName, getInitials, formatUserRole } from "@sms-hub/auth";
 import {
   Building2,
   Users,
@@ -33,7 +29,7 @@ interface AdminLayoutProps {
 }
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
-  const { user, logout } = useAuth();
+  const { user, signOut: logout } = useAuthContext();
   const { currentHub } = useHub();
   const { company } = useCompany();
 
@@ -297,11 +293,6 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                       }`}
                     />
                   </div>
-
-                  {/* Tooltip on hover */}
-                  <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-sm rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50">
-                    {item.name}
-                  </div>
                 </Link>
               );
             })}
@@ -315,11 +306,6 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             >
               <div className="p-2 rounded-xl bg-slate-800 transition-all duration-200 hover:bg-orange-500/20 hover:scale-105">
                 <ArrowLeft className="w-6 h-6 text-slate-300 group-hover:text-orange-400 transition-colors duration-200" />
-              </div>
-
-              {/* Tooltip on hover */}
-              <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-sm rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50">
-                Back to User View
               </div>
             </button>
           </div>

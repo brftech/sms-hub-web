@@ -4,11 +4,13 @@ import { BrowserRouter } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Toaster, SonnerToaster, TooltipProvider } from '@sms-hub/ui'
 import { HelmetProvider } from 'react-helmet-async'
-import { SupabaseProvider } from './providers/SupabaseProvider'
+import { AuthProvider } from '@sms-hub/auth'
+import { getSupabaseClient } from './lib/supabaseSingleton'
 import App from './App.tsx'
 import './index.css'
 
 const queryClient = new QueryClient()
+const supabase = getSupabaseClient()
 
 console.log("[UNIFIED APP] Starting unified app...");
 
@@ -19,7 +21,13 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <TooltipProvider>
           <Toaster />
           <SonnerToaster />
-          <SupabaseProvider>
+          <AuthProvider 
+            supabase={supabase}
+            config={{
+              redirectUrl: '/dashboard',
+              debug: true
+            }}
+          >
             <BrowserRouter
               future={{
                 v7_startTransition: true,
@@ -28,7 +36,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
             >
               <App />
             </BrowserRouter>
-          </SupabaseProvider>
+          </AuthProvider>
         </TooltipProvider>
       </QueryClientProvider>
     </HelmetProvider>

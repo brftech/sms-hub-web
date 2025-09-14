@@ -59,8 +59,10 @@ class Logger {
     };
 
     // Set log level from environment (if available)
-    if (typeof process !== "undefined" && process.env.LOG_LEVEL) {
-      this.config.level = this.parseLogLevel(process.env.LOG_LEVEL);
+    const logLevel = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_LOG_LEVEL) ||
+                    (typeof process !== 'undefined' && process.env?.LOG_LEVEL);
+    if (logLevel) {
+      this.config.level = this.parseLogLevel(logLevel);
     }
   }
 

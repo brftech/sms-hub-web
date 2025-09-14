@@ -11,7 +11,7 @@ export interface CustomerWithJoins extends Customer {
     id: string;
     public_name: string;
     legal_name: string | null;
-    company_account_number: string;
+    company_account_number: string | null;
   } | null;
   hub?: {
     hub_number: number;
@@ -147,7 +147,7 @@ class CustomersService {
     }
   }
 
-  async createCustomer(customerData: Partial<Customer>): Promise<CustomerWithJoins> {ched 
+  async createCustomer(customerData: Partial<Customer>): Promise<CustomerWithJoins> { 
     try {
       const { data, error } = await this.supabase
         .from("customers")

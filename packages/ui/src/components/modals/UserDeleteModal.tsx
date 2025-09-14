@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Trash2, AlertTriangle, Info } from "lucide-react";
-import { BaseModal, ModalSection, ModalField, ModalButtonGroup, ModalButton, ModalFormLayout, ModalFormColumn } from "./BaseModal";
+import { Trash2, AlertTriangle } from "lucide-react";
+import { BaseModal, ModalButtonGroup, ModalButton } from "./BaseModal";
 
 interface UserProfile {
   id: string;

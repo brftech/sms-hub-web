@@ -7,9 +7,7 @@ import { useGlobalView } from "../contexts/GlobalViewContext";
 import {
   Button,
   Command,
-  CommandEmpty,
   CommandGroup,
-  CommandInput,
   CommandItem,
   CommandList,
   Popover,

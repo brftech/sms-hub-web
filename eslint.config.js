@@ -53,6 +53,7 @@ export default [
         HTMLAnchorElement: 'readonly',
         HTMLSpanElement: 'readonly',
         HTMLImageElement: 'readonly',
+        HTMLFormElement: 'readonly',
         // Web APIs
         fetch: 'readonly',
         URL: 'readonly',
@@ -135,6 +136,23 @@ export default [
         module: 'readonly',
         require: 'readonly',
         exports: 'readonly',
+      },
+    },
+  },
+  {
+    files: ['**/*.test.{js,jsx,ts,tsx}', '**/*.spec.{js,jsx,ts,tsx}'],
+    languageOptions: {
+      globals: {
+        // Jest globals
+        describe: 'readonly',
+        it: 'readonly',
+        test: 'readonly',
+        expect: 'readonly',
+        beforeEach: 'readonly',
+        afterEach: 'readonly',
+        beforeAll: 'readonly',
+        afterAll: 'readonly',
+        jest: 'readonly',
       },
     },
   },

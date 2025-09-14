@@ -3,23 +3,23 @@ import { HubProvider, ErrorBoundary } from "@sms-hub/ui";
 import { unifiedEnvironment } from "./config/unifiedEnvironment";
 import AdminLayout from "./components/layout/AdminLayout";
 import UserLayout from "./components/layout/UserLayout";
-import { ProtectedRoute } from "./components/auth/ProtectedRoute";
+import { hasAnyRole, useAuthContext } from "@sms-hub/auth";
+import { ProtectedRoute } from "./components/auth/ProtectedRouteWrapper";
 import { UserRole } from "./types/roles";
-import { hasAnyRole } from "./utils/roleUtils";
 import ClearAuth from "./pages/ClearAuth";
+import { AuthStateDebug } from "./pages/AuthStateDebug";
 import { DebugAuth } from "./pages/DebugAuth";
 import { AuthCallback } from "./pages/AuthCallback";
 import { AuthDebug } from "./pages/AuthDebug";
 import { Landing } from "./pages/Landing";
 // import DevLogin from './pages/DevLogin'
-import { useAuth } from "./hooks/useAuth";
 import { GlobalViewProvider } from "./contexts/GlobalViewContext";
 import { DynamicFavicon } from "./components/DynamicFavicon";
 
 // Dashboard Router Component
 const DashboardRouter = () => {
   // Show appropriate dashboard based on user role
-  const { user } = useAuth();
+  const { user } = useAuthContext();
   console.log("[DashboardRouter] User:", user);
   console.log("[DashboardRouter] User role:", user?.role);
   console.log(
@@ -27,7 +27,7 @@ const DashboardRouter = () => {
     user?.role === UserRole.ADMIN || user?.role === UserRole.SUPERADMIN
   );
 
-  if (hasAnyRole(user, [UserRole.ADMIN])) {
+  if (hasAnyRole(user?.role, ["ADMIN"])) {
     console.log("[DashboardRouter] Rendering AdminLayout for Admin");
     // Admin users see admin dashboard
     return (
@@ -35,7 +35,7 @@ const DashboardRouter = () => {
         <AdminDashboard />
       </AdminLayout>
     );
-  } else if (hasAnyRole(user, [UserRole.SUPERADMIN])) {
+  } else if (hasAnyRole(user?.role, ["SUPERADMIN"])) {
     console.log("[DashboardRouter] Rendering UserLayout for Superadmin");
     // Superadmin users see user conversations view
     return (
@@ -141,6 +141,7 @@ function App() {
             <Route path="/debug-auth" element={<DebugAuth />} />
             <Route path="/auth-callback" element={<AuthCallback />} />
             <Route path="/auth-debug" element={<AuthDebug />} />
+            <Route path="/auth-state-debug" element={<AuthStateDebug />} />
             {/* <Route path="/dev-login" element={<DevLogin />} /> */}
             {/* Landing page for unauthenticated users */}
             <Route path="/" element={<Landing />} />

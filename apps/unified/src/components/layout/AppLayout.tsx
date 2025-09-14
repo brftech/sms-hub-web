@@ -1,13 +1,15 @@
 import React, { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { useAuth } from '../../hooks/useAuth'
+import { useAuthContext } from '@sms-hub/auth'
 import { useSupabase } from '../../providers/SupabaseProvider'
-import { getAvailableNavigationItems, getUserDisplayName, getRoleDisplayName, getRoleColor } from '../../utils/roleUtils'
+import { getUserDisplayName } from '@sms-hub/auth'
+import { getAvailableNavigationItems, getRoleDisplayName, getRoleColor } from '../../utils/roleUtils'
 import { redirectToWebApp } from '@sms-hub/utils'
 
 const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const { user, isAuthenticated } = useAuth()
+  const { user } = useAuthContext()
+  const isAuthenticated = !!user
   const supabase = useSupabase()
   const location = useLocation()
   const navigate = useNavigate()

@@ -20,7 +20,6 @@ export function CreateCompanyModal({
   const [newCompany, setNewCompany] = useState<Partial<Company>>({
     hub_id: hubId,
     is_active: true,
-    account_onboarding_step: "authentication",
   });
 
   const generateAccountNumber = () => {
@@ -31,7 +30,7 @@ export function CreateCompanyModal({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newCompany.public_name || !newCompany.billing_email) {
+    if (!newCompany.public_name || !newCompany.primary_contact_email) {
       alert("Please fill in required fields");
       return;
     }
@@ -94,15 +93,15 @@ export function CreateCompanyModal({
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Billing Email *
+                Primary Contact Email *
               </label>
               <input
                 type="email"
                 required
-                value={newCompany.billing_email || ""}
+                value={newCompany.primary_contact_email || ""}
                 onChange={(e) => setNewCompany({
                   ...newCompany,
-                  billing_email: e.target.value
+                  primary_contact_email: e.target.value
                 })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
@@ -114,10 +113,10 @@ export function CreateCompanyModal({
               </label>
               <input
                 type="tel"
-                value={newCompany.company_phone_number || ""}
+                value={newCompany.phone || ""}
                 onChange={(e) => setNewCompany({
                   ...newCompany,
-                  company_phone_number: e.target.value
+                  phone: e.target.value
                 })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
@@ -129,34 +128,17 @@ export function CreateCompanyModal({
               </label>
               <input
                 type="text"
-                value={newCompany.industry || ""}
+                value={newCompany.industry_vertical || ""}
                 onChange={(e) => setNewCompany({
                   ...newCompany,
-                  industry: e.target.value
+                  industry_vertical: e.target.value
                 })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Company Size
-              </label>
-              <select
-                value={newCompany.size || ""}
-                onChange={(e) => setNewCompany({
-                  ...newCompany,
-                  size: e.target.value
-                })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value="">Select Size</option>
-                <option value="1-10">1-10 employees</option>
-                <option value="11-50">11-50 employees</option>
-                <option value="51-200">51-200 employees</option>
-                <option value="201-500">201-500 employees</option>
-                <option value="500+">500+ employees</option>
-              </select>
+              {/* Company size field removed from schema */}
             </div>
 
             <div className="md:col-span-2">
@@ -180,10 +162,10 @@ export function CreateCompanyModal({
               </label>
               <input
                 type="text"
-                value={newCompany.address_street || ""}
+                value={newCompany.address || ""}
                 onChange={(e) => setNewCompany({
                   ...newCompany,
-                  address_street: e.target.value
+                  address: e.target.value
                 })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Street Address"
@@ -211,10 +193,10 @@ export function CreateCompanyModal({
               </label>
               <input
                 type="text"
-                value={newCompany.state_region || ""}
+                value={newCompany.state || ""}
                 onChange={(e) => setNewCompany({
                   ...newCompany,
-                  state_region: e.target.value
+                  state: e.target.value
                 })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
@@ -222,14 +204,14 @@ export function CreateCompanyModal({
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Postal Code
+                Zip Code
               </label>
               <input
                 type="text"
-                value={newCompany.postal_code || ""}
+                value={newCompany.zip || ""}
                 onChange={(e) => setNewCompany({
                   ...newCompany,
-                  postal_code: e.target.value
+                  zip: e.target.value
                 })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />

@@ -3,7 +3,7 @@ import { useHub } from "@sms-hub/ui";
 import { getHubCTAContent } from "@sms-hub/hub-logic";
 
 export const CTASection: React.FC = () => {
-  const { currentHub } = useHub();
+  const { currentHub, hubConfig } = useHub();
 
   const content = getHubCTAContent(currentHub);
   return (
@@ -39,12 +39,17 @@ export const CTASection: React.FC = () => {
         </div>
 
         {/* The decision */}
-        <div className="bg-gradient-to-r from-amber-600 to-amber-500 p-8 rounded-lg mb-12">
-          <h3 className="text-black text-2xl font-bold mb-4">
+        <div
+          className="p-8 rounded-lg mb-12"
+          style={{
+            background: `linear-gradient(135deg, ${hubConfig.primaryColor} 0%, ${hubConfig.accentColor} 100%)`,
+          }}
+        >
+          <h3 className="text-white text-2xl font-bold mb-4">
             Choose {currentHub === "percymd" ? "Security" : "Excellence"} Over
             Compromise
           </h3>
-          <p className="text-black/80 text-lg mb-6">
+          <p className="text-white/90 text-lg mb-6">
             {currentHub === "percymd"
               ? "Join the SMS platform that protects your patients and improves your practice outcomes."
               : "Join the SMS platform that champions your success and amplifies your growth."}
@@ -52,9 +57,9 @@ export const CTASection: React.FC = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
               onClick={() => (window.location.href = "/contact")}
-              className="px-10 py-4 bg-black text-amber-400 font-bold rounded-sm hover:bg-gray-900 transition-all duration-300 text-sm tracking-wide uppercase shadow-lg"
+              className="px-10 py-4 bg-white hub-text-primary font-bold rounded-sm hover:bg-gray-100 transition-all duration-300 text-sm tracking-wide uppercase shadow-lg"
             >
-              {content.ctaText}
+              Contact Us
             </button>
             {/* <button
               onClick={() => (window.location.href = "/phone-demo")}

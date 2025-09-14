@@ -1,8 +1,9 @@
 import type { Database } from "./database";
 
-export type Verification = Database["public"]["Tables"]["verifications"]["Row"];
-export type VerificationAttempt =
-  Database["public"]["Tables"]["verification_attempts"]["Row"];
+export type Verification = Database["public"]["Tables"]["sms_verifications"]["Row"];
+// Note: verification_attempts table doesn't exist in the current schema
+// export type VerificationAttempt =
+//   Database["public"]["Tables"]["verification_attempts"]["Row"];
 export type UserProfile = Database["public"]["Tables"]["user_profiles"]["Row"];
 export type Membership = Database["public"]["Tables"]["memberships"]["Row"];
 

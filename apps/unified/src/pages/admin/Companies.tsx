@@ -42,7 +42,7 @@ const Companies = () => {
   const [statusFilter, setStatusFilter] = useState<
     "all" | "active" | "inactive"
   >("all");
-  const [onboardingFilter, setOnboardingFilter] = useState<string>("all");
+  // onboardingFilter removed - field no longer in schema
 
   // Sorting states
   const [sortField, setSortField] = useState<keyof Company>("created_at");
@@ -227,12 +227,7 @@ const Companies = () => {
       );
     }
 
-    // Apply onboarding filter
-    if (onboardingFilter !== "all") {
-      filtered = filtered.filter(
-        (c) => c.account_onboarding_step === onboardingFilter
-      );
-    }
+    // Onboarding filter removed - field no longer in schema
 
     // Apply sorting
     filtered.sort((a, b) => {
@@ -247,7 +242,7 @@ const Companies = () => {
     });
 
     return filtered;
-  }, [companies, statusFilter, onboardingFilter, sortField, sortDirection]);
+  }, [companies, statusFilter, sortField, sortDirection]);
 
   const handleSort = (field: keyof Company) => {
     if (field === sortField) {
@@ -366,23 +361,7 @@ const Companies = () => {
                 <option value="inactive">Inactive</option>
               </select>
 
-              <select
-                value={onboardingFilter}
-                onChange={(e) => setOnboardingFilter(e.target.value)}
-                className="text-xs border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value="all">All Steps</option>
-                <option value="authentication">Authentication</option>
-                <option value="payment">Payment</option>
-                <option value="personalInfo">Personal Info</option>
-                <option value="businessInfo">Business Info</option>
-                <option value="brandSubmission">Brand Submission</option>
-                <option value="privacySetup">Privacy Setup</option>
-                <option value="campaignSubmission">Campaign Submission</option>
-                <option value="gphoneProcurement">gPhone Procurement</option>
-                <option value="accountSetup">Account Setup</option>
-                <option value="completed">Completed</option>
-              </select>
+              {/* Onboarding filter removed - field no longer in schema */}
             </div>
           </div>
         </div>
@@ -424,11 +403,11 @@ const Companies = () => {
 
                 <th
                   className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                  onClick={() => handleSort("billing_email")}
+                  onClick={() => handleSort("primary_contact_email")}
                 >
                   <div className="flex items-center space-x-1">
-                    <span>Billing Email</span>
-                    {sortField === "billing_email" &&
+                    <span>Contact Email</span>
+                    {sortField === "primary_contact_email" &&
                       (sortDirection === "asc" ? (
                         <ChevronUp className="w-3 h-3" />
                       ) : (
@@ -436,20 +415,7 @@ const Companies = () => {
                       ))}
                   </div>
                 </th>
-                <th
-                  className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                  onClick={() => handleSort("account_onboarding_step")}
-                >
-                  <div className="flex items-center space-x-1">
-                    <span>Onboarding Step</span>
-                    {sortField === "account_onboarding_step" &&
-                      (sortDirection === "asc" ? (
-                        <ChevronUp className="w-3 h-3" />
-                      ) : (
-                        <ChevronDown className="w-3 h-3" />
-                      ))}
-                  </div>
-                </th>
+                {/* Onboarding step column removed - field no longer in schema */}
                 <th
                   className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                   onClick={() => handleSort("is_active")}
@@ -499,13 +465,9 @@ const Companies = () => {
                   )}
 
                   <td className="px-4 py-2 whitespace-nowrap text-xs text-gray-600">
-                    {company.billing_email}
+                    {company.primary_contact_email || 'N/A'}
                   </td>
-                  <td className="px-4 py-2 whitespace-nowrap">
-                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                      {company.account_onboarding_step || "Not set"}
-                    </span>
-                  </td>
+                  {/* Onboarding step cell removed - field no longer in schema */}
                   <td className="px-4 py-2 whitespace-nowrap">
                     <span
                       className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
@@ -564,8 +526,7 @@ const Companies = () => {
             </h3>
             <p className="mt-1 text-sm text-muted-foreground">
               {searchQuery ||
-              statusFilter !== "all" ||
-              onboardingFilter !== "all"
+              statusFilter !== "all"
                 ? "Try adjusting your search or filter criteria."
                 : "No companies have been created yet."}
             </p>
@@ -626,15 +587,15 @@ const Companies = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Billing Email
+                  Primary Contact Email
                 </label>
                 <input
                   type="email"
-                  value={editingCompany.billing_email || ""}
+                  value={editingCompany.primary_contact_email || ""}
                   onChange={(e) =>
                     setEditingCompany({
                       ...editingCompany,
-                      billing_email: e.target.value,
+                      primary_contact_email: e.target.value,
                     })
                   }
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -647,11 +608,11 @@ const Companies = () => {
                 </label>
                 <input
                   type="tel"
-                  value={editingCompany.company_phone_number || ""}
+                  value={editingCompany.phone || ""}
                   onChange={(e) =>
                     setEditingCompany({
                       ...editingCompany,
-                      company_phone_number: e.target.value,
+                      phone: e.target.value,
                     })
                   }
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -664,11 +625,11 @@ const Companies = () => {
                 </label>
                 <input
                   type="text"
-                  value={editingCompany.industry || ""}
+                  value={editingCompany.industry_vertical || ""}
                   onChange={(e) =>
                     setEditingCompany({
                       ...editingCompany,
-                      industry: e.target.value,
+                      industry_vertical: e.target.value,
                     })
                   }
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"

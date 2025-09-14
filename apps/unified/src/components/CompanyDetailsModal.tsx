@@ -75,16 +75,16 @@ export function CompanyDetailsModal({ company, onClose }: CompanyDetailsModalPro
                 <Mail className="w-5 h-5 text-gray-400 mt-0.5" />
                 <div>
                   <p className="text-xs text-gray-500">Billing Email</p>
-                  <p className="text-sm text-gray-900">{company.billing_email}</p>
+                  <p className="text-sm text-gray-900">{company.primary_contact_email || 'N/A'}</p>
                 </div>
               </div>
 
-              {company.company_phone_number && (
+              {company.phone && (
                 <div className="flex items-start space-x-3">
                   <Phone className="w-5 h-5 text-gray-400 mt-0.5" />
                   <div>
                     <p className="text-xs text-gray-500">Phone</p>
-                    <p className="text-sm text-gray-900">{company.company_phone_number}</p>
+                    <p className="text-sm text-gray-900">{company.phone}</p>
                   </div>
                 </div>
               )}
@@ -101,17 +101,17 @@ export function CompanyDetailsModal({ company, onClose }: CompanyDetailsModalPro
                 </div>
               )}
 
-              {(company.address_street || company.city) && (
+              {(company.address || company.city) && (
                 <div className="flex items-start space-x-3">
                   <MapPin className="w-5 h-5 text-gray-400 mt-0.5" />
                   <div>
                     <p className="text-xs text-gray-500">Address</p>
                     <p className="text-sm text-gray-900">
-                      {company.address_street && <span>{company.address_street}<br /></span>}
+                      {company.address && <span>{company.address}<br /></span>}
                       {company.city && <span>{company.city}, </span>}
-                      {company.state_region && <span>{company.state_region} </span>}
-                      {company.postal_code && <span>{company.postal_code}</span>}
-                      {company.country_of_registration && <span><br />{company.country_of_registration}</span>}
+                      {company.state && <span>{company.state} </span>}
+                      {company.zip && <span>{company.zip}</span>}
+                      {company.country && <span><br />{company.country}</span>}
                     </p>
                   </div>
                 </div>
@@ -124,19 +124,14 @@ export function CompanyDetailsModal({ company, onClose }: CompanyDetailsModalPro
             <h4 className="text-lg font-medium text-gray-900 mb-3">Business Details</h4>
             
             <div className="space-y-3">
-              {company.industry && (
+              {company.industry_vertical && (
                 <div>
                   <p className="text-xs text-gray-500">Industry</p>
-                  <p className="text-sm text-gray-900">{company.industry}</p>
+                  <p className="text-sm text-gray-900">{company.industry_vertical}</p>
                 </div>
               )}
 
-              {company.size && (
-                <div>
-                  <p className="text-xs text-gray-500">Company Size</p>
-                  <p className="text-sm text-gray-900">{company.size}</p>
-                </div>
-              )}
+              {/* Company size field removed from schema */}
 
               <div>
                 <p className="text-xs text-gray-500">Status</p>
@@ -147,14 +142,7 @@ export function CompanyDetailsModal({ company, onClose }: CompanyDetailsModalPro
                 </span>
               </div>
 
-              {company.account_onboarding_step && (
-                <div>
-                  <p className="text-xs text-gray-500">Onboarding Step</p>
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                    {company.account_onboarding_step}
-                  </span>
-                </div>
-              )}
+              {/* Onboarding step field removed from schema */}
 
               {company.created_at && (
                 <div className="flex items-start space-x-3">

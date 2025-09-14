@@ -2,12 +2,13 @@ import { useState, useEffect, useCallback } from "react";
 import { UserProfile, UserRole } from "../types/roles";
 import { useSupabase } from "../providers/SupabaseProvider";
 import { logger } from "../utils/logger";
+import type { Session, AuthError, PostgrestError } from "@supabase/supabase-js";
 
 interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   user: UserProfile | null;
-  session: any;
+  session: Session | null;
   logout: () => Promise<void>;
 }
 
@@ -16,7 +17,7 @@ export const useAuth = (): AuthState => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState<UserProfile | null>(null);
-  const [session, setSession] = useState<any>(null);
+  const [session, setSession] = useState<Session | null>(null);
 
   const logout = useCallback(async () => {
     try {
@@ -33,7 +34,7 @@ export const useAuth = (): AuthState => {
     console.log("[useAuth] Initializing...");
     
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session }, error }) => {
+    supabase.auth.getSession().then(({ data: { session }, error }: { data: { session: Session | null }, error: AuthError | null }) => {
       console.log("[useAuth] Initial session check:", { hasSession: !!session, error });
       
       if (error) {
@@ -51,7 +52,7 @@ export const useAuth = (): AuthState => {
           .select("*")
           .eq("id", session.user.id)
           .single()
-          .then(({ data: profile, error: profileError }) => {
+          .then(({ data: profile, error: profileError }: { data: UserProfile | null, error: PostgrestError | null }) => {
             console.log("[useAuth] Profile loaded:", { hasProfile: !!profile, error: profileError });
             
             if (profile) {
@@ -78,7 +79,7 @@ export const useAuth = (): AuthState => {
               console.log("[useAuth] Auth state set - authenticated with minimal user");
             }
           })
-          .catch(error => {
+          .catch((error: PostgrestError) => {
             console.error("[useAuth] Error loading profile:", error);
             setIsLoading(false);
           });
@@ -89,7 +90,7 @@ export const useAuth = (): AuthState => {
     });
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event: string, session: Session | null) => {
       console.log("[useAuth] Auth state changed:", event, !!session);
       
       if (event === "SIGNED_IN" && session) {
@@ -102,7 +103,7 @@ export const useAuth = (): AuthState => {
           .select("*")
           .eq("id", session.user.id)
           .single()
-          .then(({ data: profile }) => {
+          .then(({ data: profile }: { data: UserProfile | null }) => {
             if (profile) {
               setUser(profile as UserProfile);
             }

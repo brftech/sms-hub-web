@@ -15,7 +15,6 @@ import {
   Shield,
   CreditCard,
   FileText,
-  Globe,
   Phone,
   Settings,
   Target,
@@ -301,7 +300,7 @@ const Dashboard = () => {
         try {
           // Get total count first
           const { count: totalCount, error: totalError } = await supabase
-            .from(table.name)
+            .from(table.name as any)
             .select("*", { count: "exact", head: true });
 
           if (totalError) {
@@ -313,14 +312,14 @@ const Dashboard = () => {
           let superadminCount = 0;
           if (table.name === "user_profiles") {
             const { count: superadminUserCount } = await supabase
-              .from(table.name)
+              .from(table.name as any)
               .select("*", { count: "exact", head: true })
               .eq("id", superadminUserId);
             superadminCount = superadminUserCount || 0;
           } else if (table.name === "companies") {
             // Check for companies where either created_by_user_id OR first_admin_user_id matches superadmin
             const { count: superadminCompanyCount } = await supabase
-              .from(table.name)
+              .from(table.name as any)
               .select("*", { count: "exact", head: true })
               .or(
                 `created_by_user_id.eq.${superadminUserId},first_admin_user_id.eq.${superadminUserId}`
@@ -329,14 +328,14 @@ const Dashboard = () => {
           } else if (table.name === "customers") {
             // Check user_id first
             const { count: superadminCustomerCount1 } = await supabase
-              .from(table.name)
+              .from(table.name as any)
               .select("*", { count: "exact", head: true })
               .eq("user_id", superadminUserId);
             superadminCount = superadminCustomerCount1 || 0;
           } else {
             // For other tables, check user_id
             const { count: superadminRecordCount } = await supabase
-              .from(table.name)
+              .from(table.name as any)
               .select("*", { count: "exact", head: true })
               .eq("user_id", superadminUserId);
             superadminCount = superadminRecordCount || 0;
@@ -353,7 +352,7 @@ const Dashboard = () => {
       setCleanupResult(preview);
     } catch (error) {
       console.error("Error previewing cleanup:", error);
-      setCleanupResult(`Error: ${error.message}`);
+      setCleanupResult(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
@@ -425,7 +424,7 @@ const Dashboard = () => {
       await fetchDashboardData();
     } catch (error) {
       console.error("Error executing cleanup:", error);
-      setCleanupResult(`Error: ${error.message}`);
+      setCleanupResult(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setIsExecutingCleanup(false);
     }

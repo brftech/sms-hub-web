@@ -63,7 +63,7 @@ class DataCleanupService {
         // Keep companies created before Sept 1, 2025 (delete those created after)
         this.supabase.from("companies").delete().gt("created_at", "2025-09-01"),
 
-        this.supabase.from("verification_attempts").delete(),
+        // verification_attempts table removed from schema
         this.supabase.from("user_profiles").delete(),
         this.supabase.from("leads").delete(),
         this.supabase.from("lead_activities").delete(),
@@ -140,7 +140,7 @@ class DataCleanupService {
         // Keep companies created before Sept 1, 2025 (delete those created after)
         this.supabase.from("companies").delete().gt("created_at", "2025-09-01"),
 
-        this.supabase.from("verification_attempts").delete(),
+        // verification_attempts table removed from schema
         this.supabase.from("user_profiles").delete(),
         this.supabase.from("leads").delete(),
         this.supabase.from("lead_activities").delete(),

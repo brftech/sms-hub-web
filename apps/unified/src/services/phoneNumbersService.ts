@@ -10,7 +10,7 @@ export interface PhoneNumber extends PhoneNumberBase {
     id: string;
     public_name: string;
     legal_name: string | null;
-    company_account_number: string;
+    company_account_number: string | null;
   } | null;
   hub?: {
     hub_number: number;
@@ -29,7 +29,7 @@ export interface PhoneNumber extends PhoneNumberBase {
   region?: string;
   country?: string;
   assigned_to?: string;
-  assigned_account?: string;
+  assigned_account?: string | null;
   assigned_at?: string;
   last_used?: string;
   message_count?: number;
@@ -42,7 +42,7 @@ export interface PhoneNumberFilters {
   search?: string;
   hub_id?: number;
   company_id?: string | null;
-  assigned_to_campaign?: string | null;
+  assigned_to_campaign?: boolean | null;
   campaign_id?: string;
   limit?: number;
 }
@@ -194,7 +194,7 @@ class PhoneNumbersService {
         region: this.getRegion(data.phone_number),
         country: "US",
         assigned_to: data.company?.public_name,
-        assigned_account: data.company?.company_account_number,
+        assigned_account: data.company?.company_account_number ? data.company.company_account_number : undefined,
         assigned_at:
           data.assigned_to_campaign && data.created_at
             ? data.created_at
@@ -261,7 +261,7 @@ class PhoneNumbersService {
         region: this.getRegion(data.phone_number),
         country: "US",
         assigned_to: data.company?.public_name,
-        assigned_account: data.company?.company_account_number,
+        assigned_account: data.company?.company_account_number ? data.company.company_account_number : undefined,
         assigned_at:
           data.assigned_to_campaign && data.created_at
             ? data.created_at
@@ -323,7 +323,7 @@ class PhoneNumbersService {
         region: this.getRegion(data.phone_number),
         country: "US",
         assigned_to: data.company?.public_name,
-        assigned_account: data.company?.company_account_number,
+        assigned_account: data.company?.company_account_number ? data.company.company_account_number : undefined,
         assigned_at:
           data.assigned_to_campaign && data.created_at
             ? data.created_at

@@ -272,7 +272,7 @@ class UsersService {
 
   async getUniquePaymentStatuses(): Promise<string[]> {
     const { data, error } = await this.supabase
-      .from("user_profiles")
+      .from("customers")
       .select("payment_status")
       .not("payment_status", "is", null);
 
@@ -289,21 +289,9 @@ class UsersService {
   }
 
   async getUniqueOnboardingSteps(): Promise<string[]> {
-    const { data, error } = await this.supabase
-      .from("user_profiles")
-      .select("onboarding_step")
-      .not("onboarding_step", "is", null);
-
-    if (error) {
-      console.error("Error fetching onboarding steps:", error);
-      return [];
-    }
-
-    const steps =
-      data
-        ?.map((item) => item.onboarding_step)
-        .filter((step): step is string => step !== null) || [];
-    return [...new Set(steps)]; // Remove duplicates
+    // onboarding_step was removed from the schema
+    // Return empty array for now until we determine the new approach
+    return [];
   }
 }
 

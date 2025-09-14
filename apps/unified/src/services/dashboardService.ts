@@ -274,7 +274,7 @@ class DashboardService {
       // Get recent leads
       const { data: recentLeads, error: leadsError } = await this.supabase
         .from("leads")
-        .select("id, first_name, last_name, status, created_at")
+        .select("id, name, status, created_at")
         .eq("hub_id", hubId)
         .order("created_at", { ascending: false })
         .limit(3);
@@ -286,7 +286,7 @@ class DashboardService {
               id: lead.id,
               type: "lead_converted",
               title: "Lead converted",
-              description: `Lead ${lead.first_name} ${lead.last_name} converted to user`,
+              description: `Lead ${lead.name || 'Unknown'} converted to user`,
               time: lead.created_at
                 ? this.getTimeAgo(lead.created_at)
                 : "Unknown",

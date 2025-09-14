@@ -1,8 +1,8 @@
-import { useAuth } from "../hooks/useAuth";
+import { useAuthContext } from "@sms-hub/auth";
 import { useSearchParams } from "react-router-dom";
 
 export function DebugAuth() {
-  const auth = useAuth();
+  const auth = useAuthContext();
   const [searchParams] = useSearchParams();
   
   return (
@@ -13,8 +13,8 @@ export function DebugAuth() {
       
       <h2>Auth State:</h2>
       <pre>{JSON.stringify({
-        isAuthenticated: auth.isAuthenticated,
-        isLoading: auth.isLoading,
+        isAuthenticated: !!auth.user,
+        isLoading: auth.loading,
         user: auth.user ? { email: auth.user.email, role: auth.user.role } : null,
         session: auth.session ? "Active" : "None"
       }, null, 2)}</pre>

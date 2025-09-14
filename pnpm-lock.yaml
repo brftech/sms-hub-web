@@ -129,12 +129,18 @@ importers:
 
   apps/unified:
     dependencies:
+      '@sms-hub/auth':
+        specifier: workspace:*
+        version: link:../../packages/auth
       '@sms-hub/dev-auth':
         specifier: workspace:*
         version: link:../../packages/dev-auth
       '@sms-hub/hub-logic':
         specifier: workspace:*
         version: link:../../packages/hub-logic
+      '@sms-hub/logger':
+        specifier: workspace:*
+        version: link:../../packages/logger
       '@sms-hub/supabase':
         specifier: workspace:*
         version: link:../../packages/supabase
@@ -220,6 +226,9 @@ importers:
       '@sms-hub/hub-logic':
         specifier: workspace:*
         version: link:../../packages/hub-logic
+      '@sms-hub/logger':
+        specifier: workspace:*
+        version: link:../../packages/logger
       '@sms-hub/services':
         specifier: workspace:*
         version: link:../../packages/services
@@ -281,6 +290,40 @@ importers:
       vite:
         specifier: ^5.4.19
         version: 5.4.19(@types/node@22.18.1)(terser@5.44.0)
+
+  packages/auth:
+    dependencies:
+      '@sms-hub/logger':
+        specifier: workspace:*
+        version: link:../logger
+      '@sms-hub/supabase':
+        specifier: workspace:*
+        version: link:../supabase
+      '@sms-hub/types':
+        specifier: workspace:*
+        version: link:../types
+      '@sms-hub/utils':
+        specifier: workspace:*
+        version: link:../utils
+      '@supabase/supabase-js':
+        specifier: ^2.57.2
+        version: 2.57.4
+      react:
+        specifier: ^19.1.0
+        version: 19.1.1
+      react-router-dom:
+        specifier: ^6.8.1
+        version: 6.30.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
+    devDependencies:
+      '@types/node':
+        specifier: ^22.10.5
+        version: 22.18.1
+      '@types/react':
+        specifier: ^19.1.0
+        version: 19.1.12
+      typescript:
+        specifier: ^5.9.2
+        version: 5.9.2
 
   packages/config:
     dependencies:
@@ -350,6 +393,22 @@ importers:
       eslint:
         specifier: ^9.34.0
         version: 9.35.0(jiti@1.21.7)
+      typescript:
+        specifier: ^5.9.2
+        version: 5.9.2
+
+  packages/logger:
+    dependencies:
+      '@sentry/react':
+        specifier: ^8.0.0
+        version: 8.55.0(react@19.1.1)
+      '@sms-hub/types':
+        specifier: workspace:*
+        version: link:../types
+    devDependencies:
+      '@types/node':
+        specifier: ^22.10.5
+        version: 22.18.1
       typescript:
         specifier: ^5.9.2
         version: 5.9.2
@@ -2278,6 +2337,36 @@ packages:
     resolution: {integrity: sha512-xMmiWRR8sp72Zqwjgtf3QbZfF1wdh8X2ABu3EaozvZcyHJeU0r+XAnXdKgs4cCAp6ORoYoCygipYP1mjmbjrsg==}
     cpu: [x64]
     os: [win32]
+
+  '@sentry-internal/browser-utils@8.55.0':
+    resolution: {integrity: sha512-ROgqtQfpH/82AQIpESPqPQe0UyWywKJsmVIqi3c5Fh+zkds5LUxnssTj3yNd1x+kxaPDVB023jAP+3ibNgeNDw==}
+    engines: {node: '>=14.18'}
+
+  '@sentry-internal/feedback@8.55.0':
+    resolution: {integrity: sha512-cP3BD/Q6pquVQ+YL+rwCnorKuTXiS9KXW8HNKu4nmmBAyf7urjs+F6Hr1k9MXP5yQ8W3yK7jRWd09Yu6DHWOiw==}
+    engines: {node: '>=14.18'}
+
+  '@sentry-internal/replay-canvas@8.55.0':
+    resolution: {integrity: sha512-nIkfgRWk1091zHdu4NbocQsxZF1rv1f7bbp3tTIlZYbrH62XVZosx5iHAuZG0Zc48AETLE7K4AX9VGjvQj8i9w==}
+    engines: {node: '>=14.18'}
+
+  '@sentry-internal/replay@8.55.0':
+    resolution: {integrity: sha512-roCDEGkORwolxBn8xAKedybY+Jlefq3xYmgN2fr3BTnsXjSYOPC7D1/mYqINBat99nDtvgFvNfRcZPiwwZ1hSw==}
+    engines: {node: '>=14.18'}
+
+  '@sentry/browser@8.55.0':
+    resolution: {integrity: sha512-1A31mCEWCjaMxJt6qGUK+aDnLDcK6AwLAZnqpSchNysGni1pSn1RWSmk9TBF8qyTds5FH8B31H480uxMPUJ7Cw==}
+    engines: {node: '>=14.18'}
+
+  '@sentry/core@8.55.0':
+    resolution: {integrity: sha512-6g7jpbefjHYs821Z+EBJ8r4Z7LT5h80YSWRJaylGS4nW5W5Z2KXzpdnyFarv37O7QjauzVC2E+PABmpkw5/JGA==}
+    engines: {node: '>=14.18'}
+
+  '@sentry/react@8.55.0':
+    resolution: {integrity: sha512-/qNBvFLpvSa/Rmia0jpKfJdy16d4YZaAnH/TuKLAtm0BWlsPQzbXCU4h8C5Hsst0Do0zG613MEtEmWpWrVOqWA==}
+    engines: {node: '>=14.18'}
+    peerDependencies:
+      react: ^19.1.0
 
   '@sinclair/typebox@0.27.8':
     resolution: {integrity: sha512-+Fj43pSMwJs4KRrH/938Uf+uAELIgVBmQzg/q1YG10djyfA3TnrU8N8XzqCh/okZdszqBQTZf96idMfE5lnwTA==}
@@ -7558,6 +7647,41 @@ snapshots:
 
   '@rollup/rollup-win32-x64-msvc@4.50.0':
     optional: true
+
+  '@sentry-internal/browser-utils@8.55.0':
+    dependencies:
+      '@sentry/core': 8.55.0
+
+  '@sentry-internal/feedback@8.55.0':
+    dependencies:
+      '@sentry/core': 8.55.0
+
+  '@sentry-internal/replay-canvas@8.55.0':
+    dependencies:
+      '@sentry-internal/replay': 8.55.0
+      '@sentry/core': 8.55.0
+
+  '@sentry-internal/replay@8.55.0':
+    dependencies:
+      '@sentry-internal/browser-utils': 8.55.0
+      '@sentry/core': 8.55.0
+
+  '@sentry/browser@8.55.0':
+    dependencies:
+      '@sentry-internal/browser-utils': 8.55.0
+      '@sentry-internal/feedback': 8.55.0
+      '@sentry-internal/replay': 8.55.0
+      '@sentry-internal/replay-canvas': 8.55.0
+      '@sentry/core': 8.55.0
+
+  '@sentry/core@8.55.0': {}
+
+  '@sentry/react@8.55.0(react@19.1.1)':
+    dependencies:
+      '@sentry/browser': 8.55.0
+      '@sentry/core': 8.55.0
+      hoist-non-react-statics: 3.3.2
+      react: 19.1.1
 
   '@sinclair/typebox@0.27.8': {}
 

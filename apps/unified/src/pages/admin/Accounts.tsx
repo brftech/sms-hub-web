@@ -10,11 +10,6 @@ import {
   Search,
   Filter,
   Plus,
-  MoreVertical,
-  Phone,
-  Mail,
-  Users,
-  MessageSquare,
   Calendar,
   Edit,
   Eye,
@@ -129,7 +124,7 @@ export function Accounts() {
           id: company.id,
           type: hasCustomer ? 'company_customer' : 'company',
           name: company.public_name || 'Unnamed Company',
-          email: customer?.billing_email || company.contact_email || '-',
+          email: customer?.billing_email || company.primary_contact_email || '-',
           status: company.is_active ? 'active' : 'inactive',
           payment_status: customer?.payment_status || 'none',
           payment_type: customer?.payment_type || 'none',
@@ -295,7 +290,7 @@ export function Accounts() {
       setIsEditModalOpen(false);
     } catch (error) {
       console.error("Error updating account:", error);
-      alert(error.message || "Failed to update account");
+      alert(error instanceof Error ? error.message : "Failed to update account");
     } finally {
       setIsUpdating(false);
     }
@@ -336,7 +331,7 @@ export function Accounts() {
       setIsDeleteModalOpen(false);
     } catch (error) {
       console.error("Error deleting account:", error);
-      alert(error.message || "Failed to delete account");
+      alert(error instanceof Error ? error.message : "Failed to delete account");
     } finally {
       setIsDeleting(false);
     }

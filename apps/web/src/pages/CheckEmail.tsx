@@ -65,7 +65,7 @@ export function CheckEmail() {
 
   useEffect(() => {
     // Handle resend cooldown
-    let timer: NodeJS.Timeout;
+    let timer: ReturnType<typeof setTimeout>;
     if (resendCooldown > 0) {
       timer = setTimeout(() => setResendCooldown(resendCooldown - 1), 1000);
     }
@@ -92,7 +92,7 @@ export function CheckEmail() {
     <CheckEmailContainer>
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <HubLogo hubId={hubConfig.hubNumber} size="lg" className="mx-auto mb-4" />
+          <HubLogo hubType={hubConfig.id} size="lg" className="mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-white mb-2">
             {hubConfig.displayName}
           </h1>

@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import {
   useHub,
   Button,
@@ -49,7 +49,7 @@ const supabase = getSupabaseClient();
 
 export function Login() {
   const { hubConfig } = useHub();
-  const navigate = useNavigate();
+  // const navigate = useNavigate(); // Not used after magic link implementation
   // Removed devAuth - using real Supabase authentication
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -163,9 +163,10 @@ export function Login() {
           `${unifiedAppUrl}/auth-callback?${params.toString()}`
         );
       }, 100);
-    } catch (err: any) {
+    } catch (err) {
       console.error("Login error:", err);
-      setError(err.message || "Failed to log in");
+      const errorMessage = err instanceof Error ? err.message : "Failed to log in";
+      setError(errorMessage);
     } finally {
       setIsSubmitting(false);
     }

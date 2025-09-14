@@ -32,7 +32,7 @@ export function formatUserRole(role?: string): string {
 
   switch (role.toLowerCase()) {
     case "superadmin":
-      return "Super Administrator";
+      return "Superadmin";
     case "admin":
       return "Administrator";
     case "onboarded":

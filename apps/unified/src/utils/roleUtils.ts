@@ -19,11 +19,18 @@ export const hasRole = (user: UserProfile | null, role: UserRole): boolean => {
  */
 export const hasAnyRole = (
   user: UserProfile | null,
-  roles: UserRole[]
+  roles: UserRole[] | string[]
 ): boolean => {
   if (!user) return false;
   const userRoleLower = String(user.role).toLowerCase();
-  return roles.some((role) => String(role).toLowerCase() === userRoleLower);
+  const result = roles.some((role) => String(role).toLowerCase() === userRoleLower);
+  console.log('[hasAnyRole] Check:', {
+    userRole: user.role,
+    userRoleLower,
+    checkingRoles: roles,
+    result
+  });
+  return result;
 };
 
 /**
@@ -157,7 +164,7 @@ export const getRoleDisplayName = (role: UserRole): string => {
     [UserRole.USER]: "User",
     [UserRole.ONBOARDED]: "Onboarded User",
     [UserRole.ADMIN]: "Administrator",
-    [UserRole.SUPERADMIN]: "Super Administrator",
+    [UserRole.SUPERADMIN]: "Superadmin",
   };
   return roleNames[role];
 };

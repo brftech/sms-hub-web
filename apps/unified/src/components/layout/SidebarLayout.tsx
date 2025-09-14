@@ -26,6 +26,7 @@ import {
   Globe,
   CheckCircle,
   BarChart3,
+  Shield,
 } from "lucide-react";
 
 const SidebarLayout: React.FC<{ children: React.ReactNode }> = ({
@@ -142,9 +143,11 @@ const SidebarLayout: React.FC<{ children: React.ReactNode }> = ({
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="h-screen bg-background flex flex-col">
       {/* Dev Admin Banner */}
       {isSuperAdmin && <DevAdminBanner />}
+      
+      <div className="flex-1 flex overflow-hidden">
 
       {/* Mobile sidebar backdrop */}
       {isSidebarOpen && (
@@ -264,6 +267,23 @@ const SidebarLayout: React.FC<{ children: React.ReactNode }> = ({
                   <span className="font-medium text-base">Settings</span>
                 </Link>
 
+                {/* Admin Dashboard (shield) - for admin users */}
+                <Link
+                  to="/admin/dashboard"
+                  className={`
+                    flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-all duration-200
+                    ${
+                      isActive("/admin/dashboard")
+                        ? "bg-orange-500 text-white shadow-md"
+                        : "text-foreground hover:bg-accent hover:translate-x-1"
+                    }
+                  `}
+                  onClick={() => setIsSidebarOpen(false)}
+                >
+                  <Shield className="h-5 w-5" />
+                  <span className="font-medium text-base">Admin Dashboard</span>
+                </Link>
+
                 {/* Company Users (person) - for users with full company admin access */}
                 <Link
                   to="/admin/users"
@@ -345,9 +365,9 @@ const SidebarLayout: React.FC<{ children: React.ReactNode }> = ({
       </aside>
 
       {/* Main content */}
-      <div className="lg:pl-64">
+      <div className="lg:pl-64 flex-1 flex flex-col overflow-hidden">
         {/* Top bar */}
-        <header className="sticky top-0 z-30 bg-card border-b border-border backdrop-blur-sm bg-opacity-95">
+        <header className="flex-shrink-0 bg-card border-b border-border backdrop-blur-sm bg-opacity-95">
           <div className="flex h-16 items-center justify-between px-4 sm:px-6">
             <div className="flex items-center space-x-4">
               <button
@@ -411,7 +431,8 @@ const SidebarLayout: React.FC<{ children: React.ReactNode }> = ({
         </header>
 
         {/* Page content */}
-        <main className="p-6">{children}</main>
+        <main className="flex-1 overflow-y-auto p-6">{children}</main>
+      </div>
       </div>
     </div>
   );

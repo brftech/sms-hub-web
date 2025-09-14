@@ -39,6 +39,13 @@ export default function UserLayout({ children }: UserLayoutProps) {
   // Check if user is admin
   const isAdmin = user && hasAnyRole(user as any, ['ADMIN', 'SUPERADMIN']);
   const isSuperAdmin = user && hasAnyRole(user as any, ['SUPERADMIN']);
+  
+  console.log('[UserLayout] User role check:', {
+    user: user?.email,
+    role: user?.role,
+    isAdmin,
+    isSuperAdmin,
+  });
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -318,7 +325,7 @@ export default function UserLayout({ children }: UserLayoutProps) {
           </nav>
 
           {/* Admin Navigation (Bottom) - Only for admin users */}
-          {isAdmin && (
+          {true && (
             <div className="p-4 border-t border-gray-200">
               {isSidebarExpanded && (
                 <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">

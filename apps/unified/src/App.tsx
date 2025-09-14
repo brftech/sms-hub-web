@@ -23,21 +23,13 @@ const DashboardRouter = () => {
     user?.role === UserRole.ADMIN || user?.role === UserRole.SUPERADMIN
   );
 
-  if (hasAnyRole(user?.role, ["ADMIN"])) {
-    console.log("[DashboardRouter] Rendering AdminLayout for Admin");
-    // Admin users see admin dashboard
+  if (hasAnyRole(user?.role, ["ADMIN", "SUPERADMIN"])) {
+    console.log("[DashboardRouter] Rendering AdminLayout for Admin/Superadmin");
+    // Admin and Superadmin users see admin dashboard
     return (
       <AdminLayout>
         <AdminDashboard />
       </AdminLayout>
-    );
-  } else if (hasAnyRole(user?.role, ["SUPERADMIN"])) {
-    console.log("[DashboardRouter] Rendering UserLayout for Superadmin");
-    // Superadmin users see user conversations view
-    return (
-      <UserLayout>
-        <UserConversations />
-      </UserLayout>
     );
   } else {
     console.log("[DashboardRouter] Rendering UserLayout for regular user");
@@ -133,7 +125,7 @@ function App() {
             {/* Public routes - accessible without authentication */}
             {/* Landing page for unauthenticated users */}
             <Route path="/" element={<Landing />} />
-            
+
             {/* Auth callback route for handling redirects from web app */}
             <Route path="/auth-callback" element={<AuthCallback />} />
 

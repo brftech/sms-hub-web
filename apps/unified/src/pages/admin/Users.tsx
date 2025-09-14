@@ -975,7 +975,7 @@ const Users = () => {
                       <option value="VIEWER">Viewer</option>
                       <option value="SUPPORT">Support</option>
                       <option value="ADMIN">Admin</option>
-                      <option value="SUPERADMIN">Super Admin</option>
+                      <option value="SUPERADMIN">Superadmin</option>
                     </select>
                   </div>
                   <div>

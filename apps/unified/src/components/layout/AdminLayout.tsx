@@ -139,10 +139,10 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               <Menu className="w-5 h-5" />
             </button>
 
-            {/* Super Admin Label */}
+            {/* Superadmin Label */}
             <div className="hidden lg:block">
               <h3 className="text-lg font-semibold text-gray-900">
-                Super Admin
+                Superadmin
               </h3>
             </div>
           </div>

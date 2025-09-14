@@ -71,7 +71,7 @@ export function TestAuth() {
           <li>
             Dev Auth:{" "}
             <a
-              href={`http://localhost:3001/?superadmin=${import.meta.env.VITE_DEV_AUTH_TOKEN}`}
+              href={`${import.meta.env.VITE_UNIFIED_APP_URL || "http://localhost:3001"}/?superadmin=${import.meta.env.VITE_DEV_AUTH_TOKEN}`}
             >
               Test Dev Auth
             </a>

@@ -30,8 +30,7 @@ import Demo from "./pages/Demo";
 import { Login } from "./pages/Login";
 import { Signup } from "./pages/Signup";
 import { CheckEmail } from "./pages/CheckEmail";
-import { VerifyOtp } from "./pages/VerifyOtp";
-import { VerifyCode } from "./pages/VerifyCode";
+import { VerifyAuth } from "./pages/VerifyAuth";
 import { TestAuth } from "./pages/TestAuth";
 
 // Lazy load client pages (less frequently accessed)
@@ -260,7 +259,7 @@ const AppRoutes = () => {
         path="/verify-otp"
         element={
           <PageTransition>
-            <VerifyOtp />
+            <VerifyAuth />
           </PageTransition>
         }
       />
@@ -268,7 +267,7 @@ const AppRoutes = () => {
         path="/verify"
         element={
           <PageTransition>
-            <VerifyCode />
+            <VerifyAuth />
           </PageTransition>
         }
       />

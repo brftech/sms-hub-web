@@ -113,7 +113,7 @@ const Navigation = () => {
               variant="outline"
               size="sm"
               onClick={() =>
-                (window.location.href = "http://localhost:3000/login")
+                navigate("/login")
               }
               className={`transition-all duration-300 backdrop-blur-sm px-4 py-1.5 text-xs ${
                 isLoginPage
@@ -131,7 +131,7 @@ const Navigation = () => {
               variant="outline"
               size="sm"
               onClick={() =>
-                (window.location.href = "http://localhost:3000/login")
+                navigate("/login")
               }
               className={`transition-all duration-300 backdrop-blur-sm px-3 py-1.5 text-xs ${
                 isLoginPage
@@ -191,7 +191,7 @@ const Navigation = () => {
                 <Button
                   variant="outline"
                   onClick={() =>
-                    (window.location.href = "http://localhost:3000/login")
+                    navigate("/login")
                   }
                   className="w-full bg-black/50 text-white border border-orange-500/50 hover:bg-orange-500/10 hover:border-orange-400 font-medium py-3 text-base"
                 >

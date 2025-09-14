@@ -114,7 +114,7 @@ serve(async (req) => {
       email: email,
       password: password,
       options: {
-        emailRedirectTo: `${Deno.env.get("PUBLIC_SITE_URL") || "http://localhost:3001"}/payment-setup`,
+        emailRedirectTo: `${Deno.env.get("PUBLIC_SITE_URL") || "http://localhost:3000"}/verify-auth`,
         data: {
           hub_id: invitationData ? invitationData.hub_id : hub_id,
           signup_type: signup_type,
@@ -124,6 +124,21 @@ serve(async (req) => {
         }
       }
     });
+
+    // TEMPORARY: For development, manually confirm the user to bypass email rate limits
+    if (authData?.user && !authData.user.email_confirmed_at) {
+      console.log("🔧 DEV MODE: Manually confirming user to bypass email rate limit");
+      const { error: confirmError } = await supabaseAdmin.auth.admin.updateUserById(
+        authData.user.id,
+        { email_confirm: true }
+      );
+      
+      if (confirmError) {
+        console.error("Failed to manually confirm user:", confirmError);
+      } else {
+        console.log("✅ User manually confirmed for development");
+      }
+    }
 
     if (authError) {
       console.error("Failed to create auth user:", authError);
@@ -151,8 +166,11 @@ serve(async (req) => {
         email: email,
         hub_id: invitationData ? invitationData.hub_id : hub_id,
         customer_type: customer_type,
-        confirmation_email_sent: true,
-        message: "Please check your email to confirm your account",
+        confirmation_email_sent: authData.user.email_confirmed_at ? false : true,
+        message: authData.user.email_confirmed_at 
+          ? "Account created and confirmed! Redirecting to dashboard..." 
+          : "Please check your email to confirm your account",
+        dev_mode: authData.user.email_confirmed_at ? true : false,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );

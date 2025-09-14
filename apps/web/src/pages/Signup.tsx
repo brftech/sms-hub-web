@@ -276,17 +276,31 @@ export function Signup() {
         })
       );
 
-      // Check if magic link email was sent successfully
-      if (result.magic_link_sent) {
-        console.log("Magic link email sent successfully to:", result.email);
+      // Check if confirmation email was sent successfully or if user is already confirmed (dev mode)
+      if (result.confirmation_email_sent) {
+        console.log("Confirmation email sent successfully to:", result.email);
         
         // Store email for the check-email page
         sessionStorage.setItem('signup_email', result.email);
         
         // Redirect to check email page
         window.location.href = '/check-email';
+      } else if (result.dev_mode) {
+        console.log("Dev mode: User already confirmed, creating business records...");
+        
+        // Store account data for immediate processing
+        sessionStorage.setItem('account_data', JSON.stringify({
+          email: formData.email,
+          companyName: formData.companyName,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          hubId: hubConfig.hubNumber,
+        }));
+        
+        // Redirect directly to verify-auth to create business records
+        window.location.href = '/verify-auth?type=signup&dev_mode=true';
       } else {
-        console.warn("Magic link email failed to send");
+        console.warn("Confirmation email failed to send");
         setError("Account created but email failed to send. Please contact support or try logging in directly.");
       }
 

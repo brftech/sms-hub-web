@@ -54,6 +54,7 @@ export function CheckEmail() {
   const [email, setEmail] = useState<string>("");
   const [isResending, setIsResending] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
+  const [resendMessage, setResendMessage] = useState("");
 
   useEffect(() => {
     // Get email from session storage
@@ -77,12 +78,36 @@ export function CheckEmail() {
 
     setIsResending(true);
     try {
-      // Call the resend API or trigger the signup flow again
-      // For now, just simulate the action
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/resend-verification`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({ email }),
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to resend email");
+      }
+
+      console.log("Resend verification response:", result);
+      setResendMessage("Verification email sent successfully!");
       setResendCooldown(60); // 60 second cooldown
+      
+      // Clear success message after 5 seconds
+      setTimeout(() => setResendMessage(""), 5000);
     } catch (error) {
       console.error("Failed to resend email:", error);
+      setResendMessage(error instanceof Error ? error.message : "Failed to resend email");
+      
+      // Clear error message after 5 seconds
+      setTimeout(() => setResendMessage(""), 5000);
     } finally {
       setIsResending(false);
     }
@@ -132,6 +157,16 @@ export function CheckEmail() {
                 <p className="text-sm text-gray-600 mb-4">
                   Didn't receive the email? Check your spam folder or resend it.
                 </p>
+                
+                {resendMessage && (
+                  <div className={`mb-4 p-3 rounded-lg text-sm ${
+                    resendMessage.includes('successfully') 
+                      ? 'bg-green-50 text-green-800 border border-green-200' 
+                      : 'bg-red-50 text-red-800 border border-red-200'
+                  }`}>
+                    {resendMessage}
+                  </div>
+                )}
                 
                 <ResendButton
                   onClick={handleResendEmail}

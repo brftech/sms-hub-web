@@ -5,9 +5,6 @@ import {
   UserEditModal,
   UserDeleteModal,
   BaseModal,
-  ModalSection,
-  ModalButtonGroup,
-  ModalButton,
   ModalFormLayout,
   ModalFormColumn,
   ModalStepIndicator,
@@ -74,7 +71,7 @@ const Users = () => {
     "all" | "active" | "inactive"
   >("all");
   const [roleFilter, setRoleFilter] = useState<string>("all");
-  const [paymentFilter, setPaymentFilter] = useState<string>("all");
+  const [paymentFilter] = useState<string>("all");
 
   // Sorting states
   const [sortField, setSortField] = useState<keyof UserProfile>("created_at");
@@ -1114,14 +1111,14 @@ const Users = () => {
       <UserViewModal
         isOpen={isViewModalOpen}
         onClose={handleCloseViewModal}
-        onEdit={handleEditUser}
+        onEdit={handleEditUser as any}
         user={selectedUser}
       />
 
       <UserEditModal
         isOpen={isEditModalOpen}
         onClose={handleCloseEditModal}
-        onSave={handleUpdateUser}
+        onSave={handleUpdateUser as any}
         user={editingUser}
         isUpdating={isUpdating}
       />

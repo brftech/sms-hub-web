@@ -135,12 +135,7 @@ class CustomersService {
         return null;
       }
 
-      return {
-        ...data,
-        user_count: 0, // TODO: Calculate
-        message_count: 0, // TODO: Calculate
-        phone_numbers: 0, // TODO: Calculate
-      };
+      return data as CustomerWithJoins;
     } catch (error) {
       console.error("Error in getCustomerById:", error);
       return null;

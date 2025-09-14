@@ -1,4 +1,3 @@
-
 services:
   supabase-db:
     image: postgres:15
@@ -27,7 +26,7 @@ services:
       API_EXTERNAL_URL: http://localhost:54321
       GOTRUE_DB_DRIVER: postgres
       GOTRUE_DB_DATABASE_URL: postgres://postgres:postgres@supabase-db:5432/postgres?search_path=auth
-      GOTRUE_SITE_URL: http://localhost:3000
+      GOTRUE_SITE_URL: http://localhost:3001
       GOTRUE_URI_ALLOW_LIST: "http://localhost:3000,http://localhost:3001,http://localhost:3002,http://localhost:3003,http://localhost:3004,http://localhost:3005"
       GOTRUE_DISABLE_SIGNUP: false
       GOTRUE_JWT_SECRET: super-secret-jwt-token-with-at-least-32-characters-long
@@ -42,10 +41,10 @@ services:
       GOTRUE_SMTP_PORT: 2500
       GOTRUE_SMTP_USER: fake_mail_user
       GOTRUE_SMTP_PASS: fake_mail_password
-      GOTRUE_MAILER_URLPATHS_INVITE: http://localhost:3000/auth/v1/verify
-      GOTRUE_MAILER_URLPATHS_CONFIRMATION: http://localhost:3000/auth/v1/verify
-      GOTRUE_MAILER_URLPATHS_RECOVERY: http://localhost:3000/auth/v1/verify
-      GOTRUE_MAILER_URLPATHS_EMAIL_CHANGE: http://localhost:3000/auth/v1/verify
+      GOTRUE_MAILER_URLPATHS_INVITE: http://localhost:3001/auth/v1/verify
+      GOTRUE_MAILER_URLPATHS_CONFIRMATION: http://localhost:3001/auth/v1/verify
+      GOTRUE_MAILER_URLPATHS_RECOVERY: http://localhost:3001/auth/v1/verify
+      GOTRUE_MAILER_URLPATHS_EMAIL_CHANGE: http://localhost:3001/auth/v1/verify
     ports:
       - "9999:9999"
 
@@ -75,7 +74,7 @@ services:
       DB_USER: postgres
       DB_PASSWORD: postgres
       DB_NAME: postgres
-      DB_AFTER_CONNECT_QUERY: 'SET search_path TO _realtime'
+      DB_AFTER_CONNECT_QUERY: "SET search_path TO _realtime"
       DB_ENC_KEY: supabaserealtime
       API_JWT_SECRET: super-secret-jwt-token-with-at-least-32-characters-long
       FLY_ALLOC_ID: fly123

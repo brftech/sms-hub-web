@@ -44,7 +44,7 @@ export function AccountDetails() {
   const verificationId = searchParams.get("id");
   
   // Try to get signup data with fallback
-  let signupData = {};
+  let signupData: any = {};
   try {
     const storedData = sessionStorage.getItem("signup_data");
     if (storedData) {

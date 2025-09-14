@@ -234,13 +234,13 @@ class CompaniesService {
       };
 
       // Calculate industry distribution (field removed from schema)
-      companies?.forEach((company) => {
+      companies?.forEach(() => {
         const industry = "Unknown"; // Field removed from schema
         stats.byIndustry[industry] = (stats.byIndustry[industry] || 0) + 1;
       });
 
       // Calculate size distribution (field removed from schema)
-      companies?.forEach((company) => {
+      companies?.forEach(() => {
         const size = "Unknown"; // Field removed from schema
         stats.bySize[size] = (stats.bySize[size] || 0) + 1;
       });
@@ -285,7 +285,7 @@ class CompaniesService {
   // Update company onboarding step (deprecated - field removed from schema)
   async updateCompanyOnboardingStep(
     companyId: string,
-    onboardingStep: string
+    _onboardingStep: string
   ): Promise<{ success: boolean; error?: string }> {
     try {
       const { error } = await this.supabase
@@ -517,8 +517,8 @@ class CompaniesService {
         success: true, 
         data: {
           company: company as Company,
-          customerId,
-          userId
+          customerId: customerId || undefined,
+          userId: userId || undefined
         }
       };
     } catch (error) {

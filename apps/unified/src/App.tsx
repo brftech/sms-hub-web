@@ -7,6 +7,7 @@ import { hasAnyRole, useAuthContext } from "@sms-hub/auth";
 import { ProtectedRoute } from "./components/auth/ProtectedRouteWrapper";
 import { UserRole } from "./types/roles";
 import { Landing } from "./pages/Landing";
+import AuthCallback from "./pages/AuthCallback";
 // import DevLogin from './pages/DevLogin'
 import { GlobalViewProvider } from "./contexts/GlobalViewContext";
 import { DynamicFavicon } from "./components/DynamicFavicon";
@@ -77,7 +78,6 @@ import AdminDashboard from "./pages/admin/Dashboard";
 import AdminUsers from "./pages/admin/Users";
 import AdminCompanies from "./pages/admin/Companies";
 import AdminLeads from "./pages/admin/Leads";
-import AdminTesting from "./pages/admin/Testing";
 import AdminSettings from "./pages/admin/Settings";
 import { Analytics as AdminAnalytics } from "./pages/admin/Analytics";
 import { Messages as AdminMessages } from "./pages/admin/Messages";
@@ -133,6 +133,9 @@ function App() {
             {/* Public routes - accessible without authentication */}
             {/* Landing page for unauthenticated users */}
             <Route path="/" element={<Landing />} />
+            
+            {/* Auth callback route for handling redirects from web app */}
+            <Route path="/auth-callback" element={<AuthCallback />} />
 
             {/* Redirect old signup route to landing */}
             <Route path="/signup" element={<Navigate to="/" replace />} />

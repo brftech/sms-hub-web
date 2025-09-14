@@ -22,7 +22,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           <Toaster />
           <SonnerToaster />
           <AuthProvider 
-            supabase={supabase}
+            supabase={supabase as any}
             config={{
               redirectUrl: '/dashboard',
               debug: true

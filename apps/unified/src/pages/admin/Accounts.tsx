@@ -404,62 +404,6 @@ export function Accounts() {
     setFilteredAccounts(filtered);
   }, [accounts, statusFilter, typeFilter, entityFilter, sortBy, sortOrder]);
 
-  const getStatusColor = (account: UnifiedAccount) => {
-    if (account.status === 'active') return "bg-green-100 text-green-800";
-    if (account.status === 'inactive') return "bg-gray-100 text-gray-800";
-    return "bg-gray-100 text-gray-800";
-  };
-
-  const getEntityTypeColor = (account: UnifiedAccount) => {
-    if (account.type === 'company_customer') return "bg-purple-100 text-purple-800";
-    if (account.type === 'company') return "bg-blue-100 text-blue-800";
-    if (account.type === 'customer') return "bg-orange-100 text-orange-800";
-    return "bg-gray-100 text-gray-800";
-  };
-
-  const getPaymentStatusColor = (status: string) => {
-    switch (status) {
-      case "completed":
-      case "active":
-        return "bg-green-100 text-green-800";
-      case "pending":
-        return "bg-yellow-100 text-yellow-800";
-      case "failed":
-        return "bg-red-100 text-red-800";
-      case "none":
-        return "bg-gray-100 text-gray-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
-
-  const getBillingStatusColor = (subscriptionStatus: string) => {
-    switch (subscriptionStatus) {
-      case "active":
-        return "bg-green-100 text-green-800";
-      case "past_due":
-        return "bg-red-100 text-red-800";
-      case "cancelled":
-        return "bg-gray-100 text-gray-800";
-      case "inactive":
-        return "bg-yellow-100 text-yellow-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
-
-  const getSubscriptionTierColor = (tier: string) => {
-    switch (tier) {
-      case "starter":
-        return "bg-blue-100 text-blue-800";
-      case "professional":
-        return "bg-purple-100 text-purple-800";
-      case "enterprise":
-        return "bg-orange-100 text-orange-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
 
   // Check if an account is protected from deletion
   const isProtectedAccount = (account: UnifiedAccount): boolean => {
@@ -467,26 +411,7 @@ export function Accounts() {
     return protectedEmails.includes(account.email.toLowerCase());
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
-  };
 
-  const getRelativeTime = (dateString: string) => {
-    const now = new Date();
-    const date = new Date(dateString);
-    const diffInHours = Math.floor(
-      (now.getTime() - date.getTime()) / (1000 * 60 * 60)
-    );
-
-    if (diffInHours < 1) return "Just now";
-    if (diffInHours < 24) return `${diffInHours}h ago`;
-    if (diffInHours < 168) return `${Math.floor(diffInHours / 24)}d ago`;
-    return formatDate(dateString);
-  };
 
   if (isLoading) {
     return (

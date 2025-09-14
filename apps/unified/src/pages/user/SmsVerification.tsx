@@ -10,10 +10,9 @@ import {
   CardTitle,
 } from "@sms-hub/ui";
 import { Input, Label, Alert, AlertDescription, Checkbox } from "@sms-hub/ui";
-import { Phone, Shield, CheckCircle2, ArrowRight } from "lucide-react";
+import { Phone, Shield, ArrowRight } from "lucide-react";
 import styled from "styled-components";
 import { getSupabaseClient } from "../../lib/supabaseSingleton";
-import { useUserProfile } from "@sms-hub/supabase/react";
 
 const Container = styled.div`
   min-height: 100vh;
@@ -56,7 +55,7 @@ const supabase = getSupabaseClient();
 export function SmsVerification() {
   const { hubConfig } = useHub();
   const navigate = useNavigate();
-  const { data: userProfile } = useUserProfile();
+  // const { data: userProfile } = useUserProfile();
   
   const [step, setStep] = useState<"consent" | "verify">("consent");
   const [phone, setPhone] = useState("");
@@ -64,7 +63,7 @@ export function SmsVerification() {
   const [verificationCode, setVerificationCode] = useState(["", "", "", "", "", ""]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
-  const [verificationId, setVerificationId] = useState("");
+  // const [verificationId, setVerificationId] = useState("");
 
   const formatPhoneNumber = (value: string) => {
     const cleaned = value.replace(/\D/g, "");
@@ -168,7 +167,7 @@ export function SmsVerification() {
         return;
       }
 
-      setVerificationId(result.verification_id);
+      // setVerificationId(result.verification_id);
       setStep("verify");
     } catch (err: any) {
       console.error("SMS send error:", err);

@@ -1,9 +1,10 @@
 import * as React from "react";
 import { Check, ChevronsUpDown } from "lucide-react";
-import { HUB_CONFIGS } from "@sms-hub/types";
+import { HubType, HUB_CONFIGS } from "@sms-hub/types";
 import { cn } from "@sms-hub/utils";
 import { useHub } from "../contexts/HubContext";
 import { Button } from "./button";
+import { Command, CommandGroup, CommandItem, CommandList } from "./command";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 import { HubLogo } from "./hub-logo";
 
@@ -46,7 +47,7 @@ export const HubSwitcher: React.FC<HubSwitcherProps> = ({
                 <CommandItem
                   key={hub.id}
                   value={hub.id}
-                  onSelect={(value) => {
+                  onSelect={(value: string) => {
                     switchHub(value as HubType);
                     setOpen(false);
                   }}

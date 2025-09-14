@@ -138,25 +138,37 @@ export function Login() {
         })
       );
 
-      // Always redirect to dashboard after successful login
-      const unifiedAppUrl =
-        import.meta.env.VITE_UNIFIED_APP_URL || "http://localhost:3001";
+      // Redirect to the unified app after successful login
+      // In development: localhost:3001, in production: app.[hub].com
+      const isDevelopment =
+        window.location.hostname === "localhost" ||
+        window.location.hostname === "127.0.0.1";
+      const unifiedAppUrl = isDevelopment
+        ? import.meta.env.VITE_UNIFIED_APP_URL || "http://localhost:3001"
+        : `https://app.${hubConfig.id}.com`;
       const redirectPath = result.redirect_to || "/dashboard";
 
+      // Prepare the redirect parameters
+      const params = new URLSearchParams({
+        access_token: result.session.access_token,
+        refresh_token: result.session.refresh_token,
+        redirect: redirectPath,
+      });
+
       console.log("About to redirect...");
+      console.log("Environment:", isDevelopment ? "development" : "production");
+      console.log("Hub config ID:", hubConfig.id);
       console.log("Unified app URL:", unifiedAppUrl);
       console.log("Redirect path:", redirectPath);
-      console.log("Full redirect URL:", `${unifiedAppUrl}${redirectPath}`);
+      console.log(
+        "Full redirect URL:",
+        `${unifiedAppUrl}/auth-callback?${params.toString()}`
+      );
 
       // Add a small delay to ensure everything is saved
       setTimeout(() => {
         console.log("Executing redirect now!");
         // Pass the session tokens in the URL so the unified app can set them
-        const params = new URLSearchParams({
-          access_token: result.session.access_token,
-          refresh_token: result.session.refresh_token,
-          redirect: redirectPath,
-        });
 
         // Use window.location.assign instead of window.location.href for better control
         window.location.assign(
@@ -165,7 +177,8 @@ export function Login() {
       }, 100);
     } catch (err) {
       console.error("Login error:", err);
-      const errorMessage = err instanceof Error ? err.message : "Failed to log in";
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to log in";
       setError(errorMessage);
     } finally {
       setIsSubmitting(false);

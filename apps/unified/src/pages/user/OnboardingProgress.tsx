@@ -574,7 +574,7 @@ export function OnboardingProgress() {
           return (
             <StepCard
               key={step.id}
-              $completed={step.completed}
+              $completed={step.completed || false}
               $current={isCurrent}
               onClick={() => handleStepClick(step)}
               style={{
@@ -582,7 +582,7 @@ export function OnboardingProgress() {
               }}
             >
               <StepHeader>
-                <StepIcon $completed={step.completed} $current={isCurrent}>
+                <StepIcon $completed={step.completed || false} $current={isCurrent}>
                   {step.completed ? <CheckCircle2 size={24} /> : step.icon}
                 </StepIcon>
                 <div style={{ flex: 1 }}>

@@ -359,7 +359,28 @@ import { getSupabaseClient } from "../lib/supabaseSingleton";
 
 ### Latest Fixes (September 14, 2025) - TODAY
 
-1. **Comprehensive TypeScript Error Resolution**:
+1. **Superadmin Access & Navigation Fixes**:
+   - **Fixed `hasAnyRole` function**: Correctly passes `user.role` string instead of full user object
+   - **Added route permissions**: `/user-view` route now properly configured for access control
+   - **Fixed admin/user navigation**:
+     - Admin → User: Click arrow button in bottom left of admin sidebar
+     - User → Admin: Click Shield icon in user sidebar (admin/superadmin only)
+   - **Terminology consistency**: Changed "Super Admin" to "Superadmin" throughout
+
+2. **User Sidebar UX Improvements**:
+   - **Fixed horizontal scrollbar**: Added `overflow-x-hidden` and adjusted padding
+   - **Icons-only design**: Removed all text from sidebar (64px width)
+   - **Added tooltips**: All navigation icons show descriptive tooltips on hover
+   - **Optimized spacing**: Reduced padding from `px-4 py-3` to `p-2`
+   - **Admin section visibility**: Properly shows for admin/superadmin users
+
+3. **Web App Cleanup**:
+   - **Removed unused files**: `SuperadminLogin.tsx`, `Layout.tsx`, `DevAuthToggle.tsx`
+   - **Component consolidation**: Merged `VerifyOtp.tsx` and `VerifyCode.tsx` into unified `VerifyAuth.tsx`
+   - **Environment variables**: Replaced hard-coded URLs with proper env vars
+   - **Added `VITE_UNIFIED_APP_URL`** to environment configuration
+
+4. **Comprehensive TypeScript Error Resolution**:
    - **Fixed 131 TypeScript errors** across the entire monorepo
    - **Database schema alignment**: Updated all field references to match current schema
    - **Type safety improvements**: Fixed type mismatches between components and services

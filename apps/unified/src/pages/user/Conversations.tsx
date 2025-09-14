@@ -145,9 +145,9 @@ export function Conversations() {
   }
 
   return (
-    <div className="h-full flex flex-col space-y-6">
+    <div className="h-full flex flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Conversations</h1>
           <p className="text-muted-foreground">
@@ -161,7 +161,7 @@ export function Conversations() {
       </div>
 
       {/* Filters */}
-      <Card>
+      <Card className="mb-6">
         <CardContent className="p-4">
           <div className="flex items-center space-x-4">
             <div className="flex-1 relative">
@@ -192,7 +192,7 @@ export function Conversations() {
       </Card>
 
       {/* Conversations List */}
-      <div className="flex-1 overflow-y-auto space-y-2">
+      <div className="flex-1 overflow-y-auto space-y-2 min-h-0">
         {filteredConversations.length === 0 ? (
           <Card>
             <CardContent className="p-8 text-center">

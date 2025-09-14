@@ -22,14 +22,26 @@ export const hasAnyRole = (
   roles: UserRole[] | string[]
 ): boolean => {
   if (!user) return false;
-  const userRoleLower = String(user.role).toLowerCase();
-  const result = roles.some((role) => String(role).toLowerCase() === userRoleLower);
-  console.log('[hasAnyRole] Check:', {
+  
+  // Debug: Check what we're comparing
+  console.log('[hasAnyRole] Debug:', {
     userRole: user.role,
-    userRoleLower,
-    checkingRoles: roles,
-    result
+    userRoleType: typeof user.role,
+    rolesChecking: roles,
+    rolesTypes: roles.map(r => typeof r),
   });
+  
+  // Convert user role to uppercase string for comparison
+  const userRoleUpper = String(user.role).toUpperCase();
+  
+  // Check if any of the provided roles match
+  const result = roles.some((role) => {
+    const roleUpper = String(role).toUpperCase();
+    const matches = roleUpper === userRoleUpper;
+    console.log(`[hasAnyRole] Comparing: "${roleUpper}" === "${userRoleUpper}" => ${matches}`);
+    return matches;
+  });
+  
   return result;
 };
 

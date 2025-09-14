@@ -63,6 +63,16 @@ export interface RoutePermission {
 export const routePermissions: RoutePermission[] = [
   // User routes
   {
+    path: "/user-view",
+    roles: [
+      UserRole.USER,
+      UserRole.ONBOARDED,
+      UserRole.ADMIN,
+      UserRole.SUPERADMIN,
+    ],
+    description: "User dashboard view",
+  },
+  {
     path: "/onboarding",
     roles: [
       UserRole.USER,

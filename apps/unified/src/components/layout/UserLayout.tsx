@@ -37,15 +37,9 @@ export default function UserLayout({ children }: UserLayoutProps) {
   const { company } = useCompany();
 
   // Check if user is admin
-  const isAdmin = user && hasAnyRole(user as any, ['ADMIN', 'SUPERADMIN']);
-  const isSuperAdmin = user && hasAnyRole(user as any, ['SUPERADMIN']);
-  
-  console.log('[UserLayout] User role check:', {
-    user: user?.email,
-    role: user?.role,
-    isAdmin,
-    isSuperAdmin,
-  });
+  const isAdmin = user && hasAnyRole(user.role, ["ADMIN", "SUPERADMIN"]);
+  const isSuperAdmin = user && hasAnyRole(user.role, ["SUPERADMIN"]);
+
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -255,7 +249,7 @@ export default function UserLayout({ children }: UserLayoutProps) {
 
       {/* Sidebar - Full height */}
       <div
-        className={`fixed top-0 bottom-0 left-0 z-40 bg-white text-gray-900 border-r border-gray-200 transform transition-all duration-300 ease-in-out lg:translate-x-0 ${
+        className={`fixed top-0 bottom-0 left-0 z-40 bg-white text-gray-900 border-r border-gray-200 transform transition-all duration-300 ease-in-out lg:translate-x-0 overflow-x-hidden ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         } ${isSidebarExpanded ? "w-80" : "w-16"}`}
       >
@@ -289,7 +283,7 @@ export default function UserLayout({ children }: UserLayoutProps) {
           </div>
 
           {/* Main Navigation */}
-          <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+          <nav className="flex-1 p-2 space-y-2 overflow-y-auto overflow-x-hidden">
             {userNavigationItems.map((item) => {
               const Icon = item.icon;
               const active = isActive(item.href);
@@ -298,8 +292,9 @@ export default function UserLayout({ children }: UserLayoutProps) {
                 <Link
                   key={item.name}
                   to={item.href}
-                  className="group flex items-center justify-center px-4 py-3 rounded-lg transition-all duration-200 relative"
+                  className="group flex items-center justify-center p-2 rounded-lg transition-all duration-200 relative"
                   onClick={() => setIsSidebarOpen(false)}
+                  title={item.name}
                 >
                   {/* Active indicator bar */}
                   {active && (
@@ -307,7 +302,7 @@ export default function UserLayout({ children }: UserLayoutProps) {
                   )}
 
                   <div
-                    className={`p-2 rounded-xl transition-all duration-200 ${
+                    className={`p-1.5 rounded-xl transition-all duration-200 ${
                       active
                         ? "bg-orange-100 scale-110"
                         : "hover:bg-gray-100 hover:scale-105"
@@ -326,7 +321,7 @@ export default function UserLayout({ children }: UserLayoutProps) {
 
           {/* Admin Navigation (Bottom) - Only for admin users */}
           {true && (
-            <div className="p-4 border-t border-gray-200">
+            <div className="p-2 border-t border-gray-200">
               {isSidebarExpanded && (
                 <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
                   Administration
@@ -341,8 +336,9 @@ export default function UserLayout({ children }: UserLayoutProps) {
                     <Link
                       key={item.name}
                       to={item.href}
-                      className="group flex items-center justify-center px-4 py-3 rounded-lg transition-all duration-200 relative"
+                      className="group flex items-center justify-center p-2 rounded-lg transition-all duration-200 relative"
                       onClick={() => setIsSidebarOpen(false)}
+                      title={item.name}
                     >
                       {/* Active indicator bar */}
                       {active && (
@@ -350,7 +346,7 @@ export default function UserLayout({ children }: UserLayoutProps) {
                       )}
 
                       <div
-                        className={`p-2 rounded-xl transition-all duration-200 ${
+                        className={`p-1.5 rounded-xl transition-all duration-200 ${
                           active
                             ? "bg-orange-100 scale-110"
                             : "hover:bg-gray-100 hover:scale-105"

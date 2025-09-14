@@ -18,10 +18,16 @@ const DashboardRouter = () => {
   const { user } = useAuthContext();
   console.log("[DashboardRouter] User:", user);
   console.log("[DashboardRouter] User role:", user?.role);
+  console.log("[DashboardRouter] User role type:", typeof user?.role);
+  console.log("[DashboardRouter] User role string:", String(user?.role));
+  console.log("[DashboardRouter] User role uppercase:", String(user?.role).toUpperCase());
   console.log(
     "[DashboardRouter] Is admin?",
     user?.role === UserRole.ADMIN || user?.role === UserRole.SUPERADMIN
   );
+  console.log("[DashboardRouter] hasAnyRole ADMIN check:", hasAnyRole(user?.role, ["ADMIN"]));
+  console.log("[DashboardRouter] hasAnyRole SUPERADMIN check:", hasAnyRole(user?.role, ["SUPERADMIN"]));
+  console.log("[DashboardRouter] hasAnyRole ADMIN,SUPERADMIN check:", hasAnyRole(user?.role, ["ADMIN", "SUPERADMIN"]));
 
   if (hasAnyRole(user?.role, ["ADMIN", "SUPERADMIN"])) {
     console.log("[DashboardRouter] Rendering AdminLayout for Admin/Superadmin");

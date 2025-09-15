@@ -28,22 +28,21 @@ export default defineConfig(({ mode }) => ({
     rollupOptions: {
       output: {
         manualChunks: (id) => {
-          // React and React ecosystem
+          // Client pages (lazy loaded) - check first to ensure they get their own chunk
+          if (id.includes("/pages/clients/")) {
+            return "client-pages";
+          }
+
+          // React, React ecosystem, and UI components must be together
           if (
             id.includes("react") ||
             id.includes("react-dom") ||
-            id.includes("react-router")
-          ) {
-            return "react-vendor";
-          }
-
-          // UI libraries and components
-          if (
+            id.includes("react-router") ||
             id.includes("@sms-hub/ui") ||
             id.includes("lucide-react") ||
             id.includes("radix-ui")
           ) {
-            return "ui-vendor";
+            return "react-vendor";
           }
 
           // Supabase and database related
@@ -54,11 +53,6 @@ export default defineConfig(({ mode }) => ({
           // Query and state management
           if (id.includes("@tanstack") || id.includes("@sms-hub/utils")) {
             return "query-vendor";
-          }
-
-          // Client pages (lazy loaded)
-          if (id.includes("/pages/clients/")) {
-            return "client-pages";
           }
 
           // Main pages

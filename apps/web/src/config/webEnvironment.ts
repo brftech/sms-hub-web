@@ -53,4 +53,15 @@ export const webEnvironment: EnvironmentAdapter = {
     analytics: () => webEnvironment.isProduction(),
     errorReporting: () => webEnvironment.isProduction(),
   },
+
+  // Helper to get login URL based on environment
+  getLoginUrl: (hubName: string) => {
+    if (webEnvironment.isProduction()) {
+      // In production, use the existing app.{hub}.com
+      return `https://app.${hubName}.com`;
+    } else {
+      // In development, use local login flow
+      return "/login";
+    }
+  },
 };

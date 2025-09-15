@@ -102,14 +102,16 @@ const Navigation = () => {
           {/* Right side - SignUp and Login buttons (Desktop only) */}
           <div className="hidden md:flex items-center space-x-4">
             {webEnvironment.features.hubSwitcher() && <HubSwitcher />}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handleDesktopNavClick("/signup")}
-              className="transition-all duration-300 backdrop-blur-sm px-4 py-1.5 text-xs bg-black/50 text-white border border-orange-500/50 hover:bg-orange-500/10 hover:border-orange-400"
-            >
-              Sign Up
-            </Button>
+            {!webEnvironment.isProduction() && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleDesktopNavClick("/signup")}
+                className="transition-all duration-300 backdrop-blur-sm px-4 py-1.5 text-xs bg-black/50 text-white border border-orange-500/50 hover:bg-orange-500/10 hover:border-orange-400"
+              >
+                Sign Up
+              </Button>
+            )}
             <Button
               variant="outline"
               size="sm"
@@ -195,12 +197,14 @@ const Navigation = () => {
 
               {/* Mobile-specific CTAs */}
               <div className="pt-4 border-t border-white/10 space-y-3">
-                <Button
-                  onClick={() => handleNavClick("/signup")}
-                  className={`w-full ${hubColors.bg} hover:${hubColors.bgHover} text-white font-semibold py-3 text-base`}
-                >
-                  Sign Up
-                </Button>
+                {!webEnvironment.isProduction() && (
+                  <Button
+                    onClick={() => handleNavClick("/signup")}
+                    className={`w-full ${hubColors.bg} hover:${hubColors.bgHover} text-white font-semibold py-3 text-base`}
+                  >
+                    Sign Up
+                  </Button>
+                )}
                 <Button
                   variant="outline"
                   onClick={() => {

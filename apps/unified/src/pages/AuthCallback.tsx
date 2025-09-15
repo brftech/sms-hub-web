@@ -49,6 +49,35 @@ export default function AuthCallback() {
           email: data.session.user.email,
         });
 
+        // Check if this is a signup flow and call complete-signup if needed
+        const type = searchParams.get("type");
+        if (type === "signup") {
+          logger.info("[AuthCallback] Processing signup completion...");
+          
+          try {
+            const response = await fetch(
+              `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/complete-signup`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  "Authorization": `Bearer ${accessToken}`,
+                },
+              }
+            );
+
+            const result = await response.json();
+
+            if (!response.ok) {
+              logger.warn("[AuthCallback] Complete-signup failed (non-critical):", result.error);
+            } else {
+              logger.info("[AuthCallback] Business records created successfully:", result);
+            }
+          } catch (signupError) {
+            logger.warn("[AuthCallback] Complete-signup error (non-critical):", signupError);
+          }
+        }
+
         // Session is set, redirect to the intended path
         logger.info(`[AuthCallback] Redirecting to ${redirectPath}`);
         navigate(redirectPath, { replace: true });

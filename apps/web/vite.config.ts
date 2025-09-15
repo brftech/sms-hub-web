@@ -27,49 +27,8 @@ export default defineConfig(({ mode }) => ({
     },
     rollupOptions: {
       output: {
-        manualChunks: (id) => {
-          // Client pages (lazy loaded) - check first to ensure they get their own chunk
-          if (id.includes("/pages/clients/")) {
-            return "client-pages";
-          }
-
-          // React, React ecosystem, and UI components must be together
-          if (
-            id.includes("react") ||
-            id.includes("react-dom") ||
-            id.includes("react-router") ||
-            id.includes("@sms-hub/ui") ||
-            id.includes("lucide-react") ||
-            id.includes("radix-ui")
-          ) {
-            return "react-vendor";
-          }
-
-          // Supabase and database related
-          if (id.includes("@supabase") || id.includes("@sms-hub/supabase")) {
-            return "supabase-vendor";
-          }
-
-          // Query and state management
-          if (id.includes("@tanstack") || id.includes("@sms-hub/utils")) {
-            return "query-vendor";
-          }
-
-          // Main pages
-          if (id.includes("/pages/") && !id.includes("/pages/clients/")) {
-            return "main-pages";
-          }
-
-          // Large images and assets
-          if (
-            id.includes(".png") ||
-            id.includes(".jpg") ||
-            id.includes(".jpeg") ||
-            id.includes(".svg")
-          ) {
-            return "assets";
-          }
-        },
+        // Remove manual chunks to let Vite handle bundling automatically
+        // This prevents the React.forwardRef error caused by chunk loading order issues
       },
     },
     chunkSizeWarningLimit: 500, // Reduce warning limit to 500KB

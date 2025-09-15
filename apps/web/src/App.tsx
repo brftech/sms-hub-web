@@ -224,23 +224,27 @@ const AppRoutes = () => {
         }
       />
 
-      {/* Auth routes */}
-      <Route
-        path="/test-auth"
-        element={
-          <PageTransition>
-            <TestAuth />
-          </PageTransition>
-        }
-      />
-      <Route
-        path="/debug-auth"
-        element={
-          <PageTransition>
-            <DebugAuth />
-          </PageTransition>
-        }
-      />
+      {/* Auth routes - Dev only */}
+      {import.meta.env.MODE === "development" && (
+        <Route
+          path="/test-auth"
+          element={
+            <PageTransition>
+              <TestAuth />
+            </PageTransition>
+          }
+        />
+      )}
+      {import.meta.env.MODE === "development" && (
+        <Route
+          path="/debug-auth"
+          element={
+            <PageTransition>
+              <DebugAuth />
+            </PageTransition>
+          }
+        />
+      )}
       <Route
         path="/login"
         element={

@@ -14,6 +14,7 @@ import { Input, Label, Alert, AlertDescription } from "@sms-hub/ui";
 import { Mail, Key, LogIn } from "lucide-react";
 import styled from "styled-components";
 import { getSupabaseClient } from "../lib/supabaseSingleton";
+import { environmentConfig } from "../config/environment";
 // Removed dev auth imports - using real Supabase authentication
 
 const LoginContainer = styled.div`
@@ -65,8 +66,8 @@ export function Login() {
     console.log("=== LOGIN FORM SUBMITTED ===");
     console.log("Email:", formData.email);
     console.log("Environment:", {
-      VITE_SUPABASE_URL: import.meta.env.VITE_SUPABASE_URL,
-      VITE_UNIFIED_APP_URL: import.meta.env.VITE_UNIFIED_APP_URL,
+      unifiedAppUrl: environmentConfig.unifiedAppUrl,
+      supabaseUrl: environmentConfig.supabaseUrl,
     });
 
     if (!formData.email || !formData.password) {
@@ -140,12 +141,7 @@ export function Login() {
 
       // Redirect to the unified app after successful login
       // In development: localhost:3001, in production: app.[hub].com
-      const isDevelopment =
-        window.location.hostname === "localhost" ||
-        window.location.hostname === "127.0.0.1";
-      const unifiedAppUrl = isDevelopment
-        ? import.meta.env.VITE_UNIFIED_APP_URL || "http://localhost:3001"
-        : `https://app.${hubConfig.id}.com`;
+      const unifiedAppUrl = environmentConfig.unifiedAppUrl;
       const redirectPath = result.redirect_to || "/dashboard";
 
       // Prepare the redirect parameters
@@ -156,7 +152,6 @@ export function Login() {
       });
 
       console.log("About to redirect...");
-      console.log("Environment:", isDevelopment ? "development" : "production");
       console.log("Hub config ID:", hubConfig.id);
       console.log("Unified app URL:", unifiedAppUrl);
       console.log("Redirect path:", redirectPath);

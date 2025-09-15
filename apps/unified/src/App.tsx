@@ -18,28 +18,19 @@ const DashboardRouter = () => {
   const { user } = useAuthContext();
   console.log("[DashboardRouter] User:", user);
   console.log("[DashboardRouter] User role:", user?.role);
-  console.log("[DashboardRouter] User role type:", typeof user?.role);
-  console.log("[DashboardRouter] User role string:", String(user?.role));
-  console.log(
-    "[DashboardRouter] User role uppercase:",
-    String(user?.role).toUpperCase()
-  );
-  console.log(
-    "[DashboardRouter] Is admin?",
-    user?.role === UserRole.ADMIN || user?.role === UserRole.SUPERADMIN
-  );
-  console.log(
-    "[DashboardRouter] hasAnyRole ADMIN check:",
-    hasAnyRole(user?.role, ["ADMIN"])
-  );
-  console.log(
-    "[DashboardRouter] hasAnyRole SUPERADMIN check:",
-    hasAnyRole(user?.role, ["SUPERADMIN"])
-  );
-  console.log(
-    "[DashboardRouter] hasAnyRole ADMIN,SUPERADMIN check:",
-    hasAnyRole(user?.role, ["ADMIN", "SUPERADMIN"])
-  );
+  console.log("[DashboardRouter] User payment_status:", user?.payment_status);
+
+  // Check payment status first - redirect unpaid users to payment
+  if (user && user.payment_status !== 'paid') {
+    console.log("[DashboardRouter] User hasn't paid, redirecting to payment");
+    return <Navigate to="/payment-required" replace />;
+  }
+
+  // Check if user needs onboarding
+  if (user && !user.onboarding_completed) {
+    console.log("[DashboardRouter] User needs onboarding");
+    return <Navigate to="/onboarding" replace />;
+  }
 
   if (hasAnyRole(user?.role, ["ADMIN", "SUPERADMIN"])) {
     console.log("[DashboardRouter] Rendering AdminLayout for Admin/Superadmin");

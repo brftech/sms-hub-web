@@ -109,7 +109,7 @@ export const routePermissions: RoutePermission[] = [
   },
   {
     path: "/settings",
-    roles: [UserRole.ONBOARDED, UserRole.ADMIN, UserRole.SUPERADMIN],
+    roles: [UserRole.USER, UserRole.ONBOARDED, UserRole.ADMIN, UserRole.SUPERADMIN],
     description: "User settings",
   },
   // New user view routes

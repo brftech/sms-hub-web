@@ -98,9 +98,9 @@ async function createBusinessRecords(supabaseAdmin: any, user: any, data: any) {
           hub_id: data.hub_id,
           role: "USER",
           permissions: {
-            admin: true,
-            manage_users: true,
-            manage_settings: true,
+            admin: false,
+            manage_users: false,
+            manage_settings: false,
           },
           is_active: true,
           joined_at: timestamp,
@@ -125,6 +125,7 @@ async function createBusinessRecords(supabaseAdmin: any, user: any, data: any) {
         {
           company_id: companyId,
           user_id: user.id,
+          hub_id: data.hub_id,
           billing_email: data.email,
           payment_status: "pending",
           created_at: timestamp,
@@ -329,7 +330,8 @@ serve(async (req) => {
         company_name: company_name,
         phone_number: phone_number,
       },
-      emailRedirectTo: `${unifiedUrl}/auth-callback`,
+      // Redirect to root - let Supabase handle the magic link
+      emailRedirectTo: `${unifiedUrl}`,
     };
 
     // Always use standard signup (sends email)
@@ -380,6 +382,8 @@ serve(async (req) => {
     }
 
     console.log("✅ Signup completed successfully");
+    console.log("emailConfirmed:", emailConfirmed);
+    console.log("confirmation_email_sent will be:", !emailConfirmed);
 
     return new Response(
       JSON.stringify({
@@ -388,7 +392,7 @@ serve(async (req) => {
         email: email,
         hub_id: invitationData ? invitationData.hub_id : hub_id,
         customer_type: customer_type,
-        confirmation_email_sent: !emailConfirmed,
+        confirmation_email_sent: true, // Always true for new signups
         email_verified: emailConfirmed,
         business_records_created: true,
         message: emailConfirmed 

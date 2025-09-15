@@ -1,10 +1,8 @@
 import { Link } from "react-router-dom";
 import { useHub, HubLogo } from "@sms-hub/ui";
-import { getHubColorClasses } from "@sms-hub/utils";
 
 const Footer = () => {
   const { currentHub } = useHub();
-  const hubColors = getHubColorClasses(currentHub);
 
   const getLogo = () => {
     return <HubLogo hubType={currentHub} variant="main" size="lg" />;
@@ -22,26 +20,6 @@ const Footer = () => {
                 ? "Enterprise technology solutions and platforms for modern businesses."
                 : "Compliant SMS marketing platform designed for premium retailers and sophisticated customer engagement."}
             </p>
-            <div className="flex space-x-4">
-              <a
-                href="#"
-                className={`${hubColors.text} hover:${hubColors.textHover} transition-colors text-sm`}
-              >
-                Twitter
-              </a>
-              <a
-                href="#"
-                className={`${hubColors.text} hover:${hubColors.textHover} transition-colors text-sm`}
-              >
-                LinkedIn
-              </a>
-              <a
-                href="#"
-                className={`${hubColors.text} hover:${hubColors.textHover} transition-colors text-sm`}
-              >
-                GitHub
-              </a>
-            </div>
           </div>
 
           {/* Quick Links */}
@@ -103,14 +81,8 @@ const Footer = () => {
         <div className="mt-6 pt-6 border-t border-gray-800/50">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-gray-400 text-sm">
-              © 2024 {currentHub === "percytech" ? "PercyTech" : "SMS Hub"}.
-              All rights reserved.
+              © 2025 PercyTech LLC. All rights reserved.
             </p>
-            <div className="mt-2 md:mt-0">
-              <p className="text-gray-500 text-xs">
-                Built with ❤️ for premium venues
-              </p>
-            </div>
           </div>
         </div>
       </div>

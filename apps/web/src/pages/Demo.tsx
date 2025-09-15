@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import {
   PhoneInteractive,
   PlatformDemo,
@@ -21,6 +22,7 @@ import {
 import { useState } from "react";
 
 export default function Demo() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<"phone" | "platform">("phone");
 
   return (
@@ -319,7 +321,7 @@ export default function Demo() {
                 </span>
               </p>
               <button
-                onClick={() => (window.location.href = "/contact")}
+                onClick={() => navigate("/contact")}
                 className="px-10 py-4 bg-orange-600 text-white font-bold rounded-full hover:bg-orange-700 transition-all duration-300 text-lg tracking-wide uppercase flex items-center justify-center mx-auto group"
                 style={{ fontFamily: "Inter, system-ui, sans-serif" }}
               >

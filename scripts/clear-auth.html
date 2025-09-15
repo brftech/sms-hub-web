@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Clear Auth Sessions</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 10px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .success {
+            color: green;
+            margin-top: 10px;
+        }
+        .warning {
+            background: #fee;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Clear Supabase Auth Sessions</h1>
+    
+    <div class="warning">
+        <strong>⚠️ Security Issue Found:</strong><br>
+        Superadmin sessions are persisting and overriding user logins.
+    </div>
+    
+    <h2>Quick Fix:</h2>
+    <p>Click the buttons below to clear auth sessions:</p>
+    
+    <button onclick="clearLocalhost3000()">Clear localhost:3000 (Web App)</button>
+    <button onclick="clearLocalhost3001()">Clear localhost:3001 (Unified App)</button>
+    <button onclick="clearAll()">Clear All Auth Data</button>
+    
+    <div id="status"></div>
+    
+    <h2>Manual Steps:</h2>
+    <ol>
+        <li>Open Chrome DevTools (F12)</li>
+        <li>Go to Application tab</li>
+        <li>Find "Local Storage" → localhost:3001</li>
+        <li>Delete all items starting with "supabase.auth"</li>
+        <li>Refresh the page</li>
+    </ol>
+    
+    <script>
+        function showStatus(message) {
+            document.getElementById('status').innerHTML = '<div class="success">' + message + '</div>';
+        }
+        
+        function clearLocalhost3000() {
+            // Open localhost:3000 in iframe to clear its storage
+            window.open('http://localhost:3000/clear-auth', '_blank');
+            showStatus('Opened clear page for localhost:3000');
+        }
+        
+        function clearLocalhost3001() {
+            // Open localhost:3001 in iframe to clear its storage
+            window.open('http://localhost:3001/clear-auth', '_blank');
+            showStatus('Opened clear page for localhost:3001');
+        }
+        
+        function clearAll() {
+            // Clear current domain
+            if (typeof localStorage !== 'undefined') {
+                const keys = Object.keys(localStorage);
+                keys.forEach(key => {
+                    if (key.includes('supabase')) {
+                        localStorage.removeItem(key);
+                    }
+                });
+            }
+            showStatus('Cleared all Supabase auth data from current domain');
+        }
+    </script>
+</body>
+</html>

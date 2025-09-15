@@ -8,6 +8,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  HubLogo,
 } from "@sms-hub/ui";
 import {
   CreditCard,
@@ -15,13 +16,18 @@ import {
   Shield,
   ArrowRight,
   AlertCircle,
+  Zap,
+  MessageSquare,
+  Phone,
+  Headphones,
 } from "lucide-react";
 import { useUserProfile, useCurrentUserCompany } from "@sms-hub/supabase/react";
+import { getHubContent } from "@sms-hub/hub-logic";
 import styled from "styled-components";
 
 const Container = styled.div`
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--hub-background, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -71,33 +77,48 @@ const Price = styled.div`
 
 const CTAButton = styled(Button)`
   width: 100%;
-  height: 48px;
+  height: 56px;
   font-size: 1.1rem;
   font-weight: 600;
-  background: #3b82f6;
+  background: var(--hub-primary, #3b82f6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 
   &:hover {
-    background: #2563eb;
+    background: var(--hub-primary-dark, #2563eb);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
+  
+  transition: all 0.2s ease;
 `;
 
 export function PaymentRequired() {
-  const { hubConfig } = useHub();
+  const { hubConfig, currentHub } = useHub();
   // const navigate = useNavigate()
   const { data: userProfile } = useUserProfile();
   const { data: company } = useCurrentUserCompany();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  
+  // Get hub-specific content
+  const hubContent = getHubContent(currentHub);
 
-  const features = [
-    "Unlimited SMS campaigns",
-    "Advanced analytics dashboard",
-    "Contact list management",
-    "A2P 10DLC registration",
-    "Dedicated phone numbers",
-    "API access",
-    "Priority support",
-    "Campaign templates",
+  // Hub-specific features based on Gnymble pricing page
+  const setupFeatures = [
+    "Complete business setup & training",
+    "Compliance consultation & setup",
+    "Dedicated onboarding specialist",
+    "First month of chosen plan included",
+  ];
+  
+  const everyPlanIncludes = [
+    { icon: Shield, text: "Full compliance & regulatory expertise" },
+    { icon: MessageSquare, text: "Professional SMS delivery platform" },
+    { icon: Phone, text: "Dedicated phone number included" },
+    { icon: Headphones, text: "Expert customer support" },
   ];
 
   const handleStartPayment = async () => {
@@ -145,13 +166,17 @@ export function PaymentRequired() {
     <Container>
       <ContentCard>
         <CardHeader className="text-center">
-          <div className="mx-auto mb-4 p-3 bg-blue-100 rounded-full w-fit">
-            <CreditCard className="w-8 h-8 text-blue-600" />
+          <div className="mx-auto mb-4">
+            <HubLogo
+              hubType={currentHub}
+              variant="icon"
+              size="lg"
+              className="w-16 h-16 mx-auto"
+            />
           </div>
           <CardTitle className="text-2xl">Complete Your Setup</CardTitle>
           <CardDescription>
-            Welcome to {hubConfig.displayName}! Complete your payment to unlock
-            all features.
+            Welcome to {hubConfig.displayName}! {hubContent.cta.description}
           </CardDescription>
         </CardHeader>
 
@@ -167,24 +192,41 @@ export function PaymentRequired() {
           )}
 
           <PriceSection>
-            <p className="text-sm text-gray-600 mb-2">Monthly Subscription</p>
+            <p className="text-sm text-gray-600 mb-2">Get Started Package</p>
             <Price>
-              $99<span>/month</span>
+              $179<span> one-time setup</span>
             </Price>
-            <p className="text-sm text-gray-500 mt-2">Cancel anytime</p>
+            <p className="text-sm text-gray-500 mt-2">
+              {hubContent.cta.guaranteeText || "8-day setup guarantee"}
+            </p>
           </PriceSection>
 
           <div className="mb-6">
             <h3 className="font-semibold mb-3">
-              Everything you need to succeed:
+              Your setup includes:
             </h3>
             <FeatureList>
-              {features.map((feature, index) => (
+              {setupFeatures.map((feature, index) => (
                 <FeatureItem key={index}>
                   <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
                   {feature}
                 </FeatureItem>
               ))}
+            </FeatureList>
+            
+            <h3 className="font-semibold mb-3 mt-6">
+              Every plan includes:
+            </h3>
+            <FeatureList>
+              {everyPlanIncludes.map((item, index) => {
+                const Icon = item.icon;
+                return (
+                  <FeatureItem key={index}>
+                    <Icon className="w-5 h-5 text-blue-500 flex-shrink-0" />
+                    {item.text}
+                  </FeatureItem>
+                );
+              })}
             </FeatureList>
           </div>
 
@@ -197,11 +239,14 @@ export function PaymentRequired() {
 
           <CTAButton onClick={handleStartPayment} disabled={isLoading}>
             {isLoading ? (
-              <>Processing...</>
+              <>
+                <span className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" />
+                Processing...
+              </>
             ) : (
               <>
-                Start Subscription
-                <ArrowRight className="w-5 h-5 ml-2" />
+                <Zap className="w-5 h-5" />
+                {hubContent.cta.ctaText || "🚀 GET STARTED NOW"}
               </>
             )}
           </CTAButton>
@@ -209,6 +254,12 @@ export function PaymentRequired() {
           <div className="mt-6 flex items-center justify-center gap-2 text-sm text-gray-500">
             <Shield className="w-4 h-4" />
             <span>Secure payment powered by Stripe</span>
+          </div>
+          
+          <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+            <p className="text-sm text-gray-700 text-center">
+              <strong>After setup:</strong> Choose from our monthly plans starting at $79/month
+            </p>
           </div>
         </CardContent>
       </ContentCard>

@@ -1,18 +1,61 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { HubLogo } from "@sms-hub/ui";
 import { useHub } from "@sms-hub/ui";
+import { getSupabaseClient } from "../lib/supabaseSingleton";
+import { useNavigate } from "react-router-dom";
 
 export const Landing = () => {
   const { hubConfig } = useHub();
+  const navigate = useNavigate();
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   useEffect(() => {
-    // Redirect to web app login after a short delay
-    const timer = setTimeout(() => {
-      window.location.href = "http://localhost:3000/login";
-    }, 2000);
+    const checkAuth = async () => {
+      const supabase = getSupabaseClient();
+      
+      // Check if this is a magic link callback (has auth token in URL)
+      const hashParams = new URLSearchParams(window.location.hash.substring(1));
+      const accessToken = hashParams.get('access_token');
+      
+      if (accessToken) {
+        console.log("Magic link detected, processing auth...");
+        // Wait longer for magic link to be processed
+        await new Promise(resolve => setTimeout(resolve, 2000));
+      } else {
+        // Give Supabase time to check existing session
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+      
+      // Check if we have a session
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (session) {
+        // User is authenticated - check if they've paid
+        const { data: profile } = await supabase
+          .from('user_profiles')
+          .select('role, onboarding_completed, payment_status')
+          .eq('id', session.user.id)
+          .single();
+          
+        // Check payment status first
+        if (profile && profile.payment_status !== 'paid') {
+          // No payment yet - send to Stripe
+          navigate('/payment-required');
+        } else if (profile && !profile.onboarding_completed) {
+          // Paid but not onboarded
+          navigate('/onboarding');
+        } else {
+          // Paid and onboarded
+          navigate('/dashboard');
+        }
+      } else {
+        // No session - redirect to login
+        window.location.href = "http://localhost:3000/login";
+      }
+    };
 
-    return () => clearTimeout(timer);
-  }, []);
+    checkAuth();
+  }, [navigate]);
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center">

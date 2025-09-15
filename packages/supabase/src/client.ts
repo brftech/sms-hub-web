@@ -8,11 +8,15 @@ export const createSupabaseClient = (url: string, anonKey: string) => {
     console.error("Missing Supabase environment variables");
   }
 
+  // Check if we're on the marketing site (port 3000) - don't persist sessions there
+  const isMarketingSite = typeof window !== "undefined" && 
+    (window.location.port === "3000" || window.location.hostname.includes("www."));
+
   return createClient<Database>(url, anonKey, {
     auth: {
-      persistSession: true,
-      autoRefreshToken: true,
-      detectSessionInUrl: true,
+      persistSession: !isMarketingSite, // Don't persist on marketing site
+      autoRefreshToken: !isMarketingSite,
+      detectSessionInUrl: false, // Don't auto-detect sessions
       storage: typeof window !== "undefined" ? window.localStorage : undefined,
       storageKey: "supabase.auth.token",
       flowType: "pkce",

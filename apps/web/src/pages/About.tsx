@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import { PageLayout, SEO } from "@sms-hub/ui";
 
 import Navigation from "../components/Navigation";
@@ -15,6 +16,7 @@ import {
 import bryanProfileImage from "@sms-hub/ui/assets/bryan-profile.png";
 
 const About = () => {
+  const navigate = useNavigate();
   return (
     <PageLayout
       showNavigation={true}
@@ -233,7 +235,7 @@ const About = () => {
                 works for your business.
               </p>
               <button
-                onClick={() => (window.location.href = "/contact")}
+                onClick={() => navigate("/contact")}
                 className="px-10 py-4 bg-orange-600 text-white font-bold rounded-full hover:bg-orange-700 transition-all duration-300 text-lg tracking-wide uppercase flex items-center justify-center mx-auto group"
                 style={{ fontFamily: "Inter, system-ui, sans-serif" }}
               >

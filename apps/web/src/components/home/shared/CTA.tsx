@@ -1,9 +1,11 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { useHub } from "@sms-hub/ui";
 import { getHubCTAContent } from "@sms-hub/hub-logic";
 
 export const CTASection: React.FC = () => {
   const { currentHub, hubConfig } = useHub();
+  const navigate = useNavigate();
 
   const content = getHubCTAContent(currentHub);
   return (
@@ -56,7 +58,7 @@ export const CTASection: React.FC = () => {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
-              onClick={() => (window.location.href = "/contact")}
+              onClick={() => navigate("/contact")}
               className="px-10 py-4 bg-white hub-text-primary font-bold rounded-sm hover:bg-gray-100 transition-all duration-300 text-sm tracking-wide uppercase shadow-lg"
             >
               Contact Us

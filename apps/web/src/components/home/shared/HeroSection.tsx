@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useHub, HubLogo } from "@sms-hub/ui";
 
 interface HeroContent {
@@ -20,6 +21,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   businessTypes,
   content,
 }) => {
+  const navigate = useNavigate();
   const { currentHub } = useHub();
 
   const [currentBusinessIndex, setCurrentBusinessIndex] = useState(0);
@@ -98,12 +100,12 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
         </h1>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-20 md:mb-24">
-          <a
-            href="/demo"
+          <button
+            onClick={() => navigate("/demo")}
             className="border-2 border-orange-600 text-orange-400 hover:bg-orange-600 hover:text-white font-bold py-4 px-8 rounded-lg transition-colors duration-200 text-lg"
           >
             See Demo
-          </a>
+          </button>
         </div>
 
         {/* Bold tagline - moved lower */}

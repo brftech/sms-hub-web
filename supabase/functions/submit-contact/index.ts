@@ -48,9 +48,7 @@ Deno.serve(async (req) => {
 
     const { data: existingLead, error: searchError } = await supabase
       .from("leads")
-      .select(
-        "id, first_name, last_name, company_name, phone, status, created_at"
-      )
+      .select("id, name, company_name, phone, status, created_at")
       .eq("email", email)
       .single();
 
@@ -66,8 +64,7 @@ Deno.serve(async (req) => {
         .from("leads")
         .insert({
           hub_id: hub_id || 1, // Default to Gnymble (hub_id: 1) if not provided
-          first_name: firstName,
-          last_name: lastName,
+          name: `${firstName} ${lastName}`.trim(),
           email,
           phone: phone || null,
           company_name: company || null,
@@ -107,11 +104,9 @@ Deno.serve(async (req) => {
       };
 
       // Only update fields if new data is provided and different
-      if (firstName && firstName !== existingLead.first_name) {
-        updateData.first_name = firstName;
-      }
-      if (lastName && lastName !== existingLead.last_name) {
-        updateData.last_name = lastName;
+      const fullName = `${firstName} ${lastName}`.trim();
+      if (fullName && fullName !== existingLead.name) {
+        updateData.name = fullName;
       }
       if (company && company !== existingLead.company_name) {
         updateData.company_name = company;
@@ -169,7 +164,7 @@ Deno.serve(async (req) => {
         hub_id: hub_id || 1, // Default to Gnymble (hub_id: 1) if not provided
         lead_id: leadData.id,
         activity_type: "note",
-        description: activityDescription,
+        activity_data: { description: activityDescription },
       });
 
     if (activityError) {

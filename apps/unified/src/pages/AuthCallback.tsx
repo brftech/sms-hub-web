@@ -13,7 +13,7 @@ export default function AuthCallback() {
     const handleAuthCallback = async () => {
       try {
         logger.info("[AuthCallback] Processing auth callback...");
-        
+
         // Get tokens from URL params
         const accessToken = searchParams.get("access_token");
         const refreshToken = searchParams.get("refresh_token");
@@ -53,7 +53,7 @@ export default function AuthCallback() {
         const type = searchParams.get("type");
         if (type === "signup") {
           logger.info("[AuthCallback] Processing signup completion...");
-          
+
           try {
             const response = await fetch(
               `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/complete-signup`,
@@ -61,7 +61,7 @@ export default function AuthCallback() {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
-                  "Authorization": `Bearer ${accessToken}`,
+                  Authorization: `Bearer ${accessToken}`,
                 },
               }
             );
@@ -69,12 +69,26 @@ export default function AuthCallback() {
             const result = await response.json();
 
             if (!response.ok) {
-              logger.warn("[AuthCallback] Complete-signup failed (non-critical):", result.error);
+              logger.warn(
+                "[AuthCallback] Complete-signup failed (non-critical):",
+                result.error
+              );
             } else {
-              logger.info("[AuthCallback] Business records created successfully:", result);
+              logger.info(
+                "[AuthCallback] Business records created successfully:",
+                result
+              );
             }
           } catch (signupError) {
-            logger.warn("[AuthCallback] Complete-signup error (non-critical):", signupError);
+            logger.warn(
+              "[AuthCallback] Complete-signup error (non-critical):",
+              {
+                error:
+                  signupError instanceof Error
+                    ? signupError.message
+                    : String(signupError),
+              }
+            );
           }
         }
 
@@ -84,7 +98,7 @@ export default function AuthCallback() {
       } catch (err) {
         logger.error("[AuthCallback] Error:", err);
         setError(err instanceof Error ? err.message : "Authentication failed");
-        
+
         // Redirect to landing page after a delay
         setTimeout(() => {
           navigate("/", { replace: true });
@@ -118,9 +132,7 @@ export default function AuthCallback() {
             Authentication Failed
           </h2>
           <p className="text-gray-600 mb-4">{error}</p>
-          <p className="text-sm text-gray-500">
-            Redirecting to login page...
-          </p>
+          <p className="text-sm text-gray-500">Redirecting to login page...</p>
         </div>
       </div>
     );

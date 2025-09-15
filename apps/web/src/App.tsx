@@ -31,7 +31,6 @@ import { Login } from "./pages/Login";
 import { Signup } from "./pages/Signup";
 import { CheckEmail } from "./pages/CheckEmail";
 import { VerifyAuth } from "./pages/VerifyAuth";
-import { AuthCallback } from "./pages/AuthCallback";
 import { TestAuth } from "./pages/TestAuth";
 import { DebugAuth } from "./pages/DebugAuth";
 
@@ -282,14 +281,6 @@ const AppRoutes = () => {
         element={
           <PageTransition>
             <VerifyAuth />
-          </PageTransition>
-        }
-      />
-      <Route
-        path="/verify-auth"
-        element={
-          <PageTransition>
-            <AuthCallback />
           </PageTransition>
         }
       />

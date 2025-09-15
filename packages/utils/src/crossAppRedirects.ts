@@ -34,7 +34,7 @@ export const getUserAppUrl = (path: string = '') => {
   // Remove subdomain if it exists and add user subdomain
   const mainDomain = hostname.replace(/^[^.]+\./, '');
   
-  return `${protocol}//app.${mainDomain}${path}`;
+  return `${protocol}//unified.${mainDomain}${path}`;
 };
 
 export const getTextingAppUrl = (path: string = '') => {

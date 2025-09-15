@@ -136,7 +136,7 @@ export function getEnvironmentConfig(env?: Environment): EnvironmentConfig {
       isProduction: true,
 
       webAppUrl: process.env.VITE_WEB_APP_URL || 'https://gnymble.com',
-      unifiedAppUrl: process.env.VITE_UNIFIED_APP_URL || 'https://app.gnymble.com',
+      unifiedAppUrl: process.env.VITE_UNIFIED_APP_URL || 'https://unified.gnymble.com',
       apiUrl: process.env.VITE_API_URL || 'https://api.gnymble.com',
       supabaseUrl: process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || '',
 

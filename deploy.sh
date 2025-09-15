@@ -61,7 +61,9 @@ done
 if [ "$DEPLOY_WEB" = true ]; then
   echo -e "${BLUE}📦 Deploying Web App...${NC}"
   echo "------------------------"
-  cd apps/web
+
+  # Link to web project from root
+  vercel link --project sms-hub-web --yes > /dev/null 2>&1
 
   if vercel --prod --yes $FORCE_FLAG; then
     echo -e "${GREEN}✅ Web app deployed successfully!${NC}"
@@ -70,7 +72,6 @@ if [ "$DEPLOY_WEB" = true ]; then
     exit 1
   fi
 
-  cd ../..
   echo ""
 fi
 
@@ -78,7 +79,9 @@ fi
 if [ "$DEPLOY_UNIFIED" = true ]; then
   echo -e "${BLUE}📦 Deploying Unified App...${NC}"
   echo "---------------------------"
-  cd apps/unified
+
+  # Link to unified project from root
+  vercel link --project sms-hub-unified --yes > /dev/null 2>&1
 
   if vercel --prod --yes $FORCE_FLAG; then
     echo -e "${GREEN}✅ Unified app deployed successfully!${NC}"
@@ -87,7 +90,6 @@ if [ "$DEPLOY_UNIFIED" = true ]; then
     exit 1
   fi
 
-  cd ../..
   echo ""
 fi
 

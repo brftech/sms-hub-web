@@ -219,10 +219,9 @@ serve(async (req) => {
       }
 
       // Determine login URL based on hub
-      const loginUrl =
-        hub_id === 1
-          ? "http://localhost:3001" // Gnymble unified app
-          : "http://localhost:3001"; // PercyTech unified app (default)
+      const unifiedUrl =
+        Deno.env.get("UNIFIED_APP_URL") || "http://localhost:3001";
+      const loginUrl = unifiedUrl;
 
       // Call the email notification service
       const emailResponse = await fetch(

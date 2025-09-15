@@ -13,8 +13,20 @@ interface UnifiedAccount {
   service_type?: string;
   hub_id: number;
   created_at: string;
-  company?: any;
-  customer?: any;
+  company?: {
+    id: string;
+    name: string;
+    created_at: string;
+    contact_email?: string;
+    contact_phone?: string;
+    legal_name?: string;
+    tax_id?: string;
+  };
+  customer?: {
+    id: string;
+    billing_email: string;
+    created_at: string;
+  };
   user_count?: number;
   has_texting?: boolean;
   has_other_services?: boolean;
@@ -68,7 +80,7 @@ export const AccountEditModal: React.FC<AccountEditModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    const updates: any = {
+    const updates: Partial<UnifiedAccount> = {
       // Update based on entity type
     };
 

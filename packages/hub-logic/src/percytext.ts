@@ -60,7 +60,7 @@ export const validatePercyTextIntegration = (data: {
 }) => {
   const errors: string[] = [];
 
-  if (!PERCYTEXT_INTEGRATIONS.includes(data.integrationType as any)) {
+  if (!PERCYTEXT_INTEGRATIONS.includes(data.integrationType as typeof PERCYTEXT_INTEGRATIONS[number])) {
     errors.push("Invalid integration type selected");
   }
 

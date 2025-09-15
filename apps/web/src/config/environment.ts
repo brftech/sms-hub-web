@@ -3,21 +3,21 @@
  * Handles dev/staging/production environment detection and configuration
  */
 
-export type Environment = 'development' | 'staging' | 'production';
+export type Environment = "development" | "staging" | "production";
 
 /**
  * Detect hub from current hostname
  */
 function detectHub(): string {
-  if (typeof window === 'undefined') return 'gnymble';
+  if (typeof window === "undefined") return "gnymble";
 
   const hostname = window.location.hostname.toLowerCase();
 
-  if (hostname.includes('percytech')) return 'percytech';
-  if (hostname.includes('percymd')) return 'percymd';
-  if (hostname.includes('percytext')) return 'percytext';
+  if (hostname.includes("percytech")) return "percytech";
+  if (hostname.includes("percymd")) return "percymd";
+  if (hostname.includes("percytext")) return "percytext";
 
-  return 'gnymble'; // Default
+  return "gnymble"; // Default
 }
 
 /**
@@ -30,40 +30,31 @@ function getUnifiedUrl(env: Environment, hub: string): string {
   }
 
   // Development - always localhost
-  if (env === 'development') {
-    return 'http://localhost:3001';
+  if (env === "development") {
+    return "http://localhost:3001";
   }
 
-  // Production URLs
-  if (env === 'production') {
-    switch (hub) {
-      case 'percytech':
-        return 'https://unified.percytech.com';
-      case 'percymd':
-        return 'https://unified.percymd.com';
-      case 'percytext':
-        return 'https://unified.percytext.com';
-      default:
-        return 'https://unified.gnymble.com';
-    }
+  // Production URLs - temporarily redirect all to app.gnymble.com
+  if (env === "production") {
+    return "https://app.gnymble.com";
   }
 
   // Staging URLs
-  if (env === 'staging') {
+  if (env === "staging") {
     switch (hub) {
-      case 'percytech':
-        return 'https://unified-staging.percytech.com';
-      case 'percymd':
-        return 'https://unified-staging.percymd.com';
-      case 'percytext':
-        return 'https://unified-staging.percytext.com';
+      case "percytech":
+        return "https://unified-staging.percytech.com";
+      case "percymd":
+        return "https://unified-staging.percymd.com";
+      case "percytext":
+        return "https://unified-staging.percytext.com";
       default:
-        return 'https://unified-staging.gnymble.com';
+        return "https://unified-staging.gnymble.com";
     }
   }
 
   // Fallback
-  return 'https://unified.gnymble.com';
+  return "https://app.gnymble.com";
 }
 
 interface EnvironmentConfig {
@@ -91,38 +82,44 @@ interface EnvironmentConfig {
  */
 function detectEnvironment(): Environment {
   // Check Vite environment mode first
-  if (import.meta.env.MODE === 'production') return 'production';
-  if (import.meta.env.MODE === 'staging') return 'staging';
-  if (import.meta.env.MODE === 'development') return 'development';
+  if (import.meta.env.MODE === "production") return "production";
+  if (import.meta.env.MODE === "staging") return "staging";
+  if (import.meta.env.MODE === "development") return "development";
 
   // Check hostname as fallback
-  if (typeof window !== 'undefined') {
+  if (typeof window !== "undefined") {
     const hostname = window.location.hostname;
 
     // Production domains
-    if (hostname.includes('gnymble.com') ||
-        hostname.includes('percymd.com') ||
-        hostname.includes('percytext.com')) {
-      return 'production';
+    if (
+      hostname.includes("gnymble.com") ||
+      hostname.includes("percymd.com") ||
+      hostname.includes("percytext.com")
+    ) {
+      return "production";
     }
 
     // Staging/preview domains
-    if (hostname.includes('.vercel.app') ||
-        hostname.includes('staging') ||
-        hostname.includes('preview')) {
-      return 'staging';
+    if (
+      hostname.includes(".vercel.app") ||
+      hostname.includes("staging") ||
+      hostname.includes("preview")
+    ) {
+      return "staging";
     }
 
     // Local development
-    if (hostname === 'localhost' ||
-        hostname === '127.0.0.1' ||
-        hostname.includes('.local')) {
-      return 'development';
+    if (
+      hostname === "localhost" ||
+      hostname === "127.0.0.1" ||
+      hostname.includes(".local")
+    ) {
+      return "development";
     }
   }
 
   // Default to development for safety
-  return 'development';
+  return "development";
 }
 
 /**
@@ -133,14 +130,14 @@ export function getEnvironmentConfig(): EnvironmentConfig {
   const hub = detectHub();
 
   const baseConfig = {
-    supabaseUrl: import.meta.env.VITE_SUPABASE_URL || '',
+    supabaseUrl: import.meta.env.VITE_SUPABASE_URL || "",
   };
 
   switch (env) {
-    case 'production':
+    case "production":
       return {
         ...baseConfig,
-        name: 'production',
+        name: "production",
         isDevelopment: false,
         isStaging: false,
         isProduction: true,
@@ -151,10 +148,10 @@ export function getEnvironmentConfig(): EnvironmentConfig {
         enableDebugMode: false,
       };
 
-    case 'staging':
+    case "staging":
       return {
         ...baseConfig,
-        name: 'staging',
+        name: "staging",
         isDevelopment: false,
         isStaging: true,
         isProduction: false,
@@ -166,20 +163,21 @@ export function getEnvironmentConfig(): EnvironmentConfig {
         devAuthToken: import.meta.env.VITE_DEV_AUTH_TOKEN,
       };
 
-    case 'development':
+    case "development":
     default:
       return {
         ...baseConfig,
-        name: 'development',
+        name: "development",
         isDevelopment: true,
         isStaging: false,
         isProduction: false,
-        webAppUrl: import.meta.env.VITE_WEB_APP_URL || 'http://localhost:3000',
+        webAppUrl: import.meta.env.VITE_WEB_APP_URL || "http://localhost:3000",
         unifiedAppUrl: getUnifiedUrl(env, hub),
-        skipEmailConfirmation: import.meta.env.VITE_SKIP_EMAIL_CONFIRMATION === 'true',
+        skipEmailConfirmation:
+          import.meta.env.VITE_SKIP_EMAIL_CONFIRMATION === "true",
         enableDevAuth: true,
         enableDebugMode: true,
-        devAuthToken: import.meta.env.VITE_DEV_AUTH_TOKEN || 'dev123',
+        devAuthToken: import.meta.env.VITE_DEV_AUTH_TOKEN || "dev123",
       };
   }
 }
@@ -195,7 +193,7 @@ export const getEnvironment = () => environmentConfig.name;
 
 // Debug logging (only in dev/staging)
 if (environmentConfig.enableDebugMode) {
-  console.log('🌍 Environment Configuration:', {
+  console.log("🌍 Environment Configuration:", {
     environment: environmentConfig.name,
     urls: {
       web: environmentConfig.webAppUrl,
@@ -206,6 +204,6 @@ if (environmentConfig.enableDebugMode) {
       skipEmail: environmentConfig.skipEmailConfirmation,
       devAuth: environmentConfig.enableDevAuth,
       debug: environmentConfig.enableDebugMode,
-    }
+    },
   });
 }

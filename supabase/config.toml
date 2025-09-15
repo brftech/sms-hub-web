@@ -1,56 +1,34 @@
-# A string used to distinguish different Supabase projects on the same host. Defaults to the
-# working directory name when running `supabase init`.
+# SMS Hub Monorepo - Remote Supabase Configuration
+# This project uses remote-only Supabase connections
+# Dev: vgpovgpwqkjnpnrjelyg (sms-hub-monorepo)
+# Prod: howjinnvvtvaufihwers (percytech)
+
 project_id = "sms-hub-monorepo"
 
-[api]
-enabled = true
-# Port to use for the API URL.
-port = 54321
+# Remote-only configuration - no local services
+# Note: These sections are commented out for remote-only usage
+# [api]
+# enabled = true
+# port = 54321
 
-[db]
-# Port to use for the local database URL.
-port = 54322
+# [db]
+# enabled = true
+# port = 54322
 
-[studio]
-enabled = true
-# Port to use for Supabase Studio.
-port = 54323
+# [studio]
+# enabled = true
+# port = 54323
 
-[inbucket]
-enabled = true
-# Port to use for the email testing server.
-port = 54324
+# [inbucket]
+# enabled = true
+# port = 54324
 
-[auth]
-enabled = true
-# The base URL of your website. Used as an allow-list for redirects and for constructing URLs used
-# in emails.
-site_url = "http://localhost:3000"
-# A list of *exact* URLs that auth providers are permitted to redirect to post authentication.
-additional_redirect_urls = ["http://localhost:3000", "http://localhost:3001", "http://localhost:3002", "http://localhost:3003", "http://localhost:3004", "http://localhost:3005"]
-# How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604800 (1 week).
-jwt_expiry = 3600
+# [auth]
+# enabled = true
 
-[auth.email]
-# Allow/disallow new user signups via email to your project.
-enable_signup = true
-# If enabled, a user will be required to confirm any email change on both the old, and new email
-# addresses. If disabled, only the new email is required to confirm.
-double_confirm_changes = true
-# If enabled, users need to confirm their email address before signing in.
-enable_confirmations = false
-
-[auth.sms]
-# Allow/disallow new user signups via SMS to your project.
-enable_signup = true
-# If enabled, users need to confirm their phone number before signing in.
-enable_confirmations = true
-
-[auth.external.google]
-enabled = false
-
-[auth.external.github]
-enabled = false
+# All authentication and database operations use remote Supabase instances
+# Development: https://vgpovgpwqkjnpnrjelyg.supabase.co
+# Production: https://howjinnvvtvaufihwers.supabase.co
 
 
 [functions.tcr-register-campaign]

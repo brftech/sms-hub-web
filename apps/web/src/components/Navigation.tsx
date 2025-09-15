@@ -10,6 +10,7 @@ import {
   CreditCard,
 } from "lucide-react";
 import { getHubColorClasses } from "@sms-hub/utils";
+import { webEnvironment } from "../config/webEnvironment";
 
 const Navigation = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -100,7 +101,7 @@ const Navigation = () => {
 
           {/* Right side - SignUp and Login buttons (Desktop only) */}
           <div className="hidden md:flex items-center space-x-4">
-            <HubSwitcher />
+            {webEnvironment.features.hubSwitcher() && <HubSwitcher />}
             <Button
               variant="outline"
               size="sm"
@@ -112,9 +113,7 @@ const Navigation = () => {
             <Button
               variant="outline"
               size="sm"
-              onClick={() =>
-                navigate("/login")
-              }
+              onClick={() => navigate("/login")}
               className={`transition-all duration-300 backdrop-blur-sm px-4 py-1.5 text-xs ${
                 isLoginPage
                   ? `${hubColors.bgLight} ${hubColors.text} ${hubColors.border}`
@@ -130,9 +129,7 @@ const Navigation = () => {
             <Button
               variant="outline"
               size="sm"
-              onClick={() =>
-                navigate("/login")
-              }
+              onClick={() => navigate("/login")}
               className={`transition-all duration-300 backdrop-blur-sm px-3 py-1.5 text-xs ${
                 isLoginPage
                   ? `${hubColors.bgLight} ${hubColors.text} ${hubColors.border}`
@@ -190,9 +187,7 @@ const Navigation = () => {
                 </Button>
                 <Button
                   variant="outline"
-                  onClick={() =>
-                    navigate("/login")
-                  }
+                  onClick={() => navigate("/login")}
                   className="w-full bg-black/50 text-white border border-orange-500/50 hover:bg-orange-500/10 hover:border-orange-400 font-medium py-3 text-base"
                 >
                   Login

@@ -3,10 +3,28 @@ import { Plus, Building2, User, CreditCard } from "lucide-react";
 import { BaseModal, ModalFormLayout, ModalFormColumn } from "./BaseModal";
 // import { HubType } from "@sms-hub/types"; // Not currently used
 
+interface AccountAddData {
+  hub_id: number;
+  accountType: 'business' | 'individual';
+  subscriptionTier: string;
+  paymentStatus: string;
+  // B2B fields
+  companyName?: string;
+  legalName?: string;
+  billingEmail: string;
+  // User fields (optional)
+  userEmail?: string;
+  userPassword?: string;
+  firstName?: string;
+  lastName?: string;
+  phoneNumber?: string;
+  role?: string;
+}
+
 export interface AccountAddModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onAdd: (accountData: any) => Promise<void>;
+  onAdd: (accountData: AccountAddData) => Promise<void>;
   hubId: number;
   hubName: string;
 }
@@ -86,11 +104,12 @@ export const AccountAddModal: React.FC<AccountAddModalProps> = ({
     setIsLoading(true);
 
     try {
-      let accountData: any = {
+      let accountData: AccountAddData = {
         hub_id: hubId,
         accountType: accountType,
         subscriptionTier: formData.subscriptionTier,
         paymentStatus: formData.paymentStatus,
+        billingEmail: formData.billingEmail,
       };
 
       if (accountType === 'business') {

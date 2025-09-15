@@ -4,14 +4,14 @@ module.exports = {
     // Root-level tests (integration, e2e, etc.)
     {
       displayName: 'root',
-      testMatch: ['<rootDir>/test/**/*.{test,spec}.{js,jsx,ts,tsx}'],
+      testMatch: ['<rootDir>/../test/**/*.{test,spec}.{js,jsx,ts,tsx}'],
       testEnvironment: 'jsdom',
-      setupFilesAfterEnv: ['<rootDir>/test/setup.ts'],
+      setupFilesAfterEnv: ['<rootDir>/../test/setup.ts'],
       transform: {
         '^.+\\.(ts|tsx)$': 'ts-jest',
       },
       moduleNameMapper: {
-        '^@sms-hub/(.*)$': '<rootDir>/packages/$1/src',
+        '^@sms-hub/(.*)$': '<rootDir>/../packages/$1/src',
       },
     },
   ],
@@ -23,19 +23,19 @@ module.exports = {
   coverageDirectory: 'coverage',
   
   // Global setup and teardown
-  globalSetup: '<rootDir>/test/global-setup.ts',
-  globalTeardown: '<rootDir>/test/global-teardown.ts',
+  globalSetup: '<rootDir>/../test/global-setup.ts',
+  globalTeardown: '<rootDir>/../test/global-teardown.ts',
   
   // Test environment variables
-  setupFilesAfterEnv: ['<rootDir>/test/setup.ts'],
+  setupFilesAfterEnv: ['<rootDir>/../test/setup.ts'],
   
   // Module name mapping for monorepo packages
   moduleNameMapper: {
-    '^@sms-hub/(.*)$': '<rootDir>/packages/$1/src',
-    '^@/(.*)$': '<rootDir>/apps/web/src/$1',
+    '^@sms-hub/(.*)$': '<rootDir>/../packages/$1/src',
+    '^@/(.*)$': '<rootDir>/../apps/web/src/$1',
     // Mock static assets
     '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
-    '\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$': '<rootDir>/test/utils/file-mock.js',
+    '\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$': '<rootDir>/../test/utils/file-mock.js',
   },
   
 
@@ -70,8 +70,8 @@ module.exports = {
   
   // Coverage configuration
   collectCoverageFrom: [
-    'packages/*/src/**/*.{ts,tsx}',
-    'apps/*/src/**/*.{ts,tsx}',
+    '../packages/*/src/**/*.{ts,tsx}',
+    '../apps/*/src/**/*.{ts,tsx}',
     '!**/*.d.ts',
     '!**/node_modules/**',
     '!**/dist/**',

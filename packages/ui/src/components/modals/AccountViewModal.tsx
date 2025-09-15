@@ -13,8 +13,29 @@ interface UnifiedAccount {
   service_type?: string;
   hub_id: number;
   created_at: string;
-  company?: any;
-  customer?: any;
+  company?: {
+    id: string;
+    name: string;
+    created_at: string;
+    contact_email?: string;
+    contact_phone?: string;
+    legal_name?: string;
+    tax_id?: string;
+    industry_vertical?: string;
+    website?: string;
+    address?: string;
+    city?: string;
+    state?: string;
+    zip?: string;
+    country?: string;
+  };
+  customer?: {
+    id: string;
+    billing_email: string;
+    created_at: string;
+    stripe_customer_id?: string;
+    payment_method?: string;
+  };
   user_count?: number;
   has_texting?: boolean;
   has_other_services?: boolean;

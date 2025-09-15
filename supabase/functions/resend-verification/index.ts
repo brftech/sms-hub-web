@@ -13,13 +13,10 @@ serve(async (req) => {
     const { email } = await req.json();
 
     if (!email) {
-      return new Response(
-        JSON.stringify({ error: "Email is required" }),
-        { 
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-          status: 400 
-        }
-      );
+      return new Response(JSON.stringify({ error: "Email is required" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
     }
 
     // Create Supabase admin client
@@ -31,14 +28,16 @@ serve(async (req) => {
 
     // Check if user exists
     const { data: existingUsers } = await supabaseAdmin.auth.admin.listUsers();
-    const existingUser = existingUsers?.users?.find(user => user.email === email);
+    const existingUser = existingUsers?.users?.find(
+      (user) => user.email === email
+    );
 
     if (!existingUser) {
       return new Response(
         JSON.stringify({ error: "No account found with this email" }),
-        { 
+        {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
-          status: 404 
+          status: 404,
         }
       );
     }
@@ -46,30 +45,34 @@ serve(async (req) => {
     // Check if user is already confirmed
     if (existingUser.email_confirmed_at) {
       return new Response(
-        JSON.stringify({ error: "Account is already confirmed. Please try logging in." }),
-        { 
+        JSON.stringify({
+          error: "Account is already confirmed. Please try logging in.",
+        }),
+        {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
-          status: 400 
+          status: 400,
         }
       );
     }
 
     // Resend confirmation email using Supabase's built-in resend
     const { error: resendError } = await supabaseAdmin.auth.admin.generateLink({
-      type: 'signup',
+      type: "signup",
       email: email,
       options: {
         emailRedirectTo: `${Deno.env.get("PUBLIC_SITE_URL") || "http://localhost:3000"}/verify-auth`,
-      }
+      },
     });
 
     if (resendError) {
       console.error("Failed to resend verification email:", resendError);
       return new Response(
-        JSON.stringify({ error: "Failed to resend verification email. Please try again." }),
-        { 
+        JSON.stringify({
+          error: "Failed to resend verification email. Please try again.",
+        }),
+        {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
-          status: 500 
+          status: 500,
         }
       );
     }
@@ -80,14 +83,16 @@ serve(async (req) => {
       JSON.stringify({
         success: true,
         message: "Verification email sent successfully",
-        email: email
+        email: email,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
     console.error("Error in resend-verification:", error);
     return new Response(
-      JSON.stringify({ error: error.message || "An unexpected error occurred" }),
+      JSON.stringify({
+        error: error.message || "An unexpected error occurred",
+      }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 500,
@@ -95,4 +100,3 @@ serve(async (req) => {
     );
   }
 });
-

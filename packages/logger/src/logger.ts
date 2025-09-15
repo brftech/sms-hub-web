@@ -4,6 +4,7 @@ import type {
   Logger,
   LoggerConfig,
   LogEntry,
+  LogData,
 } from "./types";
 
 const LOG_LEVELS: Record<LogLevel, number> = {
@@ -70,7 +71,7 @@ class LoggerImpl implements Logger {
     level: LogLevel,
     message: string,
     error?: Error,
-    data?: any
+    data?: LogData
   ): LogEntry {
     return {
       level,
@@ -159,19 +160,19 @@ class LoggerImpl implements Logger {
     this.logToSentry(entry);
   }
 
-  debug(message: string, data?: any): void {
+  debug(message: string, data?: LogData): void {
     this.log(this.createLogEntry("debug", message, undefined, data));
   }
 
-  info(message: string, data?: any): void {
+  info(message: string, data?: LogData): void {
     this.log(this.createLogEntry("info", message, undefined, data));
   }
 
-  warn(message: string, data?: any): void {
+  warn(message: string, data?: LogData): void {
     this.log(this.createLogEntry("warn", message, undefined, data));
   }
 
-  error(message: string, error?: Error | any, data?: any): void {
+  error(message: string, error?: Error | unknown, data?: LogData): void {
     // Handle cases where error might be a string or other type
     const errorObj =
       error instanceof Error

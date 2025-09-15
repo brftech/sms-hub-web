@@ -123,9 +123,17 @@ const Settings = () => {
                     </label>
                     <input
                       type="text"
-                      defaultValue="postgresql://localhost:5432/sms_hub"
+                      defaultValue={
+                        import.meta.env.VITE_SUPABASE_URL ||
+                        "Remote Supabase Database"
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      readOnly
                     />
+                    <p className="text-xs text-gray-500 mt-1">
+                      Remote Supabase Database - Development:
+                      vgpovgpwqkjnpnrjelyg, Production: howjinnvvtvaufihwers
+                    </p>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">

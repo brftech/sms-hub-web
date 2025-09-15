@@ -9,7 +9,40 @@ async function createBusinessRecords(supabaseAdmin: any, user: any, data: any) {
     const companyId = crypto.randomUUID();
     const accountNumber = `ACC-${Date.now()}`;
 
-    // Create company record
+    // PHASE 1: Create user profile WITHOUT company_id (breaks circular dependency)
+    console.log("🔧 PHASE 1: Creating user profile without company_id");
+    const { error: profileError } = await supabaseAdmin
+      .from("user_profiles")
+      .insert([
+        {
+          id: user.id,
+          email: data.email,
+          account_number: `USR-${Date.now()}`,
+          hub_id: data.hub_id,
+          first_name: data.first_name,
+          last_name: data.last_name,
+          mobile_phone_number: data.phone_number,
+          role: "USER",
+          signup_type: data.signup_type,
+          company_admin: true,
+          company_admin_since: timestamp,
+          is_active: true,
+          created_at: timestamp,
+          updated_at: timestamp,
+        },
+      ]);
+
+    if (profileError) {
+      console.error(
+        "❌ PHASE 1 FAILED - User profile creation error:",
+        profileError
+      );
+      throw profileError;
+    }
+    console.log("✅ PHASE 1 SUCCESS - User profile created");
+
+    // PHASE 2: Create company record (now user profile exists)
+    console.log("🔧 PHASE 2: Creating company record");
     const { error: companyError } = await supabaseAdmin
       .from("companies")
       .insert([
@@ -27,32 +60,33 @@ async function createBusinessRecords(supabaseAdmin: any, user: any, data: any) {
         },
       ]);
 
-    if (companyError) throw companyError;
+    if (companyError) {
+      console.error(
+        "❌ PHASE 2 FAILED - Company creation error:",
+        companyError
+      );
+      throw companyError;
+    }
+    console.log("✅ PHASE 2 SUCCESS - Company created");
 
-    // Create user profile record
-    const { error: profileError } = await supabaseAdmin
+    // PHASE 3: Update user profile with company_id
+    console.log("🔧 PHASE 3: Linking user profile to company");
+    const { error: updateProfileError } = await supabaseAdmin
       .from("user_profiles")
-      .insert([
-        {
-          id: user.id,
-          email: data.email,
-          account_number: `USR-${Date.now()}`,
-          hub_id: data.hub_id,
-          first_name: data.first_name,
-          last_name: data.last_name,
-          mobile_phone_number: data.phone_number,
-          role: "USER",
-          signup_type: data.signup_type,
-          company_admin: true,
-          company_admin_since: timestamp,
-          company_id: companyId,
-          is_active: true,
-          created_at: timestamp,
-          updated_at: timestamp,
-        },
-      ]);
+      .update({ company_id: companyId })
+      .eq("id", user.id);
 
-    if (profileError) throw profileError;
+    if (updateProfileError) {
+      console.error(
+        "❌ PHASE 3 FAILED - User profile update error:",
+        updateProfileError
+      );
+      throw updateProfileError;
+    }
+    console.log("✅ PHASE 3 SUCCESS - User profile linked to company");
+
+    // PHASE 4: Create dependent records
+    console.log("🔧 PHASE 4: Creating dependent records");
 
     // Create membership record
     const { error: membershipError } = await supabaseAdmin
@@ -76,7 +110,12 @@ async function createBusinessRecords(supabaseAdmin: any, user: any, data: any) {
       ]);
 
     if (membershipError) {
-      console.warn("Failed to create membership:", membershipError);
+      console.warn(
+        "⚠️ PHASE 4 WARNING - Failed to create membership:",
+        membershipError
+      );
+    } else {
+      console.log("✅ PHASE 4 SUCCESS - Membership created");
     }
 
     // Create customer record
@@ -94,7 +133,12 @@ async function createBusinessRecords(supabaseAdmin: any, user: any, data: any) {
       ]);
 
     if (customerError) {
-      console.warn("Failed to create customer:", customerError);
+      console.warn(
+        "⚠️ PHASE 4 WARNING - Failed to create customer:",
+        customerError
+      );
+    } else {
+      console.log("✅ PHASE 4 SUCCESS - Customer created");
     }
 
     console.log("✅ Business records created successfully");
@@ -124,6 +168,7 @@ serve(async (req) => {
       signup_type,
       invitation_token,
       customer_type,
+      create_business_records = false, // Flag to create business records for confirmed users
     } = await req.json();
 
     // Create Supabase admin client
@@ -274,60 +319,30 @@ serve(async (req) => {
     // Allow override from environment variable
     publicSiteUrl = Deno.env.get("PUBLIC_SITE_URL") || publicSiteUrl;
 
-    // Use standard Supabase signup (this automatically sends confirmation email)
+    // Prepare signup options
+    const signupOptions: any = {
+      data: {
+        hub_id: invitationData ? invitationData.hub_id : hub_id,
+        signup_type: signup_type,
+        customer_type: customer_type || "company",
+        first_name: first_name,
+        last_name: last_name,
+        company_name: company_name,
+        phone_number: phone_number,
+      },
+      emailRedirectTo: `${unifiedUrl}/auth-callback`,
+    };
+
+    // Always use standard signup (sends email)
+    console.log("📧 Creating user with standard signup (sends email)");
     const { data: authData, error: authError } =
       await supabaseAdmin.auth.signUp({
         email: email,
         password: password,
-        options: {
-          emailRedirectTo: `${publicSiteUrl}/auth-callback`,
-          data: {
-            hub_id: invitationData ? invitationData.hub_id : hub_id,
-            signup_type: signup_type,
-            customer_type: customer_type || "company",
-            first_name: first_name,
-            last_name: last_name,
-            company_name: company_name,
-            phone_number: phone_number,
-          },
-        },
+        options: signupOptions,
       });
 
-    // Only auto-confirm in development environment
-    let autoConfirmed = false;
-    if (isDevelopment && authData?.user && !authData.user.email_confirmed_at) {
-      const skipEmailConfirmation =
-        Deno.env.get("SKIP_EMAIL_CONFIRMATION") === "true";
-
-      if (skipEmailConfirmation) {
-        console.log(
-          "🔧 Development mode: Auto-confirming user (SKIP_EMAIL_CONFIRMATION=true)"
-        );
-        const { error: confirmError } =
-          await supabaseAdmin.auth.admin.updateUserById(authData.user.id, {
-            email_confirm: true,
-          });
-
-        if (confirmError) {
-          console.error("Failed to auto-confirm user:", confirmError);
-        } else {
-          console.log("✅ User auto-confirmed for development");
-          autoConfirmed = true;
-
-          // Create business records immediately in development
-          await createBusinessRecords(supabaseAdmin, authData.user, {
-            email,
-            first_name,
-            last_name,
-            company_name,
-            phone_number,
-            hub_id: invitationData ? invitationData.hub_id : hub_id,
-            signup_type,
-            customer_type,
-          });
-        }
-      }
-    }
+    const autoConfirmed = false;
 
     if (authError) {
       console.error("Failed to create auth user:", authError);
@@ -342,14 +357,29 @@ serve(async (req) => {
       );
     }
 
-    console.log(
-      "✅ Auth user created and confirmation email sent:",
-      authData.user.id
-    );
-    console.log("User will complete profile setup after email confirmation");
+    // Check if we should create business records (for confirmed users)
+    if (create_business_records && authData.user.email_confirmed_at) {
+      console.log("✅ User confirmed, creating business records...");
 
-    // signUp() automatically sends confirmation email - no additional action needed
-    console.log("✅ Confirmation email automatically sent via signUp()");
+      await createBusinessRecords(supabaseAdmin, authData.user, {
+        email,
+        first_name,
+        last_name,
+        company_name,
+        phone_number,
+        hub_id: invitationData ? invitationData.hub_id : hub_id,
+        signup_type,
+        customer_type,
+      });
+
+      console.log("✅ Business records created successfully");
+    } else {
+      console.log(
+        "✅ Auth user created, confirmation email sent:",
+        authData.user.id
+      );
+      console.log("User will complete profile setup after email confirmation");
+    }
 
     console.log("✅ Signup completed successfully");
 
@@ -360,11 +390,9 @@ serve(async (req) => {
         email: email,
         hub_id: invitationData ? invitationData.hub_id : hub_id,
         customer_type: customer_type,
-        confirmation_email_sent: !autoConfirmed,
-        auto_confirmed: autoConfirmed,
-        message: autoConfirmed
-          ? "Account created and ready! Redirecting to dashboard..."
-          : "Please check your email to confirm your account",
+        confirmation_email_sent: true,
+        auto_confirmed: false,
+        message: "Please check your email to confirm your account",
         environment: environment,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }

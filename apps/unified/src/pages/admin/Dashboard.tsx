@@ -467,7 +467,7 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-3">
       {/* Page Header */}
       <div className="flex items-start justify-between">
         <div>
@@ -495,60 +495,50 @@ const Dashboard = () => {
 
       {/* Payment Track */}
       {stats && (
-        <div className="bg-card rounded-lg shadow-sm p-6">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 space-y-3 sm:space-y-0">
+        <div className="bg-card rounded-lg shadow-sm p-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 space-y-2 sm:space-y-0">
             <div>
-              <h2 className="text-base sm:text-lg font-medium text-foreground">
+              <h2 className="text-sm sm:text-base font-medium text-foreground">
                 Payment Track
               </h2>
-              <p className="text-xs sm:text-sm text-muted-foreground">
+              <p className="text-xs text-muted-foreground">
                 Database Tables in Population Order
               </p>
             </div>
             <div className="text-left sm:text-right">
-              <p className="text-xl sm:text-2xl font-bold text-foreground">
+              <p className="text-lg sm:text-xl font-bold text-foreground">
                 {stats.onboardingStages.onboardingSubmissions}
               </p>
-              <p className="text-xs sm:text-sm text-muted-foreground">
+              <p className="text-xs text-muted-foreground">
                 Onboarding
               </p>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 sm:gap-3">
-            {Object.entries(stats.onboardingStages).map(([stage, count]) => {
+          <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+            {["userAuth", "userProfiles", "companies", "memberships", "customers", "onboardingSubmissions"].map((stage) => {
+              const count = stats.onboardingStages[stage];
               const stageInfo = getStageInfo(stage);
               const IconComponent = stageInfo.icon;
-              const isPaymentStage = [
-                "userAuth",
-                "userProfiles",
-                "companies",
-                "customers",
-                "memberships",
-                "onboardingSubmissions",
-              ].includes(stage);
-
-              if (!isPaymentStage) return null; // Only show payment stages
 
               return (
                 <div key={stage} className="text-center">
                   <div
-                    className={`p-2 sm:p-3 rounded-lg border-2 transition-all duration-200 hover:shadow-sm min-h-[80px] sm:min-h-[90px] lg:min-h-[100px] flex flex-col justify-center ${
+                    className={`p-2 rounded-lg border transition-all duration-200 hover:shadow-sm min-h-[60px] flex flex-col justify-center ${
                       (count as number) > 0
                         ? "border-blue-200 bg-blue-50"
                         : "border-gray-200 bg-gray-50"
                     }`}
                   >
                     <IconComponent
-                      className={`w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 mx-auto mb-1 sm:mb-2 ${(count as number) > 0 ? stageInfo.color : "text-gray-400"}`}
+                      className={`w-4 h-4 mx-auto mb-1 ${(count as number) > 0 ? stageInfo.color : "text-gray-400"}`}
                     />
-                    <p className="text-sm sm:text-base lg:text-lg font-bold text-gray-900">
+                    <p className="text-sm font-bold text-gray-900">
                       {count as number}
                     </p>
                     <p className="text-xs text-gray-600 leading-tight">
                       {stageInfo.label}
                     </p>
-                    <div className="w-2 h-2 bg-blue-500 rounded-full mx-auto mt-1"></div>
                   </div>
                 </div>
               );
@@ -559,60 +549,50 @@ const Dashboard = () => {
 
       {/* Onboarding Track */}
       {stats && (
-        <div className="bg-card rounded-lg shadow-sm p-6">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 space-y-3 sm:space-y-0">
+        <div className="bg-card rounded-lg shadow-sm p-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 space-y-2 sm:space-y-0">
             <div>
-              <h2 className="text-base sm:text-lg font-medium text-foreground">
+              <h2 className="text-sm sm:text-base font-medium text-foreground">
                 Onboarding Track
               </h2>
-              <p className="text-xs sm:text-sm text-muted-foreground">
-                Brand → Privacy → Campaign → gPhone → Account Setup → Complete
+              <p className="text-xs text-muted-foreground">
+                Brand → Privacy → Campaign → gPhone → Account → Complete
               </p>
             </div>
             <div className="text-left sm:text-right">
-              <p className="text-xl sm:text-2xl font-bold text-foreground">
+              <p className="text-lg sm:text-xl font-bold text-foreground">
                 {stats.onboardingStages.onboardingComplete}
               </p>
-              <p className="text-xs sm:text-sm text-muted-foreground">
-                Onboarding Complete
+              <p className="text-xs text-muted-foreground">
+                Complete
               </p>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 sm:gap-3">
-            {Object.entries(stats.onboardingStages).map(([stage, count]) => {
+          <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+            {["brandSubmission", "privacySetup", "campaignSubmission", "gphoneProcurement", "accountSetup", "onboardingComplete"].map((stage) => {
+              const count = stats.onboardingStages[stage];
               const stageInfo = getStageInfo(stage);
               const IconComponent = stageInfo.icon;
-              const isOnboardingStage = [
-                "brandSubmission",
-                "privacySetup",
-                "campaignSubmission",
-                "gphoneProcurement",
-                "accountSetup",
-                "onboardingComplete",
-              ].includes(stage);
-
-              if (!isOnboardingStage) return null; // Only show onboarding stages
 
               return (
                 <div key={stage} className="text-center">
                   <div
-                    className={`p-2 sm:p-3 rounded-lg border-2 transition-all duration-200 hover:shadow-sm min-h-[80px] sm:min-h-[90px] lg:min-h-[100px] flex flex-col justify-center ${
+                    className={`p-2 rounded-lg border transition-all duration-200 hover:shadow-sm min-h-[60px] flex flex-col justify-center ${
                       (count as number) > 0
                         ? "border-green-200 bg-green-50"
                         : "border-gray-200 bg-gray-50"
                     }`}
                   >
                     <IconComponent
-                      className={`w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 mx-auto mb-1 sm:mb-2 ${(count as number) > 0 ? stageInfo.color : "text-gray-400"}`}
+                      className={`w-4 h-4 mx-auto mb-1 ${(count as number) > 0 ? stageInfo.color : "text-gray-400"}`}
                     />
-                    <p className="text-sm sm:text-base lg:text-lg font-bold text-gray-900">
+                    <p className="text-sm font-bold text-gray-900">
                       {count as number}
                     </p>
                     <p className="text-xs text-gray-600 leading-tight">
                       {stageInfo.label.split(" ")[0]}
                     </p>
-                    <div className="w-2 h-2 bg-green-500 rounded-full mx-auto mt-1"></div>
                   </div>
                 </div>
               );
@@ -620,19 +600,19 @@ const Dashboard = () => {
           </div>
 
           {/* Onboarding Summary */}
-          <div className="mt-6 p-4 bg-green-50 rounded-lg">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-center">
+          <div className="mt-3 p-3 bg-green-50 rounded-lg">
+            <div className="grid grid-cols-2 gap-4 text-center">
               <div>
-                <p className="text-2xl font-bold text-green-600">
+                <p className="text-lg font-bold text-green-600">
                   {stats.onboardingStages.onboardingSubmissions}
                 </p>
-                <p className="text-sm text-gray-600">Ready for Onboarding</p>
+                <p className="text-xs text-gray-600">Ready for Onboarding</p>
               </div>
               <div>
-                <p className="text-2xl font-bold text-green-600">
+                <p className="text-lg font-bold text-green-600">
                   {stats.onboardingStages.onboardingComplete}
                 </p>
-                <p className="text-sm text-gray-600">Onboarding Complete</p>
+                <p className="text-xs text-gray-600">Onboarding Complete</p>
               </div>
             </div>
           </div>
@@ -641,8 +621,8 @@ const Dashboard = () => {
 
       {/* Hub Breakdown - Only show in Global View */}
       {isGlobalView && stats?.hubBreakdown && (
-        <div className="bg-card rounded-lg shadow-sm p-6">
-          <h2 className="text-base sm:text-lg font-medium text-gray-900 mb-3 sm:mb-4">
+        <div className="bg-card rounded-lg shadow-sm p-4">
+          <h2 className="text-sm sm:text-base font-medium text-gray-900 mb-3">
             Hub Breakdown
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
@@ -685,23 +665,23 @@ const Dashboard = () => {
 
       {/* Quick Stats */}
       {stats && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <div
-            className="bg-card rounded-lg shadow-sm p-4 sm:p-6 cursor-pointer hover:shadow-md hover:scale-105 transition-all duration-200"
+            className="bg-card rounded-lg shadow-sm p-3 cursor-pointer hover:shadow-md hover:scale-105 transition-all duration-200"
             onClick={navigateToCompanies}
           >
             <div className="flex items-center">
               <div className="p-2 icon-bg-success rounded-lg flex-shrink-0">
-                <Building className="w-5 h-5 sm:w-6 sm:h-6 text-status-success" />
+                <Building className="w-4 h-4 text-status-success" />
               </div>
-              <div className="ml-3 sm:ml-4 min-w-0 flex-1">
-                <p className="text-xs sm:text-sm font-medium text-muted-foreground truncate">
+              <div className="ml-2 min-w-0 flex-1">
+                <p className="text-xs font-medium text-muted-foreground truncate">
                   Active Companies
                 </p>
-                <p className="text-xl sm:text-2xl font-bold text-foreground">
+                <p className="text-lg font-bold text-foreground">
                   {stats.activeCompanies}
                 </p>
-                <p className="text-xs text-status-success mt-1 truncate">
+                <p className="text-xs text-status-success mt-0.5 truncate">
                   of {stats.totalCompanies} total
                 </p>
               </div>
@@ -709,21 +689,21 @@ const Dashboard = () => {
           </div>
 
           <div
-            className="bg-card rounded-lg shadow-sm p-4 sm:p-6 cursor-pointer hover:shadow-md hover:scale-105 transition-all duration-200"
+            className="bg-card rounded-lg shadow-sm p-3 cursor-pointer hover:shadow-md hover:scale-105 transition-all duration-200"
             onClick={navigateToUsers}
           >
             <div className="flex items-center">
               <div className="p-2 icon-bg-info rounded-lg flex-shrink-0">
-                <Users className="w-5 h-5 sm:w-6 sm:h-6 text-status-info" />
+                <Users className="w-4 h-4 text-status-info" />
               </div>
-              <div className="ml-3 sm:ml-4 min-w-0 flex-1">
-                <p className="text-xs sm:text-sm font-medium text-muted-foreground truncate">
+              <div className="ml-2 min-w-0 flex-1">
+                <p className="text-xs font-medium text-muted-foreground truncate">
                   Total Users
                 </p>
-                <p className="text-xl sm:text-2xl font-bold text-foreground">
+                <p className="text-lg font-bold text-foreground">
                   {stats.totalUsers.toLocaleString()}
                 </p>
-                <p className="text-xs text-status-success mt-1 truncate">
+                <p className="text-xs text-status-success mt-0.5 truncate">
                   +{stats.activeUsers} active
                 </p>
               </div>
@@ -731,21 +711,21 @@ const Dashboard = () => {
           </div>
 
           <div
-            className="bg-card rounded-lg shadow-sm p-4 sm:p-6 cursor-pointer hover:shadow-md hover:scale-105 transition-all duration-200"
+            className="bg-card rounded-lg shadow-sm p-3 cursor-pointer hover:shadow-md hover:scale-105 transition-all duration-200"
             onClick={navigateToLeads}
           >
             <div className="flex items-center">
               <div className="p-2 icon-bg-warning rounded-lg flex-shrink-0">
-                <UserPlus className="w-5 h-5 sm:w-6 sm:h-6 text-status-warning" />
+                <UserPlus className="w-4 h-4 text-status-warning" />
               </div>
-              <div className="ml-3 sm:ml-4 min-w-0 flex-1">
-                <p className="text-xs sm:text-sm font-medium text-muted-foreground truncate">
+              <div className="ml-2 min-w-0 flex-1">
+                <p className="text-xs font-medium text-muted-foreground truncate">
                   Leads
                 </p>
-                <p className="text-xl sm:text-2xl font-bold text-foreground">
+                <p className="text-lg font-bold text-foreground">
                   {stats.totalLeads}
                 </p>
-                <p className="text-xs text-status-warning mt-1 truncate">
+                <p className="text-xs text-status-warning mt-0.5 truncate">
                   {stats.pendingLeads} pending
                 </p>
               </div>
@@ -753,21 +733,21 @@ const Dashboard = () => {
           </div>
 
           <div
-            className="bg-card rounded-lg shadow-sm p-4 sm:p-6 cursor-pointer hover:shadow-md hover:scale-105 transition-all duration-200"
+            className="bg-card rounded-lg shadow-sm p-3 cursor-pointer hover:shadow-md hover:scale-105 transition-all duration-200"
             onClick={navigateToCompanies}
           >
             <div className="flex items-center">
               <div className="p-2 icon-bg-error rounded-lg flex-shrink-0">
-                <Activity className="w-5 h-5 sm:w-6 sm:h-6 text-status-error" />
+                <Activity className="w-4 h-4 text-status-error" />
               </div>
-              <div className="ml-3 sm:ml-4 min-w-0 flex-1">
-                <p className="text-xs sm:text-sm font-medium text-muted-foreground truncate">
+              <div className="ml-2 min-w-0 flex-1">
+                <p className="text-xs font-medium text-muted-foreground truncate">
                   Onboarding Progress
                 </p>
-                <p className="text-xl sm:text-2xl font-bold text-foreground">
+                <p className="text-lg font-bold text-foreground">
                   {stats.totalCompanies - stats.activeCompanies}
                 </p>
-                <p className="text-xs text-status-error mt-1 truncate">
+                <p className="text-xs text-status-error mt-0.5 truncate">
                   in progress
                 </p>
               </div>
@@ -891,60 +871,60 @@ const Dashboard = () => {
 
       {/* Secondary Stats */}
       {stats && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          <div className="bg-card rounded-lg shadow-sm p-4 sm:p-6">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="bg-card rounded-lg shadow-sm p-3">
             <div className="flex items-center justify-between">
               <div className="min-w-0 flex-1">
-                <p className="text-xs sm:text-sm font-medium text-muted-foreground truncate">
+                <p className="text-xs font-medium text-muted-foreground truncate">
                   Messages Sent
                 </p>
-                <p className="text-xl sm:text-2xl font-bold text-foreground">
+                <p className="text-lg font-bold text-foreground">
                   {stats.totalMessages.toLocaleString()}
                 </p>
               </div>
-              <div className="p-2 bg-blue-100 rounded-lg flex-shrink-0 ml-3">
-                <MessageSquare className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
+              <div className="p-1.5 bg-blue-100 rounded-lg flex-shrink-0 ml-2">
+                <MessageSquare className="w-4 h-4 text-blue-600" />
               </div>
             </div>
-            <p className="text-xs text-gray-500 mt-2 truncate">
+            <p className="text-xs text-gray-500 mt-1 truncate">
               {stats.messagesThisMonth.toLocaleString()} this month
             </p>
           </div>
 
-          <div className="bg-card rounded-lg shadow-sm p-4 sm:p-6">
+          <div className="bg-card rounded-lg shadow-sm p-3">
             <div className="flex items-center justify-between">
               <div className="min-w-0 flex-1">
-                <p className="text-xs sm:text-sm font-medium text-muted-foreground truncate">
+                <p className="text-xs font-medium text-muted-foreground truncate">
                   Revenue
                 </p>
-                <p className="text-xl sm:text-2xl font-bold text-foreground">
+                <p className="text-lg font-bold text-foreground">
                   ${stats.revenue.toLocaleString()}
                 </p>
               </div>
-              <div className="p-2 bg-orange-100 rounded-lg flex-shrink-0 ml-3">
-                <DollarSign className="w-5 h-5 sm:w-6 sm:h-6 text-orange-600" />
+              <div className="p-1.5 bg-orange-100 rounded-lg flex-shrink-0 ml-2">
+                <DollarSign className="w-4 h-4 text-orange-600" />
               </div>
             </div>
-            <p className="text-xs text-green-600 mt-2 truncate">
+            <p className="text-xs text-green-600 mt-1 truncate">
               +{stats.revenueGrowth}% this month
             </p>
           </div>
 
-          <div className="bg-card rounded-lg shadow-sm p-6">
+          <div className="bg-card rounded-lg shadow-sm p-3">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">
+                <p className="text-xs font-medium text-gray-600">
                   System Health
                 </p>
-                <p className="text-2xl font-bold text-green-600">
+                <p className="text-lg font-bold text-green-600">
                   {systemHealth?.overallHealth || 0}%
                 </p>
               </div>
-              <div className="p-2 bg-green-100 rounded-lg">
-                <CheckCircle className="w-6 h-6 text-green-600" />
+              <div className="p-1.5 bg-green-100 rounded-lg">
+                <CheckCircle className="w-4 h-4 text-green-600" />
               </div>
             </div>
-            <p className="text-xs text-gray-500 mt-2">
+            <p className="text-xs text-gray-500 mt-1">
               All systems operational
             </p>
           </div>
@@ -1060,83 +1040,82 @@ const Dashboard = () => {
       </div>
 
       {/* Quick Actions */}
-      <div className="bg-card rounded-lg shadow-sm p-4 sm:p-6">
-        <h3 className="text-lg font-medium text-foreground mb-4">
-          Onboarding Quick Actions
+      <div className="bg-card rounded-lg shadow-sm p-3">
+        <h3 className="text-sm font-medium text-foreground mb-2">
+          Quick Actions
         </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
           <button
             onClick={navigateToCompanies}
-            className="flex items-center justify-center px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            className="flex items-center justify-center px-2 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
           >
-            <Building className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-green-600" />
-            <span className="text-xs sm:text-sm font-medium text-gray-700">
-              Manage Companies
+            <Building className="w-3 h-3 mr-1.5 text-green-600" />
+            <span className="text-xs font-medium text-gray-700">
+              Companies
             </span>
           </button>
           <button
             onClick={navigateToUsers}
-            className="flex items-center justify-center px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            className="flex items-center justify-center px-2 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
           >
-            <UserPlus className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-blue-600" />
-            <span className="text-xs sm:text-sm font-medium text-gray-700">
-              Add User
+            <UserPlus className="w-3 h-3 mr-1.5 text-blue-600" />
+            <span className="text-xs font-medium text-gray-700">
+              Users
             </span>
           </button>
           <button
             onClick={navigateToCompanies}
-            className="flex items-center justify-center px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            className="flex items-center justify-center px-2 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
           >
-            <Shield className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-purple-600" />
-            <span className="text-xs sm:text-sm font-medium text-gray-700">
-              Verify Signups
+            <Shield className="w-3 h-3 mr-1.5 text-purple-600" />
+            <span className="text-xs font-medium text-gray-700">
+              Verify
             </span>
           </button>
           <button
             onClick={navigateToLeads}
-            className="flex items-center justify-center px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            className="flex items-center justify-center px-2 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
           >
-            <Target className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-orange-600" />
-            <span className="text-xs sm:text-sm font-medium text-gray-700">
-              Convert Leads
+            <Target className="w-3 h-3 mr-1.5 text-orange-600" />
+            <span className="text-xs font-medium text-gray-700">
+              Leads
             </span>
           </button>
         </div>
       </div>
 
       {/* Data Cleanup Section */}
-      <div className="bg-card rounded-lg shadow-sm p-4 sm:p-6 border border-red-200">
-        <h3 className="text-lg font-medium text-foreground mb-4 flex items-center">
-          <AlertTriangle className="w-5 h-5 mr-2 text-red-600" />
+      <div className="bg-card rounded-lg shadow-sm p-3 border border-red-200">
+        <h3 className="text-sm font-medium text-foreground mb-2 flex items-center">
+          <AlertTriangle className="w-4 h-4 mr-1.5 text-red-600" />
           Data Cleanup
         </h3>
-        <p className="text-sm text-muted-foreground mb-4">
-          Clean up payment track data while preserving superadmin and hub
-          records.
+        <p className="text-xs text-muted-foreground mb-2">
+          Clean up payment track data while preserving superadmin records.
         </p>
-        <div className="flex flex-col sm:flex-row gap-3">
+        <div className="flex gap-2">
           <button
             onClick={handlePreviewCleanup}
-            className="flex items-center justify-center px-4 py-2.5 border border-yellow-300 rounded-lg hover:bg-yellow-50 transition-colors text-yellow-700"
+            className="flex items-center justify-center px-3 py-1.5 border border-yellow-300 rounded-lg hover:bg-yellow-50 transition-colors text-yellow-700 text-xs"
           >
-            <Eye className="w-4 h-4 mr-2" />
-            Preview Cleanup
+            <Eye className="w-3 h-3 mr-1" />
+            Preview
           </button>
           <button
             onClick={handleExecuteCleanup}
             disabled={isExecutingCleanup}
-            className="flex items-center justify-center px-4 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center justify-center px-3 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-xs"
           >
             {isExecutingCleanup ? (
-              <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+              <RefreshCw className="w-3 h-3 mr-1 animate-spin" />
             ) : (
-              <Trash2 className="w-4 h-4 mr-2" />
+              <Trash2 className="w-3 h-3 mr-1" />
             )}
-            {isExecutingCleanup ? "Executing..." : "Execute Cleanup"}
+            {isExecutingCleanup ? "Executing..." : "Execute"}
           </button>
         </div>
         {cleanupResult && (
-          <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+          <div className="mt-2 p-2 bg-gray-50 rounded-lg">
             <pre className="text-xs text-gray-700 whitespace-pre-wrap">
               {cleanupResult}
             </pre>

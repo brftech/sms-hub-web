@@ -49,20 +49,35 @@ export default function AuthCallback() {
           email: data.session.user.email,
         });
 
-        // Check if this is a signup flow and call complete-signup if needed
+        // Check if this is a signup flow and create business records
         const type = searchParams.get("type");
         if (type === "signup") {
           logger.info("[AuthCallback] Processing signup completion...");
 
           try {
+            // Get user metadata from session
+            const userMetadata = data.session.user.user_metadata || {};
+
             const response = await fetch(
-              `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/complete-signup`,
+              `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/signup-native`,
               {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
                   Authorization: `Bearer ${accessToken}`,
                 },
+                body: JSON.stringify({
+                  email: data.session.user.email,
+                  password: "dummy", // Not used for business records creation
+                  phone_number: userMetadata.phone_number || "",
+                  first_name: userMetadata.first_name || "",
+                  last_name: userMetadata.last_name || "",
+                  company_name: userMetadata.company_name || "Unknown Company",
+                  hub_id: userMetadata.hub_id || 1,
+                  signup_type: userMetadata.signup_type || "new_company",
+                  customer_type: userMetadata.customer_type || "company",
+                  create_business_records: true,
+                }),
               }
             );
 
@@ -70,7 +85,7 @@ export default function AuthCallback() {
 
             if (!response.ok) {
               logger.warn(
-                "[AuthCallback] Complete-signup failed (non-critical):",
+                "[AuthCallback] Business records creation failed (non-critical):",
                 result.error
               );
             } else {
@@ -81,7 +96,7 @@ export default function AuthCallback() {
             }
           } catch (signupError) {
             logger.warn(
-              "[AuthCallback] Complete-signup error (non-critical):",
+              "[AuthCallback] Business records creation error (non-critical):",
               {
                 error:
                   signupError instanceof Error
@@ -91,6 +106,10 @@ export default function AuthCallback() {
             );
           }
         }
+
+        logger.info(
+          "[AuthCallback] Session established, redirecting to dashboard"
+        );
 
         // Session is set, redirect to the intended path
         logger.info(`[AuthCallback] Redirecting to ${redirectPath}`);

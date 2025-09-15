@@ -60,7 +60,7 @@ serve(async (req) => {
       type: "signup",
       email: email,
       options: {
-        emailRedirectTo: `${Deno.env.get("PUBLIC_SITE_URL") || "http://localhost:3001"}/auth-callback`,
+        emailRedirectTo: `${Deno.env.get("UNIFIED_APP_URL") || "http://localhost:3001"}/auth-callback`,
       },
     });
 

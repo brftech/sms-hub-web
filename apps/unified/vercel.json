@@ -1,6 +1,6 @@
 {
-  "installCommand": "cd ../.. && pnpm install",
-  "buildCommand": "cd ../.. && pnpm --filter @sms-hub/unified build",
-  "outputDirectory": "dist",
+  "installCommand": "pnpm install",
+  "buildCommand": "pnpm build --filter=@sms-hub/unified",
+  "outputDirectory": "apps/unified/dist",
   "framework": "vite"
 }

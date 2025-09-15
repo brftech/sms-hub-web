@@ -39,7 +39,7 @@ const StepIndicator = styled.div`
   gap: 1rem;
 `;
 
-const Step = styled.div<{ active: boolean; completed: boolean }>`
+const Step = styled.div<{ $active: boolean; $completed: boolean }>`
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -50,29 +50,29 @@ const Step = styled.div<{ active: boolean; completed: boolean }>`
   font-size: 14px;
   transition: all 0.3s ease;
   
-  ${props => props.active && `
+  ${props => props.$active && `
     background: var(--hub-primary);
     color: white;
     border: 2px solid var(--hub-primary);
   `}
   
-  ${props => props.completed && !props.active && `
+  ${props => props.$completed && !props.$active && `
     background: #10b981;
     color: white;
     border: 2px solid #10b981;
   `}
   
-  ${props => !props.active && !props.completed && `
+  ${props => !props.$active && !props.$completed && `
     background: transparent;
     color: #6b7280;
     border: 2px solid #6b7280;
   `}
 `;
 
-const StepConnector = styled.div<{ completed: boolean }>`
+const StepConnector = styled.div<{ $completed: boolean }>`
   width: 40px;
   height: 2px;
-  background: ${props => props.completed ? '#10b981' : '#6b7280'};
+  background: ${props => props.$completed ? '#10b981' : '#6b7280'};
   margin-top: 19px;
 `;
 
@@ -546,11 +546,11 @@ export function Signup() {
           </div>
           
           <StepIndicator>
-            <Step active={currentStep === 1} completed={currentStep > 1}>1</Step>
-            <StepConnector completed={currentStep > 1} />
-            <Step active={currentStep === 2} completed={currentStep > 2}>2</Step>
-            <StepConnector completed={currentStep > 2} />
-            <Step active={currentStep === 3} completed={false}>3</Step>
+            <Step $active={currentStep === 1} $completed={currentStep > 1}>1</Step>
+            <StepConnector $completed={currentStep > 1} />
+            <Step $active={currentStep === 2} $completed={currentStep > 2}>2</Step>
+            <StepConnector $completed={currentStep > 2} />
+            <Step $active={currentStep === 3} $completed={false}>3</Step>
           </StepIndicator>
         </CardHeader>
 

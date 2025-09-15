@@ -280,7 +280,7 @@ serve(async (req) => {
         email: email,
         password: password,
         options: {
-          emailRedirectTo: `${publicSiteUrl}/verify-auth`,
+          emailRedirectTo: `${publicSiteUrl}/auth-callback`,
           data: {
             hub_id: invitationData ? invitationData.hub_id : hub_id,
             signup_type: signup_type,

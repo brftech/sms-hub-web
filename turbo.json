@@ -41,7 +41,12 @@
       "outputs": ["storybook-static/**"]
     }
   },
-  "globalDependencies": [".env", ".env.local", ".env.production"],
+  "globalDependencies": [
+    ".env",
+    ".env.local",
+    ".env.development",
+    ".env.production"
+  ],
   "globalEnv": [
     "NODE_ENV",
     "SUPABASE_URL",

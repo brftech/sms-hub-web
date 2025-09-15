@@ -256,7 +256,45 @@ import { getSupabaseClient } from "../lib/supabaseSingleton";
    - Manual hub_id filtering required
    - Service role operations moved to backend
 
+## 🚀 Deployment & Development Commands
+
+### Quick Deployment
+```bash
+# Deploy both apps to production
+pnpm run deploy
+
+# Deploy individual apps
+pnpm run deploy:web      # Marketing site only
+pnpm run deploy:unified  # Dashboard app only
+
+# Local development
+pnpm run dev:all        # Start both apps
+pnpm run dev:web        # Port 3000
+pnpm run dev:unified    # Port 3001
+```
+
+### Database Management
+```bash
+# Development database
+Project: sms-hub-monorepo
+ID: vgpovgpwqkjnpnrjelyg
+
+# Production database (PercyTech)
+Project: percytech
+ID: howjinnvvtvaufihwers
+
+# Switch between databases
+supabase link --project-ref [ID]
+```
+
 ## 📋 Current Tasks & Priorities
+
+### Immediate Action Required (September 15, 2025)
+
+1. **Run Migration 3 on Production**:
+   - Go to: https://supabase.com/dashboard/project/howjinnvvtvaufihwers/sql/new
+   - Run: `supabase/migrations/0000003_create_superadmin_only.sql`
+   - This creates the superadmin user profiles needed for authentication
 
 ### Current Status (September 2025)
 
@@ -355,9 +393,28 @@ import { getSupabaseClient } from "../lib/supabaseSingleton";
 5. **Consider mobile**: All interfaces must be responsive
 6. **Document decisions**: Add comments for non-obvious choices
 
-## 🔄 Recent Changes (Last Updated: 2025-09-14)
+## 🔄 Recent Changes (Last Updated: 2025-09-15)
 
-### Latest Fixes (September 14, 2025) - TODAY
+### Critical Deployment Fixes (September 15, 2025) - TODAY
+
+1. **Production Deployment Complete**:
+   - **Web App**: Deployed to www.gnymble.com (and other hubs)
+   - **Unified App**: Deployed to unified.gnymble.com (and other hubs)
+   - **Authentication Flow**: Fixed redirect from app.gnymble.com to unified.gnymble.com
+   - **Environment Config**: Login.tsx now uses environmentConfig for proper dev/prod URLs
+   - **Vercel Setup**: Both projects configured with correct build settings
+   - **Deployment Scripts**: Added deploy.sh and dev.sh for easy deployment
+
+2. **Critical Fixes Applied**:
+   - **React bundling issue**: Fixed forwardRef undefined error by removing manual chunking
+   - **Redirect URLs**: Updated to use unified.{hub}.com instead of app.{hub}.com
+   - **Output Directory**: Fixed Vercel configuration (was "distapps/unified/dist")
+   - **Project Linking**: Corrected .vercel/project.json files for both apps
+
+3. **Pending Task**:
+   - **User Migration**: Need to run migration 3 on production database for superadmin users
+
+### Previous Fixes (September 14, 2025)
 
 1. **Superadmin Access & Navigation Fixes**:
    - **Fixed `hasAnyRole` function**: Correctly passes `user.role` string instead of full user object

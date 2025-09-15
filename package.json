@@ -6,6 +6,13 @@
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
+    "dev:all": "./dev.sh",
+    "dev:web": "./dev.sh --web-only",
+    "dev:unified": "./dev.sh --unified-only",
+    "deploy": "./deploy.sh",
+    "deploy:web": "./deploy.sh --web-only",
+    "deploy:unified": "./deploy.sh --unified-only",
+    "deploy:force": "./deploy.sh --force",
     "lint": "turbo run lint",
     "test": "turbo run test",
     "test:unit": "jest --testPathPattern=test/unit",

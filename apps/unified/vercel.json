@@ -1,6 +1,5 @@
 {
-  "buildCommand": "tsc && vite build",
-  "outputDirectory": "dist",
-  "installCommand": "pnpm install",
+  "buildCommand": "cd apps/unified && pnpm build",
+  "outputDirectory": "apps/unified/dist",
   "framework": "vite"
 }

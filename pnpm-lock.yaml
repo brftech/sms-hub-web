@@ -220,9 +220,6 @@ importers:
 
   apps/web:
     dependencies:
-      '@sms-hub/dev-auth':
-        specifier: workspace:*
-        version: link:../../packages/dev-auth
       '@sms-hub/hub-logic':
         specifier: workspace:*
         version: link:../../packages/hub-logic

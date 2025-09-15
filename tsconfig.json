@@ -18,6 +18,6 @@
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["../test/**/*", "../packages/*/src/**/*", "../apps/*/src/**/*"],
+  "include": ["test/**/*", "packages/*/src/**/*", "apps/*/src/**/*"],
   "exclude": ["node_modules", "dist", "build"]
 }

@@ -240,7 +240,7 @@ serve(async (req) => {
             role,
             hub_name: hubName,
             company_name: companyName,
-            account_number,
+            account_number: accountNumber,
             login_url: loginUrl,
           }),
         }

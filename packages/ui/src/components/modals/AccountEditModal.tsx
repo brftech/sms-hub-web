@@ -1,36 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Edit, Save } from "lucide-react";
 import { BaseModal, ModalFormLayout, ModalFormColumn } from "./BaseModal";
-
-interface UnifiedAccount {
-  id: string;
-  type: 'company' | 'customer' | 'company_customer';
-  name: string;
-  email: string;
-  status: string;
-  payment_status?: string;
-  payment_type?: string;
-  service_type?: string;
-  hub_id: number;
-  created_at: string;
-  company?: {
-    id: string;
-    name: string;
-    created_at: string;
-    contact_email?: string;
-    contact_phone?: string;
-    legal_name?: string;
-    tax_id?: string;
-  };
-  customer?: {
-    id: string;
-    billing_email: string;
-    created_at: string;
-  };
-  user_count?: number;
-  has_texting?: boolean;
-  has_other_services?: boolean;
-}
+import type { UnifiedAccount } from "@sms-hub/types";
 
 interface AccountEditModalProps {
   isOpen: boolean;
@@ -67,10 +38,10 @@ export const AccountEditModal: React.FC<AccountEditModalProps> = ({
         status: account.status || "active",
         payment_type: account.payment_type || "none",
         payment_status: account.payment_status || "pending",
-        contact_email: account.company?.contact_email || "",
-        contact_phone: account.company?.contact_phone || "",
+        contact_email: account.company?.primary_contact_email || "",
+        contact_phone: account.company?.primary_contact_phone || "",
         legal_name: account.company?.legal_name || "",
-        tax_id: account.company?.tax_id || "",
+        tax_id: account.company?.ein || "",
       });
     }
   }, [account]);
@@ -79,35 +50,48 @@ export const AccountEditModal: React.FC<AccountEditModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    const updates: Partial<UnifiedAccount> = {
-      // Update based on entity type
-    };
 
-    if (account.type === 'company' || account.type === 'company_customer') {
+    const updates: {
+      company?: {
+        public_name?: string;
+        primary_contact_email?: string;
+        primary_contact_phone?: string;
+        legal_name?: string;
+        ein?: string;
+        is_active?: boolean;
+      };
+      customer?: {
+        billing_email?: string;
+        payment_type?: string;
+        payment_status?: string;
+        is_active?: boolean;
+      };
+    } = {};
+
+    if (account.type === "company" || account.type === "company_customer") {
       // Update company fields
       updates.company = {
-        public_name: formData.name,  // Add the name field here
-        contact_email: formData.contact_email,
-        contact_phone: formData.contact_phone,
+        public_name: formData.name, // Add the name field here
+        primary_contact_email: formData.contact_email,
+        primary_contact_phone: formData.contact_phone,
         legal_name: formData.legal_name,
-        tax_id: formData.tax_id,
-        is_active: formData.status === 'active',
+        ein: formData.tax_id,
+        is_active: formData.status === "active",
       };
     }
 
-    if (account.type === 'customer' || account.type === 'company_customer') {
+    if (account.type === "customer" || account.type === "company_customer") {
       // Update customer fields
       // Note: Customers table doesn't have first_name/last_name - those are in user_profiles
       updates.customer = {
         billing_email: formData.email,
         payment_type: formData.payment_type,
         payment_status: formData.payment_status,
-        is_active: formData.status === 'active',
+        is_active: formData.status === "active",
       };
     }
 
-    await onSave(updates);
+    await onSave(updates as Partial<UnifiedAccount>);
   };
 
   return (
@@ -130,7 +114,9 @@ export const AccountEditModal: React.FC<AccountEditModalProps> = ({
               <input
                 type="text"
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors"
                 required
               />
@@ -141,7 +127,9 @@ export const AccountEditModal: React.FC<AccountEditModalProps> = ({
               </label>
               <select
                 value={formData.status}
-                onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, status: e.target.value })
+                }
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors"
               >
                 <option value="active">Active</option>
@@ -158,7 +146,9 @@ export const AccountEditModal: React.FC<AccountEditModalProps> = ({
               <input
                 type="email"
                 value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors"
               />
             </div>
@@ -168,7 +158,9 @@ export const AccountEditModal: React.FC<AccountEditModalProps> = ({
               </label>
               <select
                 value={formData.payment_type}
-                onChange={(e) => setFormData({ ...formData, payment_type: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, payment_type: e.target.value })
+                }
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors"
               >
                 <option value="none">None</option>
@@ -180,7 +172,8 @@ export const AccountEditModal: React.FC<AccountEditModalProps> = ({
           </ModalFormColumn>
         </ModalFormLayout>
 
-        {(account.type === 'company' || account.type === 'company_customer') && (
+        {(account.type === "company" ||
+          account.type === "company_customer") && (
           <ModalFormLayout>
             <ModalFormColumn>
               <div>
@@ -190,7 +183,9 @@ export const AccountEditModal: React.FC<AccountEditModalProps> = ({
                 <input
                   type="email"
                   value={formData.contact_email}
-                  onChange={(e) => setFormData({ ...formData, contact_email: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, contact_email: e.target.value })
+                  }
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors"
                 />
               </div>
@@ -201,7 +196,9 @@ export const AccountEditModal: React.FC<AccountEditModalProps> = ({
                 <input
                   type="text"
                   value={formData.legal_name}
-                  onChange={(e) => setFormData({ ...formData, legal_name: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, legal_name: e.target.value })
+                  }
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors"
                 />
               </div>
@@ -215,7 +212,9 @@ export const AccountEditModal: React.FC<AccountEditModalProps> = ({
                 <input
                   type="tel"
                   value={formData.contact_phone}
-                  onChange={(e) => setFormData({ ...formData, contact_phone: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, contact_phone: e.target.value })
+                  }
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors"
                 />
               </div>
@@ -226,7 +225,9 @@ export const AccountEditModal: React.FC<AccountEditModalProps> = ({
                 <input
                   type="text"
                   value={formData.tax_id}
-                  onChange={(e) => setFormData({ ...formData, tax_id: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, tax_id: e.target.value })
+                  }
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors"
                 />
               </div>
@@ -234,7 +235,8 @@ export const AccountEditModal: React.FC<AccountEditModalProps> = ({
           </ModalFormLayout>
         )}
 
-        {(account.type === 'customer' || account.type === 'company_customer') && (
+        {(account.type === "customer" ||
+          account.type === "company_customer") && (
           <ModalFormLayout>
             <ModalFormColumn span={2}>
               <div>
@@ -243,7 +245,9 @@ export const AccountEditModal: React.FC<AccountEditModalProps> = ({
                 </label>
                 <select
                   value={formData.payment_status}
-                  onChange={(e) => setFormData({ ...formData, payment_status: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, payment_status: e.target.value })
+                  }
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors"
                 >
                   <option value="pending">Pending</option>

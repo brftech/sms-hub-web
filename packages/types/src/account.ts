@@ -8,14 +8,14 @@ export type Account = Database["public"]["Tables"]["customers"]["Row"];
 export type Company = Database["public"]["Tables"]["companies"]["Row"];
 
 // Account types for better type safety
-export type AccountType = 'company' | 'individual';
-export type AccountStatus = 'active' | 'inactive' | 'suspended' | 'trial';
-export type SubscriptionTier = 'free' | 'basic' | 'professional' | 'enterprise';
+export type AccountType = "company" | "individual";
+export type AccountStatus = "active" | "inactive" | "suspended" | "trial";
+export type SubscriptionTier = "free" | "basic" | "professional" | "enterprise";
 
 // Account creation data (maps to customer creation)
 export interface CreateAccountData {
   company_id?: string; // For B2B accounts
-  user_id?: string;    // For B2C accounts
+  user_id?: string; // For B2C accounts
   billing_email: string;
   customer_type: AccountType;
   hub_id: number;
@@ -30,7 +30,10 @@ export interface CreateAccountData {
 export interface AccountService {
   getAccount: (accountId: string) => Promise<Account>;
   createAccount: (data: CreateAccountData) => Promise<Account>;
-  updateAccount: (accountId: string, data: Partial<Account>) => Promise<Account>;
+  updateAccount: (
+    accountId: string,
+    data: Partial<Account>
+  ) => Promise<Account>;
   deleteAccount: (accountId: string) => Promise<void>;
   getAccountsByHub: (hubId: number) => Promise<Account[]>;
   getAccountByUserId: (userId: string) => Promise<Account | null>;
@@ -41,8 +44,28 @@ export interface AccountContextType {
   account: Account | null;
   isLoading: boolean;
   error: string | null;
-  
+
   // Actions
   updateAccount: (data: Partial<Account>) => Promise<void>;
   refreshAccount: () => Promise<void>;
+}
+
+// Unified account type that combines companies and customers for admin views
+export interface UnifiedAccount {
+  id: string;
+  type: "company" | "customer" | "company_customer";
+  name: string;
+  email: string;
+  status: string;
+  payment_status?: string;
+  payment_type?: string;
+  service_type?: string;
+  hub_id: number;
+  created_at: string;
+  // Original data from database
+  company?: Company;
+  customer?: Account; // Account is Customer type
+  user_count?: number;
+  has_texting?: boolean;
+  has_other_services?: boolean;
 }

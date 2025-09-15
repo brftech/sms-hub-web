@@ -1,45 +1,7 @@
 import React, { useState } from "react";
 import { Trash2, AlertTriangle } from "lucide-react";
 import { BaseModal, ModalButtonGroup, ModalButton } from "./BaseModal";
-
-interface UnifiedAccount {
-  id: string;
-  type: 'company' | 'customer' | 'company_customer';
-  name: string;
-  email: string;
-  status: string;
-  payment_status?: string;
-  payment_type?: string;
-  service_type?: string;
-  hub_id: number;
-  created_at: string;
-  company?: {
-    id: string;
-    name: string;
-    created_at: string;
-    contact_email?: string;
-    contact_phone?: string;
-    legal_name?: string;
-    tax_id?: string;
-    industry_vertical?: string;
-    website?: string;
-    address?: string;
-    city?: string;
-    state?: string;
-    zip?: string;
-    country?: string;
-  };
-  customer?: {
-    id: string;
-    billing_email: string;
-    created_at: string;
-    stripe_customer_id?: string;
-    payment_method?: string;
-  };
-  user_count?: number;
-  has_texting?: boolean;
-  has_other_services?: boolean;
-}
+import type { UnifiedAccount } from "@sms-hub/types";
 
 interface AccountDeleteModalProps {
   isOpen: boolean;
@@ -71,10 +33,14 @@ export const AccountDeleteModal: React.FC<AccountDeleteModalProps> = ({
 
   const getEntityTypeLabel = () => {
     switch (account.type) {
-      case 'company_customer': return 'platform account';
-      case 'company': return 'company';
-      case 'customer': return 'customer';
-      default: return 'account';
+      case "company_customer":
+        return "platform account";
+      case "company":
+        return "company";
+      case "customer":
+        return "customer";
+      default:
+        return "account";
     }
   };
 
@@ -135,11 +101,15 @@ export const AccountDeleteModal: React.FC<AccountDeleteModalProps> = ({
           <h4 className="text-xs font-semibold text-gray-900 uppercase tracking-wider">
             Choose Action
           </h4>
-          
+
           {/* Deactivate Option */}
-          <label className={`relative flex items-start p-3 rounded-lg border cursor-pointer transition-all ${
-            !deletePermanent ? "border-blue-500 bg-blue-50" : "border-gray-200 hover:border-gray-300"
-          }`}>
+          <label
+            className={`relative flex items-start p-3 rounded-lg border cursor-pointer transition-all ${
+              !deletePermanent
+                ? "border-blue-500 bg-blue-50"
+                : "border-gray-200 hover:border-gray-300"
+            }`}
+          >
             <input
               type="radio"
               name="deleteMode"
@@ -149,7 +119,9 @@ export const AccountDeleteModal: React.FC<AccountDeleteModalProps> = ({
             />
             <div className="ml-2 flex-1">
               <div className="flex items-center">
-                <span className="text-xs font-medium text-gray-900">Deactivate Account</span>
+                <span className="text-xs font-medium text-gray-900">
+                  Deactivate Account
+                </span>
                 <span className="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
                   Recommended
                 </span>
@@ -161,9 +133,13 @@ export const AccountDeleteModal: React.FC<AccountDeleteModalProps> = ({
           </label>
 
           {/* Permanent Delete Option */}
-          <label className={`relative flex items-start p-3 rounded-lg border cursor-pointer transition-all ${
-            deletePermanent ? "border-red-500 bg-red-50" : "border-gray-200 hover:border-gray-300"
-          }`}>
+          <label
+            className={`relative flex items-start p-3 rounded-lg border cursor-pointer transition-all ${
+              deletePermanent
+                ? "border-red-500 bg-red-50"
+                : "border-gray-200 hover:border-gray-300"
+            }`}
+          >
             <input
               type="radio"
               name="deleteMode"
@@ -173,7 +149,9 @@ export const AccountDeleteModal: React.FC<AccountDeleteModalProps> = ({
             />
             <div className="ml-2 flex-1">
               <div className="flex items-center">
-                <span className="text-xs font-medium text-gray-900">Permanently Delete</span>
+                <span className="text-xs font-medium text-gray-900">
+                  Permanently Delete
+                </span>
                 <span className="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
                   Irreversible
                 </span>
@@ -186,34 +164,47 @@ export const AccountDeleteModal: React.FC<AccountDeleteModalProps> = ({
         </div>
 
         {/* Warning Message - Compact */}
-        <div className={`rounded-lg p-3 ${
-          deletePermanent 
-            ? "bg-red-50 border border-red-200" 
-            : "bg-amber-50 border border-amber-200"
-        }`}>
+        <div
+          className={`rounded-lg p-3 ${
+            deletePermanent
+              ? "bg-red-50 border border-red-200"
+              : "bg-amber-50 border border-amber-200"
+          }`}
+        >
           <div className="flex items-start space-x-2">
-            <AlertTriangle className={`w-4 h-4 mt-0.5 flex-shrink-0 ${
-              deletePermanent ? "text-red-500" : "text-amber-500"
-            }`} />
+            <AlertTriangle
+              className={`w-4 h-4 mt-0.5 flex-shrink-0 ${
+                deletePermanent ? "text-red-500" : "text-amber-500"
+              }`}
+            />
             <div className="flex-1 min-w-0">
-              <h4 className={`text-xs font-semibold ${
-                deletePermanent ? "text-red-900" : "text-amber-900"
-              }`}>
-                {deletePermanent ? "Permanent Deletion Warning" : "Deactivation Notice"}
+              <h4
+                className={`text-xs font-semibold ${
+                  deletePermanent ? "text-red-900" : "text-amber-900"
+                }`}
+              >
+                {deletePermanent
+                  ? "Permanent Deletion Warning"
+                  : "Deactivation Notice"}
               </h4>
-              <p className={`text-xs mt-0.5 ${
-                deletePermanent ? "text-red-700" : "text-amber-700"
-              }`}>
-                {deletePermanent 
+              <p
+                className={`text-xs mt-0.5 ${
+                  deletePermanent ? "text-red-700" : "text-amber-700"
+                }`}
+              >
+                {deletePermanent
                   ? `This will permanently delete the ${getEntityTypeLabel()} AND all associated users, removing them completely from the system. This cannot be reversed.`
-                  : `The ${getEntityTypeLabel()} will lose access immediately but all data and users will remain in the system for future reactivation if needed.`
-                }
+                  : `The ${getEntityTypeLabel()} will lose access immediately but all data and users will remain in the system for future reactivation if needed.`}
               </p>
               {account.user_count && account.user_count > 0 && (
-                <p className={`text-xs mt-1 font-medium ${
-                  deletePermanent ? "text-red-800" : "text-amber-800"
-                }`}>
-                  ⚠️ This will {deletePermanent ? 'DELETE' : 'deactivate'} {account.user_count} user{account.user_count && account.user_count > 1 ? 's' : ''}.
+                <p
+                  className={`text-xs mt-1 font-medium ${
+                    deletePermanent ? "text-red-800" : "text-amber-800"
+                  }`}
+                >
+                  ⚠️ This will {deletePermanent ? "DELETE" : "deactivate"}{" "}
+                  {account.user_count} user
+                  {account.user_count && account.user_count > 1 ? "s" : ""}.
                 </p>
               )}
             </div>

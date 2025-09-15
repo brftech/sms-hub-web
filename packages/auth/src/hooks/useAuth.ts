@@ -18,7 +18,6 @@ export function useAuth({
   refreshUser: () => Promise<void>;
   updateUser: (updates: Partial<AuthUser>) => Promise<void>;
 } {
-  
   const [state, setState] = useState<AuthState>({
     user: null,
     session: null,
@@ -33,20 +32,26 @@ export function useAuth({
   const loadUserProfile = useCallback(
     async (userId: string): Promise<AuthUser | null> => {
       try {
-          const { data: profile, error } = await supabase
+        const { data: profile, error } = await supabase
           .from("user_profiles")
           .select("*")
           .eq("id", userId)
           .single();
 
         if (error) {
-          logger.error("[loadUserProfile] Failed to load user profile", error, { userId });
+          logger.error("[loadUserProfile] Failed to load user profile", error, {
+            userId,
+          });
           return null;
         }
 
         return profile as AuthUser;
       } catch (error) {
-        logger.error("[loadUserProfile] Error loading user profile", error as Error, { userId });
+        logger.error(
+          "[loadUserProfile] Error loading user profile",
+          error as Error,
+          { userId }
+        );
         return null;
       }
     },
@@ -58,7 +63,7 @@ export function useAuth({
     try {
       setState((prev) => ({ ...prev, loading: true }));
       await supabase.auth.signOut();
-      
+
       if (isMountedRef.current) {
         setState({
           user: null,
@@ -81,8 +86,10 @@ export function useAuth({
 
   // Refresh user data
   const refreshUser = useCallback(async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
     if (session?.user) {
       const profile = await loadUserProfile(session.user.id);
       if (isMountedRef.current) {
@@ -128,8 +135,14 @@ export function useAuth({
       try {
         logger.debug("[useAuth] Initializing auth state");
         // Get initial session
-        const { data: { session }, error } = await supabase.auth.getSession();
-        logger.debug("[useAuth] Session check", { hasSession: !!session, error });
+        const {
+          data: { session },
+          error,
+        } = await supabase.auth.getSession();
+        logger.debug("[useAuth] Session check", {
+          hasSession: !!session,
+          error,
+        });
 
         if (error) {
           logger.error("Session initialization error", error);
@@ -145,17 +158,22 @@ export function useAuth({
         // Load user profile if session exists
         let user: AuthUser | null = null;
         if (session?.user) {
-          logger.debug("[useAuth] Loading user profile for", session.user.id);
+          logger.debug("[useAuth] Loading user profile for", {
+            userId: session.user.id,
+          });
           user = await loadUserProfile(session.user.id);
           logger.debug("[useAuth] User profile loaded", { hasUser: !!user });
-          
+
           // If no profile exists, user remains null
           // The app should handle this case by redirecting to onboarding
         }
 
         // For initial mount, always set state regardless of mount status
         // This handles React StrictMode double-mounting in development
-        logger.debug("[useAuth] Setting state with user", { hasUser: !!user, hasSession: !!session });
+        logger.debug("[useAuth] Setting state with user", {
+          hasUser: !!user,
+          hasSession: !!session,
+        });
         setState({
           user,
           session,
@@ -165,49 +183,54 @@ export function useAuth({
         isInitialMount.current = false;
 
         // Set up auth state listener
-        const { data } = supabase.auth.onAuthStateChange(async (event, session) => {
-          logger.debug("Auth state changed", { event, hasSession: !!session });
+        const { data } = supabase.auth.onAuthStateChange(
+          async (event, session) => {
+            logger.debug("Auth state changed", {
+              event,
+              hasSession: !!session,
+            });
 
-          // Call external handler if provided
-          onAuthStateChange?.(event, session);
+            // Call external handler if provided
+            onAuthStateChange?.(event, session);
 
-          if (!isMountedRef.current) return;
+            if (!isMountedRef.current) return;
 
-          switch (event) {
-            case "SIGNED_IN":
-            case "TOKEN_REFRESHED":
-              if (session?.user) {
-                const profile = await loadUserProfile(session.user.id);
+            switch (event) {
+              case "SIGNED_IN":
+              case "TOKEN_REFRESHED":
+                if (session?.user) {
+                  const profile = await loadUserProfile(session.user.id);
+                  setState({
+                    user: profile,
+                    session,
+                    loading: false,
+                    error: null,
+                  });
+                }
+                break;
+
+              case "SIGNED_OUT":
                 setState({
-                  user: profile,
-                  session,
+                  user: null,
+                  session: null,
                   loading: false,
                   error: null,
                 });
-              }
-              break;
+                break;
 
-            case "SIGNED_OUT":
-              setState({
-                user: null,
-                session: null,
-                loading: false,
-                error: null,
-              });
-              break;
-
-            case "USER_UPDATED":
-              if (session?.user) {
-                const profile = await loadUserProfile(session.user.id);
-                setState((prev) => ({
-                  ...prev,
-                  user: profile,
-                  session,
-                }));
-              }
-              break;
+              case "USER_UPDATED":
+                if (session?.user) {
+                  const profile = await loadUserProfile(session.user.id);
+                  setState((prev) => ({
+                    ...prev,
+                    user: profile,
+                    session,
+                  }));
+                }
+                break;
+            }
           }
-        });
+        );
 
         subscription = data.subscription;
       } catch (error) {
@@ -231,14 +254,14 @@ export function useAuth({
       subscription?.unsubscribe();
     };
   }, [supabase, loadUserProfile, onAuthStateChange]);
-  
+
   // Log current state for debugging
   useEffect(() => {
-    logger.debug("[useAuth] Current state", { 
-      hasUser: !!state.user, 
-      hasSession: !!state.session, 
+    logger.debug("[useAuth] Current state", {
+      hasUser: !!state.user,
+      hasSession: !!state.session,
       loading: state.loading,
-      userId: state.user?.id 
+      userId: state.user?.id,
     });
   }, [state]);
 

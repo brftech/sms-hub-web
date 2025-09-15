@@ -1,10 +1,15 @@
 import { useState, useEffect } from "react";
 import { useHub } from "@sms-hub/ui";
-import { AccountViewModal, AccountEditModal, AccountDeleteModal, AccountAddModal } from "@sms-hub/ui";
+import {
+  AccountViewModal,
+  AccountEditModal,
+  AccountDeleteModal,
+  AccountAddModal,
+} from "@sms-hub/ui";
 import { useGlobalView } from "../../contexts/GlobalViewContext";
 import { getSupabaseClient } from "../../lib/supabaseSingleton";
-import { customersService, Customer } from "../../services/customersService";
-import { companiesService, Company } from "../../services/companiesService";
+import { customersService } from "../../services/customersService";
+import { companiesService } from "../../services/companiesService";
 import {
   Building2,
   Search,
@@ -18,31 +23,16 @@ import {
   Trash2,
 } from "lucide-react";
 
-// Unified account type that combines companies and customers
-interface UnifiedAccount {
-  id: string;
-  type: 'company' | 'customer' | 'company_customer';
-  name: string;
-  email: string;
-  status: string;
-  payment_status?: string;
-  payment_type?: string;
-  service_type?: string;
-  hub_id: number;
-  created_at: string;
-  // Original data
-  company?: Company;
-  customer?: Customer;
-  user_count?: number;
-  has_texting?: boolean;
-  has_other_services?: boolean;
-}
+// Import shared UnifiedAccount type
+import type { UnifiedAccount } from "@sms-hub/types";
 
 export function Accounts() {
   const { currentHub } = useHub();
   const { isGlobalView } = useGlobalView();
   const [accounts, setAccounts] = useState<UnifiedAccount[]>([]);
-  const [filteredAccounts, setFilteredAccounts] = useState<UnifiedAccount[]>([]);
+  const [filteredAccounts, setFilteredAccounts] = useState<UnifiedAccount[]>(
+    []
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -52,13 +42,15 @@ export function Accounts() {
   const [entityFilter, setEntityFilter] = useState<string>("all");
   const [sortBy, setSortBy] = useState<string>("created_at");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
-  
+
   // Modal states
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [selectedAccount, setSelectedAccount] = useState<UnifiedAccount | null>(null);
+  const [selectedAccount, setSelectedAccount] = useState<UnifiedAccount | null>(
+    null
+  );
   const [isDeleting, setIsDeleting] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
 
@@ -106,30 +98,31 @@ export function Accounts() {
 
       // Create a map of company IDs that have customers
       const companiesWithCustomers = new Set(
-        fetchedCustomers
-          .filter(c => c.company_id)
-          .map(c => c.company_id)
+        fetchedCustomers.filter((c) => c.company_id).map((c) => c.company_id)
       );
 
       // Merge companies and customers into unified accounts
       const unifiedAccounts: UnifiedAccount[] = [];
 
       // Add companies
-      fetchedCompanies.forEach(company => {
+      fetchedCompanies.forEach((company) => {
         const hasCustomer = companiesWithCustomers.has(company.id);
-        const customer = fetchedCustomers.find(c => c.company_id === company.id);
-        
+        const customer = fetchedCustomers.find(
+          (c) => c.company_id === company.id
+        );
+
         unifiedAccounts.push({
           id: company.id,
-          type: hasCustomer ? 'company_customer' : 'company',
-          name: company.public_name || 'Unnamed Company',
-          email: customer?.billing_email || company.primary_contact_email || '-',
-          status: company.is_active ? 'active' : 'inactive',
-          payment_status: customer?.payment_status || 'none',
-          payment_type: customer?.payment_type || 'none',
-          service_type: hasCustomer ? 'texting' : 'other',
+          type: hasCustomer ? "company_customer" : "company",
+          name: company.public_name || "Unnamed Company",
+          email:
+            customer?.billing_email || company.primary_contact_email || "-",
+          status: company.is_active ? "active" : "inactive",
+          payment_status: customer?.payment_status || "none",
+          payment_type: customer?.payment_type || "none",
+          service_type: hasCustomer ? "texting" : "other",
           hub_id: company.hub_id,
-          created_at: company.created_at || '',
+          created_at: company.created_at || "",
           company: company,
           customer: customer,
           user_count: 0, // TODO: Calculate from memberships
@@ -140,19 +133,19 @@ export function Accounts() {
 
       // Add standalone customers (not linked to companies)
       fetchedCustomers
-        .filter(customer => !customer.company_id)
-        .forEach(customer => {
+        .filter((customer) => !customer.company_id)
+        .forEach((customer) => {
           unifiedAccounts.push({
             id: customer.id,
-            type: 'customer',
-            name: customer.billing_email.split('@')[0], // Use email prefix as name
+            type: "customer",
+            name: customer.billing_email.split("@")[0], // Use email prefix as name
             email: customer.billing_email,
-            status: customer.is_active ? 'active' : 'inactive',
-            payment_status: customer.payment_status || 'pending',
-            payment_type: customer.payment_type || 'none',
-            service_type: 'texting',
+            status: customer.is_active ? "active" : "inactive",
+            payment_status: customer.payment_status || "pending",
+            payment_type: customer.payment_type || "none",
+            service_type: "texting",
             hub_id: customer.hub_id,
-            created_at: customer.created_at || '',
+            created_at: customer.created_at || "",
             customer: customer,
             user_count: 0,
             has_texting: true,
@@ -199,7 +192,7 @@ export function Accounts() {
   const handleAddAccount = async (accountData: any) => {
     try {
       const supabase = getSupabaseClient();
-      
+
       // Call the Edge Function to create the account
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-account`,
@@ -219,10 +212,10 @@ export function Accounts() {
       }
 
       await response.json();
-      
+
       // Refresh the accounts list
       await fetchData();
-      
+
       // Close the modal
       setIsAddModalOpen(false);
     } catch (error) {
@@ -248,7 +241,7 @@ export function Accounts() {
               Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
             },
             body: JSON.stringify({
-              account_type: 'company',
+              account_type: "company",
               account_id: selectedAccount.company.id,
               updates: updates.company,
             }),
@@ -271,7 +264,7 @@ export function Accounts() {
               Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
             },
             body: JSON.stringify({
-              account_type: 'customer',
+              account_type: "customer",
               account_id: selectedAccount.customer.id,
               updates: updates.customer,
             }),
@@ -289,7 +282,9 @@ export function Accounts() {
       setIsEditModalOpen(false);
     } catch (error) {
       console.error("Error updating account:", error);
-      alert(error instanceof Error ? error.message : "Failed to update account");
+      alert(
+        error instanceof Error ? error.message : "Failed to update account"
+      );
     } finally {
       setIsUpdating(false);
     }
@@ -330,7 +325,9 @@ export function Accounts() {
       setIsDeleteModalOpen(false);
     } catch (error) {
       console.error("Error deleting account:", error);
-      alert(error instanceof Error ? error.message : "Failed to delete account");
+      alert(
+        error instanceof Error ? error.message : "Failed to delete account"
+      );
     } finally {
       setIsDeleting(false);
     }
@@ -353,9 +350,10 @@ export function Accounts() {
     // Apply entity filter
     if (entityFilter !== "all") {
       filtered = filtered.filter((account) => {
-        if (entityFilter === "company") return account.type === 'company';
-        if (entityFilter === "customer") return account.type === 'customer';
-        if (entityFilter === "company_customer") return account.type === 'company_customer';
+        if (entityFilter === "company") return account.type === "company";
+        if (entityFilter === "customer") return account.type === "customer";
+        if (entityFilter === "company_customer")
+          return account.type === "company_customer";
         if (entityFilter === "texting") return account.has_texting;
         if (entityFilter === "other") return account.has_other_services;
         return true;
@@ -365,10 +363,12 @@ export function Accounts() {
     // Apply status filter
     if (statusFilter !== "all") {
       filtered = filtered.filter((account) => {
-        if (statusFilter === "active") return account.status === 'active';
-        if (statusFilter === "inactive") return account.status === 'inactive';
-        if (statusFilter === "paid") return account.payment_status === 'completed';
-        if (statusFilter === "pending") return account.payment_status === 'pending';
+        if (statusFilter === "active") return account.status === "active";
+        if (statusFilter === "inactive") return account.status === "inactive";
+        if (statusFilter === "paid")
+          return account.payment_status === "completed";
+        if (statusFilter === "pending")
+          return account.payment_status === "pending";
         return true;
       });
     }
@@ -376,10 +376,11 @@ export function Accounts() {
     // Apply type filter (payment type)
     if (typeFilter !== "all") {
       filtered = filtered.filter((account) => {
-        if (typeFilter === "stripe") return account.payment_type === 'stripe';
-        if (typeFilter === "barter") return account.payment_type === 'barter';
-        if (typeFilter === "courtesy") return account.payment_type === 'courtesy';
-        if (typeFilter === "none") return account.payment_type === 'none';
+        if (typeFilter === "stripe") return account.payment_type === "stripe";
+        if (typeFilter === "barter") return account.payment_type === "barter";
+        if (typeFilter === "courtesy")
+          return account.payment_type === "courtesy";
+        if (typeFilter === "none") return account.payment_type === "none";
         return true;
       });
     }
@@ -404,14 +405,14 @@ export function Accounts() {
     setFilteredAccounts(filtered);
   }, [accounts, statusFilter, typeFilter, entityFilter, sortBy, sortOrder]);
 
-
   // Check if an account is protected from deletion
   const isProtectedAccount = (account: UnifiedAccount): boolean => {
-    const protectedEmails = ["superadmin@percytech.com", "superadmin@gnymble.com"];
+    const protectedEmails = [
+      "superadmin@percytech.com",
+      "superadmin@gnymble.com",
+    ];
     return protectedEmails.includes(account.email.toLowerCase());
   };
-
-
 
   if (isLoading) {
     return (
@@ -457,8 +458,8 @@ export function Accounts() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground">
-            {isGlobalView 
-              ? "Global Accounts" 
+            {isGlobalView
+              ? "Global Accounts"
               : `${currentHub.charAt(0).toUpperCase() + currentHub.slice(1)} Accounts`}
           </h1>
         </div>
@@ -504,7 +505,7 @@ export function Accounts() {
           <div className="flex items-center space-x-3">
             <div className="flex items-center space-x-2">
               <Filter className="w-4 h-4 text-gray-400" />
-              
+
               <select
                 value={entityFilter}
                 onChange={(e) => setEntityFilter(e.target.value)}
@@ -517,7 +518,7 @@ export function Accounts() {
                 <option value="texting">Has Texting</option>
                 <option value="other">Other Services</option>
               </select>
-              
+
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
@@ -628,13 +629,20 @@ export function Accounts() {
                       </div>
                     </td>
                     <td className="px-4 py-2 whitespace-nowrap">
-                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                        account.type === 'company_customer' ? 'bg-purple-100 text-purple-800' :
-                        account.type === 'company' ? 'bg-blue-100 text-blue-800' :
-                        'bg-orange-100 text-orange-800'
-                      }`}>
-                        {account.type === 'company_customer' ? 'Platform' : 
-                         account.type === 'company' ? 'Company' : 'Customer'}
+                      <span
+                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                          account.type === "company_customer"
+                            ? "bg-purple-100 text-purple-800"
+                            : account.type === "company"
+                              ? "bg-blue-100 text-blue-800"
+                              : "bg-orange-100 text-orange-800"
+                        }`}
+                      >
+                        {account.type === "company_customer"
+                          ? "Platform"
+                          : account.type === "company"
+                            ? "Company"
+                            : "Customer"}
                       </span>
                     </td>
                     <td className="px-4 py-2 whitespace-nowrap text-xs text-gray-600">
@@ -643,32 +651,41 @@ export function Accounts() {
                     {isGlobalView && (
                       <td className="px-4 py-2 whitespace-nowrap">
                         <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                          {account.hub_id === 0 ? "PercyTech" :
-                           account.hub_id === 1 ? "Gnymble" :
-                           account.hub_id === 2 ? "PercyMD" :
-                           account.hub_id === 3 ? "PercyText" :
-                           "Unknown"}
+                          {account.hub_id === 0
+                            ? "PercyTech"
+                            : account.hub_id === 1
+                              ? "Gnymble"
+                              : account.hub_id === 2
+                                ? "PercyMD"
+                                : account.hub_id === 3
+                                  ? "PercyText"
+                                  : "Unknown"}
                         </span>
                       </td>
                     )}
                     <td className="px-4 py-2 whitespace-nowrap">
                       <div className="flex items-center space-x-1">
-                        {account.payment_type && account.payment_type !== 'none' && (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
-                            {account.payment_type}
-                          </span>
-                        )}
-                        {account.payment_status && account.payment_status !== 'none' && (
-                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                            account.payment_status === 'active' || account.payment_status === 'completed' 
-                              ? 'bg-green-100 text-green-800' 
-                              : account.payment_status === 'pending'
-                              ? 'bg-yellow-100 text-yellow-800'
-                              : 'bg-gray-100 text-gray-800'
-                          }`}>
-                            {account.payment_status}
-                          </span>
-                        )}
+                        {account.payment_type &&
+                          account.payment_type !== "none" && (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                              {account.payment_type}
+                            </span>
+                          )}
+                        {account.payment_status &&
+                          account.payment_status !== "none" && (
+                            <span
+                              className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                                account.payment_status === "active" ||
+                                account.payment_status === "completed"
+                                  ? "bg-green-100 text-green-800"
+                                  : account.payment_status === "pending"
+                                    ? "bg-yellow-100 text-yellow-800"
+                                    : "bg-gray-100 text-gray-800"
+                              }`}
+                            >
+                              {account.payment_status}
+                            </span>
+                          )}
                       </div>
                     </td>
                     <td className="px-4 py-2 whitespace-nowrap">
@@ -686,12 +703,14 @@ export function Accounts() {
                       </div>
                     </td>
                     <td className="px-4 py-2 whitespace-nowrap">
-                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                        account.status === 'active'
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-red-100 text-red-800'
-                      }`}>
-                        {account.status === 'active' ? 'Active' : 'Inactive'}
+                      <span
+                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                          account.status === "active"
+                            ? "bg-green-100 text-green-800"
+                            : "bg-red-100 text-red-800"
+                        }`}
+                      >
+                        {account.status === "active" ? "Active" : "Inactive"}
                       </span>
                     </td>
                     <td className="px-4 py-2 whitespace-nowrap text-sm font-medium">
@@ -711,7 +730,10 @@ export function Accounts() {
                           <Edit className="w-4 h-4" />
                         </button>
                         <button
-                          onClick={() => !isProtectedAccount(account) && handleDeleteAccount(account)}
+                          onClick={() =>
+                            !isProtectedAccount(account) &&
+                            handleDeleteAccount(account)
+                          }
                           className={
                             isProtectedAccount(account)
                               ? "text-gray-400 cursor-not-allowed opacity-50"
@@ -764,7 +786,17 @@ export function Accounts() {
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         onAdd={handleAddAccount}
-        hubId={currentHub === "gnymble" ? 1 : currentHub === "percymd" ? 2 : currentHub === "percytext" ? 3 : currentHub === "percytech" ? 0 : 1}
+        hubId={
+          currentHub === "gnymble"
+            ? 1
+            : currentHub === "percymd"
+              ? 2
+              : currentHub === "percytext"
+                ? 3
+                : currentHub === "percytech"
+                  ? 0
+                  : 1
+        }
         hubName={currentHub.charAt(0).toUpperCase() + currentHub.slice(1)}
       />
     </div>

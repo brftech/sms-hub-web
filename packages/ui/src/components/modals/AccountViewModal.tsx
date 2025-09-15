@@ -1,45 +1,14 @@
 import React from "react";
-import { Eye, Building2, Mail, Calendar, CreditCard, Users } from "lucide-react";
+import {
+  Eye,
+  Building2,
+  Mail,
+  Calendar,
+  CreditCard,
+  Users,
+} from "lucide-react";
 import { BaseModal } from "./BaseModal";
-
-interface UnifiedAccount {
-  id: string;
-  type: 'company' | 'customer' | 'company_customer';
-  name: string;
-  email: string;
-  status: string;
-  payment_status?: string;
-  payment_type?: string;
-  service_type?: string;
-  hub_id: number;
-  created_at: string;
-  company?: {
-    id: string;
-    name: string;
-    created_at: string;
-    contact_email?: string;
-    contact_phone?: string;
-    legal_name?: string;
-    tax_id?: string;
-    industry_vertical?: string;
-    website?: string;
-    address?: string;
-    city?: string;
-    state?: string;
-    zip?: string;
-    country?: string;
-  };
-  customer?: {
-    id: string;
-    billing_email: string;
-    created_at: string;
-    stripe_customer_id?: string;
-    payment_method?: string;
-  };
-  user_count?: number;
-  has_texting?: boolean;
-  has_other_services?: boolean;
-}
+import type { UnifiedAccount } from "@sms-hub/types";
 
 interface AccountViewModalProps {
   isOpen: boolean;
@@ -58,20 +27,29 @@ export const AccountViewModal: React.FC<AccountViewModalProps> = ({
 
   const getHubName = (hubId: number) => {
     switch (hubId) {
-      case 0: return "PercyTech";
-      case 1: return "Gnymble";
-      case 2: return "PercyMD";
-      case 3: return "PercyText";
-      default: return `Hub ${hubId}`;
+      case 0:
+        return "PercyTech";
+      case 1:
+        return "Gnymble";
+      case 2:
+        return "PercyMD";
+      case 3:
+        return "PercyText";
+      default:
+        return `Hub ${hubId}`;
     }
   };
 
   const getEntityTypeLabel = (type: string) => {
     switch (type) {
-      case 'company_customer': return 'Texting Platform Customer';
-      case 'company': return 'Company (Other Services)';
-      case 'customer': return 'Individual Customer';
-      default: return type;
+      case "company_customer":
+        return "Texting Platform Customer";
+      case "company":
+        return "Company (Other Services)";
+      case "customer":
+        return "Individual Customer";
+      default:
+        return type;
     }
   };
 
@@ -112,15 +90,19 @@ export const AccountViewModal: React.FC<AccountViewModalProps> = ({
               <Building2 className="w-4 h-4 text-gray-400" />
               <div>
                 <p className="text-xs text-gray-500">Hub</p>
-                <p className="font-medium text-gray-900">{getHubName(account.hub_id)}</p>
+                <p className="font-medium text-gray-900">
+                  {getHubName(account.hub_id)}
+                </p>
               </div>
             </div>
-            
+
             <div className="flex items-center space-x-2">
               <Mail className="w-4 h-4 text-gray-400" />
               <div>
                 <p className="text-xs text-gray-500">Email</p>
-                <p className="font-medium text-gray-900 text-xs">{account.email}</p>
+                <p className="font-medium text-gray-900 text-xs">
+                  {account.email}
+                </p>
               </div>
             </div>
 
@@ -128,7 +110,9 @@ export const AccountViewModal: React.FC<AccountViewModalProps> = ({
               <Users className="w-4 h-4 text-gray-400" />
               <div>
                 <p className="text-xs text-gray-500">Users</p>
-                <p className="font-medium text-gray-900">{account.user_count || 0}</p>
+                <p className="font-medium text-gray-900">
+                  {account.user_count || 0}
+                </p>
               </div>
             </div>
           </div>
@@ -137,14 +121,18 @@ export const AccountViewModal: React.FC<AccountViewModalProps> = ({
           <div className="space-y-3">
             <div>
               <p className="text-xs text-gray-500">Status</p>
-              <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                account.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-              }`}>
+              <span
+                className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                  account.status === "active"
+                    ? "bg-green-100 text-green-800"
+                    : "bg-gray-100 text-gray-800"
+                }`}
+              >
                 {account.status}
               </span>
             </div>
 
-            {account.payment_type && account.payment_type !== 'none' && (
+            {account.payment_type && account.payment_type !== "none" && (
               <div>
                 <p className="text-xs text-gray-500">Payment</p>
                 <div className="flex items-center space-x-1">
@@ -152,11 +140,14 @@ export const AccountViewModal: React.FC<AccountViewModalProps> = ({
                     {account.payment_type}
                   </span>
                   {account.payment_status && (
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                      account.payment_status === 'active' || account.payment_status === 'completed'
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-yellow-100 text-yellow-800'
-                    }`}>
+                    <span
+                      className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                        account.payment_status === "active" ||
+                        account.payment_status === "completed"
+                          ? "bg-green-100 text-green-800"
+                          : "bg-yellow-100 text-yellow-800"
+                      }`}
+                    >
                       {account.payment_status}
                     </span>
                   )}
@@ -185,22 +176,30 @@ export const AccountViewModal: React.FC<AccountViewModalProps> = ({
         {/* Company info if exists */}
         {account.company && (
           <div className="pt-3 border-t border-gray-200">
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Company Details</p>
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+              Company Details
+            </p>
             <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
               <div>
                 <span className="text-gray-500">Account #:</span>
-                <span className="ml-1 font-mono font-medium">{account.company.company_account_number}</span>
+                <span className="ml-1 font-mono font-medium">
+                  {account.company.company_account_number}
+                </span>
               </div>
               {account.company.legal_name && (
                 <div>
                   <span className="text-gray-500">Legal:</span>
-                  <span className="ml-1 font-medium">{account.company.legal_name}</span>
+                  <span className="ml-1 font-medium">
+                    {account.company.legal_name}
+                  </span>
                 </div>
               )}
-              {account.company.tax_id && (
+              {account.company.ein && (
                 <div>
                   <span className="text-gray-500">Tax ID:</span>
-                  <span className="ml-1 font-medium">{account.company.tax_id}</span>
+                  <span className="ml-1 font-medium">
+                    {account.company.ein}
+                  </span>
                 </div>
               )}
             </div>
@@ -211,12 +210,19 @@ export const AccountViewModal: React.FC<AccountViewModalProps> = ({
         <div className="pt-3 border-t border-gray-200 flex items-center justify-between text-xs text-gray-500">
           <div className="flex items-center space-x-1">
             <Calendar className="w-3 h-3" />
-            <span>Created {account.created_at ? new Date(account.created_at).toLocaleDateString() : 'Unknown'}</span>
+            <span>
+              Created{" "}
+              {account.created_at
+                ? new Date(account.created_at).toLocaleDateString()
+                : "Unknown"}
+            </span>
           </div>
           {account.customer?.stripe_customer_id && (
             <div className="flex items-center space-x-1">
               <CreditCard className="w-3 h-3" />
-              <span className="font-mono text-xs">{account.customer.stripe_customer_id.slice(0, 10)}...</span>
+              <span className="font-mono text-xs">
+                {account.customer.stripe_customer_id.slice(0, 10)}...
+              </span>
             </div>
           )}
         </div>

@@ -1,7 +1,6 @@
 {
-  "buildCommand": "pnpm run build",
-  "outputDirectory": "dist",
-  "installCommand": "cd ../.. && pnpm install",
-  "framework": "vite",
-  "ignoreCommand": "exit 1"
+  "buildCommand": "tsc && vite build",
+  "outputDirectory": "apps/unified/dist",
+  "installCommand": "pnpm install",
+  "framework": "vite"
 }

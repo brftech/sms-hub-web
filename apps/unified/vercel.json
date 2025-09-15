@@ -1,5 +1,0 @@
-{
-  "buildCommand": "cd apps/unified && pnpm build",
-  "outputDirectory": "apps/unified/dist",
-  "framework": "vite"
-}

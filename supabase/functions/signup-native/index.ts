@@ -168,7 +168,6 @@ serve(async (req) => {
       signup_type,
       invitation_token,
       customer_type,
-      create_business_records = false, // Flag to create business records for confirmed users
     } = await req.json();
 
     // Create Supabase admin client
@@ -357,28 +356,27 @@ serve(async (req) => {
       );
     }
 
-    // Check if we should create business records (for confirmed users)
-    if (create_business_records && authData.user.email_confirmed_at) {
-      console.log("✅ User confirmed, creating business records...");
+    // Always create business records immediately
+    console.log("✅ Auth user created, now creating business records...");
+    
+    // Create all business records immediately
+    await createBusinessRecords(supabaseAdmin, authData.user, {
+      email,
+      first_name,
+      last_name,
+      company_name,
+      phone_number,
+      hub_id: invitationData ? invitationData.hub_id : hub_id,
+      signup_type,
+      customer_type,
+    });
 
-      await createBusinessRecords(supabaseAdmin, authData.user, {
-        email,
-        first_name,
-        last_name,
-        company_name,
-        phone_number,
-        hub_id: invitationData ? invitationData.hub_id : hub_id,
-        signup_type,
-        customer_type,
-      });
-
-      console.log("✅ Business records created successfully");
-    } else {
-      console.log(
-        "✅ Auth user created, confirmation email sent:",
-        authData.user.id
-      );
-      console.log("User will complete profile setup after email confirmation");
+    console.log("✅ Business records created successfully");
+    
+    // Check if email is confirmed using Supabase's native tracking
+    const emailConfirmed = authData.user.email_confirmed_at !== null;
+    if (!emailConfirmed) {
+      console.log("📧 Confirmation email sent, user must verify email before login");
     }
 
     console.log("✅ Signup completed successfully");
@@ -390,9 +388,12 @@ serve(async (req) => {
         email: email,
         hub_id: invitationData ? invitationData.hub_id : hub_id,
         customer_type: customer_type,
-        confirmation_email_sent: true,
-        auto_confirmed: false,
-        message: "Please check your email to confirm your account",
+        confirmation_email_sent: !emailConfirmed,
+        email_verified: emailConfirmed,
+        business_records_created: true,
+        message: emailConfirmed 
+          ? "Email verified successfully!" 
+          : "Account created! Please check your email to verify your account.",
         environment: environment,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }

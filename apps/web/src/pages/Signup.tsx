@@ -277,39 +277,35 @@ export function Signup() {
         })
       );
 
-      // Check if confirmation email was sent successfully or if user is already confirmed (dev mode)
-      if (result.confirmation_email_sent) {
-        console.log("Confirmation email sent successfully to:", result.email);
-
-        // Store email for the check-email page
-        sessionStorage.setItem('signup_email', result.email);
-
-        // Redirect to check email page
-        window.location.href = '/check-email';
-      } else if (result.auto_confirmed && environmentConfig.isDevelopment) {
-        console.log("Development mode: User auto-confirmed, proceeding to dashboard...");
-
-        // Store success data with expiration
+      // Check if business records were created (new flow)
+      if (result.business_records_created) {
+        console.log("Account created successfully! Business records created.");
+        
+        // Store signup success data
         const successData = {
           userId: result.user_id,
           email: result.email,
           timestamp: Date.now(),
-          expiresAt: Date.now() + (5 * 60 * 1000), // 5 minutes
         };
         sessionStorage.setItem('signup_success', JSON.stringify(successData));
+        sessionStorage.setItem('signup_email', result.email);
 
         // Clear sensitive data
         sessionStorage.removeItem('account_data');
 
-        // Redirect to unified app with dev auth if enabled
-        const redirectUrl = environmentConfig.enableDevAuth && environmentConfig.devAuthToken
-          ? `${environmentConfig.unifiedAppUrl}/?superadmin=${environmentConfig.devAuthToken}`
-          : environmentConfig.unifiedAppUrl;
-
-        window.location.href = redirectUrl;
+        if (result.confirmation_email_sent) {
+          console.log("Confirmation email sent to:", result.email);
+          // Redirect to check email page but user can also log in immediately
+          window.location.href = '/check-email';
+        } else {
+          // Email already verified (shouldn't happen on initial signup)
+          console.log("Email already verified, redirecting to app...");
+          window.location.href = environmentConfig.unifiedAppUrl;
+        }
       } else {
-        console.warn("Confirmation email failed to send");
-        setError("Account created but email failed to send. Please contact support or try logging in directly.");
+        // Fallback for old flow (shouldn't happen)
+        console.error("Unexpected response - no business records created");
+        throw new Error("Failed to complete account setup");
       }
 
     } catch (err: unknown) {

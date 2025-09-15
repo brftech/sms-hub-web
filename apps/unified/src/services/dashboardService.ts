@@ -25,18 +25,19 @@ export interface HubBreakdown {
 }
 
 export interface OnboardingStageStats {
-  userAuth: number;             // Supabase Auth users
-  userProfiles: number;         // user_profiles table records
-  companies: number;            // companies table records
-  customers: number;            // customers table records
-  memberships: number;          // memberships table records
+  userAuth: number; // Supabase Auth users
+  userProfiles: number; // user_profiles table records
+  companies: number; // companies table records
+  customers: number; // customers table records
+  memberships: number; // memberships table records
   onboardingSubmissions: number; // onboarding_submissions table records
-  brandSubmission: number;      // Brand submitted for TCR approval
-  privacySetup: number;         // Privacy settings configured
-  campaignSubmission: number;   // Campaign submitted for TCR approval
-  gphoneProcurement: number;    // gPhone numbers procured
-  accountSetup: number;         // Account fully configured
-  onboardingComplete: number;   // Full onboarding done
+  brandSubmission: number; // Brand submitted for TCR approval
+  privacySetup: number; // Privacy settings configured
+  campaignSubmission: number; // Campaign submitted for TCR approval
+  gphoneProcurement: number; // gPhone numbers procured
+  accountSetup: number; // Account fully configured
+  onboardingComplete: number; // Full onboarding done
+  [key: string]: number; // Index signature for dynamic access
 }
 
 export interface CompanyOnboardingData {
@@ -286,7 +287,7 @@ class DashboardService {
               id: lead.id,
               type: "lead_converted",
               title: "Lead converted",
-              description: `Lead ${lead.name || 'Unknown'} converted to user`,
+              description: `Lead ${lead.name || "Unknown"} converted to user`,
               time: lead.created_at
                 ? this.getTimeAgo(lead.created_at)
                 : "Unknown",
@@ -409,50 +410,56 @@ class DashboardService {
   async getOnboardingStageStats(hubId: number): Promise<OnboardingStageStats> {
     try {
       // Get user_profiles table count
-      const { count: userProfilesCount, error: userProfilesError } = await this.supabase
-        .from("user_profiles")
-        .select("*", { count: "exact", head: true })
-        .eq("hub_id", hubId);
+      const { count: userProfilesCount, error: userProfilesError } =
+        await this.supabase
+          .from("user_profiles")
+          .select("*", { count: "exact", head: true })
+          .eq("hub_id", hubId);
 
       if (userProfilesError) throw userProfilesError;
 
       // Get companies table count
-      const { count: companiesCount, error: companiesError } = await this.supabase
-        .from("companies")
-        .select("*", { count: "exact", head: true })
-        .eq("hub_id", hubId);
+      const { count: companiesCount, error: companiesError } =
+        await this.supabase
+          .from("companies")
+          .select("*", { count: "exact", head: true })
+          .eq("hub_id", hubId);
 
       if (companiesError) throw companiesError;
 
       // Get customers table count
-      const { count: customersCount, error: customersError } = await this.supabase
-        .from("customers")
-        .select("*", { count: "exact", head: true })
-        .eq("hub_id", hubId);
+      const { count: customersCount, error: customersError } =
+        await this.supabase
+          .from("customers")
+          .select("*", { count: "exact", head: true })
+          .eq("hub_id", hubId);
 
       if (customersError) throw customersError;
 
       // Get memberships table count
-      const { count: membershipsCount, error: membershipsError } = await this.supabase
-        .from("memberships")
-        .select("*", { count: "exact", head: true })
-        .eq("hub_id", hubId);
+      const { count: membershipsCount, error: membershipsError } =
+        await this.supabase
+          .from("memberships")
+          .select("*", { count: "exact", head: true })
+          .eq("hub_id", hubId);
 
       if (membershipsError) throw membershipsError;
 
       // Get onboarding_submissions table count
-      const { count: onboardingSubmissionsCount, error: onboardingError } = await this.supabase
-        .from("onboarding_submissions")
-        .select("*", { count: "exact", head: true })
-        .eq("hub_id", hubId);
+      const { count: onboardingSubmissionsCount, error: onboardingError } =
+        await this.supabase
+          .from("onboarding_submissions")
+          .select("*", { count: "exact", head: true })
+          .eq("hub_id", hubId);
 
       if (onboardingError) throw onboardingError;
 
       // Get onboarding submissions to track actual progress
-      const { data: onboardingSubmissions, error: onboardingDataError } = await this.supabase
-        .from("onboarding_submissions")
-        .select("id, current_step, stripe_status, created_at, updated_at")
-        .eq("hub_id", hubId);
+      const { data: onboardingSubmissions, error: onboardingDataError } =
+        await this.supabase
+          .from("onboarding_submissions")
+          .select("id, current_step, stripe_status, created_at, updated_at")
+          .eq("hub_id", hubId);
 
       if (onboardingDataError) throw onboardingDataError;
 
@@ -554,9 +561,9 @@ class DashboardService {
         companies?.map((company) => {
           const paymentStatus = (company.customers as any)?.[0]?.payment_status;
           const onboardingSubmission = company.onboarding_submissions?.[0];
-          
+
           let stage = "accountCreated"; // Default to account created since company exists
-          
+
           // Determine stage based on payment status and onboarding progress
           if (paymentStatus === "pending") {
             stage = "paymentPending";
@@ -589,9 +596,9 @@ class DashboardService {
               stage = "paymentCompleted";
             }
           }
-          
+
           const stageOrder = [
-            "verification", 
+            "verification",
             "verified",
             "accountCreated",
             "paymentPending",
@@ -638,8 +645,14 @@ class DashboardService {
             currentStage: stage,
             stageProgress: progress,
             lastActivity:
-              onboardingSubmission?.updated_at || company.updated_at || company.created_at
-                ? this.getTimeAgo(onboardingSubmission?.updated_at || company.updated_at || company.created_at!)
+              onboardingSubmission?.updated_at ||
+              company.updated_at ||
+              company.created_at
+                ? this.getTimeAgo(
+                    onboardingSubmission?.updated_at ||
+                      company.updated_at ||
+                      company.created_at!
+                  )
                 : "Unknown",
             status,
             nextAction,
@@ -682,9 +695,9 @@ class DashboardService {
         companies?.map((company) => {
           const paymentStatus = (company.customers as any)?.[0]?.payment_status;
           const onboardingSubmission = company.onboarding_submissions?.[0];
-          
+
           let stage = "accountCreated"; // Default to account created since company exists
-          
+
           // Determine stage based on payment status and onboarding progress
           if (paymentStatus === "pending") {
             stage = "paymentPending";
@@ -717,9 +730,9 @@ class DashboardService {
               stage = "paymentCompleted";
             }
           }
-          
+
           const stageOrder = [
-            "verification", 
+            "verification",
             "verified",
             "accountCreated",
             "paymentPending",
@@ -775,8 +788,14 @@ class DashboardService {
             currentStage: stage,
             stageProgress: progress,
             lastActivity:
-              onboardingSubmission?.updated_at || company.updated_at || company.created_at
-                ? this.getTimeAgo(onboardingSubmission?.updated_at || company.updated_at || company.created_at!)
+              onboardingSubmission?.updated_at ||
+              company.updated_at ||
+              company.created_at
+                ? this.getTimeAgo(
+                    onboardingSubmission?.updated_at ||
+                      company.updated_at ||
+                      company.created_at!
+                  )
                 : "Unknown",
             status,
             nextAction,
@@ -792,44 +811,52 @@ class DashboardService {
   async getGlobalOnboardingStageStats(): Promise<OnboardingStageStats> {
     try {
       // Get user_profiles table count across all hubs
-      const { count: userProfilesCount, error: userProfilesError } = await this.supabase
-        .from("user_profiles")
-        .select("*", { count: "exact", head: true });
+      const { count: userProfilesCount, error: userProfilesError } =
+        await this.supabase
+          .from("user_profiles")
+          .select("*", { count: "exact", head: true });
 
       if (userProfilesError) throw userProfilesError;
 
       // Get companies table count across all hubs
-      const { count: companiesCount, error: companiesError } = await this.supabase
-        .from("companies")
-        .select("*", { count: "exact", head: true });
+      const { count: companiesCount, error: companiesError } =
+        await this.supabase
+          .from("companies")
+          .select("*", { count: "exact", head: true });
 
       if (companiesError) throw companiesError;
 
       // Get customers table count across all hubs
-      const { count: customersCount, error: customersError } = await this.supabase
-        .from("customers")
-        .select("*", { count: "exact", head: true });
+      const { count: customersCount, error: customersError } =
+        await this.supabase
+          .from("customers")
+          .select("*", { count: "exact", head: true });
 
       if (customersError) throw customersError;
 
       // Get memberships table count across all hubs
-      const { count: membershipsCount, error: membershipsError } = await this.supabase
-        .from("memberships")
-        .select("*", { count: "exact", head: true });
+      const { count: membershipsCount, error: membershipsError } =
+        await this.supabase
+          .from("memberships")
+          .select("*", { count: "exact", head: true });
 
       if (membershipsError) throw membershipsError;
 
       // Get onboarding_submissions table count across all hubs
-      const { count: onboardingSubmissionsCount, error: onboardingError } = await this.supabase
-        .from("onboarding_submissions")
-        .select("*", { count: "exact", head: true });
+      const { count: onboardingSubmissionsCount, error: onboardingError } =
+        await this.supabase
+          .from("onboarding_submissions")
+          .select("*", { count: "exact", head: true });
 
       if (onboardingError) throw onboardingError;
 
       // Get onboarding submissions to track actual progress
-      const { data: onboardingSubmissions, error: onboardingDataError } = await this.supabase
-        .from("onboarding_submissions")
-        .select("id, current_step, stripe_status, created_at, updated_at, hub_id");
+      const { data: onboardingSubmissions, error: onboardingDataError } =
+        await this.supabase
+          .from("onboarding_submissions")
+          .select(
+            "id, current_step, stripe_status, created_at, updated_at, hub_id"
+          );
 
       if (onboardingDataError) throw onboardingDataError;
 

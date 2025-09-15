@@ -145,12 +145,27 @@ export function CheckEmail() {
 
             <div className="space-y-4">
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <h3 className="font-medium text-blue-900 mb-2">Next Steps:</h3>
+                <h3 className="font-medium text-blue-900 mb-2">Almost there!</h3>
+                <p className="text-sm text-blue-800 mb-3">
+                  Your account has been created. Please verify your email to log in and start using the platform.
+                </p>
                 <ol className="text-sm text-blue-800 space-y-1">
                   <li>1. Check your email inbox</li>
-                  <li>2. Click the magic link in the email</li>
-                  <li>3. Complete your payment setup</li>
+                  <li>2. Click the verification link</li>
+                  <li>3. Log in to access your dashboard</li>
                 </ol>
+              </div>
+
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                <p className="text-sm text-gray-700 text-center">
+                  After verifying your email, you'll be able to log in at:
+                </p>
+                <Link 
+                  to="/login" 
+                  className="inline-flex items-center justify-center w-full mt-3 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors font-medium"
+                >
+                  Go to Login Page
+                </Link>
               </div>
 
               <div className="text-center">

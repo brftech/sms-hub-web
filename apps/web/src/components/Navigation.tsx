@@ -116,8 +116,7 @@ const Navigation = () => {
               onClick={() => {
                 if (webEnvironment.isProduction()) {
                   // In production, go to the existing app.{hub}.com
-                  const hubDomain = getHubContext(location.pathname)?.current || "gnymble";
-                  window.location.href = `https://app.${hubDomain}.com`;
+                  window.location.href = `https://app.${currentHub}.com`;
                 } else {
                   // In development, use the local login flow
                   navigate("/login");
@@ -141,8 +140,7 @@ const Navigation = () => {
               onClick={() => {
                 if (webEnvironment.isProduction()) {
                   // In production, go to the existing app.{hub}.com
-                  const hubDomain = getHubContext(location.pathname)?.current || "gnymble";
-                  window.location.href = `https://app.${hubDomain}.com`;
+                  window.location.href = `https://app.${currentHub}.com`;
                 } else {
                   // In development, use the local login flow
                   navigate("/login");
@@ -208,8 +206,7 @@ const Navigation = () => {
                   onClick={() => {
                     if (webEnvironment.isProduction()) {
                       // In production, go to the existing app.{hub}.com
-                      const hubDomain = getHubContext(location.pathname)?.current || "gnymble";
-                      window.location.href = `https://app.${hubDomain}.com`;
+                      window.location.href = `https://app.${currentHub}.com`;
                     } else {
                       // In development, use the local login flow
                       navigate("/login");

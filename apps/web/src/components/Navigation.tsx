@@ -8,6 +8,7 @@ import {
   Users,
   HelpCircle,
   CreditCard,
+  Mail,
 } from "lucide-react";
 import { getHubColorClasses } from "@sms-hub/utils";
 import { webEnvironment } from "../config/webEnvironment";
@@ -41,6 +42,7 @@ const Navigation = () => {
     { path: "/about", label: "About", icon: Users },
     { path: "/faq", label: "FAQ", icon: HelpCircle },
     { path: "/demo", label: "Demo", icon: MessageSquare },
+    { path: "/contact", label: "Contact", icon: Mail },
   ];
 
   return (
@@ -96,6 +98,16 @@ const Navigation = () => {
               }`}
             >
               Demo
+            </button>
+            <button
+              onClick={() => handleDesktopNavClick("/contact")}
+              className={`transition-colors text-sm font-medium ${
+                location.pathname === "/contact"
+                  ? `${hubColors.text} hub-text-primary`
+                  : "text-white hover:text-gray-300"
+              }`}
+            >
+              Contact
             </button>
           </div>
 

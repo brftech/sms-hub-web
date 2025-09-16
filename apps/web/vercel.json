@@ -1,0 +1,6 @@
+{
+  "installCommand": "pnpm install",
+  "buildCommand": "pnpm build --filter=@sms-hub/web",
+  "outputDirectory": "apps/web/dist",
+  "framework": "vite"
+}

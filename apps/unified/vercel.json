@@ -1,6 +1,6 @@
 {
-  "installCommand": "pnpm install",
+  "installCommand": "pnpm install --frozen-lockfile",
   "buildCommand": "pnpm build --filter=@sms-hub/unified",
-  "outputDirectory": "apps/unified/dist",
+  "outputDirectory": "dist",
   "framework": "vite"
 }

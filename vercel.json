@@ -1,6 +1,0 @@
-{
-  "buildCommand": "pnpm build --filter=@sms-hub/web",
-  "outputDirectory": "apps/web/dist",
-  "installCommand": "pnpm install --frozen-lockfile",
-  "framework": "vite"
-}

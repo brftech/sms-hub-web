@@ -106,6 +106,10 @@ export default function AuthCallback() {
               }
             );
           }
+        } else if (type === "payment-first-signup") {
+          logger.info(
+            "[AuthCallback] Payment-first signup - business records already created"
+          );
         }
 
         logger.info(

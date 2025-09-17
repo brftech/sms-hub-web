@@ -169,6 +169,8 @@ serve(async (req) => {
       signup_type,
       invitation_token,
       customer_type,
+      payment_session_id,
+      payment_first,
     } = await req.json();
 
     // Create Supabase admin client
@@ -360,7 +362,7 @@ serve(async (req) => {
 
     // Always create business records immediately
     console.log("✅ Auth user created, now creating business records...");
-    
+
     // Create all business records immediately
     await createBusinessRecords(supabaseAdmin, authData.user, {
       email,
@@ -374,34 +376,81 @@ serve(async (req) => {
     });
 
     console.log("✅ Business records created successfully");
-    
-    // Check if email is confirmed using Supabase's native tracking
-    const emailConfirmed = authData.user.email_confirmed_at !== null;
-    if (!emailConfirmed) {
-      console.log("📧 Confirmation email sent, user must verify email before login");
+
+    // Handle payment-first users differently
+    let sessionData = null;
+    let emailConfirmed = authData.user.email_confirmed_at !== null;
+
+    if (payment_first && payment_session_id) {
+      console.log("💳 Payment-first signup detected, auto-confirming user");
+
+      // Auto-confirm the user since they already paid
+      const { error: confirmError } =
+        await supabaseAdmin.auth.admin.updateUserById(authData.user.id, {
+          email_confirm: true,
+        });
+
+      if (confirmError) {
+        console.error("❌ Failed to auto-confirm user:", confirmError);
+      } else {
+        console.log("✅ User auto-confirmed for payment-first flow");
+        emailConfirmed = true;
+
+        // For payment-first users, generate a magic link session
+        const { data: magicLinkData, error: magicLinkError } =
+          await supabaseAdmin.auth.admin.generateLink({
+            type: "magiclink",
+            email: email,
+          });
+
+        if (!magicLinkError && magicLinkData) {
+          sessionData = {
+            access_token: magicLinkData.properties.access_token,
+            refresh_token: magicLinkData.properties.refresh_token,
+          };
+          console.log("✅ Generated magic link session for payment-first user");
+        } else {
+          console.error(
+            "❌ Failed to generate magic link session:",
+            magicLinkError
+          );
+        }
+      }
+    } else if (!emailConfirmed) {
+      console.log(
+        "📧 Confirmation email sent, user must verify email before login"
+      );
     }
 
     console.log("✅ Signup completed successfully");
     console.log("emailConfirmed:", emailConfirmed);
     console.log("confirmation_email_sent will be:", !emailConfirmed);
 
-    return new Response(
-      JSON.stringify({
-        success: true,
-        user_id: authData.user.id,
-        email: email,
-        hub_id: invitationData ? invitationData.hub_id : hub_id,
-        customer_type: customer_type,
-        confirmation_email_sent: true, // Always true for new signups
-        email_verified: emailConfirmed,
-        business_records_created: true,
-        message: emailConfirmed 
-          ? "Email verified successfully!" 
-          : "Account created! Please check your email to verify your account.",
-        environment: environment,
-      }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+    const responseData: any = {
+      success: true,
+      user_id: authData.user.id,
+      email: email,
+      hub_id: invitationData ? invitationData.hub_id : hub_id,
+      customer_type: customer_type,
+      confirmation_email_sent: !emailConfirmed, // Only send email if not confirmed
+      email_verified: emailConfirmed,
+      business_records_created: true,
+      message: emailConfirmed
+        ? "Email verified successfully!"
+        : "Account created! Please check your email to verify your account.",
+      environment: environment,
+      payment_first: payment_first || false,
+    };
+
+    // Add session data for payment-first users
+    if (payment_first && sessionData) {
+      responseData.session = sessionData;
+      responseData.auto_login = true;
+    }
+
+    return new Response(JSON.stringify(responseData), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   } catch (error) {
     console.error("Error in signup-native:", error);
     return new Response(

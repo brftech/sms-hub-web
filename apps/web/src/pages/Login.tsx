@@ -262,12 +262,47 @@ export function Login() {
           <div className="text-center mt-6 pt-6 border-t">
             <p className="text-sm text-muted-foreground">
               Don't have an account?{" "}
-              <Link
-                to="/signup"
-                className="hub-text-primary hover:underline font-semibold"
+              <button
+                onClick={async () => {
+                  try {
+                    const response = await fetch(
+                      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-checkout-session`,
+                      {
+                        method: "POST",
+                        headers: {
+                          "Content-Type": "application/json",
+                          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+                        },
+                        body: JSON.stringify({
+                          email: "", // Will be collected in Stripe checkout
+                          priceId: import.meta.env.VITE_STRIPE_PRICE_CORE,
+                          successUrl: `${window.location.origin}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+                          cancelUrl: `${window.location.origin}/pricing`,
+                          customerType: "company",
+                          hubId: 1, // Default to Gnymble
+                        }),
+                      }
+                    );
+
+                    const result = await response.json();
+
+                    if (!response.ok) {
+                      throw new Error(
+                        result.error || "Failed to create checkout session"
+                      );
+                    }
+
+                    // Redirect to Stripe Checkout
+                    window.location.href = result.url;
+                  } catch (error) {
+                    console.error("Checkout error:", error);
+                    alert("Failed to start checkout. Please try again.");
+                  }
+                }}
+                className="hub-text-primary hover:underline font-semibold bg-transparent border-none cursor-pointer"
               >
-                Sign Up
-              </Link>
+                Get Started
+              </button>
             </p>
           </div>
         </CardContent>

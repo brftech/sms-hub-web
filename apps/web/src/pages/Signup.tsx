@@ -11,7 +11,17 @@ import {
   HubLogo,
 } from "@sms-hub/ui";
 import { Input, Label, Alert, AlertDescription } from "@sms-hub/ui";
-import { Mail, Phone, User, Building, Key, UserPlus, ChevronLeft, ChevronRight, CheckCircle } from "lucide-react";
+import {
+  Mail,
+  Phone,
+  User,
+  Building,
+  Key,
+  UserPlus,
+  ChevronLeft,
+  ChevronRight,
+  CheckCircle,
+} from "lucide-react";
 import styled from "styled-components";
 import { environmentConfig } from "../config/environment";
 
@@ -50,21 +60,29 @@ const Step = styled.div<{ $active: boolean; $completed: boolean }>`
   font-size: 14px;
   transition: all 0.3s ease;
   position: relative;
-  
-  ${props => props.$active && `
+
+  ${(props) =>
+    props.$active &&
+    `
     background: var(--hub-primary);
     color: white;
     border: 2px solid var(--hub-primary);
     box-shadow: 0 0 0 4px rgba(var(--hub-primary-rgb), 0.2);
   `}
-  
-  ${props => props.$completed && !props.$active && `
+
+  ${(props) =>
+    props.$completed &&
+    !props.$active &&
+    `
     background: #10b981;
     color: white;
     border: 2px solid #10b981;
   `}
   
-  ${props => !props.$active && !props.$completed && `
+  ${(props) =>
+    !props.$active &&
+    !props.$completed &&
+    `
     background: transparent;
     color: #6b7280;
     border: 2px solid #6b7280;
@@ -74,7 +92,7 @@ const Step = styled.div<{ $active: boolean; $completed: boolean }>`
 const StepConnector = styled.div<{ $completed: boolean }>`
   width: 40px;
   height: 2px;
-  background: ${props => props.$completed ? '#10b981' : '#6b7280'};
+  background: ${(props) => (props.$completed ? "#10b981" : "#6b7280")};
   margin-top: 19px;
 `;
 
@@ -84,18 +102,20 @@ const PasswordStrengthBar = styled.div<{ $strength: number }>`
   border-radius: 2px;
   margin-top: 8px;
   overflow: hidden;
-  
+
   &::after {
-    content: '';
+    content: "";
     display: block;
     height: 100%;
-    width: ${props => props.$strength * 25}%;
-    background: ${props => 
-      props.$strength <= 1 ? '#ef4444' :
-      props.$strength === 2 ? '#f59e0b' :
-      props.$strength === 3 ? '#eab308' :
-      '#10b981'
-    };
+    width: ${(props) => props.$strength * 25}%;
+    background: ${(props) =>
+      props.$strength <= 1
+        ? "#ef4444"
+        : props.$strength === 2
+          ? "#f59e0b"
+          : props.$strength === 3
+            ? "#eab308"
+            : "#10b981"};
     transition: all 0.3s ease;
   }
 `;
@@ -128,11 +148,13 @@ export function Signup() {
   });
 
   const invitationToken = searchParams.get("invitation");
+  const paymentSessionId = searchParams.get("payment_session");
 
   // Real-time validation functions
   const validateEmail = (email: string) => {
     if (!email) return "Email is required";
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return "Invalid email address";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+      return "Invalid email address";
     return "";
   };
 
@@ -164,7 +186,9 @@ export function Signup() {
 
   const formatPhoneNumber = (value: string) => {
     const cleaned = value.replace(/\D/g, "");
-    const withoutCountryCode = cleaned.startsWith("1") ? cleaned.slice(1) : cleaned;
+    const withoutCountryCode = cleaned.startsWith("1")
+      ? cleaned.slice(1)
+      : cleaned;
     const limited = withoutCountryCode.slice(0, 10);
 
     if (limited.length === 10) {
@@ -197,13 +221,15 @@ export function Signup() {
 
   const getPhoneForAPI = (phone: string) => {
     const cleaned = phone.replace(/\D/g, "");
-    const withoutCountryCode = cleaned.startsWith("1") ? cleaned.slice(1) : cleaned;
+    const withoutCountryCode = cleaned.startsWith("1")
+      ? cleaned.slice(1)
+      : cleaned;
     return `+1${withoutCountryCode}`;
   };
 
   const validateStep = (step: number) => {
     setError("");
-    
+
     switch (step) {
       case 1:
         if (!formData.companyName.trim()) {
@@ -226,7 +252,7 @@ export function Signup() {
           }
         }
         return true;
-      
+
       case 2:
         if (!formData.firstName.trim()) {
           setError("Please enter your first name");
@@ -237,7 +263,7 @@ export function Signup() {
           return false;
         }
         return true;
-      
+
       case 3:
         if (!formData.password) {
           setError("Please enter a password");
@@ -252,7 +278,7 @@ export function Signup() {
           return false;
         }
         return true;
-      
+
       default:
         return true;
     }
@@ -260,12 +286,12 @@ export function Signup() {
 
   const nextStep = () => {
     if (validateStep(currentStep)) {
-      setCurrentStep(prev => Math.min(prev + 1, 3));
+      setCurrentStep((prev) => Math.min(prev + 1, 3));
     }
   };
 
   const prevStep = () => {
-    setCurrentStep(prev => Math.max(prev - 1, 1));
+    setCurrentStep((prev) => Math.max(prev - 1, 1));
     setError("");
   };
 
@@ -275,7 +301,7 @@ export function Signup() {
       const timer = setTimeout(() => {
         setIsFormReady(true);
       }, 100);
-      
+
       return () => clearTimeout(timer);
     }
   }, [hubConfig]);
@@ -283,14 +309,16 @@ export function Signup() {
   // Handle focus for the first field of each step
   useEffect(() => {
     if (!isFormReady) return;
-    
+
     const timer = setTimeout(() => {
-      const firstInput = document.querySelector('input[type="text"], input[type="email"], input[type="tel"], input[type="password"]') as HTMLInputElement;
+      const firstInput = document.querySelector(
+        'input[type="text"], input[type="email"], input[type="tel"], input[type="password"]'
+      ) as HTMLInputElement;
       if (firstInput) {
         firstInput.focus();
       }
     }, 100);
-    
+
     return () => clearTimeout(timer);
   }, [currentStep, isFormReady]);
 
@@ -324,6 +352,8 @@ export function Signup() {
             signup_type: invitationToken ? "invited_user" : "new_company",
             invitation_token: invitationToken,
             customer_type: "company",
+            payment_session_id: paymentSessionId, // Add payment session
+            payment_first: !!paymentSessionId, // Flag for payment-first flow
           }),
         }
       );
@@ -331,7 +361,10 @@ export function Signup() {
       const result = await response.json();
       console.log("Signup response:", response.status, result);
       console.log("Full result object:", JSON.stringify(result, null, 2));
-      console.log("confirmation_email_sent value:", result.confirmation_email_sent);
+      console.log(
+        "confirmation_email_sent value:",
+        result.confirmation_email_sent
+      );
 
       if (!response.ok) {
         throw new Error(result.error || "Failed to create account");
@@ -351,55 +384,91 @@ export function Signup() {
 
       // Show success animation
       setShowSuccess(true);
-      
+
       // Check if confirmation email was sent successfully or if user is already confirmed (dev mode)
       console.log("Checking redirect logic...");
-      console.log("result.confirmation_email_sent:", result.confirmation_email_sent);
+      console.log(
+        "result.confirmation_email_sent:",
+        result.confirmation_email_sent
+      );
       console.log("result.auto_confirmed:", result.auto_confirmed);
-      console.log("environmentConfig.isDevelopment:", environmentConfig.isDevelopment);
-      
+      console.log(
+        "environmentConfig.isDevelopment:",
+        environmentConfig.isDevelopment
+      );
+
       // Wait for animation to play
       setTimeout(() => {
-        if (result.confirmation_email_sent) {
-          console.log("Taking confirmation_email_sent branch - should redirect to /check-email");
+        // Handle payment-first users with auto-login
+        if (result.payment_first && result.session && result.auto_login) {
+          console.log("💳 Payment-first user with auto-login session");
+          console.log("🔑 Session tokens:", {
+            hasAccessToken: !!result.session.access_token,
+            hasRefreshToken: !!result.session.refresh_token,
+            accessTokenLength: result.session.access_token?.length,
+            refreshTokenLength: result.session.refresh_token?.length,
+          });
+
+          // Redirect to unified app with session tokens for immediate login
+          const redirectUrl = environmentConfig.unifiedAppUrl;
+          const params = new URLSearchParams({
+            access_token: result.session.access_token,
+            refresh_token: result.session.refresh_token,
+            redirect: "/dashboard",
+            type: "payment-first-signup",
+          });
+
+          console.log(
+            "Redirecting payment-first user with session to:",
+            `${redirectUrl}/auth-callback?${params.toString()}`
+          );
+          window.location.href = `${redirectUrl}/auth-callback?${params.toString()}`;
+        } else if (result.confirmation_email_sent) {
+          console.log(
+            "Taking confirmation_email_sent branch - should redirect to /check-email"
+          );
 
           // Store email for the check-email page
-          sessionStorage.setItem('signup_email', result.email);
+          sessionStorage.setItem("signup_email", result.email);
 
           // Redirect to check email page
           console.log("About to redirect to /check-email");
-          window.location.href = '/check-email';
+          window.location.href = "/check-email";
         } else if (result.auto_confirmed && environmentConfig.isDevelopment) {
-        console.log("Development mode: User auto-confirmed, proceeding to dashboard...");
+          console.log(
+            "Development mode: User auto-confirmed, proceeding to dashboard..."
+          );
 
-        // Store success data with expiration
-        const successData = {
-          userId: result.user_id,
-          email: result.email,
-          timestamp: Date.now(),
-          expiresAt: Date.now() + (5 * 60 * 1000), // 5 minutes
-        };
-        sessionStorage.setItem('signup_success', JSON.stringify(successData));
+          // Store success data with expiration
+          const successData = {
+            userId: result.user_id,
+            email: result.email,
+            timestamp: Date.now(),
+            expiresAt: Date.now() + 5 * 60 * 1000, // 5 minutes
+          };
+          sessionStorage.setItem("signup_success", JSON.stringify(successData));
 
-        // Clear sensitive data
-        sessionStorage.removeItem('account_data');
+          // Clear sensitive data
+          sessionStorage.removeItem("account_data");
 
-        // Redirect to unified app with dev auth if enabled
-        const redirectUrl = environmentConfig.enableDevAuth && environmentConfig.devAuthToken
-          ? `${environmentConfig.unifiedAppUrl}/?superadmin=${environmentConfig.devAuthToken}`
-          : environmentConfig.unifiedAppUrl;
+          // Redirect to unified app as the newly created user
+          // Do NOT use superadmin token - this is a real user signup
+          const redirectUrl = environmentConfig.unifiedAppUrl;
 
+          console.log("Redirecting newly signed up user to:", redirectUrl);
           window.location.href = redirectUrl;
         } else {
           console.warn("Confirmation email failed to send");
-          setError("Account created but email failed to send. Please contact support or try logging in directly.");
+          setError(
+            "Account created but email failed to send. Please contact support or try logging in directly."
+          );
           setShowSuccess(false);
         }
       }, 2000); // 2 second delay for animation
-
     } catch (err: unknown) {
       console.error("Signup error:", err);
-      const errorMessage = err instanceof Error ? err.message : "Failed to create account";
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to create account";
       setError(errorMessage);
     } finally {
       setIsSubmitting(false);
@@ -425,7 +494,9 @@ export function Signup() {
                   setFieldErrors({ ...fieldErrors, companyName: "" });
                 }}
                 onBlur={(e) => {
-                  const error = e.target.value.trim() ? "" : "Company name is required";
+                  const error = e.target.value.trim()
+                    ? ""
+                    : "Company name is required";
                   setFieldErrors({ ...fieldErrors, companyName: error });
                 }}
                 placeholder="Enter your company name"
@@ -435,7 +506,9 @@ export function Signup() {
                 }`}
               />
               {fieldErrors.companyName && (
-                <p className="text-red-500 text-xs mt-1">{fieldErrors.companyName}</p>
+                <p className="text-red-500 text-xs mt-1">
+                  {fieldErrors.companyName}
+                </p>
               )}
             </div>
 
@@ -451,7 +524,10 @@ export function Signup() {
                 onChange={(e) => {
                   setFormData({ ...formData, email: e.target.value });
                   if (fieldErrors.email) {
-                    setFieldErrors({ ...fieldErrors, email: validateEmail(e.target.value) });
+                    setFieldErrors({
+                      ...fieldErrors,
+                      email: validateEmail(e.target.value),
+                    });
                   }
                 }}
                 onBlur={(e) => {
@@ -553,7 +629,10 @@ export function Signup() {
                 onChange={(e) => {
                   setFormData({ ...formData, password: e.target.value });
                   if (fieldErrors.password) {
-                    setFieldErrors({ ...fieldErrors, password: validatePassword(e.target.value) });
+                    setFieldErrors({
+                      ...fieldErrors,
+                      password: validatePassword(e.target.value),
+                    });
                   }
                 }}
                 onBlur={(e) => {
@@ -568,10 +647,14 @@ export function Signup() {
                 }`}
               />
               {formData.password && (
-                <PasswordStrengthBar $strength={getPasswordStrength(formData.password)} />
+                <PasswordStrengthBar
+                  $strength={getPasswordStrength(formData.password)}
+                />
               )}
               {fieldErrors.password && (
-                <p className="text-red-500 text-xs mt-1">{fieldErrors.password}</p>
+                <p className="text-red-500 text-xs mt-1">
+                  {fieldErrors.password}
+                </p>
               )}
             </div>
 
@@ -587,12 +670,18 @@ export function Signup() {
                 onChange={(e) => {
                   setFormData({ ...formData, confirmPassword: e.target.value });
                   if (fieldErrors.confirmPassword && e.target.value) {
-                    const error = formData.password !== e.target.value ? "Passwords do not match" : "";
+                    const error =
+                      formData.password !== e.target.value
+                        ? "Passwords do not match"
+                        : "";
                     setFieldErrors({ ...fieldErrors, confirmPassword: error });
                   }
                 }}
                 onBlur={(e) => {
-                  const error = formData.password !== e.target.value ? "Passwords do not match" : "";
+                  const error =
+                    formData.password !== e.target.value
+                      ? "Passwords do not match"
+                      : "";
                   setFieldErrors({ ...fieldErrors, confirmPassword: error });
                 }}
                 placeholder="Confirm password"
@@ -603,7 +692,9 @@ export function Signup() {
                 }`}
               />
               {fieldErrors.confirmPassword && (
-                <p className="text-red-500 text-xs mt-1">{fieldErrors.confirmPassword}</p>
+                <p className="text-red-500 text-xs mt-1">
+                  {fieldErrors.confirmPassword}
+                </p>
               )}
             </div>
           </>
@@ -671,9 +762,7 @@ export function Signup() {
               <CardTitle className="text-2xl font-bold">
                 Create Your Account
               </CardTitle>
-              <CardDescription>
-                Loading...
-              </CardDescription>
+              <CardDescription>Loading...</CardDescription>
             </div>
           </CardHeader>
           <CardContent className="px-4 sm:px-6">
@@ -700,22 +789,53 @@ export function Signup() {
             <CardTitle className="text-2xl font-bold">
               {getStepTitle()}
             </CardTitle>
-            <CardDescription>
-              {getStepDescription()}
-            </CardDescription>
+            <CardDescription>{getStepDescription()}</CardDescription>
           </div>
-          
+
           <StepIndicator>
-            <Step $active={currentStep === 1} $completed={currentStep > 1}>1</Step>
+            <Step $active={currentStep === 1} $completed={currentStep > 1}>
+              1
+            </Step>
             <StepConnector $completed={currentStep > 1} />
-            <Step $active={currentStep === 2} $completed={currentStep > 2}>2</Step>
+            <Step $active={currentStep === 2} $completed={currentStep > 2}>
+              2
+            </Step>
             <StepConnector $completed={currentStep > 2} />
-            <Step $active={currentStep === 3} $completed={false}>3</Step>
+            <Step $active={currentStep === 3} $completed={false}>
+              3
+            </Step>
           </StepIndicator>
         </CardHeader>
 
+        {/* Payment Success Banner */}
+        {paymentSessionId && (
+          <div className="mx-6 mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+            <div className="flex items-center">
+              <CheckCircle className="w-5 h-5 text-green-600 mr-2" />
+              <div>
+                <p className="text-sm font-medium text-green-800">
+                  Payment Successful!
+                </p>
+                <p className="text-xs text-green-600">
+                  Complete your account setup to start messaging.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         <CardContent className="px-4 sm:px-6">
-          <form onSubmit={currentStep === 3 ? handleSubmit : (e) => { e.preventDefault(); nextStep(); }} className="space-y-4 sm:space-y-6">
+          <form
+            onSubmit={
+              currentStep === 3
+                ? handleSubmit
+                : (e) => {
+                    e.preventDefault();
+                    nextStep();
+                  }
+            }
+            className="space-y-4 sm:space-y-6"
+          >
             {renderStepContent()}
 
             {error && (
@@ -736,13 +856,17 @@ export function Signup() {
                   Back
                 </Button>
               )}
-              
+
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className={`${currentStep === 1 ? 'w-full' : 'flex-1'} hub-bg-primary hover:hub-bg-primary/90`}
+                className={`${currentStep === 1 ? "w-full" : "flex-1"} hub-bg-primary hover:hub-bg-primary/90`}
               >
-                {isSubmitting ? "Creating Account..." : currentStep === 3 ? "Create Account" : "Next"}
+                {isSubmitting
+                  ? "Creating Account..."
+                  : currentStep === 3
+                    ? "Create Account"
+                    : "Next"}
                 {currentStep === 3 ? (
                   <UserPlus className="w-4 h-4 ml-2" />
                 ) : (

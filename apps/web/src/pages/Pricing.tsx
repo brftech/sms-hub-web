@@ -1,6 +1,7 @@
 import { PageLayout, SEO } from "@sms-hub/ui";
 
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import {
   Check,
   Zap,
@@ -19,6 +20,73 @@ import Footer from "../components/Footer";
 
 const Pricing = () => {
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Payment-first checkout handler
+  const handleDirectCheckout = async (planType: string) => {
+    console.log("🚀 handleDirectCheckout called with planType:", planType);
+    setIsLoading(true);
+
+    try {
+      // Map plan types to Stripe price IDs
+      const priceIds = {
+        starter: import.meta.env.VITE_STRIPE_PRICE_CORE, // Use CORE price for starter
+        core:
+          import.meta.env.VITE_STRIPE_PRICE_CORE ||
+          import.meta.env.VITE_STRIPE_PRICE_PROFESSIONAL,
+        elite:
+          import.meta.env.VITE_STRIPE_PRICE_ELITE ||
+          import.meta.env.VITE_STRIPE_PRICE_ENTERPRISE,
+      };
+
+      const priceId = priceIds[planType as keyof typeof priceIds];
+      console.log("💰 Price IDs:", priceIds);
+      console.log("🎯 Selected price ID:", priceId);
+
+      if (!priceId) {
+        console.error("❌ No price ID found for plan:", planType);
+        throw new Error(`Price ID not configured for plan: ${planType}`);
+      }
+
+      // Create checkout session
+      console.log("🌐 Supabase URL:", import.meta.env.VITE_SUPABASE_URL);
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-checkout-session`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({
+            email: "", // Will be collected in Stripe checkout
+            priceId: priceId,
+            successUrl: `${window.location.origin}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+            cancelUrl: `${window.location.origin}/pricing`,
+            customerType: "company",
+            hubId: 1, // Default to Gnymble, will be updated after signup
+          }),
+        }
+      );
+
+      const result = await response.json();
+      console.log("📋 Checkout response:", result);
+
+      if (!response.ok) {
+        console.error("❌ Checkout failed:", result);
+        throw new Error(result.error || "Failed to create checkout session");
+      }
+
+      // Redirect to Stripe Checkout
+      console.log("🔄 Redirecting to Stripe:", result.url);
+      window.location.href = result.url;
+    } catch (error) {
+      console.error("Checkout error:", error);
+      alert("Failed to start checkout. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const onboardingPlan = {
     name: "Get Started Package",
@@ -230,11 +298,14 @@ const Pricing = () => {
               </ul>
 
               <button
-                onClick={() => navigate("/contact")}
-                className="px-10 py-4 bg-orange-600 text-white font-bold rounded-full hover:bg-orange-700 transition-all duration-300 text-lg tracking-wide uppercase flex items-center justify-center mx-auto group mb-6"
+                onClick={() => handleDirectCheckout("starter")}
+                disabled={isLoading}
+                className="px-10 py-4 bg-orange-600 text-white font-bold rounded-full hover:bg-orange-700 disabled:bg-orange-400 disabled:cursor-not-allowed transition-all duration-300 text-lg tracking-wide uppercase flex items-center justify-center mx-auto group mb-6"
                 style={{ fontFamily: "Inter, system-ui, sans-serif" }}
               >
-                Get Started Today
+                {isLoading
+                  ? "Starting Checkout..."
+                  : "Get Started Today - $179"}
                 <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
               </button>
 
@@ -442,11 +513,14 @@ const Pricing = () => {
                 texting that works.
               </p>
               <button
-                onClick={() => navigate("/contact")}
-                className="px-10 py-4 bg-orange-600 text-white font-bold rounded-full hover:bg-orange-700 transition-all duration-300 text-lg tracking-wide uppercase flex items-center justify-center mx-auto group"
+                onClick={() => handleDirectCheckout("starter")}
+                disabled={isLoading}
+                className="px-10 py-4 bg-orange-600 text-white font-bold rounded-full hover:bg-orange-700 disabled:bg-orange-400 disabled:cursor-not-allowed transition-all duration-300 text-lg tracking-wide uppercase flex items-center justify-center mx-auto group"
                 style={{ fontFamily: "Inter, system-ui, sans-serif" }}
               >
-                Get Started Today
+                {isLoading
+                  ? "Starting Checkout..."
+                  : "Get Started Today - $179"}
                 <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
               </button>
             </div>

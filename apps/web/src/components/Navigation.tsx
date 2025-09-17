@@ -13,6 +13,42 @@ import {
 import { getHubColorClasses } from "@sms-hub/utils";
 import { webEnvironment } from "../config/webEnvironment";
 
+// Direct Stripe checkout helper
+const handleDirectCheckout = async () => {
+  try {
+    const response = await fetch(
+      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-checkout-session`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({
+          email: "", // Will be collected in Stripe checkout
+          priceId: import.meta.env.VITE_STRIPE_PRICE_CORE,
+          successUrl: `${window.location.origin}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+          cancelUrl: `${window.location.origin}/pricing`,
+          customerType: "company",
+          hubId: 1, // Default to Gnymble
+        }),
+      }
+    );
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error || "Failed to create checkout session");
+    }
+
+    // Redirect to Stripe Checkout
+    window.location.href = result.url;
+  } catch (error) {
+    console.error("Checkout error:", error);
+    alert("Failed to start checkout. Please try again.");
+  }
+};
+
 const Navigation = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
@@ -118,10 +154,10 @@ const Navigation = () => {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => handleDesktopNavClick("/signup")}
+                onClick={() => handleDirectCheckout()}
                 className="transition-all duration-300 backdrop-blur-sm px-4 py-1.5 text-xs bg-black/50 text-white border border-orange-500/50 hover:bg-orange-500/10 hover:border-orange-400"
               >
-                Sign Up
+                Get Started
               </Button>
             )}
             <Button
@@ -211,10 +247,13 @@ const Navigation = () => {
               <div className="pt-4 border-t border-white/10 space-y-3">
                 {!webEnvironment.isProduction() && (
                   <Button
-                    onClick={() => handleNavClick("/signup")}
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      handleDirectCheckout();
+                    }}
                     className={`w-full ${hubColors.bg} hover:${hubColors.bgHover} text-white font-semibold py-3 text-base`}
                   >
-                    Sign Up
+                    Get Started
                   </Button>
                 )}
                 <Button

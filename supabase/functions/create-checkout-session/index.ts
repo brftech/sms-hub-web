@@ -16,7 +16,7 @@ interface CreateCheckoutData {
   priceId?: string;
   successUrl?: string;
   cancelUrl?: string;
-  customerType?: 'company' | 'individual';
+  customerType?: "company" | "individual";
 }
 
 serve(async (req) => {
@@ -29,15 +29,18 @@ serve(async (req) => {
     if (!stripeKey) {
       throw new Error("Stripe secret key not configured");
     }
-    
+
     // Log the key length and check for line breaks
     console.log("🔑 Stripe key length:", stripeKey.length);
-    console.log("🔑 Stripe key contains newlines:", stripeKey.includes('\n'));
+    console.log("🔑 Stripe key contains newlines:", stripeKey.includes("\n"));
     console.log("🔑 Stripe key starts with:", stripeKey.substring(0, 20));
-    console.log("🔑 Stripe key ends with:", stripeKey.substring(stripeKey.length - 20));
-    
+    console.log(
+      "🔑 Stripe key ends with:",
+      stripeKey.substring(stripeKey.length - 20)
+    );
+
     // Clean the key by removing any whitespace and newlines
-    const cleanStripeKey = stripeKey.trim().replace(/\s+/g, '');
+    const cleanStripeKey = stripeKey.trim().replace(/\s+/g, "");
     console.log("🧹 Cleaned key length:", cleanStripeKey.length);
 
     const stripe = new Stripe(cleanStripeKey, {
@@ -45,22 +48,28 @@ serve(async (req) => {
       httpClient: Stripe.createFetchHttpClient(),
     });
 
-    const { 
-      email, 
+    const {
+      email,
       userId,
       companyId,
       hubId,
       priceId = Deno.env.get("STRIPE_DEFAULT_PRICE_ID"),
       successUrl = `${req.headers.get("origin")}/onboarding?session_id={CHECKOUT_SESSION_ID}`,
       cancelUrl = `${req.headers.get("origin")}/signup`,
-      customerType = 'company'
+      customerType = "company",
     }: CreateCheckoutData = await req.json();
 
-    if (!email) {
-      throw new Error("Email is required");
+    // For payment-first flow, email can be collected in Stripe checkout
+    const isPaymentFirst = !email;
+
+    if (!email && !priceId) {
+      throw new Error("Email is required when no price ID is provided");
     }
 
-    console.log("🛒 Creating checkout session for:", email);
+    console.log(
+      "🛒 Creating checkout session for:",
+      email || "payment-first flow"
+    );
 
     // Create Supabase client
     const supabaseAdmin = createClient(
@@ -69,32 +78,37 @@ serve(async (req) => {
       { auth: { persistSession: false } }
     );
 
-    // Check if customer already exists in Stripe
-    let customer;
-    const existingCustomers = await stripe.customers.list({
-      email: email,
-      limit: 1
-    });
-
-    if (existingCustomers.data.length > 0) {
-      customer = existingCustomers.data[0];
-      console.log("✅ Found existing customer:", customer.id);
-    } else {
-      // Create new customer
-      customer = await stripe.customers.create({
+    // Check if customer already exists in Stripe (only if email provided)
+    let customer = null;
+    if (!isPaymentFirst && email) {
+      const existingCustomers = await stripe.customers.list({
         email: email,
-        metadata: {
-          user_id: userId || "",
-          company_id: companyId || "",
-          hub_id: hubId?.toString() || "",
-        }
+        limit: 1,
       });
-      console.log("✅ Created new customer:", customer.id);
+
+      if (existingCustomers.data.length > 0) {
+        customer = existingCustomers.data[0];
+        console.log("✅ Found existing customer:", customer.id);
+      } else {
+        // Create new customer with email
+        customer = await stripe.customers.create({
+          email: email,
+          metadata: {
+            user_id: userId || "",
+            company_id: companyId || "",
+            hub_id: hubId?.toString() || "",
+          },
+        });
+        console.log("✅ Created new customer:", customer.id);
+      }
+    } else if (isPaymentFirst) {
+      console.log(
+        "💳 Payment-first flow: Stripe will create customer during checkout"
+      );
     }
 
     // Create checkout session
-    const session = await stripe.checkout.sessions.create({
-      customer: customer.id,
+    const sessionConfig: any = {
       payment_method_types: ["card"],
       mode: "subscription",
       line_items: [
@@ -111,99 +125,121 @@ serve(async (req) => {
         company_id: companyId || "",
         hub_id: hubId?.toString() || "",
         customer_type: customerType,
+        payment_first: isPaymentFirst ? "true" : "false",
       },
       subscription_data: {
         metadata: {
           user_id: userId || "",
           company_id: companyId || "",
           hub_id: hubId?.toString() || "",
-        }
+          payment_first: isPaymentFirst ? "true" : "false",
+        },
       },
       allow_promotion_codes: true,
       billing_address_collection: "required",
-      customer_update: {
+    };
+
+    // Configure customer handling based on whether we have email
+    if (!isPaymentFirst && customer) {
+      // Normal flow: use existing customer
+      sessionConfig.customer = customer.id;
+      sessionConfig.customer_update = {
         address: "auto",
-        name: "auto"
-      }
-    });
+        name: "auto",
+      };
+    }
+    // Payment-first flow: Don't specify customer at all
+    // Stripe will automatically create a customer in subscription mode
+
+    const session = await stripe.checkout.sessions.create(sessionConfig);
 
     console.log("✅ Checkout session created:", session.id);
 
-    // Create or update customer record
-    const customerData = {
-      hub_id: hubId || 1,
-      customer_type: customerType,
-      stripe_customer_id: customer.id,
-      billing_email: email,
-      is_active: true,
-      metadata: {
-        stripe_session_id: session.id,
-        user_id: userId,
-        company_id: companyId
-      }
-    };
-
-    // Check if customer already exists
-    const { data: existingCustomer } = await supabaseAdmin
-      .from("customers")
-      .select("id")
-      .eq("stripe_customer_id", customer.id)
-      .single();
-
+    // For payment-first flow, we'll create the customer record after payment
+    // via the webhook when we have the actual customer data from Stripe
     let customerId;
-    if (existingCustomer) {
-      // Update existing customer
-      const { data: updatedCustomer, error: updateError } = await supabaseAdmin
+
+    if (!isPaymentFirst) {
+      // Normal flow: create customer record now
+      const customerData: any = {
+        hub_id: hubId || 1,
+        customer_type: customerType,
+        stripe_customer_id: customer.id,
+        billing_email: email,
+        is_active: true,
+        metadata: {
+          stripe_session_id: session.id,
+          user_id: userId,
+          company_id: companyId,
+        },
+      };
+
+      // Check if customer already exists
+      const { data: existingCustomer } = await supabaseAdmin
         .from("customers")
-        .update(customerData)
-        .eq("id", existingCustomer.id)
         .select("id")
+        .eq("stripe_customer_id", customer.id)
         .single();
-      
-      if (updateError) {
-        console.error("⚠️ Failed to update customer:", updateError);
+
+      if (existingCustomer) {
+        // Update existing customer
+        const { data: updatedCustomer, error: updateError } =
+          await supabaseAdmin
+            .from("customers")
+            .update(customerData)
+            .eq("id", existingCustomer.id)
+            .select("id")
+            .single();
+
+        if (updateError) {
+          console.error("⚠️ Failed to update customer:", updateError);
+        } else {
+          customerId = updatedCustomer.id;
+          console.log("✅ Updated customer record");
+        }
       } else {
-        customerId = updatedCustomer.id;
-        console.log("✅ Updated customer record");
+        // Create new customer
+        const { data: newCustomer, error: createError } = await supabaseAdmin
+          .from("customers")
+          .insert(customerData)
+          .select("id")
+          .single();
+
+        if (createError) {
+          console.error("⚠️ Failed to create customer:", createError);
+        } else {
+          customerId = newCustomer.id;
+          console.log("✅ Created customer record");
+        }
       }
     } else {
-      // Create new customer
-      const { data: newCustomer, error: createError } = await supabaseAdmin
-        .from("customers")
-        .insert(customerData)
-        .select("id")
-        .single();
-      
-      if (createError) {
-        console.error("⚠️ Failed to create customer:", createError);
-      } else {
-        customerId = newCustomer.id;
-        console.log("✅ Created customer record");
-      }
+      console.log(
+        "💳 Payment-first flow: customer record will be created after payment"
+      );
     }
 
     // Link customer to company or user
     if (customerId) {
-      if (customerType === 'company' && companyId) {
+      if (customerType === "company" && companyId) {
         const { error: linkError } = await supabaseAdmin
           .from("companies")
           .update({ customer_id: customerId })
           .eq("id", companyId);
-        
+
         if (linkError) {
           console.error("⚠️ Failed to link customer to company:", linkError);
         } else {
           console.log("✅ Linked customer to company");
         }
-      } else if (customerType === 'individual' && userId) {
+      } else if (customerType === "individual" && userId) {
         const { error: linkError } = await supabaseAdmin
           .from("user_profiles")
-          .update({ 
+          .update({
             customer_id: customerId,
-            is_individual_customer: true 
+            is_individual_customer: true,
           })
           .eq("id", userId);
-        
+
         if (linkError) {
           console.error("⚠️ Failed to link customer to user:", linkError);
         } else {
@@ -217,7 +253,8 @@ serve(async (req) => {
         success: true,
         url: session.url,
         sessionId: session.id,
-        customerId: customer.id
+        customerId: isPaymentFirst ? null : customer?.id, // No customer ID for payment-first
+        paymentFirst: isPaymentFirst,
       }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },

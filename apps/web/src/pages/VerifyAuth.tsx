@@ -122,9 +122,9 @@ export function VerifyAuth() {
         setSuccess(true);
         sessionStorage.removeItem("login_email");
 
-        // Redirect to unified app
+        // Redirect to unified app as the authenticated user
         setTimeout(() => {
-          window.location.href = `${import.meta.env.VITE_UNIFIED_APP_URL || "http://localhost:3001"}/?superadmin=dev123`;
+          window.location.href = `${import.meta.env.VITE_UNIFIED_APP_URL || "http://localhost:3001"}/`;
         }, 1500);
       } else {
         // Signup verification via edge function
@@ -166,7 +166,7 @@ export function VerifyAuth() {
         sessionStorage.setItem("verified_verification_id", verifyData.verification_id);
 
         setTimeout(() => {
-          window.location.href = `${import.meta.env.VITE_UNIFIED_APP_URL || "http://localhost:3001"}/account-details?id=${verifyData.verification_id}&superadmin=dev123`;
+          window.location.href = `${import.meta.env.VITE_UNIFIED_APP_URL || "http://localhost:3001"}/account-details?id=${verifyData.verification_id}`;
         }, 1500);
       }
     } catch (err: unknown) {

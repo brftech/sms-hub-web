@@ -33,6 +33,7 @@ import { CheckEmail } from "./pages/CheckEmail";
 import { VerifyAuth } from "./pages/VerifyAuth";
 import { TestAuth } from "./pages/TestAuth";
 import { DebugAuth } from "./pages/DebugAuth";
+import PaymentSuccess from "./pages/PaymentSuccess";
 
 // Lazy load client pages (less frequently accessed)
 const DonsBurlingame = lazy(() => import("./pages/clients/DonsBurlingame"));
@@ -257,6 +258,14 @@ const AppRoutes = () => {
         element={
           <PageTransition>
             <Signup />
+          </PageTransition>
+        }
+      />
+      <Route
+        path="/payment-success"
+        element={
+          <PageTransition>
+            <PaymentSuccess />
           </PageTransition>
         }
       />

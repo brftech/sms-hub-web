@@ -1,8 +1,7 @@
 {
-  "installCommand": "pnpm install --frozen-lockfile",
-  "buildCommand": "pnpm build --filter=@sms-hub/web",
+  "buildCommand": "pnpm build --filter @sms-hub/web",
   "outputDirectory": "dist",
-  "framework": "vite",
+  "framework": null,
   "redirects": [
     {
       "source": "/signup",

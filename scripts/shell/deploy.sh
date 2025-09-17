@@ -62,9 +62,7 @@ if [ "$DEPLOY_WEB" = true ]; then
   echo -e "${BLUE}📦 Deploying Web App...${NC}"
   echo "------------------------"
 
-  # Deploy from web app directory
-  cd apps/web
-  
+  # Deploy from root (expert advice: never cd into subfolders)
   if vercel --prod --yes $FORCE_FLAG; then
     echo -e "${GREEN}✅ Web app deployed successfully!${NC}"
   else
@@ -80,9 +78,7 @@ if [ "$DEPLOY_UNIFIED" = true ]; then
   echo -e "${BLUE}📦 Deploying Unified App...${NC}"
   echo "---------------------------"
 
-  # Deploy from unified app directory  
-  cd apps/unified
-  
+  # Deploy from root (expert advice: never cd into subfolders)
   if vercel --prod --yes $FORCE_FLAG; then
     echo -e "${GREEN}✅ Unified app deployed successfully!${NC}"
   else

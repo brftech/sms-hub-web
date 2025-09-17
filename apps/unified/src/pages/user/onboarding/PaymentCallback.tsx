@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useHub, HubLogo, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@sms-hub/ui'
-import { CheckCircle, XCircle, Loader2 } from 'lucide-react'
+import { CheckCircle, XCircle, Loader2, AlertCircle } from 'lucide-react'
 import { toast } from 'sonner'
 // import { createClient } from '@supabase/supabase-js'
 
@@ -9,8 +9,9 @@ export function PaymentCallback() {
   const { currentHub } = useHub()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
-  const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading')
+  const [status, setStatus] = useState<'loading' | 'success' | 'error' | 'canceled'>('loading')
   const [message, setMessage] = useState('')
+  const [retryCount, setRetryCount] = useState(0)
 
   useEffect(() => {
     verifyPayment()
@@ -21,12 +22,13 @@ export function PaymentCallback() {
     const canceled = searchParams.get('canceled')
     
     if (canceled === 'true') {
-      setStatus('error')
-      setMessage('Payment was canceled. Redirecting to your dashboard...')
-      // Still redirect to dashboard - they have an account now
+      setStatus('canceled')
+      setMessage('Payment was canceled. You can complete payment later from your dashboard.')
+      toast.info('You can complete payment anytime from your account settings')
+      // Redirect to dashboard after a delay
       setTimeout(() => {
         navigate('/dashboard')
-      }, 3000)
+      }, 4000)
       return
     }
 
@@ -74,8 +76,19 @@ export function PaymentCallback() {
       
     } catch (error) {
       console.error('Error in payment verification:', error)
-      setStatus('error')
-      setMessage('Error processing payment. Please contact support.')
+      
+      // Retry logic for transient failures
+      if (retryCount < 3) {
+        setMessage('Verifying payment status... Please wait.')
+        setTimeout(() => {
+          setRetryCount(prev => prev + 1)
+          verifyPayment()
+        }, 2000)
+      } else {
+        setStatus('error')
+        setMessage('Unable to verify payment status. Please check your email for confirmation or contact support.')
+        toast.error('Payment verification failed. Please contact support if you were charged.')
+      }
     }
   }
 
@@ -89,6 +102,7 @@ export function PaymentCallback() {
             {status === 'loading' && 'Verifying your payment...'}
             {status === 'success' && 'Payment successful!'}
             {status === 'error' && 'Payment verification failed'}
+            {status === 'canceled' && 'Payment canceled'}
           </CardDescription>
         </CardHeader>
         <CardContent className="text-center">
@@ -109,6 +123,13 @@ export function PaymentCallback() {
           {status === 'error' && (
             <div className="flex flex-col items-center space-y-4">
               <XCircle className="h-12 w-12 text-destructive" />
+              <p className="text-sm">{message}</p>
+            </div>
+          )}
+
+          {status === 'canceled' && (
+            <div className="flex flex-col items-center space-y-4">
+              <AlertCircle className="h-12 w-12 text-yellow-500" />
               <p className="text-sm">{message}</p>
             </div>
           )}

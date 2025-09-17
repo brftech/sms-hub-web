@@ -11,7 +11,7 @@ import {
   HubLogo,
 } from "@sms-hub/ui";
 import { Input, Label, Alert, AlertDescription } from "@sms-hub/ui";
-import { Mail, Phone, User, Building, Key, UserPlus, ChevronLeft, ChevronRight } from "lucide-react";
+import { Mail, Phone, User, Building, Key, UserPlus, ChevronLeft, ChevronRight, CheckCircle } from "lucide-react";
 import styled from "styled-components";
 import { environmentConfig } from "../config/environment";
 
@@ -49,11 +49,13 @@ const Step = styled.div<{ $active: boolean; $completed: boolean }>`
   font-weight: bold;
   font-size: 14px;
   transition: all 0.3s ease;
+  position: relative;
   
   ${props => props.$active && `
     background: var(--hub-primary);
     color: white;
     border: 2px solid var(--hub-primary);
+    box-shadow: 0 0 0 4px rgba(var(--hub-primary-rgb), 0.2);
   `}
   
   ${props => props.$completed && !props.$active && `
@@ -76,6 +78,28 @@ const StepConnector = styled.div<{ $completed: boolean }>`
   margin-top: 19px;
 `;
 
+const PasswordStrengthBar = styled.div<{ $strength: number }>`
+  height: 4px;
+  background: #e5e7eb;
+  border-radius: 2px;
+  margin-top: 8px;
+  overflow: hidden;
+  
+  &::after {
+    content: '';
+    display: block;
+    height: 100%;
+    width: ${props => props.$strength * 25}%;
+    background: ${props => 
+      props.$strength <= 1 ? '#ef4444' :
+      props.$strength === 2 ? '#f59e0b' :
+      props.$strength === 3 ? '#eab308' :
+      '#10b981'
+    };
+    transition: all 0.3s ease;
+  }
+`;
+
 export function Signup() {
   const { hubConfig } = useHub();
   const [searchParams] = useSearchParams();
@@ -83,7 +107,17 @@ export function Signup() {
   const [error, setError] = useState("");
   const [currentStep, setCurrentStep] = useState(1);
   const [isFormReady, setIsFormReady] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const [formData, setFormData] = useState({
+    email: "",
+    phone: "",
+    password: "",
+    confirmPassword: "",
+    firstName: "",
+    lastName: "",
+    companyName: "",
+  });
+  const [fieldErrors, setFieldErrors] = useState({
     email: "",
     phone: "",
     password: "",
@@ -94,6 +128,39 @@ export function Signup() {
   });
 
   const invitationToken = searchParams.get("invitation");
+
+  // Real-time validation functions
+  const validateEmail = (email: string) => {
+    if (!email) return "Email is required";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return "Invalid email address";
+    return "";
+  };
+
+  const validatePhone = (phone: string) => {
+    const phoneDigits = phone.replace(/\D/g, "");
+    if (!phoneDigits) return "Phone number is required";
+    if (phoneDigits.length !== 10) return "Phone number must be 10 digits";
+    return "";
+  };
+
+  const validatePassword = (password: string) => {
+    if (!password) return "Password is required";
+    if (password.length < 6) return "Password must be at least 6 characters";
+    if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)) {
+      return "Password must contain uppercase, lowercase, and number";
+    }
+    return "";
+  };
+
+  const getPasswordStrength = (password: string): number => {
+    let strength = 0;
+    if (password.length >= 6) strength++;
+    if (password.length >= 8) strength++;
+    if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
+    if (/\d/.test(password)) strength++;
+    if (/[!@#$%^&*]/.test(password)) strength++;
+    return Math.min(strength, 4);
+  };
 
   const formatPhoneNumber = (value: string) => {
     const cleaned = value.replace(/\D/g, "");
@@ -123,6 +190,9 @@ export function Signup() {
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formatted = formatPhoneNumber(e.target.value);
     setFormData({ ...formData, phone: formatted });
+    if (fieldErrors.phone) {
+      setFieldErrors({ ...fieldErrors, phone: validatePhone(formatted) });
+    }
   };
 
   const getPhoneForAPI = (phone: string) => {
@@ -279,22 +349,27 @@ export function Signup() {
         })
       );
 
+      // Show success animation
+      setShowSuccess(true);
+      
       // Check if confirmation email was sent successfully or if user is already confirmed (dev mode)
       console.log("Checking redirect logic...");
       console.log("result.confirmation_email_sent:", result.confirmation_email_sent);
       console.log("result.auto_confirmed:", result.auto_confirmed);
       console.log("environmentConfig.isDevelopment:", environmentConfig.isDevelopment);
       
-      if (result.confirmation_email_sent) {
-        console.log("Taking confirmation_email_sent branch - should redirect to /check-email");
+      // Wait for animation to play
+      setTimeout(() => {
+        if (result.confirmation_email_sent) {
+          console.log("Taking confirmation_email_sent branch - should redirect to /check-email");
 
-        // Store email for the check-email page
-        sessionStorage.setItem('signup_email', result.email);
+          // Store email for the check-email page
+          sessionStorage.setItem('signup_email', result.email);
 
-        // Redirect to check email page
-        console.log("About to redirect to /check-email");
-        window.location.href = '/check-email';
-      } else if (result.auto_confirmed && environmentConfig.isDevelopment) {
+          // Redirect to check email page
+          console.log("About to redirect to /check-email");
+          window.location.href = '/check-email';
+        } else if (result.auto_confirmed && environmentConfig.isDevelopment) {
         console.log("Development mode: User auto-confirmed, proceeding to dashboard...");
 
         // Store success data with expiration
@@ -314,11 +389,13 @@ export function Signup() {
           ? `${environmentConfig.unifiedAppUrl}/?superadmin=${environmentConfig.devAuthToken}`
           : environmentConfig.unifiedAppUrl;
 
-        window.location.href = redirectUrl;
-      } else {
-        console.warn("Confirmation email failed to send");
-        setError("Account created but email failed to send. Please contact support or try logging in directly.");
-      }
+          window.location.href = redirectUrl;
+        } else {
+          console.warn("Confirmation email failed to send");
+          setError("Account created but email failed to send. Please contact support or try logging in directly.");
+          setShowSuccess(false);
+        }
+      }, 2000); // 2 second delay for animation
 
     } catch (err: unknown) {
       console.error("Signup error:", err);
@@ -343,13 +420,23 @@ export function Signup() {
                 id="companyName"
                 type="text"
                 value={formData.companyName}
-                onChange={(e) =>
-                  setFormData({ ...formData, companyName: e.target.value })
-                }
+                onChange={(e) => {
+                  setFormData({ ...formData, companyName: e.target.value });
+                  setFieldErrors({ ...fieldErrors, companyName: "" });
+                }}
+                onBlur={(e) => {
+                  const error = e.target.value.trim() ? "" : "Company name is required";
+                  setFieldErrors({ ...fieldErrors, companyName: error });
+                }}
                 placeholder="Enter your company name"
                 required
-                className="w-full bg-white text-black border-gray-300 focus:border-orange-500 focus:ring-orange-500"
+                className={`w-full bg-white text-black border-gray-300 focus:border-orange-500 focus:ring-orange-500 ${
+                  fieldErrors.companyName ? "border-red-500" : ""
+                }`}
               />
+              {fieldErrors.companyName && (
+                <p className="text-red-500 text-xs mt-1">{fieldErrors.companyName}</p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -361,14 +448,26 @@ export function Signup() {
                 id="email"
                 type="email"
                 value={formData.email}
-                onChange={(e) =>
-                  setFormData({ ...formData, email: e.target.value })
-                }
+                onChange={(e) => {
+                  setFormData({ ...formData, email: e.target.value });
+                  if (fieldErrors.email) {
+                    setFieldErrors({ ...fieldErrors, email: validateEmail(e.target.value) });
+                  }
+                }}
+                onBlur={(e) => {
+                  const error = validateEmail(e.target.value);
+                  setFieldErrors({ ...fieldErrors, email: error });
+                }}
                 placeholder="john@company.com"
                 required
                 autoComplete="email"
-                className="w-full bg-white text-black border-gray-300 focus:border-orange-500 focus:ring-orange-500"
+                className={`w-full bg-white text-black border-gray-300 focus:border-orange-500 focus:ring-orange-500 ${
+                  fieldErrors.email ? "border-red-500" : ""
+                }`}
               />
+              {fieldErrors.email && (
+                <p className="text-red-500 text-xs mt-1">{fieldErrors.email}</p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -381,10 +480,19 @@ export function Signup() {
                 type="tel"
                 value={formData.phone}
                 onChange={handlePhoneChange}
+                onBlur={() => {
+                  const error = validatePhone(formData.phone);
+                  setFieldErrors({ ...fieldErrors, phone: error });
+                }}
                 placeholder="(555) 123-4567"
                 required
-                className="w-full bg-white text-black border-gray-300 focus:border-orange-500 focus:ring-orange-500"
+                className={`w-full bg-white text-black border-gray-300 focus:border-orange-500 focus:ring-orange-500 ${
+                  fieldErrors.phone ? "border-red-500" : ""
+                }`}
               />
+              {fieldErrors.phone && (
+                <p className="text-red-500 text-xs mt-1">{fieldErrors.phone}</p>
+              )}
             </div>
           </>
         );
@@ -442,14 +550,29 @@ export function Signup() {
                 id="password"
                 type="password"
                 value={formData.password}
-                onChange={(e) =>
-                  setFormData({ ...formData, password: e.target.value })
-                }
+                onChange={(e) => {
+                  setFormData({ ...formData, password: e.target.value });
+                  if (fieldErrors.password) {
+                    setFieldErrors({ ...fieldErrors, password: validatePassword(e.target.value) });
+                  }
+                }}
+                onBlur={(e) => {
+                  const error = validatePassword(e.target.value);
+                  setFieldErrors({ ...fieldErrors, password: error });
+                }}
                 placeholder="Min. 6 characters"
                 required
                 autoComplete="new-password"
-                className="w-full bg-white text-black border-gray-300 focus:border-orange-500 focus:ring-orange-500"
+                className={`w-full bg-white text-black border-gray-300 focus:border-orange-500 focus:ring-orange-500 ${
+                  fieldErrors.password ? "border-red-500" : ""
+                }`}
               />
+              {formData.password && (
+                <PasswordStrengthBar $strength={getPasswordStrength(formData.password)} />
+              )}
+              {fieldErrors.password && (
+                <p className="text-red-500 text-xs mt-1">{fieldErrors.password}</p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -461,14 +584,27 @@ export function Signup() {
                 id="confirmPassword"
                 type="password"
                 value={formData.confirmPassword}
-                onChange={(e) =>
-                  setFormData({ ...formData, confirmPassword: e.target.value })
-                }
+                onChange={(e) => {
+                  setFormData({ ...formData, confirmPassword: e.target.value });
+                  if (fieldErrors.confirmPassword && e.target.value) {
+                    const error = formData.password !== e.target.value ? "Passwords do not match" : "";
+                    setFieldErrors({ ...fieldErrors, confirmPassword: error });
+                  }
+                }}
+                onBlur={(e) => {
+                  const error = formData.password !== e.target.value ? "Passwords do not match" : "";
+                  setFieldErrors({ ...fieldErrors, confirmPassword: error });
+                }}
                 placeholder="Confirm password"
                 required
                 autoComplete="new-password"
-                className="w-full bg-white text-black border-gray-300 focus:border-orange-500 focus:ring-orange-500"
+                className={`w-full bg-white text-black border-gray-300 focus:border-orange-500 focus:ring-orange-500 ${
+                  fieldErrors.confirmPassword ? "border-red-500" : ""
+                }`}
               />
+              {fieldErrors.confirmPassword && (
+                <p className="text-red-500 text-xs mt-1">{fieldErrors.confirmPassword}</p>
+              )}
             </div>
           </>
         );
@@ -503,6 +639,22 @@ export function Signup() {
         return "Start your business with " + hubConfig.displayName;
     }
   };
+
+  if (showSuccess) {
+    return (
+      <SignupContainer>
+        <Card className="w-full max-w-md mx-auto">
+          <CardContent className="text-center py-12">
+            <CheckCircle className="w-20 h-20 text-green-500 mx-auto mb-4 animate-bounce" />
+            <h2 className="text-2xl font-bold mb-2">Account Created!</h2>
+            <p className="text-muted-foreground">
+              Redirecting you to complete your setup...
+            </p>
+          </CardContent>
+        </Card>
+      </SignupContainer>
+    );
+  }
 
   if (!isFormReady) {
     return (

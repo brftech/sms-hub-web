@@ -50,6 +50,7 @@ export function PaymentStep({
   // const { hubConfig } = useHub()
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedPlan, setSelectedPlan] = useState<"starter" | "professional" | "enterprise">("starter");
   const createCheckoutSession = useCreateCustomerCheckout();
   const supabase = useSupabase();
 
@@ -62,7 +63,7 @@ export function PaymentStep({
       billing_city: "",
       billing_state: "",
       billing_zip: "",
-      plan_tier: "starter",
+      plan_tier: selectedPlan,
       ...((submission.step_data as any)?.payment || {}),
     },
     mode: "onChange",
@@ -111,13 +112,20 @@ export function PaymentStep({
     try {
       // Map plan tiers to Stripe price IDs
       const priceIds = {
-        starter: import.meta.env.VITE_STRIPE_PRICE_STARTER || "price_starter",
+        starter: import.meta.env.VITE_STRIPE_PRICE_STARTER,
         professional:
-          import.meta.env.VITE_STRIPE_PRICE_PROFESSIONAL ||
-          "price_professional",
+          import.meta.env.VITE_STRIPE_PRICE_CORE ||
+          import.meta.env.VITE_STRIPE_PRICE_PROFESSIONAL,
         enterprise:
-          import.meta.env.VITE_STRIPE_PRICE_ENTERPRISE || "price_enterprise",
+          import.meta.env.VITE_STRIPE_PRICE_ELITE ||
+          import.meta.env.VITE_STRIPE_PRICE_ENTERPRISE,
       };
+
+      if (!priceIds[data.plan_tier]) {
+        setError(`Price ID not configured for ${data.plan_tier} plan. Please contact support.`);
+        setIsSubmitting(false);
+        return;
+      }
 
       // Get current user session
 
@@ -230,13 +238,23 @@ export function PaymentStep({
             {Object.entries(pricingPlans).map(([key, plan]) => (
               <div
                 key={key}
-                className={`p-4 border rounded-lg cursor-pointer transition-all ${
+                className={`relative p-4 border-2 rounded-lg cursor-pointer transition-all ${
                   form.watch("plan_tier") === key
-                    ? "border-hub-primary bg-hub-primary/5"
-                    : "border-border hover:border-hub-primary/50"
+                    ? "border-hub-primary bg-hub-primary/10 shadow-lg scale-105"
+                    : "border-border hover:border-hub-primary/50 hover:shadow-md"
                 }`}
-                onClick={() => form.setValue("plan_tier", key as any)}
+                onClick={() => {
+                  form.setValue("plan_tier", key as any);
+                  setSelectedPlan(key as any);
+                }}
               >
+                {key === "professional" && (
+                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                    <span className="bg-hub-primary text-white text-xs font-bold px-3 py-1 rounded-full">
+                      Most Popular
+                    </span>
+                  </div>
+                )}
                 <div className="text-center">
                   <h3 className="font-semibold text-lg">{plan.name}</h3>
                   <div className="mt-2">

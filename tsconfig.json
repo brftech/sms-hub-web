@@ -16,8 +16,39 @@
     "noFallthroughCasesInSwitch": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": ".",
+    "paths": {
+      "@sms-hub/ui": ["packages/ui/src"],
+      "@sms-hub/ui/*": ["packages/ui/src/*"],
+      "@sms-hub/auth": ["packages/auth/src"],
+      "@sms-hub/auth/*": ["packages/auth/src/*"],
+      "@sms-hub/types": ["packages/types/src"],
+      "@sms-hub/types/*": ["packages/types/src/*"],
+      "@sms-hub/utils": ["packages/utils/src"],
+      "@sms-hub/utils/*": ["packages/utils/src/*"],
+      "@sms-hub/supabase": ["packages/supabase/src"],
+      "@sms-hub/supabase/*": ["packages/supabase/src/*"],
+      "@sms-hub/services": ["packages/services/src"],
+      "@sms-hub/services/*": ["packages/services/src/*"],
+      "@sms-hub/hub-logic": ["packages/hub-logic/src"],
+      "@sms-hub/hub-logic/*": ["packages/hub-logic/src/*"],
+      "@sms-hub/logger": ["packages/logger/src"],
+      "@sms-hub/logger/*": ["packages/logger/src/*"],
+      "@sms-hub/dev-auth": ["packages/dev-auth/src"],
+      "@sms-hub/dev-auth/*": ["packages/dev-auth/src/*"],
+      "@sms-hub/config": ["packages/config/src"],
+      "@sms-hub/config/*": ["packages/config/src/*"]
+    }
   },
-  "include": ["test/**/*", "packages/*/src/**/*", "apps/*/src/**/*"],
-  "exclude": ["node_modules", "dist", "build", "supabase/functions"]
+  "include": ["packages/*/src/**/*", "apps/*/src/**/*"],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "build",
+    "supabase/functions",
+    "**/*.test.*",
+    "**/*.spec.*",
+    "test/**/*"
+  ]
 }

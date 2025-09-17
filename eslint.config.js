@@ -3,6 +3,7 @@ import typescript from '@typescript-eslint/eslint-plugin'
 import typescriptParser from '@typescript-eslint/parser'
 import react from 'eslint-plugin-react'
 import reactHooks from 'eslint-plugin-react-hooks'
+import globals from 'globals'
 
 export default [
   js.configs.recommended,
@@ -18,74 +19,10 @@ export default [
         },
       },
       globals: {
-        // Browser globals
-        window: 'readonly',
-        document: 'readonly',
-        console: 'readonly',
-        setTimeout: 'readonly',
-        clearTimeout: 'readonly',
-        setInterval: 'readonly',
-        clearInterval: 'readonly',
-        localStorage: 'readonly',
-        sessionStorage: 'readonly',
-        navigator: 'readonly',
-        alert: 'readonly',
-        confirm: 'readonly',
-        // React globals
+        ...globals.browser,
+        ...globals.node,
+        ...globals.es2021,
         React: 'readonly',
-        // DOM types
-        HTMLElement: 'readonly',
-        HTMLButtonElement: 'readonly',
-        HTMLDivElement: 'readonly',
-        HTMLParagraphElement: 'readonly',
-        HTMLHeadingElement: 'readonly',
-        HTMLInputElement: 'readonly',
-        HTMLTextAreaElement: 'readonly',
-        HTMLSelectElement: 'readonly',
-        HTMLTableElement: 'readonly',
-        HTMLTableSectionElement: 'readonly',
-        HTMLTableRowElement: 'readonly',
-        HTMLTableCellElement: 'readonly',
-        HTMLTableCaptionElement: 'readonly',
-        HTMLUListElement: 'readonly',
-        HTMLLIElement: 'readonly',
-        HTMLOListElement: 'readonly',
-        HTMLAnchorElement: 'readonly',
-        HTMLSpanElement: 'readonly',
-        HTMLImageElement: 'readonly',
-        HTMLFormElement: 'readonly',
-        // Web APIs
-        fetch: 'readonly',
-        URL: 'readonly',
-        URLSearchParams: 'readonly',
-        IntersectionObserver: 'readonly',
-        KeyboardEvent: 'readonly',
-        Event: 'readonly',
-        Headers: 'readonly',
-        Response: 'readonly',
-        Request: 'readonly',
-        Blob: 'readonly',
-        FormData: 'readonly',
-        WebSocket: 'readonly',
-        Worker: 'readonly',
-        AbortController: 'readonly',
-        TextEncoder: 'readonly',
-        TextDecoder: 'readonly',
-        crypto: 'readonly',
-        btoa: 'readonly',
-        atob: 'readonly',
-        self: 'readonly',
-        // Vite globals
-        import: 'readonly',
-        // Node globals
-        process: 'readonly',
-        Buffer: 'readonly',
-        __dirname: 'readonly',
-        __filename: 'readonly',
-        global: 'readonly',
-        module: 'readonly',
-        require: 'readonly',
-        exports: 'readonly',
       },
     },
     plugins: {
@@ -96,18 +33,18 @@ export default [
     rules: {
       ...typescript.configs.recommended.rules,
       ...react.configs.recommended.rules,
-      // Temporarily disable react-hooks rules until plugin is updated for ESLint 9.x
+      // React hooks rules - temporarily disabled due to ESLint 9.x compatibility issues
       'react-hooks/rules-of-hooks': 'off',
       'react-hooks/exhaustive-deps': 'off',
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
-      '@typescript-eslint/no-explicit-any': 'warn',
-      '@typescript-eslint/no-unnecessary-type-constraint': 'warn',
-      '@typescript-eslint/no-empty-object-type': 'warn',
+      '@typescript-eslint/no-explicit-any': 'error',
+      '@typescript-eslint/no-unnecessary-type-constraint': 'error',
+      '@typescript-eslint/no-empty-object-type': 'error',
       'react/react-in-jsx-scope': 'off',
       'react/prop-types': 'off',
       'react/no-unescaped-entities': 'off',
-      'react/no-unknown-property': 'warn',
-      'react/display-name': 'warn',
+      'react/no-unknown-property': 'error',
+      'react/display-name': 'error',
       'no-useless-escape': 'warn',
       'no-redeclare': 'warn',
       'no-case-declarations': 'warn',
@@ -127,15 +64,8 @@ export default [
       ecmaVersion: 'latest',
       sourceType: 'module',
       globals: {
-        console: 'readonly',
-        process: 'readonly',
-        Buffer: 'readonly',
-        __dirname: 'readonly',
-        __filename: 'readonly',
-        global: 'readonly',
-        module: 'readonly',
-        require: 'readonly',
-        exports: 'readonly',
+        ...globals.node,
+        ...globals.es2021,
       },
     },
   },
@@ -143,16 +73,7 @@ export default [
     files: ['**/*.test.{js,jsx,ts,tsx}', '**/*.spec.{js,jsx,ts,tsx}'],
     languageOptions: {
       globals: {
-        // Jest globals
-        describe: 'readonly',
-        it: 'readonly',
-        test: 'readonly',
-        expect: 'readonly',
-        beforeEach: 'readonly',
-        afterEach: 'readonly',
-        beforeAll: 'readonly',
-        afterAll: 'readonly',
-        jest: 'readonly',
+        ...globals.jest,
       },
     },
   },
@@ -164,9 +85,14 @@ export default [
       '.turbo/**',
       '*.config.js',
       '*.config.ts',
+      'packages/types/src/database-comprehensive.ts', // Generated file
       'packages/supabase/src/database-comprehensive.ts', // Generated file
+      'supabase/functions/**', // Deno edge functions
       'apps/*/dist/**',
       'apps/*/build/**',
+      '**/*.d.ts', // Type declaration files
+      'apps/*/.vercel/**', // Vercel config
+      '.vercel/**', // Vercel config
     ],
   },
 ]

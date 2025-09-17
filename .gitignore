@@ -10,6 +10,13 @@ node_modules/
 /out/
 storybook-static/
 
+# Monorepo workspace builds
+apps/*/dist/
+apps/*/build/
+apps/*/.next/
+packages/*/dist/
+packages/*/build/
+
 # Environment variables
 .env
 .env.local
@@ -37,6 +44,12 @@ coverage/
 # nyc test coverage
 .nyc_output
 
+# Modern testing tools
+test-results/
+playwright-report/
+.jest-cache/
+.pnpm-store/
+
 # ESLint cache
 .eslintcache
 
@@ -49,8 +62,6 @@ coverage/
 # Optional npm cache directory
 .npm
 
-# Optional eslint cache
-.eslintcache
 
 # Optional REPL history
 .node_repl_history
@@ -100,6 +111,12 @@ Thumbs.db
 .branches
 .temp
 .import
+supabase/.env*
+supabase/config.toml.local
+
+# Generated files
+packages/types/src/database-comprehensive.ts
+packages/supabase/src/database-comprehensive.ts
 
 # Local env file
 .env*.local
@@ -110,7 +127,10 @@ Thumbs.db
 # Package manager lock files (keep pnpm-lock.yaml)
 yarn.lock
 package-lock.json
+
+# Vercel deployment configs
 .vercel
+apps/*/.vercel/
 
 # TypeScript build info
 *.tsbuildinfo

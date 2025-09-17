@@ -1,19 +1,32 @@
 module.exports = {
   // Monorepo-wide Jest configuration
   projects: [
-    // Root-level tests (integration, e2e, etc.)
+    // Integration tests at root level
     {
-      displayName: 'root',
-      testMatch: ['<rootDir>/../test/**/*.{test,spec}.{js,jsx,ts,tsx}'],
+      displayName: 'integration',
+      testMatch: ['<rootDir>/../test/integration/**/*.{test,spec}.{ts,tsx}'],
       testEnvironment: 'jsdom',
       setupFilesAfterEnv: ['<rootDir>/../test/setup.ts'],
-      transform: {
-        '^.+\\.(ts|tsx)$': 'ts-jest',
+      preset: 'ts-jest',
+      moduleNameMapper: {
+        '^@sms-hub/(.*)$': '<rootDir>/../packages/$1/src',
+        '^@/(.*)$': '<rootDir>/../apps/web/src/$1',
       },
+    },
+    // Unit tests at root level
+    {
+      displayName: 'unit',
+      testMatch: ['<rootDir>/../test/unit/**/*.{test,spec}.{ts,tsx}'],
+      testEnvironment: 'jsdom',
+      setupFilesAfterEnv: ['<rootDir>/../test/setup.ts'],
+      preset: 'ts-jest',
       moduleNameMapper: {
         '^@sms-hub/(.*)$': '<rootDir>/../packages/$1/src',
       },
     },
+    // Package-level tests (if they exist)
+    '<rootDir>/../packages/*/jest.config.js',
+    '<rootDir>/../apps/*/jest.config.js',
   ],
   
   // Global test configuration
@@ -25,36 +38,6 @@ module.exports = {
   // Global setup and teardown
   globalSetup: '<rootDir>/../test/global-setup.ts',
   globalTeardown: '<rootDir>/../test/global-teardown.ts',
-  
-  // Test environment variables
-  setupFilesAfterEnv: ['<rootDir>/../test/setup.ts'],
-  
-  // Module name mapping for monorepo packages
-  moduleNameMapper: {
-    '^@sms-hub/(.*)$': '<rootDir>/../packages/$1/src',
-    '^@/(.*)$': '<rootDir>/../apps/web/src/$1',
-    // Mock static assets
-    '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
-    '\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$': '<rootDir>/../test/utils/file-mock.js',
-  },
-  
-
-  
-  // Test environment
-  testEnvironment: 'jsdom',
-  
-  // TypeScript configuration
-  preset: 'ts-jest',
-  transform: {
-    '^.+\\.(ts|tsx)$': ['ts-jest', {
-      tsconfig: {
-        jsx: 'react-jsx',
-        esModuleInterop: true,
-        allowSyntheticDefaultImports: true,
-      }
-    }],
-    '^.+\\.(js|jsx)$': 'babel-jest',
-  },
   
   // File extensions
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],

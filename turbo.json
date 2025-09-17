@@ -5,13 +5,7 @@
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [
-        ".next/**",
-        "!.next/cache/**",
-        "dist/**",
-        "build/**",
-        "storybook-static/**"
-      ]
+      "outputs": ["dist/**", "build/**", "storybook-static/**", ".turbo/**"]
     },
     "dev": {
       "cache": false,
@@ -39,6 +33,10 @@
     "build-storybook": {
       "dependsOn": ["^build"],
       "outputs": ["storybook-static/**"]
+    },
+    "deploy": {
+      "dependsOn": ["build", "lint", "type-check"],
+      "cache": false
     }
   },
   "globalDependencies": [
@@ -54,9 +52,16 @@
     "SUPABASE_PROJECT_ID",
     "STRIPE_PUBLISHABLE_KEY",
     "STRIPE_SECRET_KEY",
+    "STRIPE_WEBHOOK_SECRET",
     "TCR_API_KEY",
     "BANDWIDTH_API_KEY",
     "VITE_SUPABASE_URL",
-    "VITE_SUPABASE_ANON_KEY"
+    "VITE_SUPABASE_ANON_KEY",
+    "VITE_HUB_ID",
+    "VITE_STRIPE_PRICE_CORE",
+    "VITE_UNIFIED_APP_URL",
+    "VITE_WEB_APP_URL",
+    "VITE_SKIP_EMAIL_CONFIRMATION",
+    "VITE_ENABLE_DEV_AUTH"
   ]
 }

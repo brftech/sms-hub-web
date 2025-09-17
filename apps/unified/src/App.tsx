@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import { HubProvider, ErrorBoundary } from "@sms-hub/ui";
+import { HubProvider, ErrorBoundary, useHub } from "@sms-hub/ui";
 import { unifiedEnvironment } from "./config/unifiedEnvironment";
 import { environmentConfig } from "./config/environment";
 import AdminLayout from "./components/layout/AdminLayout";
@@ -8,10 +8,24 @@ import { hasAnyRole, useAuthContext } from "@sms-hub/auth";
 import { ProtectedRoute } from "./components/auth/ProtectedRouteWrapper";
 import { UserRole } from "./types/roles";
 import AuthCallback from "./pages/AuthCallback";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 // import DevLogin from './pages/DevLogin'
 import { GlobalViewProvider } from "./contexts/GlobalViewContext";
 import { DynamicFavicon } from "./components/DynamicFavicon";
+
+// Component to set data-hub attribute on body
+const HubThemeWrapper = ({ children }: { children: React.ReactNode }) => {
+  const { currentHub } = useHub();
+
+  useEffect(() => {
+    document.body.setAttribute("data-hub", currentHub);
+    return () => {
+      document.body.removeAttribute("data-hub");
+    };
+  }, [currentHub]);
+
+  return <>{children}</>;
+};
 
 // Dashboard Router Component
 const DashboardRouter = () => {
@@ -146,6 +160,11 @@ const AdminStatistics = lazy(() =>
     default: m.AdminStatistics,
   }))
 );
+const AbandonedPayments = lazy(() =>
+  import("./pages/admin/AbandonedPayments").then((m) => ({
+    default: m.default,
+  }))
+);
 
 // Loading component for Suspense
 const PageLoader = () => (
@@ -197,489 +216,508 @@ function App() {
 
   return (
     <ErrorBoundary>
-      <HubProvider environment={unifiedEnvironment} defaultHub="percytech">
-        <DynamicFavicon />
-        <GlobalViewProvider>
-          <Suspense fallback={<PageLoader />}>
-            <Routes>
-              {/* Public routes - accessible without authentication */}
-              {/* Root redirect - redirect to web app for login */}
-              <Route
-                path="/"
-                element={<Navigate to={environmentConfig.webAppUrl} replace />}
-              />
+      <HubProvider environment={unifiedEnvironment} defaultHub="gnymble">
+        <HubThemeWrapper>
+          <DynamicFavicon />
+          <GlobalViewProvider>
+            <Suspense fallback={<PageLoader />}>
+              <Routes>
+                {/* Public routes - accessible without authentication */}
+                {/* Root redirect - redirect to web app for login */}
+                <Route
+                  path="/"
+                  element={
+                    <Navigate to={environmentConfig.webAppUrl} replace />
+                  }
+                />
 
-              {/* Auth callback route for handling redirects from web app */}
-              <Route path="/auth-callback" element={<AuthCallback />} />
+                {/* Auth callback route for handling redirects from web app */}
+                <Route path="/auth-callback" element={<AuthCallback />} />
 
-              {/* Redirect old signup route to landing */}
-              <Route path="/signup" element={<Navigate to="/" replace />} />
+                {/* Redirect old signup route to landing */}
+                <Route path="/signup" element={<Navigate to="/" replace />} />
 
-              {/* Dashboard Route - show different dashboards based on role */}
-              <Route
-                path="/dashboard"
-                element={
-                  <ProtectedRoute
-                    requiredRoles={[
-                      UserRole.USER,
-                      UserRole.ONBOARDED,
-                      UserRole.ADMIN,
-                      UserRole.SUPERADMIN,
-                    ]}
-                  >
-                    <DashboardRouter />
-                  </ProtectedRoute>
-                }
-              />
+                {/* Dashboard Route - show different dashboards based on role */}
+                <Route
+                  path="/dashboard"
+                  element={
+                    <ProtectedRoute
+                      requiredRoles={[
+                        UserRole.USER,
+                        UserRole.ONBOARDED,
+                        UserRole.ADMIN,
+                        UserRole.SUPERADMIN,
+                      ]}
+                    >
+                      <DashboardRouter />
+                    </ProtectedRoute>
+                  }
+                />
 
-              {/* User View Route - forces UserLayout regardless of role */}
-              <Route
-                path="/user-view"
-                element={
-                  <ProtectedRoute
-                    requiredRoles={[
-                      UserRole.USER,
-                      UserRole.ONBOARDED,
-                      UserRole.ADMIN,
-                      UserRole.SUPERADMIN,
-                    ]}
-                  >
-                    <UserLayout>
-                      <UserConversations />
-                    </UserLayout>
-                  </ProtectedRoute>
-                }
-              />
+                {/* User View Route - forces UserLayout regardless of role */}
+                <Route
+                  path="/user-view"
+                  element={
+                    <ProtectedRoute
+                      requiredRoles={[
+                        UserRole.USER,
+                        UserRole.ONBOARDED,
+                        UserRole.ADMIN,
+                        UserRole.SUPERADMIN,
+                      ]}
+                    >
+                      <UserLayout>
+                        <UserConversations />
+                      </UserLayout>
+                    </ProtectedRoute>
+                  }
+                />
 
-              <Route
-                path="/campaigns"
-                element={
-                  <ProtectedRoute
-                    requiredRoles={[
-                      UserRole.ONBOARDED,
-                      UserRole.ADMIN,
-                      UserRole.SUPERADMIN,
-                    ]}
-                  >
-                    <UserCampaigns />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/messages"
-                element={
-                  <ProtectedRoute
-                    requiredRoles={[
-                      UserRole.ONBOARDED,
-                      UserRole.ADMIN,
-                      UserRole.SUPERADMIN,
-                    ]}
-                  >
-                    <UserMessages />
-                  </ProtectedRoute>
-                }
-              />
+                <Route
+                  path="/campaigns"
+                  element={
+                    <ProtectedRoute
+                      requiredRoles={[
+                        UserRole.ONBOARDED,
+                        UserRole.ADMIN,
+                        UserRole.SUPERADMIN,
+                      ]}
+                    >
+                      <UserCampaigns />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/messages"
+                  element={
+                    <ProtectedRoute
+                      requiredRoles={[
+                        UserRole.ONBOARDED,
+                        UserRole.ADMIN,
+                        UserRole.SUPERADMIN,
+                      ]}
+                    >
+                      <UserMessages />
+                    </ProtectedRoute>
+                  }
+                />
 
-              {/* New User View Routes */}
-              <Route
-                path="/conversations"
-                element={
-                  <ProtectedRoute
-                    requiredRoles={[
-                      UserRole.ONBOARDED,
-                      UserRole.ADMIN,
-                      UserRole.SUPERADMIN,
-                    ]}
-                  >
-                    <UserLayout>
-                      <UserConversations />
-                    </UserLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/broadcasts"
-                element={
-                  <ProtectedRoute
-                    requiredRoles={[
-                      UserRole.ONBOARDED,
-                      UserRole.ADMIN,
-                      UserRole.SUPERADMIN,
-                    ]}
-                  >
-                    <UserLayout>
-                      <UserBroadcasts />
-                    </UserLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/persons"
-                element={
-                  <ProtectedRoute
-                    requiredRoles={[
-                      UserRole.ONBOARDED,
-                      UserRole.ADMIN,
-                      UserRole.SUPERADMIN,
-                    ]}
-                  >
-                    <UserLayout>
-                      <UserPersons />
-                    </UserLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/statistics"
-                element={
-                  <ProtectedRoute
-                    requiredRoles={[
-                      UserRole.ONBOARDED,
-                      UserRole.ADMIN,
-                      UserRole.SUPERADMIN,
-                    ]}
-                  >
-                    <UserLayout>
-                      <UserStatistics />
-                    </UserLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/settings"
-                element={
-                  <ProtectedRoute
-                    requiredRoles={[
-                      UserRole.ONBOARDED,
-                      UserRole.ADMIN,
-                      UserRole.SUPERADMIN,
-                    ]}
-                  >
-                    <UserLayout>
-                      <UserSettings />
-                    </UserLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/account-details"
-                element={
-                  <ProtectedRoute
-                    requiredRoles={[
-                      UserRole.ONBOARDED,
-                      UserRole.ADMIN,
-                      UserRole.SUPERADMIN,
-                    ]}
-                  >
-                    <UserLayout>
-                      <UserAccountDetails />
-                    </UserLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/onboarding"
-                element={
-                  <ProtectedRoute
-                    requiredRoles={[
-                      UserRole.USER,
-                      UserRole.ONBOARDED,
-                      UserRole.ADMIN,
-                      UserRole.SUPERADMIN,
-                    ]}
-                  >
-                    <UserOnboarding />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/onboarding-progress"
-                element={
-                  <ProtectedRoute
-                    requiredRoles={[
-                      UserRole.USER,
-                      UserRole.ONBOARDED,
-                      UserRole.ADMIN,
-                      UserRole.SUPERADMIN,
-                    ]}
-                  >
-                    <UserOnboardingProgress />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/payment-required"
-                element={
-                  <ProtectedRoute
-                    requiredRoles={[
-                      UserRole.USER,
-                      UserRole.ONBOARDED,
-                      UserRole.ADMIN,
-                      UserRole.SUPERADMIN,
-                    ]}
-                  >
-                    <UserPaymentRequired />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/payment-success"
-                element={
-                  <ProtectedRoute
-                    requiredRoles={[
-                      UserRole.USER,
-                      UserRole.ONBOARDED,
-                      UserRole.ADMIN,
-                      UserRole.SUPERADMIN,
-                    ]}
-                  >
-                    <UserPaymentSuccess />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/sms-verification"
-                element={
-                  <ProtectedRoute
-                    requiredRoles={[
-                      UserRole.USER,
-                      UserRole.ONBOARDED,
-                      UserRole.ADMIN,
-                      UserRole.SUPERADMIN,
-                    ]}
-                  >
-                    <SmsVerification />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/verify"
-                element={
-                  <ProtectedRoute
-                    requiredRoles={[
-                      UserRole.USER,
-                      UserRole.ONBOARDED,
-                      UserRole.ADMIN,
-                      UserRole.SUPERADMIN,
-                    ]}
-                  >
-                    <UserVerify />
-                  </ProtectedRoute>
-                }
-              />
+                {/* New User View Routes */}
+                <Route
+                  path="/conversations"
+                  element={
+                    <ProtectedRoute
+                      requiredRoles={[
+                        UserRole.ONBOARDED,
+                        UserRole.ADMIN,
+                        UserRole.SUPERADMIN,
+                      ]}
+                    >
+                      <UserLayout>
+                        <UserConversations />
+                      </UserLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/broadcasts"
+                  element={
+                    <ProtectedRoute
+                      requiredRoles={[
+                        UserRole.ONBOARDED,
+                        UserRole.ADMIN,
+                        UserRole.SUPERADMIN,
+                      ]}
+                    >
+                      <UserLayout>
+                        <UserBroadcasts />
+                      </UserLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/persons"
+                  element={
+                    <ProtectedRoute
+                      requiredRoles={[
+                        UserRole.ONBOARDED,
+                        UserRole.ADMIN,
+                        UserRole.SUPERADMIN,
+                      ]}
+                    >
+                      <UserLayout>
+                        <UserPersons />
+                      </UserLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/statistics"
+                  element={
+                    <ProtectedRoute
+                      requiredRoles={[
+                        UserRole.ONBOARDED,
+                        UserRole.ADMIN,
+                        UserRole.SUPERADMIN,
+                      ]}
+                    >
+                      <UserLayout>
+                        <UserStatistics />
+                      </UserLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/settings"
+                  element={
+                    <ProtectedRoute
+                      requiredRoles={[
+                        UserRole.ONBOARDED,
+                        UserRole.ADMIN,
+                        UserRole.SUPERADMIN,
+                      ]}
+                    >
+                      <UserLayout>
+                        <UserSettings />
+                      </UserLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/account-details"
+                  element={
+                    <ProtectedRoute
+                      requiredRoles={[
+                        UserRole.ONBOARDED,
+                        UserRole.ADMIN,
+                        UserRole.SUPERADMIN,
+                      ]}
+                    >
+                      <UserLayout>
+                        <UserAccountDetails />
+                      </UserLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/onboarding"
+                  element={
+                    <ProtectedRoute
+                      requiredRoles={[
+                        UserRole.USER,
+                        UserRole.ONBOARDED,
+                        UserRole.ADMIN,
+                        UserRole.SUPERADMIN,
+                      ]}
+                    >
+                      <UserOnboarding />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/onboarding-progress"
+                  element={
+                    <ProtectedRoute
+                      requiredRoles={[
+                        UserRole.USER,
+                        UserRole.ONBOARDED,
+                        UserRole.ADMIN,
+                        UserRole.SUPERADMIN,
+                      ]}
+                    >
+                      <UserOnboardingProgress />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/payment-required"
+                  element={
+                    <ProtectedRoute
+                      requiredRoles={[
+                        UserRole.USER,
+                        UserRole.ONBOARDED,
+                        UserRole.ADMIN,
+                        UserRole.SUPERADMIN,
+                      ]}
+                    >
+                      <UserPaymentRequired />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/payment-success"
+                  element={
+                    <ProtectedRoute
+                      requiredRoles={[
+                        UserRole.USER,
+                        UserRole.ONBOARDED,
+                        UserRole.ADMIN,
+                        UserRole.SUPERADMIN,
+                      ]}
+                    >
+                      <UserPaymentSuccess />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/sms-verification"
+                  element={
+                    <ProtectedRoute
+                      requiredRoles={[
+                        UserRole.USER,
+                        UserRole.ONBOARDED,
+                        UserRole.ADMIN,
+                        UserRole.SUPERADMIN,
+                      ]}
+                    >
+                      <SmsVerification />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/verify"
+                  element={
+                    <ProtectedRoute
+                      requiredRoles={[
+                        UserRole.USER,
+                        UserRole.ONBOARDED,
+                        UserRole.ADMIN,
+                        UserRole.SUPERADMIN,
+                      ]}
+                    >
+                      <UserVerify />
+                    </ProtectedRoute>
+                  }
+                />
 
-              {/* Texting Routes - accessible to onboarded users and above */}
-              <Route
-                path="/texting"
-                element={
-                  <ProtectedRoute
-                    requiredRoles={[
-                      UserRole.ONBOARDED,
-                      UserRole.ADMIN,
-                      UserRole.SUPERADMIN,
-                    ]}
-                  >
-                    <TextingDashboard />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/texting/campaigns"
-                element={
-                  <ProtectedRoute
-                    requiredRoles={[
-                      UserRole.ONBOARDED,
-                      UserRole.ADMIN,
-                      UserRole.SUPERADMIN,
-                    ]}
-                  >
-                    <TextingCampaigns />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/texting/messages"
-                element={
-                  <ProtectedRoute
-                    requiredRoles={[
-                      UserRole.ONBOARDED,
-                      UserRole.ADMIN,
-                      UserRole.SUPERADMIN,
-                    ]}
-                  >
-                    <TextingMessages />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/texting/settings"
-                element={
-                  <ProtectedRoute
-                    requiredRoles={[
-                      UserRole.ONBOARDED,
-                      UserRole.ADMIN,
-                      UserRole.SUPERADMIN,
-                    ]}
-                  >
-                    <TextingSettings />
-                  </ProtectedRoute>
-                }
-              />
+                {/* Texting Routes - accessible to onboarded users and above */}
+                <Route
+                  path="/texting"
+                  element={
+                    <ProtectedRoute
+                      requiredRoles={[
+                        UserRole.ONBOARDED,
+                        UserRole.ADMIN,
+                        UserRole.SUPERADMIN,
+                      ]}
+                    >
+                      <TextingDashboard />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/texting/campaigns"
+                  element={
+                    <ProtectedRoute
+                      requiredRoles={[
+                        UserRole.ONBOARDED,
+                        UserRole.ADMIN,
+                        UserRole.SUPERADMIN,
+                      ]}
+                    >
+                      <TextingCampaigns />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/texting/messages"
+                  element={
+                    <ProtectedRoute
+                      requiredRoles={[
+                        UserRole.ONBOARDED,
+                        UserRole.ADMIN,
+                        UserRole.SUPERADMIN,
+                      ]}
+                    >
+                      <TextingMessages />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/texting/settings"
+                  element={
+                    <ProtectedRoute
+                      requiredRoles={[
+                        UserRole.ONBOARDED,
+                        UserRole.ADMIN,
+                        UserRole.SUPERADMIN,
+                      ]}
+                    >
+                      <TextingSettings />
+                    </ProtectedRoute>
+                  }
+                />
 
-              {/* Admin Routes - accessible to admin users and above */}
-              <Route
-                path="/admin"
-                element={
-                  <ProtectedRoute
-                    requiredRoles={[UserRole.ADMIN, UserRole.SUPERADMIN]}
-                  >
-                    <Navigate to="/admin/dashboard" replace />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/admin/users"
-                element={
-                  <ProtectedRoute
-                    requiredRoles={[UserRole.ADMIN, UserRole.SUPERADMIN]}
-                  >
-                    <AdminLayout>
-                      <AdminUsers />
-                    </AdminLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/admin/companies"
-                element={
-                  <ProtectedRoute
-                    requiredRoles={[UserRole.ADMIN, UserRole.SUPERADMIN]}
-                  >
-                    <AdminLayout>
-                      <AdminCompanies />
-                    </AdminLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/admin/leads"
-                element={
-                  <ProtectedRoute
-                    requiredRoles={[UserRole.ADMIN, UserRole.SUPERADMIN]}
-                  >
-                    <AdminLayout>
-                      <AdminLeads />
-                    </AdminLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/admin/settings"
-                element={
-                  <ProtectedRoute
-                    requiredRoles={[UserRole.ADMIN, UserRole.SUPERADMIN]}
-                  >
-                    <AdminLayout>
-                      <AdminSettings />
-                    </AdminLayout>
-                  </ProtectedRoute>
-                }
-              />
+                {/* Admin Routes - accessible to admin users and above */}
+                <Route
+                  path="/admin"
+                  element={
+                    <ProtectedRoute
+                      requiredRoles={[UserRole.ADMIN, UserRole.SUPERADMIN]}
+                    >
+                      <Navigate to="/admin/dashboard" replace />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/users"
+                  element={
+                    <ProtectedRoute
+                      requiredRoles={[UserRole.ADMIN, UserRole.SUPERADMIN]}
+                    >
+                      <AdminLayout>
+                        <AdminUsers />
+                      </AdminLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/companies"
+                  element={
+                    <ProtectedRoute
+                      requiredRoles={[UserRole.ADMIN, UserRole.SUPERADMIN]}
+                    >
+                      <AdminLayout>
+                        <AdminCompanies />
+                      </AdminLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/leads"
+                  element={
+                    <ProtectedRoute
+                      requiredRoles={[UserRole.ADMIN, UserRole.SUPERADMIN]}
+                    >
+                      <AdminLayout>
+                        <AdminLeads />
+                      </AdminLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/settings"
+                  element={
+                    <ProtectedRoute
+                      requiredRoles={[UserRole.ADMIN, UserRole.SUPERADMIN]}
+                    >
+                      <AdminLayout>
+                        <AdminSettings />
+                      </AdminLayout>
+                    </ProtectedRoute>
+                  }
+                />
 
-              {/* New Admin Routes */}
-              <Route
-                path="/admin/accounts"
-                element={
-                  <ProtectedRoute
-                    requiredRoles={[UserRole.ADMIN, UserRole.SUPERADMIN]}
-                  >
-                    <AdminLayout>
-                      <AdminAccounts />
-                    </AdminLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/admin/phone-numbers"
-                element={
-                  <ProtectedRoute
-                    requiredRoles={[UserRole.ADMIN, UserRole.SUPERADMIN]}
-                  >
-                    <AdminLayout>
-                      <AdminPhoneNumbers />
-                    </AdminLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/admin/voice"
-                element={
-                  <ProtectedRoute
-                    requiredRoles={[UserRole.ADMIN, UserRole.SUPERADMIN]}
-                  >
-                    <AdminLayout>
-                      <AdminVoice />
-                    </AdminLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/admin/statistics"
-                element={
-                  <ProtectedRoute
-                    requiredRoles={[UserRole.ADMIN, UserRole.SUPERADMIN]}
-                  >
-                    <AdminLayout>
-                      <AdminStatistics />
-                    </AdminLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/admin/dashboard"
-                element={
-                  <ProtectedRoute
-                    requiredRoles={[UserRole.ADMIN, UserRole.SUPERADMIN]}
-                  >
-                    <AdminLayout>
-                      <AdminDashboard />
-                    </AdminLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/admin/analytics"
-                element={
-                  <ProtectedRoute
-                    requiredRoles={[UserRole.ADMIN, UserRole.SUPERADMIN]}
-                  >
-                    <AdminLayout>
-                      <AdminAnalytics />
-                    </AdminLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/admin/messages"
-                element={
-                  <ProtectedRoute
-                    requiredRoles={[UserRole.ADMIN, UserRole.SUPERADMIN]}
-                  >
-                    <AdminLayout>
-                      <AdminMessages />
-                    </AdminLayout>
-                  </ProtectedRoute>
-                }
-              />
+                {/* New Admin Routes */}
+                <Route
+                  path="/admin/accounts"
+                  element={
+                    <ProtectedRoute
+                      requiredRoles={[UserRole.ADMIN, UserRole.SUPERADMIN]}
+                    >
+                      <AdminLayout>
+                        <AdminAccounts />
+                      </AdminLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/phone-numbers"
+                  element={
+                    <ProtectedRoute
+                      requiredRoles={[UserRole.ADMIN, UserRole.SUPERADMIN]}
+                    >
+                      <AdminLayout>
+                        <AdminPhoneNumbers />
+                      </AdminLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/voice"
+                  element={
+                    <ProtectedRoute
+                      requiredRoles={[UserRole.ADMIN, UserRole.SUPERADMIN]}
+                    >
+                      <AdminLayout>
+                        <AdminVoice />
+                      </AdminLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/statistics"
+                  element={
+                    <ProtectedRoute
+                      requiredRoles={[UserRole.ADMIN, UserRole.SUPERADMIN]}
+                    >
+                      <AdminLayout>
+                        <AdminStatistics />
+                      </AdminLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/dashboard"
+                  element={
+                    <ProtectedRoute
+                      requiredRoles={[UserRole.ADMIN, UserRole.SUPERADMIN]}
+                    >
+                      <AdminLayout>
+                        <AdminDashboard />
+                      </AdminLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/analytics"
+                  element={
+                    <ProtectedRoute
+                      requiredRoles={[UserRole.ADMIN, UserRole.SUPERADMIN]}
+                    >
+                      <AdminLayout>
+                        <AdminAnalytics />
+                      </AdminLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/messages"
+                  element={
+                    <ProtectedRoute
+                      requiredRoles={[UserRole.ADMIN, UserRole.SUPERADMIN]}
+                    >
+                      <AdminLayout>
+                        <AdminMessages />
+                      </AdminLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/abandoned-payments"
+                  element={
+                    <ProtectedRoute
+                      requiredRoles={[UserRole.ADMIN, UserRole.SUPERADMIN]}
+                    >
+                      <AdminLayout>
+                        <AbandonedPayments />
+                      </AdminLayout>
+                    </ProtectedRoute>
+                  }
+                />
 
-              {/* Unauthorized page */}
-              <Route path="/unauthorized" element={<Unauthorized />} />
+                {/* Unauthorized page */}
+                <Route path="/unauthorized" element={<Unauthorized />} />
 
-              {/* Catch all - redirect to dashboard */}
-              <Route path="*" element={<Navigate to="/dashboard" replace />} />
-            </Routes>
-          </Suspense>
-        </GlobalViewProvider>
+                {/* Catch all - redirect to dashboard */}
+                <Route
+                  path="*"
+                  element={<Navigate to="/dashboard" replace />}
+                />
+              </Routes>
+            </Suspense>
+          </GlobalViewProvider>
+        </HubThemeWrapper>
       </HubProvider>
     </ErrorBoundary>
   );

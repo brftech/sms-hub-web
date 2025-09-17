@@ -364,16 +364,65 @@ serve(async (req) => {
     console.log("✅ Auth user created, now creating business records...");
 
     // Create all business records immediately
-    await createBusinessRecords(supabaseAdmin, authData.user, {
-      email,
-      first_name,
-      last_name,
-      company_name,
-      phone_number,
-      hub_id: invitationData ? invitationData.hub_id : hub_id,
-      signup_type,
-      customer_type,
-    });
+    const businessRecords = await createBusinessRecords(
+      supabaseAdmin,
+      authData.user,
+      {
+        email,
+        first_name,
+        last_name,
+        company_name,
+        phone_number,
+        hub_id: invitationData ? invitationData.hub_id : hub_id,
+        signup_type,
+        customer_type,
+      }
+    );
+
+    // For payment-first users, link to existing customer record if it exists
+    if (payment_first && payment_session_id) {
+      console.log("🔗 Linking payment-first user to existing customer record");
+
+      // Find customer record created by webhook
+      const { data: existingCustomer, error: customerFindError } =
+        await supabaseAdmin
+          .from("customers")
+          .select("id")
+          .eq("billing_email", email)
+          .eq("metadata->payment_first", true)
+          .eq("metadata->stripe_session_id", payment_session_id)
+          .single();
+
+      if (existingCustomer && !customerFindError) {
+        // Link the customer to the newly created company and user
+        const { error: linkError } = await supabaseAdmin
+          .from("customers")
+          .update({
+            company_id: businessRecords.companyId,
+            user_id: authData.user.id,
+            metadata: {
+              ...existingCustomer.metadata,
+              linked_at: new Date().toISOString(),
+              account_created: true,
+            },
+          })
+          .eq("id", existingCustomer.id);
+
+        if (linkError) {
+          console.error(
+            "❌ Failed to link customer to user/company:",
+            linkError
+          );
+        } else {
+          console.log("✅ Linked existing customer to new user/company");
+        }
+      } else {
+        console.warn(
+          "⚠️ No matching customer record found for payment session:",
+          payment_session_id
+        );
+      }
+    }
 
     console.log("✅ Business records created successfully");
 
@@ -396,23 +445,23 @@ serve(async (req) => {
         console.log("✅ User auto-confirmed for payment-first flow");
         emailConfirmed = true;
 
-        // For payment-first users, generate a magic link session
-        const { data: magicLinkData, error: magicLinkError } =
-          await supabaseAdmin.auth.admin.generateLink({
-            type: "magiclink",
+        // For payment-first users, sign them in directly to get valid session
+        const { data: signInData, error: signInError } =
+          await supabaseAdmin.auth.signInWithPassword({
             email: email,
+            password: password,
           });
 
-        if (!magicLinkError && magicLinkData) {
+        if (!signInError && signInData.session) {
           sessionData = {
-            access_token: magicLinkData.properties.access_token,
-            refresh_token: magicLinkData.properties.refresh_token,
+            access_token: signInData.session.access_token,
+            refresh_token: signInData.session.refresh_token,
           };
-          console.log("✅ Generated magic link session for payment-first user");
+          console.log("✅ Generated valid session for payment-first user");
         } else {
           console.error(
-            "❌ Failed to generate magic link session:",
-            magicLinkError
+            "❌ Failed to sign in payment-first user:",
+            signInError
           );
         }
       }

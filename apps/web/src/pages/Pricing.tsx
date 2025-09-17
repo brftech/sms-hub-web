@@ -1,6 +1,5 @@
 import { PageLayout, SEO } from "@sms-hub/ui";
 
-import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import {
   Check,
@@ -19,7 +18,6 @@ import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";
 
 const Pricing = () => {
-  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
 
   // Payment-first checkout handler

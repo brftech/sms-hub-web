@@ -20,6 +20,7 @@ import {
   ArrowLeft,
   LayoutDashboard,
   UserPlus,
+  CreditCard,
 } from "lucide-react";
 
 interface AdminLayoutProps {
@@ -56,6 +57,14 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       description: "Manage customers and companies",
       color: "text-orange-500",
       bgColor: "bg-orange-100",
+    },
+    {
+      name: "Abandoned Payments",
+      href: "/admin/abandoned-payments",
+      icon: CreditCard,
+      description: "Recover payments without accounts",
+      color: "text-red-500",
+      bgColor: "bg-red-100",
     },
     {
       name: "Users",

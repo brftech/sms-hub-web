@@ -30,11 +30,14 @@ import {
 import styled from "styled-components";
 
 const PageContainer = styled.div`
-  background: linear-gradient(135deg, #1e293b 0%, #334155 50%, #475569 100%);
+  background: var(
+    --gradient-hero,
+    linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--muted)) 100%)
+  );
   min-height: calc(100vh - 6rem);
   padding: 1.5rem;
   border-radius: 16px;
-  color: #f1f5f9;
+  color: hsl(var(--foreground));
 `;
 
 const HeaderSection = styled.div`
@@ -46,7 +49,11 @@ const Title = styled.h1`
   font-size: 2.5rem;
   font-weight: 800;
   margin-bottom: 1rem;
-  background: linear-gradient(45deg, #f8fafc, #cbd5e1);
+  background: linear-gradient(
+    45deg,
+    hsl(var(--foreground)),
+    hsl(var(--hub-primary))
+  );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -54,7 +61,7 @@ const Title = styled.h1`
 
 const Subtitle = styled.p`
   font-size: 1.125rem;
-  color: rgba(241, 245, 249, 0.8);
+  color: hsl(var(--muted-foreground));
   margin-bottom: 2rem;
 `;
 
@@ -71,13 +78,14 @@ const StatsContainer = styled.div`
 `;
 
 const StatCard = styled.div`
-  background: rgba(15, 23, 42, 0.4);
+  background: hsl(var(--card));
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(71, 85, 105, 0.3);
+  border: 1px solid hsl(var(--border));
   border-radius: 12px;
   padding: 1.5rem;
   text-align: center;
   min-width: 120px;
+  box-shadow: var(--shadow-elegant, 0 8px 32px -8px rgba(0, 0, 0, 0.1));
 `;
 
 const StatNumber = styled.div`
@@ -582,7 +590,10 @@ export function OnboardingProgress() {
               }}
             >
               <StepHeader>
-                <StepIcon $completed={step.completed || false} $current={isCurrent}>
+                <StepIcon
+                  $completed={step.completed || false}
+                  $current={isCurrent}
+                >
                   {step.completed ? <CheckCircle2 size={24} /> : step.icon}
                 </StepIcon>
                 <div style={{ flex: 1 }}>

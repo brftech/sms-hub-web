@@ -1,100 +1,186 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useHub, Card, CardContent, CardDescription, CardHeader, CardTitle, Button, Input, Label, Textarea, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@sms-hub/ui'
-import { Progress, Badge, Checkbox } from '@sms-hub/ui'
-import { ArrowRight, ArrowLeft, CheckCircle } from 'lucide-react'
-import { useUserProfile, useOnboardingSubmission, useCreateOnboardingSubmission, useUpdateOnboardingSubmission } from '@sms-hub/supabase/react'
-import { ONBOARDING_STEPS, type OnboardingStepName } from '@sms-hub/types'
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  useHub,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  Button,
+  Input,
+  Label,
+  Textarea,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@sms-hub/ui";
+import { Progress, Badge, Checkbox } from "@sms-hub/ui";
+import { ArrowRight, ArrowLeft, CheckCircle } from "lucide-react";
+import {
+  useUserProfile,
+  useOnboardingSubmission,
+  useCreateOnboardingSubmission,
+  useUpdateOnboardingSubmission,
+} from "@sms-hub/supabase/react";
+import { useAuthContext } from "@sms-hub/auth";
+import { ONBOARDING_STEPS, type OnboardingStepName } from "@sms-hub/types";
 
 export function Onboarding() {
-  const { hubConfig } = useHub()
-  const navigate = useNavigate()
-  const { data: userProfile } = useUserProfile()
+  const { hubConfig } = useHub();
+  const navigate = useNavigate();
+  const { session } = useAuthContext();
+  const { data: userProfile } = useUserProfile();
   const { data: onboardingSubmission } = useOnboardingSubmission(
-    userProfile?.company_id || '',
+    userProfile?.company_id || "",
     hubConfig.hubNumber
-  )
-  const createOnboarding = useCreateOnboardingSubmission()
-  const updateOnboarding = useUpdateOnboardingSubmission()
+  );
+  const createOnboarding = useCreateOnboardingSubmission();
+  const updateOnboarding = useUpdateOnboardingSubmission();
 
   const [currentStep, setCurrentStep] = useState<OnboardingStepName>(
-    (onboardingSubmission?.current_step as OnboardingStepName) || 'verification'
-  )
-  const [formData, setFormData] = useState((onboardingSubmission?.step_data as Record<string, any>) || {})
-  const [isLoading, setIsLoading] = useState(false)
+    (onboardingSubmission?.current_step as OnboardingStepName) || "verification"
+  );
+  const [formData, setFormData] = useState(
+    (onboardingSubmission?.step_data as Record<
+      string,
+      string | boolean | number
+    >) || {}
+  );
+  const [isLoading, setIsLoading] = useState(false);
 
-  const steps = Object.values(ONBOARDING_STEPS)
-  const currentStepIndex = steps.findIndex(step => step.stepName === currentStep)
-  const currentStepConfig = steps[currentStepIndex]
+  const steps = Object.values(ONBOARDING_STEPS);
+  const currentStepIndex = steps.findIndex(
+    (step) => step.stepName === currentStep
+  );
+  const currentStepConfig = steps[currentStepIndex];
 
   const handleNext = async () => {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
-      const nextStepIndex = currentStepIndex + 1
-      const nextStep = nextStepIndex < steps.length ? steps[nextStepIndex].stepName : 'completed'
+      const nextStepIndex = currentStepIndex + 1;
+      const nextStep =
+        nextStepIndex < steps.length
+          ? steps[nextStepIndex].stepName
+          : "completed";
 
       if (onboardingSubmission) {
         await updateOnboarding.mutateAsync({
           id: onboardingSubmission.id,
           current_step: nextStep,
-          step_data: formData
-        })
+          step_data: formData,
+        });
       } else {
         await createOnboarding.mutateAsync({
-          company_id: userProfile?.company_id || '',
+          company_id: userProfile?.company_id || "",
           hub_id: hubConfig.hubNumber,
-          user_id: userProfile?.id || '',
+          user_id: userProfile?.id || "",
           current_step: nextStep,
-          step_data: formData
-        })
+          step_data: formData,
+        });
       }
 
-      if (nextStep === 'completed') {
-        navigate('/')
+      if (nextStep === "completed") {
+        navigate("/");
       } else {
-        setCurrentStep(nextStep)
+        setCurrentStep(nextStep);
       }
     } catch (error) {
-      console.error('Failed to update onboarding:', error)
+      console.error("Failed to update onboarding:", error);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handlePrevious = () => {
     if (currentStepIndex > 0) {
-      setCurrentStep(steps[currentStepIndex - 1].stepName)
+      setCurrentStep(steps[currentStepIndex - 1].stepName);
     }
-  }
+  };
 
-  const updateFormData = (key: string, value: any) => {
-    setFormData((prev: Record<string, any>) => ({ ...prev, [key]: value }))
-  }
+  const updateFormData = (key: string, value: string | boolean | number) => {
+    setFormData((prev: Record<string, string | boolean | number>) => ({
+      ...prev,
+      [key]: value,
+    }));
+  };
 
   const renderStepContent = () => {
+    // Check if email is actually verified
+    const isEmailVerified =
+      (session?.user as { email_confirmed_at?: string })?.email_confirmed_at !==
+      null;
+
+    // Check if this is a payment-first user (auto-confirmed)
+    const userMetadata =
+      (session?.user as { user_metadata?: Record<string, unknown> })
+        ?.user_metadata || {};
+    const isPaymentFirst = userMetadata.payment_first === true;
+
+    // Debug email verification status
+    console.log("🔍 Email verification check:", {
+      hasSession: !!session,
+      hasUser: !!session?.user,
+      emailConfirmedAt: (session?.user as { email_confirmed_at?: string })
+        ?.email_confirmed_at,
+      isEmailVerified: isEmailVerified,
+      isPaymentFirst: isPaymentFirst,
+      userMetadata: userMetadata,
+    });
+
     switch (currentStep) {
-      case 'verification':
+      case "verification":
         return (
           <div className="space-y-4">
             <div className="text-center">
-              <CheckCircle className="h-12 w-12 hub-text-primary mx-auto mb-4" />
-              <h3 className="text-lg font-semibold">Email Verified</h3>
-              <p className="text-muted-foreground">
-                Your email has been verified. Let's continue with your setup.
-              </p>
+              {isEmailVerified ? (
+                <>
+                  <CheckCircle className="h-12 w-12 hub-text-primary mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold">
+                    {isPaymentFirst ? "Payment Confirmed" : "Email Verified"}
+                  </h3>
+                  <p className="text-muted-foreground">
+                    {isPaymentFirst
+                      ? "Your payment has been processed. Let's continue with your setup."
+                      : "Your email has been verified. Let's continue with your setup."}
+                  </p>
+                </>
+              ) : (
+                <>
+                  <div className="h-12 w-12 border-2 border-dashed border-gray-300 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span className="text-gray-400">✉</span>
+                  </div>
+                  <h3 className="text-lg font-semibold">
+                    Email Verification Pending
+                  </h3>
+                  <p className="text-muted-foreground">
+                    Please check your email and click the verification link to
+                    continue.
+                  </p>
+                  <Button
+                    variant="outline"
+                    onClick={() => window.open("https://gmail.com", "_blank")}
+                    className="mt-4"
+                  >
+                    Open Email
+                  </Button>
+                </>
+              )}
             </div>
           </div>
-        )
+        );
 
-      case 'payment':
+      case "payment":
         return (
           <div className="space-y-4">
             <div>
               <Label htmlFor="billing-name">Billing Name</Label>
               <Input
                 id="billing-name"
-                value={formData.billingName || ''}
-                onChange={(e) => updateFormData('billingName', e.target.value)}
+                value={String(formData.billingName || "")}
+                onChange={(e) => updateFormData("billingName", e.target.value)}
                 placeholder="Enter billing name"
               />
             </div>
@@ -102,8 +188,10 @@ export function Onboarding() {
               <Label htmlFor="billing-address">Billing Address</Label>
               <Textarea
                 id="billing-address"
-                value={formData.billingAddress || ''}
-                onChange={(e) => updateFormData('billingAddress', e.target.value)}
+                value={String(formData.billingAddress || "")}
+                onChange={(e) =>
+                  updateFormData("billingAddress", e.target.value)
+                }
                 placeholder="Enter billing address"
                 rows={3}
               />
@@ -113,8 +201,10 @@ export function Onboarding() {
                 <Label htmlFor="billing-city">City</Label>
                 <Input
                   id="billing-city"
-                  value={formData.billingCity || ''}
-                  onChange={(e) => updateFormData('billingCity', e.target.value)}
+                  value={String(formData.billingCity || "")}
+                  onChange={(e) =>
+                    updateFormData("billingCity", e.target.value)
+                  }
                   placeholder="City"
                 />
               </div>
@@ -122,32 +212,32 @@ export function Onboarding() {
                 <Label htmlFor="billing-zip">ZIP Code</Label>
                 <Input
                   id="billing-zip"
-                  value={formData.billingZip || ''}
-                  onChange={(e) => updateFormData('billingZip', e.target.value)}
+                  value={String(formData.billingZip || "")}
+                  onChange={(e) => updateFormData("billingZip", e.target.value)}
                   placeholder="ZIP"
                 />
               </div>
             </div>
           </div>
-        )
+        );
 
-      case 'brand':
+      case "brand":
         return (
           <div className="space-y-4">
             <div>
               <Label htmlFor="business-name">Business Name</Label>
               <Input
                 id="business-name"
-                value={formData.businessName || ''}
-                onChange={(e) => updateFormData('businessName', e.target.value)}
+                value={String(formData.businessName || "")}
+                onChange={(e) => updateFormData("businessName", e.target.value)}
                 placeholder="Your business name"
               />
             </div>
             <div>
               <Label htmlFor="business-type">Business Type</Label>
               <Select
-                value={formData.businessType || ''}
-                onValueChange={(value) => updateFormData('businessType', value)}
+                value={String(formData.businessType || "")}
+                onValueChange={(value) => updateFormData("businessType", value)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select business type" />
@@ -166,31 +256,35 @@ export function Onboarding() {
               <Label htmlFor="business-description">Business Description</Label>
               <Textarea
                 id="business-description"
-                value={formData.businessDescription || ''}
-                onChange={(e) => updateFormData('businessDescription', e.target.value)}
+                value={String(formData.businessDescription || "")}
+                onChange={(e) =>
+                  updateFormData("businessDescription", e.target.value)
+                }
                 placeholder="Describe your business and how you plan to use SMS"
                 rows={4}
               />
             </div>
           </div>
-        )
+        );
 
-      case 'privacy_terms':
+      case "privacy_terms":
         return (
           <div className="space-y-4">
             <div className="space-y-3">
               <div className="flex items-start space-x-3">
                 <Checkbox
                   id="terms"
-                  checked={formData.acceptedTerms || false}
-                  onCheckedChange={(checked) => updateFormData('acceptedTerms', checked)}
+                  checked={Boolean(formData.acceptedTerms)}
+                  onCheckedChange={(checked) =>
+                    updateFormData("acceptedTerms", checked)
+                  }
                 />
                 <Label htmlFor="terms" className="text-sm leading-relaxed">
-                  I agree to the{' '}
+                  I agree to the{" "}
                   <a href="#" className="hub-text-primary hover:underline">
                     Terms of Service
-                  </a>{' '}
-                  and{' '}
+                  </a>{" "}
+                  and{" "}
                   <a href="#" className="hub-text-primary hover:underline">
                     Privacy Policy
                   </a>
@@ -199,18 +293,23 @@ export function Onboarding() {
               <div className="flex items-start space-x-3">
                 <Checkbox
                   id="tcpa"
-                  checked={formData.acceptedTCPA || false}
-                  onCheckedChange={(checked) => updateFormData('acceptedTCPA', checked)}
+                  checked={Boolean(formData.acceptedTCPA)}
+                  onCheckedChange={(checked) =>
+                    updateFormData("acceptedTCPA", checked)
+                  }
                 />
                 <Label htmlFor="tcpa" className="text-sm leading-relaxed">
-                  I understand and agree to TCPA compliance requirements for SMS marketing
+                  I understand and agree to TCPA compliance requirements for SMS
+                  marketing
                 </Label>
               </div>
               <div className="flex items-start space-x-3">
                 <Checkbox
                   id="marketing"
-                  checked={formData.acceptedMarketing || false}
-                  onCheckedChange={(checked) => updateFormData('acceptedMarketing', checked)}
+                  checked={Boolean(formData.acceptedMarketing)}
+                  onCheckedChange={(checked) =>
+                    updateFormData("acceptedMarketing", checked)
+                  }
                 />
                 <Label htmlFor="marketing" className="text-sm leading-relaxed">
                   I agree to receive marketing communications (optional)
@@ -218,25 +317,25 @@ export function Onboarding() {
               </div>
             </div>
           </div>
-        )
+        );
 
-      case 'campaign':
+      case "campaign":
         return (
           <div className="space-y-4">
             <div>
               <Label htmlFor="campaign-name">Campaign Name</Label>
               <Input
                 id="campaign-name"
-                value={formData.campaignName || ''}
-                onChange={(e) => updateFormData('campaignName', e.target.value)}
+                value={String(formData.campaignName || "")}
+                onChange={(e) => updateFormData("campaignName", e.target.value)}
                 placeholder="My First Campaign"
               />
             </div>
             <div>
               <Label htmlFor="campaign-type">Campaign Type</Label>
               <Select
-                value={formData.campaignType || ''}
-                onValueChange={(value) => updateFormData('campaignType', value)}
+                value={String(formData.campaignType || "")}
+                onValueChange={(value) => updateFormData("campaignType", value)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select campaign type" />
@@ -253,16 +352,16 @@ export function Onboarding() {
               <Label htmlFor="use-case">Primary Use Case</Label>
               <Textarea
                 id="use-case"
-                value={formData.useCase || ''}
-                onChange={(e) => updateFormData('useCase', e.target.value)}
+                value={String(formData.useCase || "")}
+                onChange={(e) => updateFormData("useCase", e.target.value)}
                 placeholder="Describe how you plan to use SMS campaigns"
                 rows={3}
               />
             </div>
           </div>
-        )
+        );
 
-      case 'bandwidth':
+      case "bandwidth":
         return (
           <div className="space-y-4">
             <div className="text-center mb-6">
@@ -275,8 +374,8 @@ export function Onboarding() {
               <Label htmlFor="area-code">Preferred Area Code</Label>
               <Input
                 id="area-code"
-                value={formData.areaCode || ''}
-                onChange={(e) => updateFormData('areaCode', e.target.value)}
+                value={String(formData.areaCode || "")}
+                onChange={(e) => updateFormData("areaCode", e.target.value)}
                 placeholder="e.g., 555"
                 maxLength={3}
               />
@@ -284,8 +383,8 @@ export function Onboarding() {
             <div>
               <Label htmlFor="phone-type">Phone Number Type</Label>
               <Select
-                value={formData.phoneType || ''}
-                onValueChange={(value) => updateFormData('phoneType', value)}
+                value={String(formData.phoneType || "")}
+                onValueChange={(value) => updateFormData("phoneType", value)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select phone number type" />
@@ -298,13 +397,14 @@ export function Onboarding() {
             </div>
             <div className="bg-blue-50 border border-blue-200 p-4 rounded-md">
               <p className="text-sm text-blue-800">
-                We'll provision your phone number and register it with carriers for optimal delivery rates.
+                We'll provision your phone number and register it with carriers
+                for optimal delivery rates.
               </p>
             </div>
           </div>
-        )
+        );
 
-      case 'activation':
+      case "activation":
         return (
           <div className="space-y-4">
             <div className="text-center">
@@ -323,29 +423,29 @@ export function Onboarding() {
               </ul>
             </div>
           </div>
-        )
+        );
 
       default:
-        return <div>Unknown step</div>
+        return <div>Unknown step</div>;
     }
-  }
+  };
 
   const canProceed = () => {
     switch (currentStep) {
-      case 'privacy_terms':
-        return formData.acceptedTerms && formData.acceptedTCPA
-      case 'payment':
-        return formData.billingName && formData.billingAddress
-      case 'brand':
-        return formData.businessName && formData.businessType
-      case 'campaign':
-        return formData.campaignName && formData.campaignType
-      case 'bandwidth':
-        return formData.phoneType
+      case "privacy_terms":
+        return formData.acceptedTerms && formData.acceptedTCPA;
+      case "payment":
+        return formData.billingName && formData.billingAddress;
+      case "brand":
+        return formData.businessName && formData.businessType;
+      case "campaign":
+        return formData.campaignName && formData.campaignType;
+      case "bandwidth":
+        return formData.phoneType;
       default:
-        return true
+        return true;
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -360,10 +460,18 @@ export function Onboarding() {
         </div>
 
         <div className="mb-8">
-          <Progress value={((currentStepIndex + 1) / steps.length) * 100} className="w-full" />
+          <Progress
+            value={((currentStepIndex + 1) / steps.length) * 100}
+            className="w-full"
+          />
           <div className="flex justify-between mt-2 text-xs text-muted-foreground">
-            <span>Step {currentStepIndex + 1} of {steps.length}</span>
-            <span>{Math.round(((currentStepIndex + 1) / steps.length) * 100)}% complete</span>
+            <span>
+              Step {currentStepIndex + 1} of {steps.length}
+            </span>
+            <span>
+              {Math.round(((currentStepIndex + 1) / steps.length) * 100)}%
+              complete
+            </span>
           </div>
         </div>
 
@@ -390,19 +498,27 @@ export function Onboarding() {
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Previous
                 </Button>
-                
+
                 <Button
-                  onClick={currentStep === 'activation' ? () => navigate('/') : handleNext}
+                  onClick={
+                    currentStep === "activation"
+                      ? () => navigate("/")
+                      : handleNext
+                  }
                   disabled={!canProceed() || isLoading}
                   className="hub-bg-primary"
                 >
-                  {isLoading ? 'Processing...' : (
-                    currentStep === 'activation' ? 'Go to Dashboard' : (
-                      <>
-                        {currentStepIndex === steps.length - 1 ? 'Complete Setup' : 'Next'}
-                        <ArrowRight className="h-4 w-4 ml-2" />
-                      </>
-                    )
+                  {isLoading ? (
+                    "Processing..."
+                  ) : currentStep === "activation" ? (
+                    "Go to Dashboard"
+                  ) : (
+                    <>
+                      {currentStepIndex === steps.length - 1
+                        ? "Complete Setup"
+                        : "Next"}
+                      <ArrowRight className="h-4 w-4 ml-2" />
+                    </>
                   )}
                 </Button>
               </div>
@@ -411,5 +527,5 @@ export function Onboarding() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

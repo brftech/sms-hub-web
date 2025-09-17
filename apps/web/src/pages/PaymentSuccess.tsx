@@ -74,7 +74,7 @@ const PaymentSuccess = () => {
         />
         <Navigation />
 
-        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center px-4">
+        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center px-4 pt-24">
           <div className="max-w-md w-full text-center">
             <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-3xl border border-gray-700/50 p-8">
               <Loader className="w-16 h-16 text-orange-500 animate-spin mx-auto mb-6" />
@@ -102,7 +102,7 @@ const PaymentSuccess = () => {
         />
         <Navigation />
 
-        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center px-4">
+        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center px-4 pt-24">
           <div className="max-w-md w-full text-center">
             <div className="bg-gradient-to-br from-red-900/20 to-red-800/20 backdrop-blur-sm rounded-3xl border border-red-700/50 p-8">
               <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -138,7 +138,7 @@ const PaymentSuccess = () => {
       />
       <Navigation />
 
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center px-4 pt-24">
         <div className="max-w-lg w-full text-center">
           <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-3xl border border-gray-700/50 p-8">
             <CheckCircle className="w-20 h-20 text-green-500 mx-auto mb-6" />

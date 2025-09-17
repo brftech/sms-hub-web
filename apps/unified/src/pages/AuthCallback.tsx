@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { getSupabaseClient } from "../lib/supabaseSingleton";
 import { logger } from "@sms-hub/logger";
+import { environmentConfig } from "../config/environment";
 
 export default function AuthCallback() {
   const navigate = useNavigate();
@@ -120,7 +121,7 @@ export default function AuthCallback() {
 
         // Redirect to web app after a delay
         setTimeout(() => {
-          window.location.href = "http://localhost:3000";
+          window.location.href = environmentConfig.webAppUrl;
         }, 3000);
       }
     };

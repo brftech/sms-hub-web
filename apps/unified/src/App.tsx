@@ -1,12 +1,14 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { HubProvider, ErrorBoundary } from "@sms-hub/ui";
 import { unifiedEnvironment } from "./config/unifiedEnvironment";
+import { environmentConfig } from "./config/environment";
 import AdminLayout from "./components/layout/AdminLayout";
 import UserLayout from "./components/layout/UserLayout";
 import { hasAnyRole, useAuthContext } from "@sms-hub/auth";
 import { ProtectedRoute } from "./components/auth/ProtectedRouteWrapper";
 import { UserRole } from "./types/roles";
 import AuthCallback from "./pages/AuthCallback";
+import { lazy, Suspense } from "react";
 // import DevLogin from './pages/DevLogin'
 import { GlobalViewProvider } from "./contexts/GlobalViewContext";
 import { DynamicFavicon } from "./components/DynamicFavicon";
@@ -43,41 +45,50 @@ const DashboardRouter = () => {
   }
 };
 
-// Import user pages
-// import { Dashboard as UserDashboard } from "./pages/user/Dashboard";
-import { Campaigns as UserCampaigns } from "./pages/user/Campaigns";
-import { Messages as UserMessages } from "./pages/user/Messages";
-import { Conversations as UserConversations } from "./pages/user/Conversations";
-import { Broadcasts as UserBroadcasts } from "./pages/user/Broadcasts";
-import { Persons as UserPersons } from "./pages/user/Persons";
-import { Statistics as UserStatistics } from "./pages/user/Statistics";
-import { Settings as UserSettings } from "./pages/user/Settings";
-import { AccountDetails as UserAccountDetails } from "./pages/user/AccountDetails";
-import { Onboarding as UserOnboarding } from "./pages/user/Onboarding";
-import { OnboardingProgress as UserOnboardingProgress } from "./pages/user/OnboardingProgress";
-import { PaymentRequired as UserPaymentRequired } from "./pages/user/PaymentRequired";
-import { PaymentSuccess as UserPaymentSuccess } from "./pages/user/PaymentSuccess";
-import { Verify as UserVerify } from "./pages/user/Verify";
-import { SmsVerification } from "./pages/user/SmsVerification";
+// Lazy load user pages for better performance
+const UserCampaigns = lazy(() => import("./pages/user/Campaigns").then(m => ({ default: m.Campaigns })));
+const UserMessages = lazy(() => import("./pages/user/Messages").then(m => ({ default: m.Messages })));
+const UserConversations = lazy(() => import("./pages/user/Conversations").then(m => ({ default: m.Conversations })));
+const UserBroadcasts = lazy(() => import("./pages/user/Broadcasts").then(m => ({ default: m.Broadcasts })));
+const UserPersons = lazy(() => import("./pages/user/Persons").then(m => ({ default: m.Persons })));
+const UserStatistics = lazy(() => import("./pages/user/Statistics").then(m => ({ default: m.Statistics })));
+const UserSettings = lazy(() => import("./pages/user/Settings").then(m => ({ default: m.Settings })));
+const UserAccountDetails = lazy(() => import("./pages/user/AccountDetails").then(m => ({ default: m.AccountDetails })));
+const UserOnboarding = lazy(() => import("./pages/user/Onboarding").then(m => ({ default: m.Onboarding })));
+const UserOnboardingProgress = lazy(() => import("./pages/user/OnboardingProgress").then(m => ({ default: m.OnboardingProgress })));
+const UserPaymentRequired = lazy(() => import("./pages/user/PaymentRequired").then(m => ({ default: m.PaymentRequired })));
+const UserPaymentSuccess = lazy(() => import("./pages/user/PaymentSuccess").then(m => ({ default: m.PaymentSuccess })));
+const UserVerify = lazy(() => import("./pages/user/Verify").then(m => ({ default: m.Verify })));
+const SmsVerification = lazy(() => import("./pages/user/SmsVerification").then(m => ({ default: m.SmsVerification })));
 
-// Import texting pages
-import { Dashboard as TextingDashboard } from "./pages/texting/Dashboard";
-import { Campaigns as TextingCampaigns } from "./pages/texting/Campaigns";
-import { Messages as TextingMessages } from "./pages/texting/Messages";
-import { Settings as TextingSettings } from "./pages/texting/Settings";
+// Lazy load texting pages
+const TextingDashboard = lazy(() => import("./pages/texting/Dashboard").then(m => ({ default: m.Dashboard })));
+const TextingCampaigns = lazy(() => import("./pages/texting/Campaigns").then(m => ({ default: m.Campaigns })));
+const TextingMessages = lazy(() => import("./pages/texting/Messages").then(m => ({ default: m.Messages })));
+const TextingSettings = lazy(() => import("./pages/texting/Settings").then(m => ({ default: m.Settings })));
 
-// Import admin pages
-import AdminDashboard from "./pages/admin/Dashboard";
-import AdminUsers from "./pages/admin/Users";
-import AdminCompanies from "./pages/admin/Companies";
-import AdminLeads from "./pages/admin/Leads";
-import AdminSettings from "./pages/admin/Settings";
-import { Analytics as AdminAnalytics } from "./pages/admin/Analytics";
-import { Messages as AdminMessages } from "./pages/admin/Messages";
-import { Accounts as AdminAccounts } from "./pages/admin/Accounts";
-import { PhoneNumbers as AdminPhoneNumbers } from "./pages/admin/PhoneNumbers";
-import { Voice as AdminVoice } from "./pages/admin/Voice";
-import { AdminStatistics } from "./pages/admin/AdminStatistics";
+// Lazy load admin pages
+const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
+const AdminUsers = lazy(() => import("./pages/admin/Users"));
+const AdminCompanies = lazy(() => import("./pages/admin/Companies"));
+const AdminLeads = lazy(() => import("./pages/admin/Leads"));
+const AdminSettings = lazy(() => import("./pages/admin/Settings"));
+const AdminAnalytics = lazy(() => import("./pages/admin/Analytics").then(m => ({ default: m.Analytics })));
+const AdminMessages = lazy(() => import("./pages/admin/Messages").then(m => ({ default: m.Messages })));
+const AdminAccounts = lazy(() => import("./pages/admin/Accounts").then(m => ({ default: m.Accounts })));
+const AdminPhoneNumbers = lazy(() => import("./pages/admin/PhoneNumbers").then(m => ({ default: m.PhoneNumbers })));
+const AdminVoice = lazy(() => import("./pages/admin/Voice").then(m => ({ default: m.Voice })));
+const AdminStatistics = lazy(() => import("./pages/admin/AdminStatistics").then(m => ({ default: m.AdminStatistics })));
+
+// Loading component for Suspense
+const PageLoader = () => (
+  <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="text-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+      <p className="text-gray-600">Loading...</p>
+    </div>
+  </div>
+);
 
 // Unauthorized page
 const Unauthorized = () => (
@@ -122,10 +133,11 @@ function App() {
       <HubProvider environment={unifiedEnvironment} defaultHub="percytech">
         <DynamicFavicon />
         <GlobalViewProvider>
-          <Routes>
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
             {/* Public routes - accessible without authentication */}
             {/* Root redirect - redirect to web app for login */}
-            <Route path="/" element={<Navigate to="http://localhost:3000" replace />} />
+            <Route path="/" element={<Navigate to={environmentConfig.webAppUrl} replace />} />
 
             {/* Auth callback route for handling redirects from web app */}
             <Route path="/auth-callback" element={<AuthCallback />} />
@@ -596,6 +608,7 @@ function App() {
             {/* Catch all - redirect to dashboard */}
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>
+          </Suspense>
         </GlobalViewProvider>
       </HubProvider>
     </ErrorBoundary>

@@ -27,8 +27,17 @@ export default defineConfig(({ mode }) => ({
     },
     rollupOptions: {
       output: {
-        // Remove manual chunks to let Vite handle bundling automatically
-        // This prevents the React.forwardRef error caused by chunk loading order issues
+        manualChunks: {
+          // Split vendor libraries into separate chunks
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'ui-vendor': ['@sms-hub/ui'],
+          'query-vendor': ['@tanstack/react-query'],
+          'supabase-vendor': ['@supabase/supabase-js'],
+        },
+        // Optimize chunk names
+        chunkFileNames: 'assets/[name]-[hash].js',
+        entryFileNames: 'assets/[name]-[hash].js',
+        assetFileNames: 'assets/[name]-[hash].[ext]',
       },
     },
     chunkSizeWarningLimit: 500, // Reduce warning limit to 500KB

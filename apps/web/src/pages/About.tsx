@@ -13,7 +13,7 @@ import {
   Target,
 } from "lucide-react";
 // Import Bryan's profile image from UI assets
-import bryanProfileImage from "@sms-hub/ui/assets/bryan-profile.png";
+import bryanProfileImage from "@sms-hub/ui/assets/bryan-profile.jpg";
 
 const About = () => {
   const navigate = useNavigate();

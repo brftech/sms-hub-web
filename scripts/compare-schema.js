@@ -1,5 +1,5 @@
 // Script to compare migration schema with database-comprehensive.ts
-const fs = require('fs');
+import fs from 'fs';
 
 // Extract tables from migration file
 function extractTablesFromMigration(migrationContent) {

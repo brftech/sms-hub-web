@@ -9,7 +9,7 @@ import {
 import { ArrowRight, Loader2 } from "lucide-react";
 import { SEO } from "@sms-hub/ui";
 import { contactService } from "../services/contactService";
-import cigarImage from "@sms-hub/ui/assets/cigar.png";
+import cigarImage from "@sms-hub/ui/assets/cigar.jpg";
 
 const CigarLanding = () => {
   const [isVisible, setIsVisible] = useState(false);

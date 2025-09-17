@@ -9,6 +9,9 @@ As of **2025-09-14 23:25 UTC**, the following Edge Functions are deployed and ac
 - ✅ `complete-signup` (v2) - Post-confirmation business record creation
 - ✅ `login-native` (v1) - Authentication handler
 - ✅ `resend-verification` (v2) - Email verification resend
+- ✅ `create-user` (v1) - User creation endpoint
+- ✅ `update-user` (v1) - User updates
+- ✅ `delete-user` (v1) - User deletion
 
 ### Account Management
 - ✅ `create-account` (v1) - Account creation endpoint
@@ -23,6 +26,11 @@ As of **2025-09-14 23:25 UTC**, the following Edge Functions are deployed and ac
 ### Admin Functions
 - ✅ `check-superadmin` (v1) - Superadmin status verification
 - ✅ `validate-invitation` (v1) - Invitation validation
+- ✅ `superadmin-auth` (v1) - Superadmin authentication
+- ✅ `sync-auth-users` (v1) - Auth user synchronization
+- ✅ `test-permissions` (v1) - Permission testing
+- ✅ `test-rpc` (v1) - RPC testing
+- ✅ `reset-superadmin-password` (v1) - Password reset functionality
 
 ## Environment Configuration
 
@@ -91,12 +99,12 @@ npx supabase functions list
    - Set `RESEND_API_KEY`
    - Set `EMAIL_FROM`
 
-### Optional Functions (Deploy When Needed)
-- `tcr-register-campaign` - TCR campaign registration
-- `tcr-webhook` - TCR webhook handler
-- `sms-verification-consent` - SMS verification
-- `send-user-notification` - User notifications
-- `submit-contact` - Contact form handler
+### Additional Functions (Available)
+- ✅ `tcr-register-campaign` (v1) - TCR campaign registration
+- ✅ `tcr-webhook` (v1) - TCR webhook handler
+- ✅ `sms-verification-consent` (v1) - SMS verification
+- ✅ `send-user-notification` (v1) - User notifications
+- ✅ `submit-contact` (v1) - Contact form handler
 
 ## Monitoring
 

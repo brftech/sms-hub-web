@@ -81,52 +81,6 @@ importers:
         specifier: ^5.9.2
         version: 5.9.2
 
-  apps/api:
-    dependencies:
-      '@sms-hub/dev-auth':
-        specifier: workspace:*
-        version: link:../../packages/dev-auth
-      '@sms-hub/supabase':
-        specifier: workspace:*
-        version: link:../../packages/supabase
-      '@sms-hub/ui':
-        specifier: workspace:*
-        version: link:../../packages/ui
-      '@sms-hub/utils':
-        specifier: workspace:*
-        version: link:../../packages/utils
-      react:
-        specifier: ^19.1.0
-        version: 19.1.1
-      react-dom:
-        specifier: ^19.1.0
-        version: 19.1.1(react@19.1.1)
-      react-router-dom:
-        specifier: ^6.8.1
-        version: 6.30.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
-      styled-components:
-        specifier: ^6.1.13
-        version: 6.1.19(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
-    devDependencies:
-      '@types/react':
-        specifier: ^19.1.0
-        version: 19.1.12
-      '@types/react-dom':
-        specifier: ^19.1.1
-        version: 19.1.9(@types/react@19.1.12)
-      '@types/styled-components':
-        specifier: ^5.1.34
-        version: 5.1.34
-      '@vitejs/plugin-react':
-        specifier: ^4.2.1
-        version: 4.7.0(vite@5.4.19(@types/node@22.18.1)(terser@5.44.0))
-      typescript:
-        specifier: ^5.9.2
-        version: 5.9.2
-      vite:
-        specifier: ^5.0.8
-        version: 5.4.19(@types/node@22.18.1)(terser@5.44.0)
-
   apps/unified:
     dependencies:
       '@sms-hub/auth':

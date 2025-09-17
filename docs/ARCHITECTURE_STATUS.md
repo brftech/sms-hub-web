@@ -5,7 +5,7 @@
 ### Technology Stack
 
 - **Monorepo Structure**: Turbo + pnpm workspaces
-- **Frontend Framework**: React 19 with Vite
+- **Frontend Framework**: React 19 with Vite (consistent across all apps)
 - **Styling**: styled-components (CSS-in-JS) - **NO CSS file imports**
 - **Backend**: Supabase (PostgreSQL + Auth + Edge Functions)
 - **Authentication**: Supabase Auth with PostgreSQL + Magic Link flow
@@ -20,9 +20,8 @@
 ```
 sms-hub-monorepo/
 ├── apps/
-│   ├── web/         # Marketing site & auth gateway (Port 3000)
-│   ├── unified/     # Main authenticated dashboard (Port 3001)
-│   └── api/         # API documentation
+│   ├── web/         # Marketing site & auth gateway (Port 3000) - React 19
+│   └── unified/     # Main authenticated dashboard (Port 3001) - React 19
 ├── packages/
 │   ├── ui/          # Shared UI components (styled-components)
 │   ├── types/       # TypeScript type definitions

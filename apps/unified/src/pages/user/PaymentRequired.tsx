@@ -11,10 +11,8 @@ import {
   HubLogo,
 } from "@sms-hub/ui";
 import {
-  CreditCard,
   CheckCircle,
   Shield,
-  ArrowRight,
   AlertCircle,
   Zap,
   MessageSquare,

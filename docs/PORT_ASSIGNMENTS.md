@@ -1,5 +1,12 @@
 # SMS Hub - Port Assignments
 
+## 📋 Current Status (September 2025)
+
+**Architecture**: Clean 2-app production setup
+- ✅ **Web App (Port 3000)**: Marketing & authentication gateway
+- ✅ **Unified App (Port 3001)**: Main authenticated application
+- ❌ **Legacy Apps**: All removed/migrated (ports 3003-3005)
+
 ## 🚀 Production Ports
 
 ### Web App (Port 3000)
@@ -23,37 +30,17 @@
   - Contact management
   - Account settings
   - Data cleanup tools
+  
+## 🗑️ Legacy Ports (Removed)
 
-### API Server (Port 3002)
-- **Purpose**: Nest.js backend API
-- **URL**: http://localhost:3002
-- **Status**: In development
-- **Features**:
-  - REST API endpoints
-  - Business logic
-  - External integrations
+**Migration Status**: ✅ **Complete** - All legacy apps have been consolidated into the Unified app
 
-## 🔧 Development Ports
+### Removed Apps
+- **API Documentation (Port 3003)**: ❌ Removed - API docs functionality integrated into Unified app
+- **Legacy Admin (Port 3004)**: ❌ Migrated - Admin functions moved to Unified app
+- **Legacy User (Port 3005)**: ❌ Migrated - User functions moved to Unified app
 
-### API Documentation (Port 3003)
-- **Purpose**: API documentation site
-- **URL**: http://localhost:3003
-- **Features**:
-  - API endpoint documentation
-  - Request/response examples
-  - Authentication guides
-
-## 📛 Legacy Ports (Being Migrated)
-
-### Legacy Admin (Port 3004)
-- **Purpose**: Legacy admin dashboard
-- **Status**: Being migrated to Unified app
-- **Migration**: Admin functions moved to Unified app
-
-### Legacy User (Port 3005)
-- **Purpose**: Legacy user dashboard
-- **Status**: Being migrated to Unified app
-- **Migration**: User functions moved to Unified app
+**Result**: Clean 2-app architecture with all functionality consolidated
 
 ## 🌐 External Services
 
@@ -92,18 +79,17 @@ pnpm dev --port 3001  # Unified app
 ### Port Configuration
 - **Web App**: Configured in `apps/web/vite.config.ts`
 - **Unified App**: Configured in `apps/unified/vite.config.ts`
-- **API Server**: Configured in `apps/api/vite.config.ts`
 
 ## 🎯 Port Assignment Strategy
 
 ### Production Architecture
 ```
-User → Web App (3000) → Unified App (3001) → API Server (3002)
+User → Web App (3000) → Unified App (3001)
 ```
 
 ### Development Architecture
 ```
-Developer → Web App (3000) + Unified App (3001) + API Server (3002)
+Developer → Web App (3000) + Unified App (3001)
 ```
 
 ## 🔧 Port Management
@@ -122,14 +108,18 @@ For external access:
 
 ## 📊 Port Status Summary
 
+### ✅ Active Production Apps
 | Port | App | Status | Purpose |
 |------|-----|--------|---------|
 | 3000 | Web | ✅ Active | Marketing & Auth |
 | 3001 | Unified | ✅ Active | Main App |
-| 3002 | API | 🚧 Development | Backend API |
-| 3003 | API Docs | ✅ Active | Documentation |
-| 3004 | Legacy Admin | 📛 Migrating | Legacy Admin |
-| 3005 | Legacy User | 📛 Migrating | Legacy User |
+
+### ❌ Removed/Migrated Apps
+| Port | App | Status | Purpose |
+|------|-----|--------|---------|
+| 3003 | API Docs | ❌ Removed | Legacy Documentation |
+| 3004 | Legacy Admin | ❌ Migrated | Legacy Admin |
+| 3005 | Legacy User | ❌ Migrated | Legacy User |
 
 ## 🎯 Best Practices
 
@@ -149,14 +139,13 @@ For external access:
 
 ### Port Consolidation (September 2025)
 - **Unified App**: Consolidated admin and user functions with enhanced security
-- **Legacy Apps**: Being migrated to Unified app
-- **Port Reduction**: From 6 apps to 3 production apps
+- **Legacy Apps**: ✅ **Migration Complete** - All legacy apps removed/consolidated
+- **Port Reduction**: From 6 apps to 2 production apps
 - **Enhanced Authentication**: Magic link flow implemented across Web → Unified app flow
 
 ### Current Focus (Updated September 2025)
 - **Web App (3000)**: Marketing and **magic link authentication** gateway
 - **Unified App (3001)**: All authenticated functionality with **global view default** and **superadmin protection**
-- **API Server (3002)**: Backend services with enhanced Edge Functions
 
 ### Recent Improvements
 - **Magic Link Authentication**: Prevents session carryover between Web (3000) and Unified (3001) apps

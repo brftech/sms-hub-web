@@ -6,7 +6,6 @@ import UserLayout from "./components/layout/UserLayout";
 import { hasAnyRole, useAuthContext } from "@sms-hub/auth";
 import { ProtectedRoute } from "./components/auth/ProtectedRouteWrapper";
 import { UserRole } from "./types/roles";
-import { Landing } from "./pages/Landing";
 import AuthCallback from "./pages/AuthCallback";
 // import DevLogin from './pages/DevLogin'
 import { GlobalViewProvider } from "./contexts/GlobalViewContext";
@@ -18,13 +17,6 @@ const DashboardRouter = () => {
   const { user } = useAuthContext();
   console.log("[DashboardRouter] User:", user);
   console.log("[DashboardRouter] User role:", user?.role);
-  console.log("[DashboardRouter] User payment_status:", user?.payment_status);
-
-  // Check payment status first - redirect unpaid users to payment
-  if (user && user.payment_status !== 'paid') {
-    console.log("[DashboardRouter] User hasn't paid, redirecting to payment");
-    return <Navigate to="/payment-required" replace />;
-  }
 
   // Check if user needs onboarding
   if (user && !user.onboarding_completed) {
@@ -132,8 +124,8 @@ function App() {
         <GlobalViewProvider>
           <Routes>
             {/* Public routes - accessible without authentication */}
-            {/* Landing page for unauthenticated users */}
-            <Route path="/" element={<Landing />} />
+            {/* Root redirect - redirect to web app for login */}
+            <Route path="/" element={<Navigate to="http://localhost:3000" replace />} />
 
             {/* Auth callback route for handling redirects from web app */}
             <Route path="/auth-callback" element={<AuthCallback />} />

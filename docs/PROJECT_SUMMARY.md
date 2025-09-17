@@ -8,7 +8,7 @@ SMS Hub is a **multi-tenant B2B SMS SaaS platform** built as a Turbo monorepo. I
 
 ### Technology Stack
 - **Monorepo**: Turbo + pnpm workspaces
-- **Frontend**: React 19 + Vite + TypeScript
+- **Frontend**: React 19 + Vite + TypeScript (consistent across all apps)
 - **Styling**: styled-components (CSS-in-JS)
 - **Backend**: Supabase (PostgreSQL + Auth + Edge Functions)
 - **Authentication**: Supabase Auth + SMS OTP
@@ -20,8 +20,7 @@ SMS Hub is a **multi-tenant B2B SMS SaaS platform** built as a Turbo monorepo. I
 sms-hub-monorepo/
 ├── apps/
 │   ├── web/         # Marketing & auth gateway (Port 3000)
-│   ├── unified/     # Main authenticated app (Port 3001)
-│   └── api/         # API documentation
+│   └── unified/     # Main authenticated app (Port 3001)
 ├── packages/
 │   ├── ui/          # Shared UI components
 │   ├── types/       # TypeScript type definitions
@@ -216,7 +215,6 @@ pnpm dev
 ### Port Assignments
 - **Web App**: 3000 (marketing, auth gateway)
 - **Unified App**: 3001 (main authenticated application)
-- **API**: 3002 (Nest.js backend server)
 
 ## 📊 Performance & Optimization
 

@@ -118,9 +118,9 @@ export default function AuthCallback() {
         logger.error("[AuthCallback] Error:", err);
         setError(err instanceof Error ? err.message : "Authentication failed");
 
-        // Redirect to landing page after a delay
+        // Redirect to web app after a delay
         setTimeout(() => {
-          navigate("/", { replace: true });
+          window.location.href = "http://localhost:3000";
         }, 3000);
       }
     };

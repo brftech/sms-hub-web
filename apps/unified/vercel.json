@@ -1,5 +1,11 @@
 {
   "buildCommand": "pnpm build --filter @sms-hub/unified",
   "outputDirectory": "dist",
-  "framework": null
+  "framework": null,
+  "rewrites": [
+    {
+      "source": "/((?!api|_next/static|_next/image|favicon.ico|.*\\.).*)",
+      "destination": "/index.html"
+    }
+  ]
 }

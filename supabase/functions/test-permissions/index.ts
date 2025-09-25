@@ -1,4 +1,4 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { corsHeaders } from "../_shared/cors.ts";
 
@@ -23,18 +23,18 @@ serve(async (req) => {
     // Create admin client
     const supabaseAdmin = createClient(url!, serviceRoleKey!, {
       auth: { persistSession: false },
-      db: { schema: 'public' },
+      db: { schema: "public" },
       global: {
         headers: {
-          'apikey': serviceRoleKey!,
-          'Authorization': `Bearer ${serviceRoleKey!}`
-        }
-      }
+          apikey: serviceRoleKey!,
+          Authorization: `Bearer ${serviceRoleKey!}`,
+        },
+      },
     });
 
     // Try different queries
     console.log("\nTesting queries with service role:");
-    
+
     // 1. Count query
     const { count, error: countError } = await supabaseAdmin
       .from("user_profiles")
@@ -49,12 +49,14 @@ serve(async (req) => {
     console.log("Select result:", { data, error: selectError });
 
     // 3. RPC call to check permissions
-    const { data: hasAccess, error: rpcError } = await supabaseAdmin
-      .rpc('has_table_privilege', {
-        rolename: 'service_role',
-        tablename: 'public.user_profiles',
-        privilege: 'SELECT'
-      });
+    const { data: hasAccess, error: rpcError } = await supabaseAdmin.rpc(
+      "has_table_privilege",
+      {
+        rolename: "service_role",
+        tablename: "public.user_profiles",
+        privilege: "SELECT",
+      }
+    );
     console.log("RPC permission check:", { hasAccess, error: rpcError });
 
     return new Response(
@@ -69,17 +71,17 @@ serve(async (req) => {
           queries: {
             count: { result: count, error: countError },
             select: { result: data, error: selectError },
-            permissions: { hasAccess, error: rpcError }
-          }
-        }
+            permissions: { hasAccess, error: rpcError },
+          },
+        },
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
     console.error("Test error:", error);
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
-    );
+    return new Response(JSON.stringify({ error: error.message }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 500,
+    });
   }
 });

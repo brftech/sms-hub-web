@@ -1,4 +1,4 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { corsHeaders } from "../_shared/cors.ts";
 
@@ -13,9 +13,9 @@ serve(async (req) => {
     if (!invitation_token) {
       return new Response(
         JSON.stringify({ error: "Invitation token is required" }),
-        { 
+        {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
-          status: 400 
+          status: 400,
         }
       );
     }
@@ -30,7 +30,8 @@ serve(async (req) => {
     // Get invitation data
     const { data: invitation, error } = await supabaseAdmin
       .from("user_invitations")
-      .select(`
+      .select(
+        `
         *,
         companies (
           id,
@@ -41,7 +42,8 @@ serve(async (req) => {
           first_name,
           last_name
         )
-      `)
+      `
+      )
       .eq("invitation_token", invitation_token)
       .eq("status", "pending")
       .single();
@@ -50,9 +52,9 @@ serve(async (req) => {
       console.error("Invalid invitation token:", error);
       return new Response(
         JSON.stringify({ error: "Invalid or expired invitation" }),
-        { 
+        {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
-          status: 404 
+          status: 404,
         }
       );
     }
@@ -61,9 +63,9 @@ serve(async (req) => {
     if (new Date(invitation.expires_at) < new Date()) {
       return new Response(
         JSON.stringify({ error: "This invitation has expired" }),
-        { 
+        {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
-          status: 400 
+          status: 400,
         }
       );
     }

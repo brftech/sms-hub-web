@@ -20,66 +20,38 @@ import Footer from "../components/Footer";
 const Pricing = () => {
   const [isLoading, setIsLoading] = useState(false);
 
-  // Payment-first checkout handler
+  // Payment link handler - much simpler!
   const handleDirectCheckout = async (planType: string) => {
     console.log("🚀 handleDirectCheckout called with planType:", planType);
     setIsLoading(true);
 
     try {
-      // Map plan types to Stripe price IDs
-      const priceIds = {
-        starter: import.meta.env.VITE_STRIPE_PRICE_CORE, // Use CORE price for starter
+      // Map plan types to payment links
+      const paymentLinks = {
+        starter:
+          import.meta.env.VITE_STRIPE_PAYMENT_LINK_STARTER ||
+          import.meta.env.VITE_STRIPE_PAYMENT_LINK,
         core:
-          import.meta.env.VITE_STRIPE_PRICE_CORE ||
-          import.meta.env.VITE_STRIPE_PRICE_PROFESSIONAL,
+          import.meta.env.VITE_STRIPE_PAYMENT_LINK_CORE ||
+          import.meta.env.VITE_STRIPE_PAYMENT_LINK,
         elite:
-          import.meta.env.VITE_STRIPE_PRICE_ELITE ||
-          import.meta.env.VITE_STRIPE_PRICE_ENTERPRISE,
+          import.meta.env.VITE_STRIPE_PAYMENT_LINK_ELITE ||
+          import.meta.env.VITE_STRIPE_PAYMENT_LINK,
       };
 
-      const priceId = priceIds[planType as keyof typeof priceIds];
-      console.log("💰 Price IDs:", priceIds);
-      console.log("🎯 Selected price ID:", priceId);
+      const paymentLink = paymentLinks[planType as keyof typeof paymentLinks];
+      console.log("🔗 Payment link:", paymentLink);
 
-      if (!priceId) {
-        console.error("❌ No price ID found for plan:", planType);
-        throw new Error(`Price ID not configured for plan: ${planType}`);
+      if (!paymentLink) {
+        console.error("❌ No payment link found for plan:", planType);
+        throw new Error(`Payment link not configured for plan: ${planType}`);
       }
 
-      // Create checkout session
-      console.log("🌐 Supabase URL:", import.meta.env.VITE_SUPABASE_URL);
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-checkout-session`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-          },
-          body: JSON.stringify({
-            email: "", // Will be collected in Stripe checkout
-            priceId: priceId,
-            successUrl: `${window.location.origin}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
-            cancelUrl: `${window.location.origin}/pricing`,
-            customerType: "company",
-            hubId: 1, // Default to Gnymble, will be updated after signup
-          }),
-        }
-      );
-
-      const result = await response.json();
-      console.log("📋 Checkout response:", result);
-
-      if (!response.ok) {
-        console.error("❌ Checkout failed:", result);
-        throw new Error(result.error || "Failed to create checkout session");
-      }
-
-      // Redirect to Stripe Checkout
-      console.log("🔄 Redirecting to Stripe:", result.url);
-      window.location.href = result.url;
+      // Redirect directly to Stripe Payment Link
+      console.log("🔄 Redirecting to Stripe Payment Link:", paymentLink);
+      window.location.href = paymentLink;
     } catch (error) {
-      console.error("Checkout error:", error);
+      console.error("Payment link error:", error);
       alert("Failed to start checkout. Please try again.");
     } finally {
       setIsLoading(false);

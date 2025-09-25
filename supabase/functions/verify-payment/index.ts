@@ -1,4 +1,4 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { corsHeaders } from "../_shared/cors.ts";
 import Stripe from "https://esm.sh/stripe@14.21.0?target=deno";
@@ -23,7 +23,7 @@ serve(async (req) => {
       throw new Error("Stripe secret key not configured");
     }
 
-    const cleanStripeKey = stripeKey.trim().replace(/\s+/g, '');
+    const cleanStripeKey = stripeKey.trim().replace(/\s+/g, "");
     const stripe = new Stripe(cleanStripeKey, {
       apiVersion: "2023-10-16",
       httpClient: Stripe.createFetchHttpClient(),
@@ -31,21 +31,22 @@ serve(async (req) => {
 
     // Retrieve the checkout session from Stripe
     const session = await stripe.checkout.sessions.retrieve(session_id, {
-      expand: ['payment_intent', 'subscription']
+      expand: ["payment_intent", "subscription"],
     });
 
     console.log("📊 Session status:", session.payment_status);
 
     // Check if payment was successful
-    const isPaid = session.payment_status === 'paid' || 
-                  session.payment_status === 'complete' ||
-                  (session.payment_intent && 
-                   typeof session.payment_intent === 'object' && 
-                   session.payment_intent.status === 'succeeded');
+    const isPaid =
+      session.payment_status === "paid" ||
+      session.payment_status === "complete" ||
+      (session.payment_intent &&
+        typeof session.payment_intent === "object" &&
+        session.payment_intent.status === "succeeded");
 
     if (isPaid) {
       console.log("✅ Payment verified successfully");
-      
+
       // Update customer payment status in our database
       const supabaseAdmin = createClient(
         Deno.env.get("SUPABASE_URL") ?? "",
@@ -57,15 +58,18 @@ serve(async (req) => {
         // Update customer payment status
         const { error: updateError } = await supabaseAdmin
           .from("customers")
-          .update({ 
-            payment_status: 'completed',
+          .update({
+            payment_status: "completed",
             stripe_customer_id: session.customer as string,
-            updated_at: new Date().toISOString()
+            updated_at: new Date().toISOString(),
           })
           .eq("company_id", session.metadata.company_id);
 
         if (updateError) {
-          console.error("❌ Failed to update customer payment status:", updateError);
+          console.error(
+            "❌ Failed to update customer payment status:",
+            updateError
+          );
         } else {
           console.log("✅ Updated customer payment status");
         }
@@ -74,33 +78,32 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({
           success: true,
-          payment_status: 'paid',
+          payment_status: "paid",
           session_id: session_id,
-          message: "Payment verified successfully"
+          message: "Payment verified successfully",
         }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     } else {
       console.log("❌ Payment not completed:", session.payment_status);
-      
+
       return new Response(
         JSON.stringify({
           success: false,
-          payment_status: session.payment_status || 'unknown',
+          payment_status: session.payment_status || "unknown",
           session_id: session_id,
-          message: "Payment not completed"
+          message: "Payment not completed",
         }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
-
   } catch (error) {
     console.error("❌ Error in verify-payment:", error);
     return new Response(
-      JSON.stringify({ 
+      JSON.stringify({
         success: false,
         error: error.message,
-        message: "Payment verification failed"
+        message: "Payment verification failed",
       }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },

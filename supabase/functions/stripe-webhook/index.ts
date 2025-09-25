@@ -87,6 +87,30 @@ serve(async (req) => {
 
     // Handle different event types
     switch (event.type) {
+      case "customer.created": {
+        await handleCustomerCreated(
+          event.data.object as Stripe.Customer,
+          supabaseAdmin
+        );
+        break;
+      }
+
+      case "customer.updated": {
+        await handleCustomerUpdated(
+          event.data.object as Stripe.Customer,
+          supabaseAdmin
+        );
+        break;
+      }
+
+      case "customer.deleted": {
+        await handleCustomerDeleted(
+          event.data.object as Stripe.Customer,
+          supabaseAdmin
+        );
+        break;
+      }
+
       case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session;
         console.log("✅ Checkout completed:", session.id);
@@ -427,5 +451,300 @@ serve(async (req) => {
     });
   }
 });
+
+// Handle customer.created event
+async function handleCustomerCreated(
+  customer: Stripe.Customer,
+  supabaseAdmin: any
+) {
+  console.log("👤 Processing customer.created:", customer.id);
+
+  // Check if customer already exists in Supabase
+  const { data: existingCustomer } = await supabaseAdmin
+    .from("customers")
+    .select("id")
+    .eq("stripe_customer_id", customer.id)
+    .single();
+
+  if (existingCustomer) {
+    console.log("✅ Customer already exists in Supabase:", existingCustomer.id);
+    return;
+  }
+
+  // Determine if this is from web signup or manual creation
+  const isFromWebSignup =
+    customer.metadata?.payment_first === "true" ||
+    customer.metadata?.created_via === "web_signup";
+
+  const isFromManualCreation =
+    !isFromWebSignup &&
+    (customer.metadata?.created_via === "manual" ||
+      !customer.metadata?.created_via);
+
+  console.log(
+    "📊 Customer source:",
+    isFromWebSignup ? "web_signup" : "manual_creation"
+  );
+
+  const timestamp = new Date().toISOString();
+  const companyId = crypto.randomUUID();
+  const accountNumber = `ACC-${Date.now()}`;
+
+  try {
+    // Step 1: Create company record
+    console.log("🏢 Creating company record");
+    const { data: company, error: companyError } = await supabaseAdmin
+      .from("companies")
+      .insert([
+        {
+          id: companyId,
+          hub_id: parseInt(customer.metadata?.hub_id || "1"),
+          public_name:
+            customer.metadata?.company_name ||
+            customer.name ||
+            "Unknown Company",
+          legal_name:
+            customer.metadata?.company_name ||
+            customer.name ||
+            "Unknown Company",
+          company_account_number: accountNumber,
+          is_active: true,
+          created_at: timestamp,
+          updated_at: timestamp,
+        },
+      ])
+      .select()
+      .single();
+
+    if (companyError) {
+      throw new Error(`Failed to create company: ${companyError.message}`);
+    }
+
+    // Step 2: Create customer record with comprehensive Stripe data
+    console.log("💳 Creating customer record with Stripe data");
+    const customerId = crypto.randomUUID();
+    const { data: customerRecord, error: customerError } = await supabaseAdmin
+      .from("customers")
+      .insert([
+        {
+          id: customerId,
+          hub_id: parseInt(customer.metadata?.hub_id || "1"),
+          company_id: companyId,
+          billing_email: customer.email,
+          customer_type: customer.business_type || "company",
+          stripe_customer_id: customer.id,
+          payment_status: "pending",
+          subscription_status: "inactive",
+          subscription_tier: "free",
+          is_active: true,
+          metadata: {
+            // Core Stripe data
+            synced_from_stripe: true,
+            stripe_created: customer.created,
+            stripe_updated: customer.updated,
+            stripe_metadata: customer.metadata,
+            created_via: isFromWebSignup ? "web_signup" : "manual_creation",
+
+            // Customer information
+            customer_name: customer.name,
+            customer_phone: customer.phone,
+            customer_currency: customer.currency,
+            customer_balance: customer.balance,
+            default_payment_method: customer.default_source,
+
+            // Address information
+            billing_address: customer.address
+              ? {
+                  line1: customer.address.line1,
+                  line2: customer.address.line2,
+                  city: customer.address.city,
+                  state: customer.address.state,
+                  postal_code: customer.address.postal_code,
+                  country: customer.address.country,
+                }
+              : null,
+
+            // Business information
+            business_type: customer.business_type,
+            company_info: customer.company
+              ? {
+                  name: customer.company.name,
+                  tax_id: customer.company.tax_id,
+                  vat_id: customer.company.vat_id,
+                  phone: customer.company.phone,
+                  address: customer.company.address,
+                }
+              : null,
+
+            // Payment information
+            payment_methods: customer.invoice_settings?.default_payment_method,
+            invoice_settings: customer.invoice_settings,
+
+            // Additional Stripe data
+            livemode: customer.livemode,
+            delinquent: customer.delinquent,
+            discount: customer.discount,
+            shipping: customer.shipping,
+            tax_exempt: customer.tax_exempt,
+          },
+          created_at: timestamp,
+          updated_at: timestamp,
+        },
+      ])
+      .select()
+      .single();
+
+    if (customerError) {
+      // Clean up company if customer creation fails
+      await supabaseAdmin.from("companies").delete().eq("id", companyId);
+      throw new Error(`Failed to create customer: ${customerError.message}`);
+    }
+
+    // Step 3: Handle authentication based on source
+    if (isFromManualCreation) {
+      // For manually created customers, send authentication email
+      await handleManualCustomerAuth(
+        customer,
+        customerRecord,
+        company,
+        supabaseAdmin
+      );
+    } else if (isFromWebSignup) {
+      // For web signups, the authentication is handled by the existing signup flow
+      console.log(
+        "🌐 Web signup customer - authentication handled by signup flow"
+      );
+    }
+
+    console.log("✅ Customer webhook processed successfully");
+  } catch (error) {
+    console.error("❌ Error processing customer.created:", error);
+    throw error;
+  }
+}
+
+// Handle manual customer authentication
+async function handleManualCustomerAuth(
+  customer: Stripe.Customer,
+  customerRecord: any,
+  company: any,
+  supabaseAdmin: any
+) {
+  console.log("📧 Setting up authentication for manual customer");
+
+  const timestamp = new Date().toISOString();
+  const verificationId = crypto.randomUUID();
+
+  // Create verification record
+  const { data: verification, error: verificationError } = await supabaseAdmin
+    .from("sms_verifications")
+    .insert([
+      {
+        id: verificationId,
+        hub_id: customerRecord.hub_id,
+        email: customer.email,
+        mobile_phone: customer.phone || null,
+        auth_method: "email",
+        verification_code: Math.random()
+          .toString(36)
+          .substring(2, 8)
+          .toUpperCase(),
+        verification_sent_at: timestamp,
+        created_at: timestamp,
+        updated_at: timestamp,
+        metadata: {
+          stripe_customer_id: customer.id,
+          company_id: company.id,
+          customer_id: customerRecord.id,
+          synced_from_stripe: true,
+          created_via: "manual_creation",
+        },
+      },
+    ])
+    .select()
+    .single();
+
+  if (verificationError) {
+    console.warn("⚠️ Failed to create verification record:", verificationError);
+    return;
+  }
+
+  // Send authentication email
+  try {
+    const { data: emailResult, error: emailError } =
+      await supabaseAdmin.functions.invoke("send-user-notification", {
+        body: {
+          to: customer.email,
+          template: "stripe_customer_auth",
+          data: {
+            company_name: company.public_name,
+            verification_code: verification.verification_code,
+            hub_id: customerRecord.hub_id,
+            stripe_customer_id: customer.id,
+          },
+        },
+      });
+
+    if (emailError) {
+      console.warn("⚠️ Failed to send authentication email:", emailError);
+    } else {
+      console.log("✅ Authentication email sent to:", customer.email);
+    }
+  } catch (emailError) {
+    console.warn("⚠️ Email service error:", emailError);
+  }
+}
+
+// Handle customer.updated event
+async function handleCustomerUpdated(
+  customer: Stripe.Customer,
+  supabaseAdmin: any
+) {
+  console.log("🔄 Processing customer.updated:", customer.id);
+
+  // Update customer record in Supabase
+  const { error: updateError } = await supabaseAdmin
+    .from("customers")
+    .update({
+      billing_email: customer.email,
+      metadata: {
+        synced_from_stripe: true,
+        stripe_updated: customer.updated,
+        stripe_metadata: customer.metadata,
+      },
+      updated_at: new Date().toISOString(),
+    })
+    .eq("stripe_customer_id", customer.id);
+
+  if (updateError) {
+    console.error("❌ Failed to update customer:", updateError);
+  } else {
+    console.log("✅ Customer updated successfully");
+  }
+}
+
+// Handle customer.deleted event
+async function handleCustomerDeleted(
+  customer: Stripe.Customer,
+  supabaseAdmin: any
+) {
+  console.log("🗑️ Processing customer.deleted:", customer.id);
+
+  // Mark customer as inactive (don't delete to preserve data)
+  const { error: updateError } = await supabaseAdmin
+    .from("customers")
+    .update({
+      is_active: false,
+      deleted_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    })
+    .eq("stripe_customer_id", customer.id);
+
+  if (updateError) {
+    console.error("❌ Failed to mark customer as deleted:", updateError);
+  } else {
+    console.log("✅ Customer marked as deleted");
+  }
+}
 
 export default serve;

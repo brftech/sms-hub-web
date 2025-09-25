@@ -1,4 +1,4 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { corsHeaders } from "../_shared/cors.ts";
 
@@ -147,13 +147,13 @@ serve(async (req) => {
         } else {
           console.log("✅ Auth email updated");
           finalEmail = email;
-          
+
           // Also update the email in the profile to keep them in sync
           const { error: profileEmailError } = await supabaseAdmin
             .from("user_profiles")
             .update({ email, updated_at: new Date().toISOString() })
             .eq("id", user_id);
-            
+
           if (profileEmailError) {
             console.warn("Profile email sync failed:", profileEmailError);
           }
@@ -192,7 +192,7 @@ serve(async (req) => {
         success: true,
         user: {
           id: profileData.id,
-          email: finalEmail,  // Use the final email (either updated or existing)
+          email: finalEmail, // Use the final email (either updated or existing)
           first_name: profileData.first_name,
           last_name: profileData.last_name,
           role: profileData.role,

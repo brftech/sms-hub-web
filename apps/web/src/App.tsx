@@ -37,6 +37,12 @@ import PaymentSuccess from "./pages/PaymentSuccess";
 
 // Lazy load client pages (less frequently accessed)
 const DonsBurlingame = lazy(() => import("./pages/clients/DonsBurlingame"));
+const DonsBurlingamePrivacy = lazy(
+  () => import("./pages/clients/DonsBurlingamePrivacy")
+);
+const DonsBurlingameTerms = lazy(
+  () => import("./pages/clients/DonsBurlingameTerms")
+);
 const MichaelsTobacco = lazy(() => import("./pages/clients/MichaelsTobacco"));
 const FirstRoundAmmo = lazy(() => import("./pages/clients/FirstRoundAmmo"));
 const HarlemCigar = lazy(() => import("./pages/clients/HarlemCigar"));
@@ -147,6 +153,70 @@ const AppRoutes = () => {
               }
             >
               <DonsBurlingame />
+            </Suspense>
+          </PageTransition>
+        }
+      />
+      <Route
+        path="/clients/dons-burlingame/privacy"
+        element={
+          <PageTransition>
+            <Suspense
+              fallback={
+                <div className="min-h-screen bg-black flex items-center justify-center">
+                  <div className="text-orange-500 text-xl">Loading...</div>
+                </div>
+              }
+            >
+              <DonsBurlingamePrivacy />
+            </Suspense>
+          </PageTransition>
+        }
+      />
+      <Route
+        path="/clients/dons-burlingame/terms"
+        element={
+          <PageTransition>
+            <Suspense
+              fallback={
+                <div className="min-h-screen bg-black flex items-center justify-center">
+                  <div className="text-orange-500 text-xl">Loading...</div>
+                </div>
+              }
+            >
+              <DonsBurlingameTerms />
+            </Suspense>
+          </PageTransition>
+        }
+      />
+      <Route
+        path="/clients/donsbt/privacy"
+        element={
+          <PageTransition>
+            <Suspense
+              fallback={
+                <div className="min-h-screen bg-black flex items-center justify-center">
+                  <div className="text-orange-500 text-xl">Loading...</div>
+                </div>
+              }
+            >
+              <DonsBurlingamePrivacy />
+            </Suspense>
+          </PageTransition>
+        }
+      />
+      <Route
+        path="/clients/donsbt/terms"
+        element={
+          <PageTransition>
+            <Suspense
+              fallback={
+                <div className="min-h-screen bg-black flex items-center justify-center">
+                  <div className="text-orange-500 text-xl">Loading...</div>
+                </div>
+              }
+            >
+              <DonsBurlingameTerms />
             </Suspense>
           </PageTransition>
         }

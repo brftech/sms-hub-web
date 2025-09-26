@@ -74,17 +74,19 @@ export default function DonsBurlingame() {
 
   return (
     <ClientPageTemplate
-      clientName="Don's Burlingame"
+      clientName="DONSBT"
       clientDescription="Premium Cigars & Tobacco"
       clientLogo={donsBurlingameLogo}
       clientIcon={<Cigarette className="w-5 h-5 text-black" />}
-      phoneNumber="555-123-DONS"
-      address="123 Main Street, Burlingame, CA 94010"
-      hours="Mon-Sat: 10AM-8PM, Sun: 12PM-6PM"
+      phoneNumber="6502298355"
+      address="1404 Burlingame Avenue, Burlingame CA 94010"
+      hours="Mon-Fri 10AM-8PM, Sat-Sun 11AM-6PM"
       features={features}
       benefits={benefits}
-      ctaText="Stay connected with Don's Burlingame for exclusive cigar releases, tasting events, and premium tobacco products delivered directly to your phone."
-      ctaButtonText="JOIN DON'S"
+      ctaText="Stay connected with DONS Burlingame Tobacconist for exclusive cigar releases, tasting events, and premium tobacco products delivered directly to your phone."
+      ctaButtonText="JOIN DONSBT"
+      privacyLink="/clients/donsbt/privacy"
+      termsLink="/clients/donsbt/terms"
     />
   );
 }

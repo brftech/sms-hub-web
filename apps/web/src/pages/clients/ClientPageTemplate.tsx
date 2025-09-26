@@ -25,6 +25,8 @@ interface ClientPageTemplateProps {
   ctaText: string;
   ctaButtonText: string;
   clientWebsite?: string;
+  privacyLink?: string;
+  termsLink?: string;
 }
 
 export default function ClientPageTemplate({
@@ -40,6 +42,8 @@ export default function ClientPageTemplate({
   ctaText,
   ctaButtonText,
   clientWebsite,
+  privacyLink,
+  termsLink,
 }: ClientPageTemplateProps) {
   return (
     <>
@@ -87,13 +91,13 @@ export default function ClientPageTemplate({
               </div>
               <nav className="hidden md:flex space-x-6">
                 <Link
-                  to="/privacy"
+                  to={privacyLink || "/privacy"}
                   className="text-orange-200 hover:text-orange-500 transition-colors"
                 >
                   Privacy Policy
                 </Link>
                 <Link
-                  to="/terms"
+                  to={termsLink || "/terms"}
                   className="text-orange-200 hover:text-orange-500 transition-colors"
                 >
                   Terms & Conditions
@@ -218,7 +222,7 @@ export default function ClientPageTemplate({
               <div className="grid md:grid-cols-3 gap-8">
                 <div className="flex flex-col items-center">
                   <Phone className="w-12 h-12 text-orange-500 mb-4" />
-                  <h3 className="text-xl font-bold text-white mb-2">Call Us</h3>
+                  <h3 className="text-xl font-bold text-white mb-2">Text Us</h3>
                   <p className="text-orange-200">{phoneNumber}</p>
                 </div>
                 <div className="flex flex-col items-center">
@@ -271,13 +275,13 @@ export default function ClientPageTemplate({
               </div>
               <div className="flex space-x-6">
                 <Link
-                  to="/privacy"
+                  to={privacyLink || "/privacy"}
                   className="text-orange-200 hover:text-orange-500 transition-colors"
                 >
                   Privacy Policy
                 </Link>
                 <Link
-                  to="/terms"
+                  to={termsLink || "/terms"}
                   className="text-orange-200 hover:text-orange-500 transition-colors"
                 >
                   Terms & Conditions

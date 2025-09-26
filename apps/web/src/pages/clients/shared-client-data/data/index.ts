@@ -56,12 +56,12 @@ export const CLIENTS: Client[] = [
     updatedAt: new Date("2024-01-01"),
   },
   {
-    id: "dons-burlingame",
+    id: "donsbt",
     name: "Don's Burlingame",
-    slug: "dons-burlingame",
+    slug: "donsbt",
     description: "Premium cigar and lifestyle establishment",
     website: "https://donsburlingame.com",
-    logo: "/clients/dons-burlingame/assets/dons-logo.png",
+    logo: "/clients/donsbt/assets/dons-logo.png",
     primaryColor: "#FF8C00",
     secondaryColor: "#FFA500",
     isActive: true,
@@ -122,10 +122,10 @@ export const CLIENT_ASSETS: Record<string, ClientAsset[]> = {
       createdAt: new Date("2024-01-01"),
     },
   ],
-  "dons-burlingame": [
+  donsbt: [
     {
       id: "dons-logo-main",
-      clientId: "dons-burlingame",
+      clientId: "donsbt",
       type: "logo",
       filename: "dons-logo.png",
       path: "dons-logo.png",

@@ -36,16 +36,9 @@ import { DebugAuth } from "./pages/DebugAuth";
 import PaymentSuccess from "./pages/PaymentSuccess";
 
 // Lazy load client pages (less frequently accessed)
-const DonsBurlingame = lazy(() => import("./pages/clients/DonsBurlingame"));
-const DonsBurlingamePrivacy = lazy(
-  () => import("./pages/clients/DonsBurlingamePrivacy")
-);
-const DonsBurlingameTerms = lazy(
-  () => import("./pages/clients/DonsBurlingameTerms")
-);
-const MichaelsTobacco = lazy(() => import("./pages/clients/MichaelsTobacco"));
-const FirstRoundAmmo = lazy(() => import("./pages/clients/FirstRoundAmmo"));
-const HarlemCigar = lazy(() => import("./pages/clients/HarlemCigar"));
+const ClientPage = lazy(() => import("./pages/clients/ClientPage"));
+const ClientPrivacy = lazy(() => import("./pages/clients/ClientPrivacy"));
+const ClientTerms = lazy(() => import("./pages/clients/ClientTerms"));
 
 const queryClient = new QueryClient();
 
@@ -141,8 +134,9 @@ const AppRoutes = () => {
           </PageTransition>
         }
       />
+      {/* Dynamic Client Routes */}
       <Route
-        path="/dons-burlingame"
+        path="/donsbt"
         element={
           <PageTransition>
             <Suspense
@@ -152,13 +146,13 @@ const AppRoutes = () => {
                 </div>
               }
             >
-              <DonsBurlingame />
+              <ClientPage />
             </Suspense>
           </PageTransition>
         }
       />
       <Route
-        path="/clients/dons-burlingame/privacy"
+        path="/clients/:clientId"
         element={
           <PageTransition>
             <Suspense
@@ -168,13 +162,13 @@ const AppRoutes = () => {
                 </div>
               }
             >
-              <DonsBurlingamePrivacy />
+              <ClientPage />
             </Suspense>
           </PageTransition>
         }
       />
       <Route
-        path="/clients/dons-burlingame/terms"
+        path="/clients/:clientId/privacy"
         element={
           <PageTransition>
             <Suspense
@@ -184,13 +178,13 @@ const AppRoutes = () => {
                 </div>
               }
             >
-              <DonsBurlingameTerms />
+              <ClientPrivacy />
             </Suspense>
           </PageTransition>
         }
       />
       <Route
-        path="/clients/donsbt/privacy"
+        path="/clients/:clientId/terms"
         element={
           <PageTransition>
             <Suspense
@@ -200,71 +194,7 @@ const AppRoutes = () => {
                 </div>
               }
             >
-              <DonsBurlingamePrivacy />
-            </Suspense>
-          </PageTransition>
-        }
-      />
-      <Route
-        path="/clients/donsbt/terms"
-        element={
-          <PageTransition>
-            <Suspense
-              fallback={
-                <div className="min-h-screen bg-black flex items-center justify-center">
-                  <div className="text-orange-500 text-xl">Loading...</div>
-                </div>
-              }
-            >
-              <DonsBurlingameTerms />
-            </Suspense>
-          </PageTransition>
-        }
-      />
-      <Route
-        path="/michaels-tobacco"
-        element={
-          <PageTransition>
-            <Suspense
-              fallback={
-                <div className="min-h-screen bg-black flex items-center justify-center">
-                  <div className="text-orange-500 text-xl">Loading...</div>
-                </div>
-              }
-            >
-              <MichaelsTobacco />
-            </Suspense>
-          </PageTransition>
-        }
-      />
-      <Route
-        path="/1st-round-ammo"
-        element={
-          <PageTransition>
-            <Suspense
-              fallback={
-                <div className="min-h-screen bg-black flex items-center justify-center">
-                  <div className="text-orange-500 text-xl">Loading...</div>
-                </div>
-              }
-            >
-              <FirstRoundAmmo />
-            </Suspense>
-          </PageTransition>
-        }
-      />
-      <Route
-        path="/harlem-cigar"
-        element={
-          <PageTransition>
-            <Suspense
-              fallback={
-                <div className="min-h-screen bg-black flex items-center justify-center">
-                  <div className="text-orange-500 text-xl">Loading...</div>
-                </div>
-              }
-            >
-              <HarlemCigar />
+              <ClientTerms />
             </Suspense>
           </PageTransition>
         }

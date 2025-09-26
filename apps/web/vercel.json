@@ -1,7 +1,4 @@
 {
-  "buildCommand": "pnpm build --filter @sms-hub/web",
-  "outputDirectory": "dist",
-  "framework": null,
   "redirects": [
     {
       "source": "/signup",

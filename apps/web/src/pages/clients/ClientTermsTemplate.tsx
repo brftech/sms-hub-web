@@ -25,7 +25,7 @@ export default function ClientTermsTemplate({
   phoneNumber,
   address,
   hours,
-  businessType, // eslint-disable-line @typescript-eslint/no-unused-vars
+  businessType,
   industryContext,
   shortCode,
   website,
@@ -164,7 +164,7 @@ export default function ClientTermsTemplate({
                     <ul className="list-disc list-inside space-y-2 text-orange-100">
                       <li>
                         SMS marketing and promotional messages about{" "}
-                        {industryContext}
+                        {industryContext} for {businessType}
                       </li>
                       <li>Order confirmations and shipping updates</li>
                       <li>Appointment reminders and notifications</li>

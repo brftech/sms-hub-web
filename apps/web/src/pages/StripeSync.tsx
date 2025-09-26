@@ -19,7 +19,7 @@ const StripeSync = () => {
   const [result, setResult] = useState<{
     success: boolean;
     message: string;
-    data?: any;
+    data?: Record<string, unknown>;
   } | null>(null);
   const [error, setError] = useState<string | null>(null);
 

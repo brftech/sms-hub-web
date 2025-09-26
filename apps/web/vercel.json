@@ -1,4 +1,7 @@
 {
+  "framework": null,
+  "buildCommand": "pnpm turbo run build --filter=apps/web...",
+  "outputDirectory": "apps/web/dist",
   "redirects": [
     {
       "source": "/signup",
@@ -8,7 +11,7 @@
   ],
   "rewrites": [
     {
-      "source": "/((?!api|_next/static|_next/image|favicon.ico|.*\\.).*)",
+      "source": "/(.*)",
       "destination": "/index.html"
     }
   ]

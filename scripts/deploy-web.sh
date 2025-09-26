@@ -2,7 +2,5 @@
 # Deploy web app only from root
 
 echo "🚀 Deploying Web App..."
-cd apps/web
-vercel --prod
-cd ../..
+vercel --prod --yes --cwd apps/web
 echo "✅ Web app deployed!"

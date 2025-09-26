@@ -1,7 +1,8 @@
 {
   "buildCommand": "pnpm build --filter @sms-hub/unified",
-  "outputDirectory": "dist",
-  "framework": null,
+  "outputDirectory": "apps/unified/dist",
+  "installCommand": "pnpm install",
+  "framework": "vite",
   "rewrites": [
     {
       "source": "/((?!api|_next/static|_next/image|favicon.ico|.*\\.).*)",

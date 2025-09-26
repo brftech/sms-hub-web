@@ -5,13 +5,14 @@
   "description": "Multi-hub SMS B2B SaaS platform with Gnymble, PercyMD, PercyTech, and PercyText",
   "scripts": {
     "build": "turbo run build",
+    "build:web": "turbo run build --filter=@sms-hub/web",
     "dev": "turbo run dev",
     "dev:remote": "./scripts/shell/dev-remote.sh",
     "dev:web": "./scripts/shell/dev.sh --web-only",
     "dev:unified": "./scripts/shell/dev.sh --unified-only",
-    "deploy:web": "./scripts/shell/deploy.sh --web-only",
-    "deploy:unified": "./scripts/shell/deploy.sh --unified-only",
-    "deploy:all": "turbo run deploy",
+    "deploy:web": "cd apps/web && vercel --prod --yes",
+    "deploy:unified": "cd apps/unified && vercel --prod --yes",
+    "deploy:all": "npm run deploy:web && npm run deploy:unified",
     "lint": "turbo run lint",
     "test": "turbo run test",
     "test:unit": "jest --config=config/jest.config.js --testPathPattern=test/unit",
@@ -40,10 +41,6 @@
     "storybook": "turbo run storybook",
     "build-storybook": "turbo run build-storybook"
   },
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
   "pnpm": {
     "overrides": {
       "react": "^19.1.0",

@@ -25,7 +25,7 @@ export default function ClientTermsTemplate({
   phoneNumber,
   address,
   hours,
-  businessType,
+  businessType, // eslint-disable-line @typescript-eslint/no-unused-vars
   industryContext,
   shortCode,
   website,

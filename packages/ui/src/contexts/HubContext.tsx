@@ -129,8 +129,9 @@ export const HubProvider: React.FC<HubProviderProps> = ({
     dom.setBodyAttribute("data-hub", currentHub);
     dom.setDocumentElementAttribute("data-hub", currentHub);
 
-    // Update document title
-    dom.setDocumentTitle(hubConfig.name);
+    // Update document title with fallback
+    const title = hubConfig?.name || 'SMS Hub';
+    dom.setDocumentTitle(title);
 
     // Apply hub CSS variables
     dom.setCSSVariable("--hub-primary", hubConfig.primaryColor);

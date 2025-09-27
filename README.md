@@ -13,9 +13,11 @@ This is the public-facing web application for the SMS Hub multi-tenant B2B SMS S
 ## Tech Stack
 
 - **Framework**: React 19 + Vite + TypeScript
-- **Styling**: styled-components (CSS-in-JS)
+- **Styling**: Tailwind CSS + CSS Modules
+- **Testing**: Vitest + Testing Library
 - **Backend**: Supabase (PostgreSQL + Auth + Edge Functions)
 - **UI Components**: Custom component library in `packages/ui`
+- **Deployment**: Vercel
 
 ## Project Structure
 
@@ -60,6 +62,12 @@ npm run dev
 
 # Run type checking
 npm run type-check
+
+# Run tests
+npm run test
+
+# Run linting
+npm run lint
 
 # Build for production
 npm run build

@@ -18,9 +18,13 @@ const handleDirectCheckout = async () => {
   try {
     // Redirect directly to Stripe Payment Link
     const paymentLink = import.meta.env.VITE_STRIPE_PAYMENT_LINK;
+    console.log("🔗 Payment link from env:", paymentLink);
+    
     if (!paymentLink) {
       throw new Error("Payment link not configured");
     }
+    
+    console.log("🚀 Redirecting to:", paymentLink);
     window.location.href = paymentLink;
   } catch (error) {
     console.error("Checkout error:", error);

@@ -9,26 +9,12 @@ node_modules/
 /out/
 storybook-static/
 
-# Monorepo workspace builds
-apps/*/dist/
-apps/*/build/
-apps/*/.next/
-packages/*/dist/
-packages/*/build/
-
 # Environment variables
-.env
-.env.local
 .env.development.local
-.env.test.local
 .env.production.local
 
 # Debug logs
 npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
 
 # Runtime data
 pids
@@ -47,7 +33,6 @@ coverage/
 test-results/
 playwright-report/
 .jest-cache/
-.pnpm-store/
 
 # ESLint cache
 .eslintcache

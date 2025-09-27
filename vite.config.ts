@@ -4,7 +4,7 @@ import path from "path";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-  envDir: "../../", // Load .env from monorepo root
+  envDir: ".", // Load .env from current directory
   server: {
     host: "localhost",
     port: 3000,
@@ -13,7 +13,7 @@ export default defineConfig(({ mode }) => ({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
-      "@sms-hub/ui": path.resolve(__dirname, "../../packages/ui/src"),
+      "@sms-hub/ui": path.resolve(__dirname, "./packages/ui/src"),
     },
   },
   build: {

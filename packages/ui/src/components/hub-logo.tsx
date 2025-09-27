@@ -41,6 +41,21 @@ const logoMap: Record<HubType, { text: string; icon: string; main?: string }> =
 export const HubLogo = React.forwardRef<HTMLDivElement, HubLogoProps>(
   ({ hubType, variant = "text", size = "md", className, ...props }, ref) => {
     const logos = logoMap[hubType];
+    
+    // Handle invalid hubType
+    if (!logos) {
+      console.warn(`Invalid hubType: ${hubType}. Available types: ${Object.keys(logoMap).join(', ')}`);
+      return (
+        <div
+          ref={ref}
+          className={cn("flex items-center justify-center text-red-500", className)}
+          {...props}
+        >
+          <span className="text-sm">Invalid Hub</span>
+        </div>
+      );
+    }
+    
     const logoSrc =
       variant === "icon"
         ? logos.icon

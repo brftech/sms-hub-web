@@ -20,7 +20,10 @@ export const HubSwitcher: React.FC<HubSwitcherProps> = ({
   const [open, setOpen] = React.useState(false);
   const { currentHub, switchHub } = useHub();
 
-  const hubs = Object.values(HUB_CONFIGS);
+  const hubs = Object.entries(HUB_CONFIGS).map(([hubType, config]) => ({
+    hubType: hubType as HubType,
+    ...config
+  }));
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -46,7 +49,7 @@ export const HubSwitcher: React.FC<HubSwitcherProps> = ({
               {hubs.map((hub) => (
                 <CommandItem
                   key={hub.id}
-                  value={hub.id}
+                  value={hub.hubType}
                   onSelect={(value: string) => {
                     switchHub(value as HubType);
                     setOpen(false);
@@ -54,13 +57,13 @@ export const HubSwitcher: React.FC<HubSwitcherProps> = ({
                   className="data-[selected=true]:bg-transparent data-[selected=true]:text-foreground"
                 >
                   <div className="flex items-center">
-                    <HubLogo hubType={hub.id} variant="icon" size="sm" />
+                    <HubLogo hubType={hub.hubType} variant="icon" size="sm" />
                     <span className="ml-2">{hub.name}</span>
                   </div>
                   <Check
                     className={cn(
                       "ml-auto h-4 w-4",
-                      currentHub === hub.id ? "opacity-100" : "opacity-0"
+                      currentHub === hub.hubType ? "opacity-100" : "opacity-0"
                     )}
                   />
                 </CommandItem>

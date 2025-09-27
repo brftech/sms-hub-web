@@ -50,7 +50,7 @@ const ResendButton = styled.button`
 `;
 
 export function CheckEmail() {
-  const { hubConfig } = useHub();
+  const { hubConfig, currentHub } = useHub();
   const [email, setEmail] = useState<string>("");
   const [isResending, setIsResending] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
@@ -117,7 +117,7 @@ export function CheckEmail() {
     <CheckEmailContainer>
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <HubLogo hubType={hubConfig.id} size="lg" className="mx-auto mb-4" />
+          <HubLogo hubType={currentHub} size="lg" className="mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-white mb-2">
             {hubConfig.displayName}
           </h1>

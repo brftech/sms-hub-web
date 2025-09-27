@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
-import { useDevAuth, clearDevAuth } from "@sms-hub/dev-auth";
+// import { useDevAuth, clearDevAuth } from "@sms-hub/dev-auth";
 // import { EnvironmentAdapter } from '../types' // Type not used
 
 const IndicatorContainer = styled.div`
@@ -98,14 +98,14 @@ export function DevAdminBanner({
   environment,
   onboardingPath = "/onboarding",
 }: DevAdminBannerProps) {
-  const devAuth = useDevAuth({
-    isDevelopment: environment.isDevelopment || (() => false),
-  });
+  // const devAuth = useDevAuth({
+  //   isDevelopment: environment.isDevelopment || (() => false),
+  // });
   const navigate = useNavigate();
 
-  if (!devAuth.isSuperadmin) {
-    return null;
-  }
+  // if (!devAuth.isSuperadmin) {
+  //   return null;
+  // }
 
   const handleIndicatorClick = (e: React.MouseEvent) => {
     // Don't navigate if clicking the close button
@@ -125,7 +125,7 @@ export function DevAdminBanner({
       <CloseButton
         onClick={(e) => {
           e.stopPropagation();
-          clearDevAuth();
+          // clearDevAuth();
         }}
         title="Exit Dev Mode"
       >

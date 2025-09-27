@@ -4,7 +4,7 @@ export * from './percytech'
 export * from './percytext'
 export * from './hubContent'
 
-import { HubType } from '@sms-hub/types'
+import { HubType } from './types'
 import { getGnymbleOnboardingRequirements } from './gnymble'
 import { getPercyMDOnboardingRequirements } from './percymd'
 import { getPercyTechCapabilities } from './percytech'

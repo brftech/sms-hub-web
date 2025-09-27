@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { createAuthService } from "./auth";
 import { createSupabaseClient } from "./client";
-import { Company, UserProfile, SignupData, VerificationData } from "@sms-hub/types";
+import { Company, UserProfile, SignupData, VerificationData } from "./types";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 // Create a single supabase client instance

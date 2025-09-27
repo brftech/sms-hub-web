@@ -12,7 +12,7 @@ import {
   useMemo,
 } from "react";
 import { logger, logError } from "@sms-hub/utils";
-import { ChatMessage, ConversationContext } from "@sms-hub/types";
+import { ChatMessage, ConversationContext } from "../types";
 
 // =============================================================================
 // STATE MACHINE DEFINITIONS

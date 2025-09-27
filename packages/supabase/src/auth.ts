@@ -1,5 +1,5 @@
 import { SupabaseClient } from "@supabase/supabase-js";
-import { SignupData, VerificationData, UserProfile } from "@sms-hub/types";
+import { SignupData, VerificationData, UserProfile } from "./types";
 
 export const createAuthService = (client: SupabaseClient) => ({
   async createVerification(data: SignupData) {

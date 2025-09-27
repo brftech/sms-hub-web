@@ -1,4 +1,4 @@
-import { HubType, HubConfig, HUB_CONFIGS } from '@sms-hub/types'
+import { HubType, HubConfig, HUB_CONFIGS } from './types'
 
 export const detectHubFromDomain = (hostname: string): HubType => {
   if (hostname.includes('gnymble')) return 'gnymble'

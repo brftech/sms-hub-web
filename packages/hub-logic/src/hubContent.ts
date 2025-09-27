@@ -1,4 +1,4 @@
-import { HubType } from "@sms-hub/types";
+import { HubType } from "./types";
 
 // Hero Content Types
 export interface HeroContent {

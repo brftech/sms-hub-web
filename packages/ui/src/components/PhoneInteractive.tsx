@@ -7,7 +7,7 @@ import { createPortal } from "react-dom";
 import { useLiveMessaging } from "../contexts/LiveMessagingContext";
 import SMSAuthModal from "./SMSAuthModal";
 import { logger, logError } from "@sms-hub/utils";
-import { ChatMessage } from "@sms-hub/types";
+import { ChatMessage } from "../types";
 
 // =============================================================================
 // TYPES & INTERFACES

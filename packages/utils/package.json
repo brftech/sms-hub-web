@@ -16,7 +16,6 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@sms-hub/types": "workspace:*",
     "clsx": "^2.1.1",
     "class-variance-authority": "^0.7.1",
     "tailwind-merge": "^2.5.2",

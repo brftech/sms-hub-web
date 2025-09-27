@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Trash2, AlertTriangle } from "lucide-react";
 import { BaseModal, ModalButtonGroup, ModalButton } from "./BaseModal";
-import type { UnifiedAccount } from "@sms-hub/types";
+import type { UnifiedAccount } from "../types";
 
 interface AccountDeleteModalProps {
   isOpen: boolean;

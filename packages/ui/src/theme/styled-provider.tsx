@@ -1,6 +1,6 @@
 import React from "react";
 import { ThemeProvider, createGlobalStyle } from "styled-components";
-import { HubType } from "@sms-hub/types";
+import { HubType } from "../types";
 import { useHub } from "../contexts/HubContext";
 
 // Hub color configurations

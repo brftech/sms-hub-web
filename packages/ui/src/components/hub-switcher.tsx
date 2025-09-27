@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Check, ChevronsUpDown } from "lucide-react";
-import { HubType, HUB_CONFIGS } from "@sms-hub/types";
+import { HubType, HUB_CONFIGS } from "../types";
 import { cn } from "@sms-hub/utils";
 import { useHub } from "../contexts/HubContext";
 import { Button } from "./button";

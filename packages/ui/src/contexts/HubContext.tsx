@@ -5,7 +5,7 @@ import React, {
   useEffect,
   ReactNode,
 } from "react";
-import { HubType, getHubConfig } from "@sms-hub/types";
+import { HubType, getHubConfig } from "../types";
 
 // Abstract interface for environment-specific functionality
 export interface EnvironmentAdapter {

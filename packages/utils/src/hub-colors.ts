@@ -1,4 +1,4 @@
-import { HubType } from "@sms-hub/types";
+import { HubType } from "./types";
 
 export const getHubColorClasses = (currentHub: HubType) => {
   switch (currentHub) {

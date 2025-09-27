@@ -10,9 +10,7 @@
     "lint": "eslint src --ext .ts,.tsx",
     "test": "jest"
   },
-  "dependencies": {
-    "@sms-hub/types": "workspace:*"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@types/node": "^22.10.5",
     "typescript": "^5.9.2"

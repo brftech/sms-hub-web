@@ -1,5 +1,5 @@
 import styled, { css } from 'styled-components'
-import { HubType } from '@sms-hub/types'
+import { HubType } from '../types'
 import { hubColors } from './styled-provider'
 
 // Hub-aware styled components

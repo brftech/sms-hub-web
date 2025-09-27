@@ -8,7 +8,7 @@ import {
   Users,
 } from "lucide-react";
 import { BaseModal } from "./BaseModal";
-import type { UnifiedAccount } from "@sms-hub/types";
+import type { UnifiedAccount } from "../types";
 
 interface AccountViewModalProps {
   isOpen: boolean;

@@ -57,8 +57,8 @@ export * from "./components/hub-switcher";
 export * from "./components/modals";
 
 // Dev mode components
-export * from "./components/DevAdminBanner";
-export * from "./components/DevAuthToggle";
+// export * from "./components/DevAdminBanner"; // Removed - needs dev-auth package
+// export * from "./components/DevAuthToggle"; // Removed - needs dev-auth package
 
 // Phone Interactive components
 export { default as PhoneInteractive } from "./components/PhoneInteractive";

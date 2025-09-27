@@ -1,5 +1,5 @@
 import * as React from "react";
-import { HubType } from "@sms-hub/types";
+import { HubType } from "../types";
 import { cn } from "@sms-hub/utils";
 
 // Import all logo assets

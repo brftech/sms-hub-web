@@ -17,8 +17,7 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@sms-hub/types": "workspace:*",
-    "@sms-hub/utils": "workspace:*"
+    "@sms-hub/utils": "file:../utils"
   },
   "devDependencies": {
     "@types/node": "^22.15.3",

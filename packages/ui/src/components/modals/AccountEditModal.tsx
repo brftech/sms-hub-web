@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Edit, Save } from "lucide-react";
 import { BaseModal, ModalFormLayout, ModalFormColumn } from "./BaseModal";
-import type { UnifiedAccount } from "@sms-hub/types";
+import type { UnifiedAccount } from "../types";
 
 interface AccountEditModalProps {
   isOpen: boolean;

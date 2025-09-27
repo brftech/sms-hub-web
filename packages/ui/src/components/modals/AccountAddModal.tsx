@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Plus, Building2, User, CreditCard } from "lucide-react";
 import { BaseModal, ModalFormLayout, ModalFormColumn } from "./BaseModal";
-// import { HubType } from "@sms-hub/types"; // Not currently used
+// import { HubType } from "../types"; // Not currently used
 
 interface AccountAddData {
   hub_id: number;

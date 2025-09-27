@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import { Database } from "@sms-hub/types";
+import { Database } from "./types";
 
 // For Vite apps, environment variables need to be injected at build time
 // We'll export a function that creates the client with provided config

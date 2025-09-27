@@ -6,7 +6,6 @@ node_modules/
 # Production builds
 /build
 /dist
-/.next/
 /out/
 storybook-static/
 

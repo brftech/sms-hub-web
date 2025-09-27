@@ -235,7 +235,14 @@ const About = () => {
                 works for your business.
               </p>
               <button
-                onClick={() => navigate("/contact")}
+                onClick={() => {
+                  const paymentLink = import.meta.env.VITE_STRIPE_PAYMENT_LINK;
+                  if (paymentLink) {
+                    window.location.href = paymentLink;
+                  } else {
+                    navigate("/contact");
+                  }
+                }}
                 className="px-10 py-4 bg-orange-600 text-white font-bold rounded-full hover:bg-orange-700 transition-all duration-300 text-lg tracking-wide uppercase flex items-center justify-center mx-auto group"
                 style={{ fontFamily: "Inter, system-ui, sans-serif" }}
               >

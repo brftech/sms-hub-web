@@ -292,14 +292,21 @@ const FAQ = () => {
                 professional texting that works for your regulated business.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <a
-                  href="/contact"
+                <button
+                  onClick={() => {
+                    const paymentLink = import.meta.env.VITE_STRIPE_PAYMENT_LINK;
+                    if (paymentLink) {
+                      window.location.href = paymentLink;
+                    } else {
+                      window.location.href = "/pricing";
+                    }
+                  }}
                   className="px-10 py-4 bg-orange-600 text-white font-bold rounded-full hover:bg-orange-700 transition-all duration-300 text-lg tracking-wide uppercase flex items-center justify-center group"
                   style={{ fontFamily: "Inter, system-ui, sans-serif" }}
                 >
                   Get Started Today
                   <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
-                </a>
+                </button>
                 <a
                   href="/pricing"
                   className="px-10 py-4 border border-orange-500/50 text-orange-400 font-bold rounded-full hover:bg-orange-500/10 hover:border-orange-400 transition-all duration-300 text-lg tracking-wide uppercase flex items-center justify-center"

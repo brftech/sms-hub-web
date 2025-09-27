@@ -1,9 +1,9 @@
-# SMS Hub Monorepo - Remote Supabase Configuration
+# SMS Hub Web - Remote Supabase Configuration
 # This project uses remote-only Supabase connections
-# Dev: vgpovgpwqkjnpnrjelyg (sms-hub-monorepo)
-# Prod: howjinnvvtvaufihwers (percytech)
+# Dev: hmumtnpnyxuplvqcmnfk (web-dev)
+# Prod: fwlivygerbqzowbzxesw (web-prod)
 
-project_id = "sms-hub-monorepo"
+project_id = "web-dev"
 
 # Remote-only configuration - no local services
 # Note: These sections are commented out for remote-only usage
@@ -27,31 +27,12 @@ project_id = "sms-hub-monorepo"
 # enabled = true
 
 # All authentication and database operations use remote Supabase instances
-# Development: https://vgpovgpwqkjnpnrjelyg.supabase.co
-# Production: https://howjinnvvtvaufihwers.supabase.co
+# Dev: https://hmumtnpnyxuplvqcmnfk.supabase.co
+# Prod: https://fwlivygerbqzowbzxesw.supabase.co
 
-
-[functions.tcr-register-campaign]
+[functions.submit-contact]
 enabled = true
-verify_jwt = true
-import_map = "./functions/tcr-register-campaign/deno.json"
-# Uncomment to specify a custom file path to the entrypoint.
-# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
-entrypoint = "./functions/tcr-register-campaign/index.ts"
-# Specifies static files to be bundled with the function. Supports glob patterns.
-# For example, if you want to serve static HTML pages in your function:
-# static_files = [ "./functions/tcr-register-campaign/*.html" ]
-
-[functions.tcr-webhook]
-enabled = true
-verify_jwt = true
-import_map = "./functions/tcr-webhook/deno.json"
-# Uncomment to specify a custom file path to the entrypoint.
-# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
-entrypoint = "./functions/tcr-webhook/index.ts"
-# Specifies static files to be bundled with the function. Supports glob patterns.
-# For example, if you want to serve static HTML pages in your function:
-# static_files = [ "./functions/tcr-webhook/*.html" ]
+verify_jwt = false
 
 [functions.stripe-webhook]
 enabled = true

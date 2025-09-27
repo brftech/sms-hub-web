@@ -1,31 +1,17 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@14.18.0?target=deno";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { corsHeaders } from "../_shared/cors.ts";
 
 serve(async (req) => {
   console.log("🔔 Webhook endpoint called - Method:", req.method);
-  console.log(
-    "🔔 Webhook endpoint called - Headers:",
-    Object.fromEntries(req.headers.entries())
-  );
 
   // Handle CORS preflight
   if (req.method === "OPTIONS") {
     return new Response("ok", {
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "POST, OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type, Stripe-Signature",
-      },
+      headers: corsHeaders,
     });
   }
-
-  // Add CORS headers to all responses
-  const corsHeaders = {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type, Stripe-Signature",
-  };
 
   // Test endpoint to verify function is accessible
   if (req.method === "GET") {
@@ -58,7 +44,6 @@ serve(async (req) => {
 
     console.log("🔑 Stripe key configured:", !!stripeKey);
     console.log("🔑 Webhook secret configured:", !!webhookSecret);
-    console.log("🔑 Webhook secret length:", webhookSecret?.length || 0);
 
     if (!stripeKey || !webhookSecret) {
       throw new Error("Stripe configuration missing");
@@ -87,241 +72,145 @@ serve(async (req) => {
 
     // Handle different event types
     switch (event.type) {
-      case "customer.created": {
-        await handleCustomerCreated(
-          event.data.object as Stripe.Customer,
-          supabaseAdmin
-        );
-        break;
-      }
-
-      case "customer.updated": {
-        await handleCustomerUpdated(
-          event.data.object as Stripe.Customer,
-          supabaseAdmin
-        );
-        break;
-      }
-
-      case "customer.deleted": {
-        await handleCustomerDeleted(
-          event.data.object as Stripe.Customer,
-          supabaseAdmin
-        );
-        break;
-      }
-
       case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session;
         console.log("✅ Checkout completed:", session.id);
         console.log("📊 Session metadata:", session.metadata);
-        console.log("💰 Payment details:", {
-          amount_total: session.amount_total,
-          currency: session.currency,
-          mode: session.mode,
-          subscription: session.subscription,
-        });
 
         try {
           // Determine if this is a one-time purchase or subscription
           const isOneTimePurchase = !session.subscription;
-          const paymentAmount = session.amount_total || 0;
-          const paymentCurrency = session.currency || "usd";
+          const customerEmail = session.customer_details?.email;
+          const hubId = parseInt(session.metadata?.hub_id || "1");
 
-          // Handle payment-first flow vs normal flow
-          const isPaymentFirst = session.metadata?.payment_first === "true";
-
-          if (isPaymentFirst) {
-            console.log(
-              "💳 Payment-first flow detected - creating placeholder customer record"
-            );
-
-            // Create customer record with Stripe data (no user/company yet)
-            const { data: newCustomer, error: customerCreateError } =
-              await supabaseAdmin.from("customers").insert({
-                hub_id: parseInt(session.metadata.hub_id || "1"),
-                billing_email:
-                  session.customer_details?.email || "unknown@example.com",
-                customer_type: session.metadata?.customer_type || "company",
-                stripe_customer_id: session.customer as string,
-                subscription_status: isOneTimePurchase ? "active" : "pending",
-                subscription_tier: isOneTimePurchase ? "one_time" : "core",
-                payment_status: "paid",
-                is_active: true,
-                metadata: {
-                  stripe_session_id: session.id,
-                  payment_first: true,
-                  created_via: "payment_first_webhook",
-                  customer_email: session.customer_details?.email,
-                  customer_name: session.customer_details?.name,
-                },
-              });
-
-            if (customerCreateError) {
-              console.error(
-                "❌ Failed to create payment-first customer:",
-                customerCreateError
-              );
-            } else {
-              console.log(
-                "✅ Created payment-first customer record:",
-                newCustomer?.id
-              );
-            }
-          } else if (session.metadata?.company_id) {
-            // First, find the customer record for this company
-            const { data: customer, error: customerFindError } =
-              await supabaseAdmin
-                .from("customers")
-                .select("id, stripe_customer_id")
-                .eq(
-                  "billing_email",
-                  session.customer_details?.email || session.metadata?.email
-                )
-                .single();
-
-            if (customerFindError && customerFindError.code !== "PGRST116") {
-              console.error("❌ Error finding customer:", customerFindError);
-            }
-
-            if (customer) {
-              // Update existing customer
-              const updateData: any = {
-                updated_at: new Date().toISOString(),
-              };
-
-              if (isOneTimePurchase) {
-                // One-time purchase - mark as active
-                updateData.subscription_status = "active";
-                updateData.subscription_tier = "one_time";
-              } else {
-                // Subscription - will be handled by subscription events
-                updateData.subscription_status = "pending";
-              }
-
-              const { error: customerUpdateError } = await supabaseAdmin
-                .from("customers")
-                .update(updateData)
-                .eq("id", customer.id);
-
-              if (customerUpdateError) {
-                console.error(
-                  "❌ Failed to update customer:",
-                  customerUpdateError
-                );
-              } else {
-                console.log("✅ Updated customer payment details");
-              }
-            } else {
-              // Create new customer record
-              const { error: customerCreateError } = await supabaseAdmin
-                .from("customers")
-                .insert({
-                  hub_id: parseInt(session.metadata.hub_id || "1"),
-                  billing_email:
-                    session.customer_details?.email ||
-                    session.metadata?.email ||
-                    "unknown@example.com",
-                  customer_type: session.metadata?.customer_type || "b2b",
-                  stripe_customer_id: session.customer as string,
-                  subscription_status: isOneTimePurchase ? "active" : "pending",
-                  subscription_tier: isOneTimePurchase ? "one_time" : "starter",
-                  is_active: true,
-                  company_id: session.metadata.company_id,
-                  user_id: session.metadata.user_id,
-                });
-
-              if (customerCreateError) {
-                console.error(
-                  "❌ Failed to create customer:",
-                  customerCreateError
-                );
-              } else {
-                console.log("✅ Created new customer record");
-              }
-            }
+          if (!customerEmail) {
+            console.error("❌ No customer email in checkout session");
+            return new Response(JSON.stringify({ error: "No customer email" }), {
+              status: 400,
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            });
           }
 
-          // Create or update onboarding submission and ensure proper user-company linkage
-          if (session.metadata?.company_id && session.metadata?.user_id) {
-            console.log(
-              "📝 Processing onboarding submission for company:",
-              session.metadata.company_id
-            );
-            console.log("👤 Processing for user:", session.metadata.user_id);
+          console.log("💳 Payment-first flow - creating customer with Supabase Auth");
 
-            // First, ensure the company is linked to the user profile
-            const { error: membershipError } = await supabaseAdmin
-              .from("user_profiles")
-              .update({ company_id: session.metadata.company_id })
-              .eq("id", session.metadata.user_id);
+          // Step 1: Create company record
+          const companyId = crypto.randomUUID();
+          const { data: company, error: companyError } = await supabaseAdmin
+            .from("companies")
+            .insert({
+              id: companyId,
+              hub_id: hubId,
+              public_name: session.customer_details?.name || "New Company",
+              legal_name: session.customer_details?.name || "New Company",
+              company_account_number: `ACC-${Date.now()}`,
+              is_active: true,
+            })
+            .select()
+            .single();
 
-            if (membershipError) {
-              console.error(
-                "❌ Failed to link user to company:",
-                membershipError
-              );
-            } else {
-              console.log("✅ Linked user profile to company");
-            }
-
-            const { data: existing } = await supabaseAdmin
-              .from("onboarding_submissions")
-              .select("id")
-              .eq("company_id", session.metadata.company_id)
-              .single();
-
-            if (existing) {
-              // Update existing
-              const { error } = await supabaseAdmin
-                .from("onboarding_submissions")
-                .update({
-                  stripe_status: "completed",
-                  current_step: "brand",
-                  updated_at: new Date().toISOString(),
-                })
-                .eq("id", existing.id);
-
-              if (error) {
-                console.error(
-                  "❌ Failed to update onboarding submission:",
-                  error
-                );
-              } else {
-                console.log("✅ Updated onboarding submission");
-              }
-            } else {
-              // Create new
-              const { error } = await supabaseAdmin
-                .from("onboarding_submissions")
-                .insert({
-                  hub_id: parseInt(session.metadata.hub_id || "1"),
-                  company_id: session.metadata.company_id,
-                  user_id: session.metadata.user_id,
-                  stripe_status: "completed",
-                  current_step: "brand",
-                  step_data: { checkout_session_id: session.id },
-                });
-
-              if (error) {
-                console.error(
-                  "❌ Failed to create onboarding submission:",
-                  error
-                );
-                console.error("Error details:", JSON.stringify(error, null, 2));
-              } else {
-                console.log("✅ Created new onboarding submission");
-              }
-            }
-          } else {
-            console.log("⚠️ Missing metadata for onboarding submission");
-            console.log(
-              "Metadata received:",
-              JSON.stringify(session.metadata, null, 2)
-            );
+          if (companyError) {
+            console.error("❌ Failed to create company:", companyError);
+            throw companyError;
           }
+
+          // Step 2: Create customer record
+          const customerId = crypto.randomUUID();
+          const { data: newCustomer, error: customerCreateError } =
+            await supabaseAdmin.from("customers").insert({
+              id: customerId,
+              hub_id: hubId,
+              company_id: companyId,
+              billing_email: customerEmail,
+              customer_type: session.metadata?.customer_type || "company",
+              stripe_customer_id: session.customer as string,
+              subscription_status: isOneTimePurchase ? "active" : "pending",
+              subscription_tier: isOneTimePurchase ? "one_time" : "core",
+              payment_status: "paid",
+              is_active: true,
+              metadata: {
+                stripe_session_id: session.id,
+                payment_first: true,
+                created_via: "payment_first_webhook",
+                customer_email: customerEmail,
+                customer_name: session.customer_details?.name,
+              },
+            })
+            .select()
+            .single();
+
+          if (customerCreateError) {
+            console.error("❌ Failed to create customer:", customerCreateError);
+            throw customerCreateError;
+          }
+
+          // Step 3: Create Supabase Auth user
+          const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.createUser({
+            email: customerEmail,
+            email_confirm: false, // Will trigger email confirmation
+            user_metadata: {
+              stripe_customer_id: session.customer,
+              company_id: companyId,
+              customer_id: customerId,
+              created_via: "payment_first",
+              hub_id: hubId,
+            }
+          });
+
+          if (authError) {
+            console.error("❌ Failed to create Supabase Auth user:", authError);
+            throw authError;
+          }
+
+          // Step 4: Create user profile
+          const { error: profileError } = await supabaseAdmin
+            .from("user_profiles")
+            .insert({
+              id: authUser.user.id,
+              hub_id: hubId,
+              email: customerEmail,
+              first_name: null,
+              last_name: null,
+              company_id: companyId,
+              is_active: true,
+              email_confirmed: false,
+              verification_setup_completed: false,
+              metadata: {
+                stripe_customer_id: session.customer,
+                company_id: companyId,
+                customer_id: customerId,
+                created_via: "payment_first",
+                requires_profile_setup: true,
+              }
+            });
+
+          if (profileError) {
+            console.error("❌ Failed to create user profile:", profileError);
+            // Clean up auth user if profile creation fails
+            await supabaseAdmin.auth.admin.deleteUser(authUser.user.id);
+            throw profileError;
+          }
+
+          // Step 5: Create accounts_users relationship
+          const { error: membershipError } = await supabaseAdmin
+            .from("accounts_users")
+            .insert({
+              user_id: authUser.user.id,
+              company_id: companyId,
+              hub_id: hubId,
+              role: "OWNER",
+              is_active: true,
+              permissions: {},
+            });
+
+          if (membershipError) {
+            console.error("❌ Failed to create user-company relationship:", membershipError);
+          }
+
+          console.log("✅ Payment-first flow complete - email confirmation sent to:", customerEmail);
+
         } catch (error) {
-          console.error("❌ Error processing checkout completion:", error);
+          console.error("❌ Error in payment processing:", error);
+          throw error;
         }
         break;
       }
@@ -332,35 +221,33 @@ serve(async (req) => {
         console.log("📊 Subscription event:", subscription.id);
 
         // Update customer subscription status
-        if (subscription.metadata?.company_id) {
-          const status =
-            subscription.status === "active"
-              ? "active"
-              : subscription.status === "trialing"
-                ? "trialing"
-                : "inactive";
+        const status =
+          subscription.status === "active"
+            ? "active"
+            : subscription.status === "trialing"
+              ? "trialing"
+              : "inactive";
 
-          const { error } = await supabaseAdmin
-            .from("customers")
-            .update({
-              subscription_status: status,
-              stripe_subscription_id: subscription.id,
-              subscription_tier: subscription.metadata?.tier || "starter",
-              subscription_ends_at: subscription.current_period_end
-                ? new Date(subscription.current_period_end * 1000).toISOString()
-                : null,
-              trial_ends_at: subscription.trial_end
-                ? new Date(subscription.trial_end * 1000).toISOString()
-                : null,
-              updated_at: new Date().toISOString(),
-            })
-            .eq("stripe_customer_id", subscription.customer);
+        const { error } = await supabaseAdmin
+          .from("customers")
+          .update({
+            subscription_status: status,
+            stripe_subscription_id: subscription.id,
+            subscription_tier: subscription.metadata?.tier || "starter",
+            subscription_ends_at: subscription.current_period_end
+              ? new Date(subscription.current_period_end * 1000).toISOString()
+              : null,
+            trial_ends_at: subscription.trial_end
+              ? new Date(subscription.trial_end * 1000).toISOString()
+              : null,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("stripe_customer_id", subscription.customer);
 
-          if (error) {
-            console.error("Failed to update customer subscription:", error);
-          } else {
-            console.log("✅ Updated customer subscription status");
-          }
+        if (error) {
+          console.error("Failed to update customer subscription:", error);
+        } else {
+          console.log("✅ Updated customer subscription status");
         }
         break;
       }
@@ -370,21 +257,19 @@ serve(async (req) => {
         console.log("❌ Subscription cancelled:", subscription.id);
 
         // Update customer subscription status
-        if (subscription.metadata?.company_id) {
-          const { error } = await supabaseAdmin
-            .from("customers")
-            .update({
-              subscription_status: "cancelled",
-              subscription_ends_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-            })
-            .eq("stripe_customer_id", subscription.customer);
+        const { error } = await supabaseAdmin
+          .from("customers")
+          .update({
+            subscription_status: "cancelled",
+            subscription_ends_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          })
+          .eq("stripe_customer_id", subscription.customer);
 
-          if (error) {
-            console.error("Failed to update cancelled subscription:", error);
-          } else {
-            console.log("✅ Updated customer subscription to cancelled");
-          }
+        if (error) {
+          console.error("Failed to update cancelled subscription:", error);
+        } else {
+          console.log("✅ Updated customer subscription to cancelled");
         }
         break;
       }
@@ -394,10 +279,10 @@ serve(async (req) => {
         console.log("💰 Payment succeeded:", invoice.id);
 
         // Record payment in payment_history
-        if (invoice.metadata?.company_id && invoice.metadata?.user_id) {
+        if (invoice.metadata?.customer_id) {
           const { error } = await supabaseAdmin.from("payment_history").insert({
-            hub_id: parseInt(invoice.metadata.hub_id || "2"),
-            user_profile_id: invoice.metadata.user_id,
+            hub_id: parseInt(invoice.metadata.hub_id || "1"),
+            customer_id: invoice.metadata.customer_id,
             stripe_payment_intent_id: invoice.payment_intent as string,
             amount: invoice.amount_paid,
             currency: invoice.currency,
@@ -417,10 +302,10 @@ serve(async (req) => {
         console.log("❌ Payment failed:", invoice.id);
 
         // Record failed payment
-        if (invoice.metadata?.company_id && invoice.metadata?.user_id) {
+        if (invoice.metadata?.customer_id) {
           const { error } = await supabaseAdmin.from("payment_history").insert({
-            hub_id: parseInt(invoice.metadata.hub_id || "2"),
-            user_profile_id: invoice.metadata.user_id,
+            hub_id: parseInt(invoice.metadata.hub_id || "1"),
+            customer_id: invoice.metadata.customer_id,
             stripe_payment_intent_id: invoice.payment_intent as string,
             amount: invoice.amount_due,
             currency: invoice.currency,
@@ -451,300 +336,5 @@ serve(async (req) => {
     });
   }
 });
-
-// Handle customer.created event
-async function handleCustomerCreated(
-  customer: Stripe.Customer,
-  supabaseAdmin: any
-) {
-  console.log("👤 Processing customer.created:", customer.id);
-
-  // Check if customer already exists in Supabase
-  const { data: existingCustomer } = await supabaseAdmin
-    .from("customers")
-    .select("id")
-    .eq("stripe_customer_id", customer.id)
-    .single();
-
-  if (existingCustomer) {
-    console.log("✅ Customer already exists in Supabase:", existingCustomer.id);
-    return;
-  }
-
-  // Determine if this is from web signup or manual creation
-  const isFromWebSignup =
-    customer.metadata?.payment_first === "true" ||
-    customer.metadata?.created_via === "web_signup";
-
-  const isFromManualCreation =
-    !isFromWebSignup &&
-    (customer.metadata?.created_via === "manual" ||
-      !customer.metadata?.created_via);
-
-  console.log(
-    "📊 Customer source:",
-    isFromWebSignup ? "web_signup" : "manual_creation"
-  );
-
-  const timestamp = new Date().toISOString();
-  const companyId = crypto.randomUUID();
-  const accountNumber = `ACC-${Date.now()}`;
-
-  try {
-    // Step 1: Create company record
-    console.log("🏢 Creating company record");
-    const { data: company, error: companyError } = await supabaseAdmin
-      .from("companies")
-      .insert([
-        {
-          id: companyId,
-          hub_id: parseInt(customer.metadata?.hub_id || "1"),
-          public_name:
-            customer.metadata?.company_name ||
-            customer.name ||
-            "Unknown Company",
-          legal_name:
-            customer.metadata?.company_name ||
-            customer.name ||
-            "Unknown Company",
-          company_account_number: accountNumber,
-          is_active: true,
-          created_at: timestamp,
-          updated_at: timestamp,
-        },
-      ])
-      .select()
-      .single();
-
-    if (companyError) {
-      throw new Error(`Failed to create company: ${companyError.message}`);
-    }
-
-    // Step 2: Create customer record with comprehensive Stripe data
-    console.log("💳 Creating customer record with Stripe data");
-    const customerId = crypto.randomUUID();
-    const { data: customerRecord, error: customerError } = await supabaseAdmin
-      .from("customers")
-      .insert([
-        {
-          id: customerId,
-          hub_id: parseInt(customer.metadata?.hub_id || "1"),
-          company_id: companyId,
-          billing_email: customer.email,
-          customer_type: customer.business_type || "company",
-          stripe_customer_id: customer.id,
-          payment_status: "pending",
-          subscription_status: "inactive",
-          subscription_tier: "free",
-          is_active: true,
-          metadata: {
-            // Core Stripe data
-            synced_from_stripe: true,
-            stripe_created: customer.created,
-            stripe_updated: customer.updated,
-            stripe_metadata: customer.metadata,
-            created_via: isFromWebSignup ? "web_signup" : "manual_creation",
-
-            // Customer information
-            customer_name: customer.name,
-            customer_phone: customer.phone,
-            customer_currency: customer.currency,
-            customer_balance: customer.balance,
-            default_payment_method: customer.default_source,
-
-            // Address information
-            billing_address: customer.address
-              ? {
-                  line1: customer.address.line1,
-                  line2: customer.address.line2,
-                  city: customer.address.city,
-                  state: customer.address.state,
-                  postal_code: customer.address.postal_code,
-                  country: customer.address.country,
-                }
-              : null,
-
-            // Business information
-            business_type: customer.business_type,
-            company_info: customer.company
-              ? {
-                  name: customer.company.name,
-                  tax_id: customer.company.tax_id,
-                  vat_id: customer.company.vat_id,
-                  phone: customer.company.phone,
-                  address: customer.company.address,
-                }
-              : null,
-
-            // Payment information
-            payment_methods: customer.invoice_settings?.default_payment_method,
-            invoice_settings: customer.invoice_settings,
-
-            // Additional Stripe data
-            livemode: customer.livemode,
-            delinquent: customer.delinquent,
-            discount: customer.discount,
-            shipping: customer.shipping,
-            tax_exempt: customer.tax_exempt,
-          },
-          created_at: timestamp,
-          updated_at: timestamp,
-        },
-      ])
-      .select()
-      .single();
-
-    if (customerError) {
-      // Clean up company if customer creation fails
-      await supabaseAdmin.from("companies").delete().eq("id", companyId);
-      throw new Error(`Failed to create customer: ${customerError.message}`);
-    }
-
-    // Step 3: Handle authentication based on source
-    if (isFromManualCreation) {
-      // For manually created customers, send authentication email
-      await handleManualCustomerAuth(
-        customer,
-        customerRecord,
-        company,
-        supabaseAdmin
-      );
-    } else if (isFromWebSignup) {
-      // For web signups, the authentication is handled by the existing signup flow
-      console.log(
-        "🌐 Web signup customer - authentication handled by signup flow"
-      );
-    }
-
-    console.log("✅ Customer webhook processed successfully");
-  } catch (error) {
-    console.error("❌ Error processing customer.created:", error);
-    throw error;
-  }
-}
-
-// Handle manual customer authentication
-async function handleManualCustomerAuth(
-  customer: Stripe.Customer,
-  customerRecord: any,
-  company: any,
-  supabaseAdmin: any
-) {
-  console.log("📧 Setting up authentication for manual customer");
-
-  const timestamp = new Date().toISOString();
-  const verificationId = crypto.randomUUID();
-
-  // Create verification record
-  const { data: verification, error: verificationError } = await supabaseAdmin
-    .from("sms_verifications")
-    .insert([
-      {
-        id: verificationId,
-        hub_id: customerRecord.hub_id,
-        email: customer.email,
-        mobile_phone: customer.phone || null,
-        auth_method: "email",
-        verification_code: Math.random()
-          .toString(36)
-          .substring(2, 8)
-          .toUpperCase(),
-        verification_sent_at: timestamp,
-        created_at: timestamp,
-        updated_at: timestamp,
-        metadata: {
-          stripe_customer_id: customer.id,
-          company_id: company.id,
-          customer_id: customerRecord.id,
-          synced_from_stripe: true,
-          created_via: "manual_creation",
-        },
-      },
-    ])
-    .select()
-    .single();
-
-  if (verificationError) {
-    console.warn("⚠️ Failed to create verification record:", verificationError);
-    return;
-  }
-
-  // Send authentication email
-  try {
-    const { data: emailResult, error: emailError } =
-      await supabaseAdmin.functions.invoke("send-user-notification", {
-        body: {
-          to: customer.email,
-          template: "stripe_customer_auth",
-          data: {
-            company_name: company.public_name,
-            verification_code: verification.verification_code,
-            hub_id: customerRecord.hub_id,
-            stripe_customer_id: customer.id,
-          },
-        },
-      });
-
-    if (emailError) {
-      console.warn("⚠️ Failed to send authentication email:", emailError);
-    } else {
-      console.log("✅ Authentication email sent to:", customer.email);
-    }
-  } catch (emailError) {
-    console.warn("⚠️ Email service error:", emailError);
-  }
-}
-
-// Handle customer.updated event
-async function handleCustomerUpdated(
-  customer: Stripe.Customer,
-  supabaseAdmin: any
-) {
-  console.log("🔄 Processing customer.updated:", customer.id);
-
-  // Update customer record in Supabase
-  const { error: updateError } = await supabaseAdmin
-    .from("customers")
-    .update({
-      billing_email: customer.email,
-      metadata: {
-        synced_from_stripe: true,
-        stripe_updated: customer.updated,
-        stripe_metadata: customer.metadata,
-      },
-      updated_at: new Date().toISOString(),
-    })
-    .eq("stripe_customer_id", customer.id);
-
-  if (updateError) {
-    console.error("❌ Failed to update customer:", updateError);
-  } else {
-    console.log("✅ Customer updated successfully");
-  }
-}
-
-// Handle customer.deleted event
-async function handleCustomerDeleted(
-  customer: Stripe.Customer,
-  supabaseAdmin: any
-) {
-  console.log("🗑️ Processing customer.deleted:", customer.id);
-
-  // Mark customer as inactive (don't delete to preserve data)
-  const { error: updateError } = await supabaseAdmin
-    .from("customers")
-    .update({
-      is_active: false,
-      deleted_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    })
-    .eq("stripe_customer_id", customer.id);
-
-  if (updateError) {
-    console.error("❌ Failed to mark customer as deleted:", updateError);
-  } else {
-    console.log("✅ Customer marked as deleted");
-  }
-}
 
 export default serve;

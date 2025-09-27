@@ -43,7 +43,6 @@ const Navigation = () => {
     return <HubLogo hubType={currentHub} variant="icon" size="lg" />;
   };
 
-  const isLoginPage = location.pathname === "/login";
 
   const handleNavClick = (path: string) => {
     setIsMobileMenuOpen(false);
@@ -130,19 +129,17 @@ const Navigation = () => {
             </button>
           </div>
 
-          {/* Right side - SignUp and Login buttons (Desktop only) */}
+          {/* Right side - CTAs (Desktop only) */}
           <div className="hidden md:flex items-center space-x-4">
             {webEnvironment.features.hubSwitcher() && <HubSwitcher />}
-            {!webEnvironment.isProduction() && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleDirectCheckout()}
-                className="transition-all duration-300 backdrop-blur-sm px-4 py-1.5 text-xs bg-black/50 text-white border border-orange-500/50 hover:bg-orange-500/10 hover:border-orange-400"
-              >
-                Get Started
-              </Button>
-            )}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleDirectCheckout()}
+              className="transition-all duration-300 backdrop-blur-sm px-4 py-1.5 text-xs bg-black/50 text-white border border-orange-500/50 hover:bg-orange-500/10 hover:border-orange-400"
+            >
+              Get Started
+            </Button>
             <Button
               variant="outline"
               size="sm"
@@ -151,15 +148,11 @@ const Navigation = () => {
                   // In production, go to the existing app.{hub}.com
                   window.location.href = `https://app.${currentHub}.com`;
                 } else {
-                  // In development, use the local login flow
-                  navigate("/login");
+                  // In development, go to localhost:3001 (customer app)
+                  window.location.href = "http://localhost:3001";
                 }
               }}
-              className={`transition-all duration-300 backdrop-blur-sm px-4 py-1.5 text-xs ${
-                isLoginPage
-                  ? `${hubColors.bgLight} ${hubColors.text} ${hubColors.border}`
-                  : "bg-black/50 text-white border border-orange-500/50 hover:bg-orange-500/10 hover:border-orange-400"
-              }`}
+              className="transition-all duration-300 backdrop-blur-sm px-4 py-1.5 text-xs bg-black/50 text-white border border-orange-500/50 hover:bg-orange-500/10 hover:border-orange-400"
             >
               Login
             </Button>
@@ -175,15 +168,11 @@ const Navigation = () => {
                   // In production, go to the existing app.{hub}.com
                   window.location.href = `https://app.${currentHub}.com`;
                 } else {
-                  // In development, use the local login flow
-                  navigate("/login");
+                  // In development, go to localhost:3001 (customer app)
+                  window.location.href = "http://localhost:3001";
                 }
               }}
-              className={`transition-all duration-300 backdrop-blur-sm px-3 py-1.5 text-xs ${
-                isLoginPage
-                  ? `${hubColors.bgLight} ${hubColors.text} ${hubColors.border}`
-                  : "bg-black/50 text-white border border-orange-500/50 hover:bg-orange-500/10 hover:border-orange-400"
-              }`}
+              className="transition-all duration-300 backdrop-blur-sm px-3 py-1.5 text-xs bg-black/50 text-white border border-orange-500/50 hover:bg-orange-500/10 hover:border-orange-400"
             >
               Login
             </Button>
@@ -228,17 +217,15 @@ const Navigation = () => {
 
               {/* Mobile-specific CTAs */}
               <div className="pt-4 border-t border-white/10 space-y-3">
-                {!webEnvironment.isProduction() && (
-                  <Button
-                    onClick={() => {
-                      setIsMobileMenuOpen(false);
-                      handleDirectCheckout();
-                    }}
-                    className={`w-full ${hubColors.bg} hover:${hubColors.bgHover} text-white font-semibold py-4 text-base`}
-                  >
-                    Get Started
-                  </Button>
-                )}
+                <Button
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    handleDirectCheckout();
+                  }}
+                  className={`w-full ${hubColors.bg} hover:${hubColors.bgHover} text-white font-semibold py-4 text-base`}
+                >
+                  Get Started
+                </Button>
               </div>
             </div>
           </div>

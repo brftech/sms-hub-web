@@ -29,8 +29,6 @@ const FAQ = lazy(() => import("./pages/FAQ"));
 const Demo = lazy(() => import("./pages/Demo"));
 
 // Import auth pages
-import { Login } from "./pages/Login";
-import { Signup } from "./pages/Signup";
 import { CheckEmail } from "./pages/CheckEmail";
 import { VerifyAuth } from "./pages/VerifyAuth";
 import { TestAuth } from "./pages/TestAuth";
@@ -269,22 +267,6 @@ const AppRoutes = () => {
           }
         />
       )}
-      <Route
-        path="/login"
-        element={
-          <PageTransition>
-            <Login />
-          </PageTransition>
-        }
-      />
-      <Route
-        path="/signup"
-        element={
-          <PageTransition>
-            <Signup />
-          </PageTransition>
-        }
-      />
       <Route
         path="/payment-success"
         element={

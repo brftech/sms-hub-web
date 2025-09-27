@@ -123,14 +123,53 @@ function detectEnvironment(): Environment {
 }
 
 /**
+ * Get Supabase configuration based on environment
+ */
+function getSupabaseConfig(env: Environment) {
+  // Allow environment variable override
+  if (import.meta.env.VITE_SUPABASE_URL) {
+    return {
+      url: import.meta.env.VITE_SUPABASE_URL,
+      anonKey: import.meta.env.VITE_SUPABASE_ANON_KEY || "",
+    };
+  }
+
+  // Environment-specific database configuration
+  switch (env) {
+    case "development":
+      return {
+        url: "https://hmumtnpnyxuplvqcmnfk.supabase.co",
+        anonKey: import.meta.env.VITE_SUPABASE_ANON_KEY || "",
+      };
+    case "production":
+      return {
+        url: "https://fwlivygerbqzowbzxesw.supabase.co", 
+        anonKey: import.meta.env.VITE_SUPABASE_ANON_KEY || "",
+      };
+    case "staging":
+      // Use dev database for staging
+      return {
+        url: "https://hmumtnpnyxuplvqcmnfk.supabase.co",
+        anonKey: import.meta.env.VITE_SUPABASE_ANON_KEY || "",
+      };
+    default:
+      return {
+        url: "https://hmumtnpnyxuplvqcmnfk.supabase.co",
+        anonKey: import.meta.env.VITE_SUPABASE_ANON_KEY || "",
+      };
+  }
+}
+
+/**
  * Get environment configuration
  */
 export function getEnvironmentConfig(): EnvironmentConfig {
   const env = detectEnvironment();
   const hub = detectHub();
+  const supabaseConfig = getSupabaseConfig(env);
 
   const baseConfig = {
-    supabaseUrl: import.meta.env.VITE_SUPABASE_URL || "",
+    supabaseUrl: supabaseConfig.url,
   };
 
   switch (env) {
@@ -199,6 +238,10 @@ if (environmentConfig.enableDebugMode) {
       web: environmentConfig.webAppUrl,
       unified: environmentConfig.unifiedAppUrl,
       supabase: environmentConfig.supabaseUrl,
+    },
+    database: {
+      project: environmentConfig.supabaseUrl.includes('hmumtnpnyxuplvqcmnfk') ? 'web-dev' : 'web-prod',
+      environment: environmentConfig.name,
     },
     features: {
       skipEmail: environmentConfig.skipEmailConfirmation,

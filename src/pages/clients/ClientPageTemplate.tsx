@@ -144,7 +144,15 @@ export default function ClientPageTemplate({
                   Get Started Today
                 </h2>
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
-                  <button className="bg-orange-500 hover:bg-orange-600 text-black font-bold py-3 px-8 rounded-lg transition-colors">
+                  <button
+                    onClick={() => {
+                      const paymentLink = import.meta.env.VITE_STRIPE_PAYMENT_LINK;
+                      if (paymentLink) {
+                        window.location.href = paymentLink;
+                      }
+                    }}
+                    className="bg-orange-500 hover:bg-orange-600 text-black font-bold py-3 px-8 rounded-lg transition-colors"
+                  >
                     {ctaButtonText}
                   </button>
                   <div className="bg-white text-black px-4 py-2 rounded-lg font-mono">

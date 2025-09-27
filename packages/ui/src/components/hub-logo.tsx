@@ -40,6 +40,10 @@ const logoMap: Record<HubType, { text: string; icon: string; main?: string }> =
 
 export const HubLogo = React.forwardRef<HTMLDivElement, HubLogoProps>(
   ({ hubType, variant = "text", size = "md", className, ...props }, ref) => {
+    console.log('HubLogo called with:', { hubType, variant, size });
+    console.log('Available hubTypes:', Object.keys(logoMap));
+    console.log('logoMap[hubType]:', logoMap[hubType]);
+    
     const logos = logoMap[hubType];
     
     // Handle invalid hubType

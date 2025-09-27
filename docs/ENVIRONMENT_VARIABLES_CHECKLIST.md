@@ -16,7 +16,7 @@ https://supabase.com/dashboard/project/vgpovgpwqkjnpnrjelyg/settings/vault
 - [ ] `STRIPE_WEBHOOK_SECRET` - Your Stripe webhook signing secret
 
 ### Application URLs
-- [ ] `PUBLIC_SITE_URL` - Your public website URL (e.g., https://yourdomain.com or http://localhost:3001 for dev)
+- [ ] `PUBLIC_SITE_URL` - Your public website URL (e.g., https://yourdomain.com or http://localhost:3000 for dev)
 
 ### Development Variables (Optional)
 - [ ] `ENVIRONMENT` - Set to "development" for dev mode features
@@ -35,7 +35,7 @@ You can verify these are set by checking the Edge Functions logs after deploymen
 
 ## Local Development
 
-For local development, ensure these are in your `.env.local` file:
+For local development, ensure these are in your `.env.development` file:
 ```
 VITE_SUPABASE_URL=https://vgpovgpwqkjnpnrjelyg.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-key

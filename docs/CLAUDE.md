@@ -1,61 +1,58 @@
-# Claude Code Agent Instructions - SMS Hub Monorepo
+# Claude Code Agent Instructions - SMS Hub Web
 
 ## 🚀 Project Overview
 
-You are working on a **multi-tenant B2B SMS SaaS platform** built as a Turbo monorepo. This is a production-ready platform that provides SMS messaging services to multiple business hubs with distinct branding and features.
+You are working on **SMS Hub Web**, a standalone React application that provides SMS messaging services with multi-hub support. This is a production-ready platform that has been migrated from a monorepo structure to a focused, deployable web application.
 
 ### Core Architecture
 
-- **Monorepo Structure**: Turbo + pnpm workspaces for efficient builds and dependency management
-- **Database**: Supabase (PostgreSQL) with (currently fully disabled) Row Level Security (RLS)
+- **Standalone React App**: Single application with all functionality consolidated
+- **Database**: Supabase (PostgreSQL) with comprehensive authentication
 - **Authentication**: **Magic link authentication** with enhanced security and session isolation
-- **Frontend**: React + Vite + TypeScript with styled-components
-- **Backend**: Supabase Edge Functions (primarily) + Nest.js API (in the future for texting)
+- **Frontend**: React 19 + Vite + TypeScript with styled-components
+- **Backend**: Supabase Edge Functions for server-side operations
 - **Multi-tenancy**: 4 distinct business hubs with isolated data
 
 ## 📁 Project Structure
 
 ```
-sms-hub-monorepo/
-├── apps/
-│   ├── web/          # Marketing & landing pages (port 3000)
-│   ├── unified/      # Main authenticated app (port 3001)
-│   └── api/          # API documentation
+sms-hub-web/
+├── src/
+│   ├── components/     # React components
+│   ├── pages/         # Page components
+│   ├── services/      # API services
+│   ├── config/        # Configuration
+│   └── lib/          # Utilities
 ├── packages/
-│   ├── ui/           # Shared React components
-│   ├── types/        # TypeScript type definitions
-│   ├── config/       # Shared configurations
-│   ├── supabase/     # Supabase client & utilities
-│   ├── utils/        # Shared utilities
-│   ├── hub-logic/    # Hub-specific business logic
-│   ├── services/     # Shared service layer
-│   └── dev-auth/     # Development authentication
-└── supabase/
-    ├── functions/    # Edge Functions
-    └── migrations/   # Database migrations
+│   ├── ui/           # Shared UI components
+│   ├── hub-logic/    # Hub configuration
+│   ├── supabase/     # Supabase client
+│   ├── utils/        # Utility functions
+│   └── logger/       # Logging utilities
+├── supabase/
+│   ├── functions/    # Edge Functions
+│   └── migrations/   # Database migrations
+└── public/           # Static assets
 ```
 
 ## 🏗️ Current Architecture & Status
 
 ### Application Flow
 
-1. **Web App (port 3000)**: Public-facing marketing site
+1. **Web App (port 3000)**: Complete application
    - Landing pages for each hub (Gnymble, PercyMD, PercyText, PercyTech)
    - Lead capture forms with **enhanced B2B/B2C support**
    - **Magic link authentication** gateway (login/signup)
-   - **Proper session isolation** when redirecting to Unified app
-
-2. **Unified App (port 3001)**: Main authenticated application
-   - Consolidated dashboard for all authenticated users
+   - **Consolidated dashboard** for all authenticated users
    - **Fixed role-based access control** (USER, ONBOARDED, ADMIN, SUPERADMIN)
    - **Global view default** for admin dashboard
    - Hub-specific features and branding
    - Admin dashboard with **protected account management** and data cleanup tools
    - **Superadmin protection** (delete buttons disabled for protected accounts)
 
-3. **Enhanced Authentication Flow**:
+2. **Enhanced Authentication Flow**:
    ```
-   Web App (Magic Link) → Enhanced Supabase Auth → Unified App (Dashboard)
+   Web App (Magic Link) → Enhanced Supabase Auth → Dashboard (Same App)
    ```
 
 ### Recent Major Updates (September 2025)

@@ -1,38 +1,38 @@
-# SMS Hub Monorepo - Project Summary
+# SMS Hub Web - Project Summary
 
 ## 🎯 Project Overview
 
-SMS Hub is a **multi-tenant B2B SMS SaaS platform** built as a Turbo monorepo. It provides SMS messaging services to multiple business hubs with distinct branding and features, serving as a comprehensive solution for businesses to manage their SMS communications.
+SMS Hub Web is a **standalone React application** that provides SMS messaging services with multi-hub support. The application has been migrated from a monorepo structure to a focused, deployable web application.
 
 ## 🏗️ Architecture
 
 ### Technology Stack
-- **Monorepo**: Turbo + pnpm workspaces
-- **Frontend**: React 19 + Vite + TypeScript (consistent across all apps)
+- **Frontend**: React 19 + Vite + TypeScript
 - **Styling**: styled-components (CSS-in-JS)
 - **Backend**: Supabase (PostgreSQL + Auth + Edge Functions)
-- **Authentication**: Supabase Auth + SMS OTP
+- **Authentication**: Supabase Auth with magic link flow
 - **State Management**: React Query (TanStack Query)
-- **Type Safety**: Comprehensive TypeScript coverage
+- **Deployment**: Vercel
 
 ### Application Structure
 ```
-sms-hub-monorepo/
-├── apps/
-│   ├── web/         # Marketing & auth gateway (Port 3000)
-│   └── unified/     # Main authenticated app (Port 3001)
+sms-hub-web/
+├── src/
+│   ├── components/     # React components
+│   ├── pages/         # Page components
+│   ├── services/      # API services
+│   ├── config/        # Configuration
+│   └── lib/          # Utilities
 ├── packages/
-│   ├── ui/          # Shared UI components
-│   ├── types/       # TypeScript type definitions
-│   ├── config/      # Shared configurations
-│   ├── supabase/    # Supabase client & queries
-│   ├── utils/       # Utility functions
-│   ├── hub-logic/   # Hub configuration & logic
-│   ├── services/    # Shared service layer
-│   └── dev-auth/    # Development authentication
-└── supabase/
-    ├── functions/   # Edge Functions (Deno)
-    └── migrations/  # Database migrations
+│   ├── ui/           # Shared UI components
+│   ├── hub-logic/    # Hub configuration
+│   ├── supabase/     # Supabase client
+│   ├── utils/        # Utility functions
+│   └── logger/       # Logging utilities
+├── supabase/
+│   ├── functions/    # Edge Functions
+│   └── migrations/   # Database migrations
+└── public/           # Static assets
 ```
 
 ## 🎯 Core Features
@@ -196,37 +196,33 @@ Each hub has distinct:
 ### Getting Started
 ```bash
 # Install dependencies
-pnpm install
+npm install --legacy-peer-deps
 
 # Set up environment variables
-cp .env.example .env.local
+cp .env.example .env.development
 
-# Start development servers
-pnpm dev
+# Start development server
+npm run dev
 ```
 
 ### Key Commands
-- `pnpm dev` - Start both web and unified apps
-- `pnpm build` - Build all applications
-- `pnpm lint` - ESLint across monorepo
-- `pnpm type-check` - TypeScript type checking
-- `turbo run build` - Parallel builds with caching
+- `npm run dev` - Start development server (port 3000)
+- `npm run build` - Build for production
+- `npm run lint` - ESLint linting
+- `npm run type-check` - TypeScript type checking
 
-### Port Assignments
-- **Web App**: 3000 (marketing, auth gateway)
-- **Unified App**: 3001 (main authenticated application)
+### Port Assignment
+- **Web App**: Port 3000 (marketing and auth gateway)
 
 ## 📊 Performance & Optimization
 
 ### Build Optimizations
-- Turbo build caching
 - Code splitting in Vite
 - React Query data caching
 - Styled-components runtime optimization
 
 ### Database Optimizations
 - Efficient queries with proper indexing
-- Row Level Security (RLS) for data isolation
 - Connection pooling via Supabase
 
 ## 🎯 Recent Achievements (September 2025)

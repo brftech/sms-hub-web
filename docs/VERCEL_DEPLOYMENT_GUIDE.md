@@ -1,50 +1,43 @@
-# SMS Hub Deployment Guide
+# SMS Hub Web Deployment Guide
 
 ## 🏗️ Architecture Overview
 
-- **2 Applications**: Web (marketing) + Unified (dashboard)
-- **PNPM Monorepo** with shared packages
-- **Separate Vercel projects** for each app
+- **1 Application**: Standalone React web app
+- **NPM Package Management** with internal packages
+- **Single Vercel project** for the web app
 - **Hub-specific branding** determined by domain
 
-## 📋 Current Vercel Projects
+## 📋 Current Vercel Project
 
 | Project           | Domain              | Purpose          |
 | ----------------- | ------------------- | ---------------- |
-| `sms-hub-web`     | www.gnymble.com     | Marketing & Auth |
-| `sms-hub-unified` | unified.gnymble.com | Main Dashboard   |
+| `sms-hub-web`     | www.gnymble.com     | Marketing, Auth & Dashboard |
 
 ## ⚠️ CRITICAL DEPLOYMENT RULES
 
 **ALWAYS FOLLOW THESE RULES TO PREVENT ISSUES:**
 
-1. **ALWAYS** run `vercel` from individual app directories (`apps/web`, `apps/unified`)
-2. **NEVER** run deployment from monorepo root - this creates conflicts
+1. **ALWAYS** run `vercel` from project root directory
+2. **NEVER** run deployment from subdirectories - this creates conflicts
 3. **NEVER** use `--cwd` flag with vercel commands
 4. **ALWAYS** use the deployment scripts provided
-5. **LINK each app once** - run `vercel link --project=<project-name> --yes` in each app directory
-6. **NEVER** create a root `.vercel` directory - each app has its own `.vercel` directory
+5. **LINK project once** - run `vercel link --project=<project-name> --yes` in project root
+6. **NEVER** create multiple `.vercel` directories
 
 ## 🚀 Deployment Commands
 
 ### Simple deployment (recommended):
 
 ```bash
-# Deploy web app
-cd apps/web && vercel --prod --yes
-
-# Deploy unified app
-cd apps/unified && vercel --prod --yes
+# Deploy from project root
+vercel --prod --yes
 ```
 
-### One-time setup (run once per app):
+### One-time setup (run once):
 
 ```bash
-# Link web app to Vercel project
-cd apps/web && vercel link --project=sms-hub-web --yes
-
-# Link unified app to Vercel project
-cd apps/unified && vercel link --project=sms-hub-unified --yes
+# Link project to Vercel project
+vercel link --project=sms-hub-web --yes
 ```
 
 ### Optional: Create simple npm scripts
@@ -54,9 +47,7 @@ Add to root `package.json`:
 ```json
 {
   "scripts": {
-    "deploy:web": "cd apps/web && vercel --prod --yes",
-    "deploy:unified": "cd apps/unified && vercel --prod --yes",
-    "deploy:all": "npm run deploy:web && npm run deploy:unified"
+    "deploy": "vercel --prod --yes"
   }
 }
 ```
@@ -64,35 +55,33 @@ Add to root `package.json`:
 Then use:
 
 ```bash
-npm run deploy:web
-npm run deploy:unified
-npm run deploy:all
+npm run deploy
 ```
 
 ## ⚙️ Vercel Configuration
 
 ### Dashboard Settings (Critical)
 
-Both projects should have these settings in Vercel Dashboard:
+The project should have these settings in Vercel Dashboard:
 
-- **Root Directory**: `apps/web` (or `apps/unified`)
-- **Build Command**: `pnpm build --filter=@sms-hub/web` (or `@sms-hub/unified`)
+- **Root Directory**: `.` (project root)
+- **Build Command**: `npm run build`
 - **Output Directory**: `dist`
-- **Install Command**: `pnpm install`
+- **Install Command**: `npm install`
 - **Framework**: Vite
 
-### vercel.json Files
+### vercel.json File
 
-Each app has its own `vercel.json`:
+The project has a single `vercel.json`:
 
-**apps/web/vercel.json:**
+**vercel.json:**
 
 ```json
 {
-  "buildCommand": "pnpm build --filter @sms-hub/web",
+  "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "framework": null,
-  "installCommand": "pnpm install",
+  "installCommand": "npm install",
   "redirects": [
     {
       "source": "/signup",
@@ -109,40 +98,25 @@ Each app has its own `vercel.json`:
 }
 ```
 
-**apps/unified/vercel.json:**
-
-```json
-{
-  "buildCommand": "pnpm build --filter @sms-hub/unified",
-  "outputDirectory": "dist",
-  "framework": null,
-  "installCommand": "pnpm install"
-}
-```
-
 ## 🌐 Domain Configuration
 
 All domains are configured in Vercel:
 
 ### Gnymble
 
-- Marketing: www.gnymble.com → sms-hub-web
-- App: unified.gnymble.com → sms-hub-unified
+- Website: www.gnymble.com → sms-hub-web
 
 ### PercyTech
 
-- Marketing: www.percytech.com → sms-hub-web
-- App: unified.percytech.com → sms-hub-unified
+- Website: www.percytech.com → sms-hub-web
 
 ### PercyMD (planned)
 
-- Marketing: www.percymd.com → sms-hub-web
-- App: unified.percymd.com → sms-hub-unified
+- Website: www.percymd.com → sms-hub-web
 
 ### PercyText (planned)
 
-- Marketing: www.percytext.com → sms-hub-web
-- App: unified.percytext.com → sms-hub-unified
+- Website: www.percytext.com → sms-hub-web
 
 ## 🔧 Environment Variables
 

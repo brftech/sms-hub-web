@@ -41,7 +41,7 @@ As of **2025-09-14 23:25 UTC**, the following Edge Functions are deployed and ac
 - **Email Confirmation**: Required (not skipped)
 - **Dashboard**: https://supabase.com/dashboard/project/howjinnvvtvaufihwers/functions
 
-### Development (sms-hub-monorepo)
+### Development (sms-hub-web)
 - **Project ID**: `vgpovgpwqkjnpnrjelyg`
 - **Database Password**: `Ali1dog2@@##`
 - **Environment**: `development`
@@ -52,10 +52,10 @@ As of **2025-09-14 23:25 UTC**, the following Edge Functions are deployed and ac
 
 ### 1. Hub-Specific Domain Routing
 The `signup-native` function now automatically routes users to their hub-specific domain:
-- Gnymble → `www.gnymble.com` → `unified.gnymble.com`
-- PercyTech → `www.percytech.com` → `unified.percytech.com`
-- PercyMD → `www.percymd.com` → `unified.percymd.com`
-- PercyText → `www.percytext.com` → `unified.percytext.com`
+- Gnymble → `www.gnymble.com`
+- PercyTech → `www.percytech.com`
+- PercyMD → `www.percymd.com`
+- PercyText → `www.percytext.com`
 
 ### 2. Superadmin Protection
 The `delete-account` function has built-in protection for critical accounts:

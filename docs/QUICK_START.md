@@ -1,9 +1,9 @@
-# SMS Hub - Quick Start Guide
+# SMS Hub Web - Quick Start Guide
 
 ## 🚀 Getting Started
 
 ### Prerequisites
-- Node.js 18+ and pnpm
+- Node.js 18+ and npm
 - Supabase account and project
 - Stripe account (for payments)
 - Zapier account (for SMS)
@@ -12,21 +12,20 @@
 ```bash
 # Clone and install
 git clone <repository-url>
-cd sms-hub-monorepo
-pnpm install
+cd sms-hub-web
+npm install --legacy-peer-deps
 
 # Set up environment
-cp .env.example .env.local
+cp .env.example .env.development
 # Add your Supabase and other API keys
 
 # Start development
-pnpm dev
+npm run dev
 ```
 
 ### Access Points
-- **Web App**: http://localhost:3000 (marketing, **magic link auth**)
-- **Unified App**: http://localhost:3001 (main app with **global view default**)
-- **Development Superadmin**: http://localhost:3001/?superadmin=dev123
+- **Web App**: http://localhost:3000 (marketing and auth gateway)
+- **Development Superadmin**: http://localhost:3000/?superadmin=dev123
 - **Protected Superadmin Accounts**:
   - superadmin@percytech.com (protected from deletion)
   - superadmin@gnymble.com (protected from deletion)
@@ -58,13 +57,13 @@ pnpm dev
 
 ### Type Checking
 ```bash
-pnpm type-check
+npm run type-check
 ```
 
 ### Database Operations
 ```bash
 # Generate types
-supabase gen types typescript --project-id vgpovgpwqkjnpnrjelyg > packages/types/src/database-comprehensive.ts
+supabase gen types typescript --project-id vgpovgpwqkjnpnrjelyg > packages/supabase/src/types.ts
 
 # Run migrations
 supabase db push
@@ -106,9 +105,9 @@ supabase db push
 
 ## 📁 Key Files
 
-- `apps/web/src/pages/Signup.tsx` - User signup
-- `apps/unified/src/pages/admin/Dashboard.tsx` - Admin dashboard
-- `packages/types/src/database-comprehensive.ts` - Database types
+- `src/pages/Signup.tsx` - User signup
+- `src/pages/Login.tsx` - User login
+- `packages/supabase/src/types.ts` - Database types
 - `supabase/functions/` - Edge Functions
 
 ## 🎯 Development Rules

@@ -1,4 +1,9 @@
-// Minimal types for supabase package
+// Comprehensive database types for SMS Hub Web standalone app
+// Re-export from the main database schema
+
+export * from './database'
+
+// Legacy simplified interfaces for backward compatibility
 export interface Database {
   public: {
     Tables: any;
@@ -8,6 +13,7 @@ export interface Database {
   }
 }
 
+// Simplified Company interface (legacy)
 export interface Company {
   id: string;
   name: string;
@@ -15,6 +21,7 @@ export interface Company {
   is_active?: boolean;
 }
 
+// Simplified UserProfile interface (legacy)
 export interface UserProfile {
   id: string;
   email: string;

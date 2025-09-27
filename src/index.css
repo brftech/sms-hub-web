@@ -6,4 +6,27 @@
 @import "@sms-hub/ui/styles/percymd.css";
 @import "@sms-hub/ui/styles/percytext.css";
 
-/* Web app specific overrides (if any) */
+/* Web app specific overrides */
+/* Mobile Phone Demo Optimizations */
+@media (max-width: 768px) {
+  .mobile-phone-demo {
+    transform: scale(0.75) !important;
+    margin: 20px 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .mobile-phone-demo {
+    transform: scale(0.65) !important;
+    margin: 15px 0;
+  }
+}
+
+/* Better mobile button spacing */
+@media (max-width: 768px) {
+  .mobile-cta-button {
+    padding: 16px 24px !important;
+    font-size: 18px !important;
+    min-height: 56px;
+  }
+}

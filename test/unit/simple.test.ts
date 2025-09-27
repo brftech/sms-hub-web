@@ -1,4 +1,5 @@
-// Simple test to verify Jest setup works
+// Simple test to verify Vitest setup works
+/// <reference types="vitest/globals" />
 describe("Simple Test", () => {
   it("should work", () => {
     expect(1 + 1).toBe(2);

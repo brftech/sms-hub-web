@@ -9,7 +9,7 @@ export interface ChatMessage {
   timestamp: Date;
   businessName?: string; // For business messages
   metadata?: {
-    [key: string]: any;
+    [key: string]: unknown;
   };
 }
 

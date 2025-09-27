@@ -12,13 +12,13 @@
   "categories": ["business", "productivity", "communication"],
   "icons": [
     {
-      "src": "/favicon.svg",
+      "src": "/gnymble-icon-logo.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any"
     },
     {
-      "src": "/apple-touch-icon-fixed.svg",
+      "src": "/gnymble-icon-logo.svg",
       "sizes": "180x180",
       "type": "image/svg+xml"
     }

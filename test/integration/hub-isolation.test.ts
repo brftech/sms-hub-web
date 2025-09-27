@@ -1,3 +1,4 @@
+/// <reference types="vitest/globals" />
 import {
   createTestClient,
   createTestUser,

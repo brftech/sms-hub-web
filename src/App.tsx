@@ -14,17 +14,19 @@ import { useScrollToTop } from "@sms-hub/utils";
 import { webEnvironment } from "./config/webEnvironment";
 import { useEffect } from "react";
 
-// Import main pages directly (frequently accessed)
+// Import critical pages directly (frequently accessed)
 import Home from "./pages/Home";
 import Contact from "./pages/Contact";
-import Terms from "./pages/Terms";
-import Privacy from "./pages/Privacy";
-import About from "./pages/About";
-import Pricing from "./pages/Pricing";
-import Landing from "./pages/Landing";
-import CigarLanding from "./pages/CigarLanding";
-import FAQ from "./pages/FAQ";
-import Demo from "./pages/Demo";
+
+// Lazy load larger pages for better performance
+const Terms = lazy(() => import("./pages/Terms"));
+const Privacy = lazy(() => import("./pages/Privacy"));
+const About = lazy(() => import("./pages/About"));
+const Pricing = lazy(() => import("./pages/Pricing"));
+const Landing = lazy(() => import("./pages/Landing"));
+const CigarLanding = lazy(() => import("./pages/CigarLanding"));
+const FAQ = lazy(() => import("./pages/FAQ"));
+const Demo = lazy(() => import("./pages/Demo"));
 
 // Import auth pages
 import { Login } from "./pages/Login";
@@ -41,6 +43,16 @@ const ClientPrivacy = lazy(() => import("./pages/clients/ClientPrivacy"));
 const ClientTerms = lazy(() => import("./pages/clients/ClientTerms"));
 
 const queryClient = new QueryClient();
+
+// Enhanced loading component for better UX
+const PageLoader = () => (
+  <div className="min-h-screen bg-black flex items-center justify-center">
+    <div className="text-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
+      <p className="text-white">Loading...</p>
+    </div>
+  </div>
+);
 
 // Component to set data-hub attribute on body
 const HubThemeWrapper = ({ children }: { children: React.ReactNode }) => {
@@ -68,11 +80,7 @@ const AppRoutes = () => {
 
   // Show Home page as default; Landing page is available at /landing
   // But if we're on cigar subdomain, always show CigarLanding
-  let DefaultComponent = Home;
-
-  if (isCigarSubdomain) {
-    DefaultComponent = CigarLanding;
-  }
+  const DefaultComponent = isCigarSubdomain ? CigarLanding : Home;
 
   return (
     <Routes>
@@ -81,7 +89,9 @@ const AppRoutes = () => {
         path="/landing"
         element={
           <PageTransition>
-            <Landing />
+            <Suspense fallback={<PageLoader />}>
+              <Landing />
+            </Suspense>
           </PageTransition>
         }
       />
@@ -89,7 +99,9 @@ const AppRoutes = () => {
         path="/cigar"
         element={
           <PageTransition>
-            <CigarLanding />
+            <Suspense fallback={<PageLoader />}>
+              <CigarLanding />
+            </Suspense>
           </PageTransition>
         }
       />
@@ -114,7 +126,9 @@ const AppRoutes = () => {
         path="/faq"
         element={
           <PageTransition>
-            <FAQ />
+            <Suspense fallback={<PageLoader />}>
+              <FAQ />
+            </Suspense>
           </PageTransition>
         }
       />
@@ -122,7 +136,9 @@ const AppRoutes = () => {
         path="/terms"
         element={
           <PageTransition>
-            <Terms />
+            <Suspense fallback={<PageLoader />}>
+              <Terms />
+            </Suspense>
           </PageTransition>
         }
       />
@@ -130,7 +146,9 @@ const AppRoutes = () => {
         path="/privacy"
         element={
           <PageTransition>
-            <Privacy />
+            <Suspense fallback={<PageLoader />}>
+              <Privacy />
+            </Suspense>
           </PageTransition>
         }
       />
@@ -203,7 +221,9 @@ const AppRoutes = () => {
         path="/about"
         element={
           <PageTransition>
-            <About />
+            <Suspense fallback={<PageLoader />}>
+              <About />
+            </Suspense>
           </PageTransition>
         }
       />
@@ -211,7 +231,9 @@ const AppRoutes = () => {
         path="/pricing"
         element={
           <PageTransition>
-            <Pricing />
+            <Suspense fallback={<PageLoader />}>
+              <Pricing />
+            </Suspense>
           </PageTransition>
         }
       />
@@ -219,7 +241,9 @@ const AppRoutes = () => {
         path="/demo"
         element={
           <PageTransition>
-            <Demo />
+            <Suspense fallback={<PageLoader />}>
+              <Demo />
+            </Suspense>
           </PageTransition>
         }
       />
@@ -315,12 +339,7 @@ const App = () => (
           <SonnerToaster />
           <HubProvider environment={webEnvironment} defaultHub="gnymble">
             <HubThemeWrapper>
-              <BrowserRouter
-                future={{
-                  v7_startTransition: true,
-                  v7_relativeSplatPath: true,
-                }}
-              >
+              <BrowserRouter>
                 <AppRoutes />
               </BrowserRouter>
             </HubThemeWrapper>

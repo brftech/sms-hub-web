@@ -6,10 +6,10 @@ export * from './database'
 // Legacy simplified interfaces for backward compatibility
 export interface Database {
   public: {
-    Tables: any;
-    Views: any;
-    Functions: any;
-    Enums: any;
+    Tables: Record<string, unknown>;
+    Views: Record<string, unknown>;
+    Functions: Record<string, unknown>;
+    Enums: Record<string, unknown>;
   }
 }
 

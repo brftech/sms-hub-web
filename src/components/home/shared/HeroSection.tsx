@@ -72,9 +72,9 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
 
   return (
     <div className="min-h-screen bg-black pt-16 pb-20 relative overflow-hidden">
-      <div className="max-w-4xl mx-auto px-6 text-center py-12 md:py-20 relative">
+      <div className="max-w-4xl mx-auto px-4 md:px-6 text-center py-8 md:py-12 lg:py-20 relative">
         {/* Logo */}
-        <div className="mb-16 md:mb-20">
+        <div className="mb-12 md:mb-16 lg:mb-20">
           <HubLogo
             hubType={currentHub}
             variant="main"
@@ -86,7 +86,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
 
         {/* Main message with typing animation */}
         <h1
-          className="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-16 md:mb-20 leading-tight"
+          className="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-12 md:mb-16 lg:mb-20 leading-tight"
           style={{ fontFamily: "Inter, system-ui, sans-serif" }}
         >
           <span>
@@ -99,17 +99,17 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           </span>
         </h1>
 
-        <div className="flex flex-col sm:flex-row gap-4 justify-center mb-20 md:mb-24">
+        <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16 md:mb-20 lg:mb-24">
           <button
             onClick={() => navigate("/demo")}
-            className="border-2 border-orange-600 text-orange-400 hover:bg-orange-600 hover:text-white font-bold py-4 px-8 rounded-lg transition-colors duration-200 text-lg"
+            className="mobile-cta-button border-2 border-orange-600 text-orange-400 hover:bg-orange-600 hover:text-white font-bold py-4 px-8 rounded-lg transition-colors duration-200 text-lg w-full sm:w-auto"
           >
             See Demo
           </button>
         </div>
 
         {/* Bold tagline - moved lower */}
-        <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-amber-400 mb-12 md:mb-16">
+        <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-amber-400 mb-8 md:mb-12 lg:mb-16">
           <div className="mb-2">{content.tagline.line1}</div>
           <div>{content.tagline.line2}</div>
         </h2>

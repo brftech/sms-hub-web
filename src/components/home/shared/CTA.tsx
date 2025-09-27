@@ -59,7 +59,7 @@ export const CTASection: React.FC = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
               onClick={() => navigate("/contact")}
-              className="px-10 py-4 bg-white hub-text-primary font-bold rounded-sm hover:bg-gray-100 transition-all duration-300 text-sm tracking-wide uppercase shadow-lg"
+              className="mobile-cta-button px-8 md:px-10 py-4 bg-white hub-text-primary font-bold rounded-sm hover:bg-gray-100 transition-all duration-300 text-sm md:text-base tracking-wide uppercase shadow-lg w-full sm:w-auto"
             >
               Contact Us
             </button>

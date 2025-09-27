@@ -78,9 +78,9 @@ export const ProblemSolutionSection: React.FC = () => {
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-12 md:gap-16 lg:gap-20 items-center">
+        <div className="grid lg:grid-cols-2 gap-8 md:gap-12 lg:gap-16 items-center">
           {/* Left: The Hard Truth */}
-          <div className="space-y-8 md:space-y-12">
+          <div className="space-y-6 md:space-y-8 lg:space-y-12">
             {/* What We Deliver */}
             <div
               className={`border-l-4 ${getPrimaryBorderClass()} pl-6 md:pl-8`}

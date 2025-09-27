@@ -5,7 +5,7 @@ export const PhoneDemo: React.FC = () => {
   const { currentHub } = useHub();
 
   return (
-    <div className="phone-3d mx-auto">
+    <div className="phone-3d mx-auto mobile-phone-demo">
       <div className="phone-screen">
         {/* Phone Status Bar */}
         <div className="phone-status-bar">

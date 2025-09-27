@@ -166,7 +166,7 @@ const Navigation = () => {
           </div>
 
           {/* Mobile menu button */}
-          <div className="md:hidden flex items-center space-x-3">
+          <div className="md:hidden flex items-center space-x-2">
             <Button
               variant="outline"
               size="sm"
@@ -189,7 +189,7 @@ const Navigation = () => {
             </Button>
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="text-white hover:text-gray-300 transition-colors p-1"
+              className="text-white hover:text-gray-300 transition-colors p-2"
               aria-label="Toggle mobile menu"
             >
               {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -234,26 +234,11 @@ const Navigation = () => {
                       setIsMobileMenuOpen(false);
                       handleDirectCheckout();
                     }}
-                    className={`w-full ${hubColors.bg} hover:${hubColors.bgHover} text-white font-semibold py-3 text-base`}
+                    className={`w-full ${hubColors.bg} hover:${hubColors.bgHover} text-white font-semibold py-4 text-base`}
                   >
                     Get Started
                   </Button>
                 )}
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    if (webEnvironment.isProduction()) {
-                      // In production, go to the existing app.{hub}.com
-                      window.location.href = `https://app.${currentHub}.com`;
-                    } else {
-                      // In development, use the local login flow
-                      navigate("/login");
-                    }
-                  }}
-                  className="w-full bg-black/50 text-white border border-orange-500/50 hover:bg-orange-500/10 hover:border-orange-400 font-medium py-3 text-base"
-                >
-                  Login
-                </Button>
               </div>
             </div>
           </div>

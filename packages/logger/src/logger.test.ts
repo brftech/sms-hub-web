@@ -1,20 +1,22 @@
+/// <reference types="vitest/globals" />
 import { createLogger } from './logger';
+import { vi } from 'vitest';
 
 describe('Logger', () => {
-  let consoleLogSpy: jest.SpyInstance;
-  let consoleErrorSpy: jest.SpyInstance;
-  let consoleWarnSpy: jest.SpyInstance;
-  let consoleDebugSpy: jest.SpyInstance;
+  let consoleLogSpy: ReturnType<typeof vi.spyOn>;
+  let consoleErrorSpy: ReturnType<typeof vi.spyOn>;
+  let consoleWarnSpy: ReturnType<typeof vi.spyOn>;
+  let consoleDebugSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
-    consoleLogSpy = jest.spyOn(console, 'log').mockImplementation();
-    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
-    consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation();
-    consoleDebugSpy = jest.spyOn(console, 'debug').mockImplementation();
+    consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    consoleDebugSpy = vi.spyOn(console, 'debug').mockImplementation(() => {});
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   describe('Log Levels', () => {
@@ -110,7 +112,7 @@ describe('Logger', () => {
       expect(consoleErrorSpy).toHaveBeenCalled();
       const errorArg = consoleErrorSpy.mock.calls[0][1];
       expect(errorArg).toBeInstanceOf(Error);
-      expect(errorArg.message).toBe('String error');
+      expect((errorArg as Error).message).toBe('String error');
     });
   });
 

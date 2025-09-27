@@ -9,11 +9,16 @@ export default defineConfig(({ mode }) => ({
     host: "localhost",
     port: 3000,
   },
-  plugins: [react()],
+  plugins: [react({
+    jsxRuntime: 'automatic',
+    jsxImportSource: 'react'
+  })],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
       "@sms-hub/ui": path.resolve(__dirname, "./packages/ui/src"),
+      "react": path.resolve(__dirname, "./node_modules/react"),
+      "react-dom": path.resolve(__dirname, "./node_modules/react-dom"),
     },
   },
   build: {
@@ -23,16 +28,51 @@ export default defineConfig(({ mode }) => ({
       compress: {
         drop_console: mode === "production",
         drop_debugger: mode === "production",
+        pure_funcs: mode === "production" ? ["console.log", "console.info"] : [],
       },
     },
     rollupOptions: {
       output: {
-        manualChunks: {
-          // Split vendor libraries into separate chunks
-          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          'ui-vendor': ['@sms-hub/ui'],
-          'query-vendor': ['@tanstack/react-query'],
-          'supabase-vendor': ['@supabase/supabase-js'],
+        manualChunks: (id) => {
+          // More aggressive chunk splitting for better caching
+          if (id.includes('node_modules')) {
+            // Core React ecosystem
+            if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) {
+              return 'react-core';
+            }
+            // UI components and styling
+            if (id.includes('@radix-ui') || id.includes('lucide-react') || id.includes('styled-components')) {
+              return 'ui-components';
+            }
+            // Data fetching and state
+            if (id.includes('@tanstack/react-query') || id.includes('@supabase/supabase-js')) {
+              return 'data-layer';
+            }
+            // Form handling
+            if (id.includes('react-hook-form') || id.includes('zod')) {
+              return 'forms';
+            }
+            // Charts and visualization
+            if (id.includes('recharts') || id.includes('@tanstack/react-table')) {
+              return 'charts';
+            }
+            // Everything else
+            return 'vendor';
+          }
+          // Split our own packages
+          if (id.includes('@sms-hub/ui')) {
+            return 'sms-ui';
+          }
+          if (id.includes('@sms-hub/supabase') || id.includes('@sms-hub/hub-logic')) {
+            return 'sms-core';
+          }
+          // Split large pages
+          if (id.includes('/pages/Pricing.tsx')) {
+            return 'pricing-page';
+          }
+          if (id.includes('/pages/FAQ.tsx')) {
+            return 'faq-page';
+          }
         },
         // Optimize chunk names
         chunkFileNames: 'assets/[name]-[hash].js',
@@ -40,8 +80,10 @@ export default defineConfig(({ mode }) => ({
         assetFileNames: 'assets/[name]-[hash].[ext]',
       },
     },
-    chunkSizeWarningLimit: 500, // Reduce warning limit to 500KB
+    chunkSizeWarningLimit: 300, // Stricter limit for better performance
     sourcemap: mode === "development",
+    // Enable CSS code splitting
+    cssCodeSplit: true,
   },
   optimizeDeps: {
     include: [
@@ -54,5 +96,12 @@ export default defineConfig(({ mode }) => ({
       "@sms-hub/supabase",
       "@sms-hub/utils",
     ],
+    // Exclude heavy dependencies from pre-bundling
+    exclude: ["@radix-ui/react-accordion", "@radix-ui/react-dialog"],
+  },
+  // Performance optimizations
+  esbuild: {
+    target: 'es2020',
+    drop: mode === 'production' ? ['console', 'debugger'] : [],
   },
 }));

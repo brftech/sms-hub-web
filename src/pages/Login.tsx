@@ -49,7 +49,7 @@ const ForgotPasswordLink = styled(Link)`
 const supabase = getSupabaseClient();
 
 export function Login() {
-  const { hubConfig } = useHub();
+  const { hubConfig, currentHub } = useHub();
   // const navigate = useNavigate(); // Not used after magic link implementation
   // Removed devAuth - using real Supabase authentication
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -187,7 +187,7 @@ export function Login() {
         <CardHeader>
           <div className="text-center mb-6">
             <HubLogo
-              hubType={hubConfig.id}
+              hubType={currentHub}
               variant="icon"
               size="md"
               className="mx-auto mb-4"

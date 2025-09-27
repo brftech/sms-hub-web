@@ -101,7 +101,8 @@ supabase/config.toml.local
 packages/types/src/database-comprehensive.ts
 packages/supabase/src/database-comprehensive.ts
 
-# Local env file
+# Local env files (highest priority for Vite)
+.env.local
 .env*.local
 
 # Turbo

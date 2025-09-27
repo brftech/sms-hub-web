@@ -121,7 +121,7 @@ const PasswordStrengthBar = styled.div<{ $strength: number }>`
 `;
 
 export function Signup() {
-  const { hubConfig } = useHub();
+  const { hubConfig, currentHub } = useHub();
   const [searchParams] = useSearchParams();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -754,7 +754,7 @@ export function Signup() {
           <CardHeader>
             <div className="text-center mb-6">
               <HubLogo
-                hubType={hubConfig.id}
+                hubType={currentHub}
                 variant="icon"
                 size="md"
                 className="mx-auto mb-4"
@@ -781,7 +781,7 @@ export function Signup() {
         <CardHeader>
           <div className="text-center mb-6">
             <HubLogo
-              hubType={hubConfig.id}
+              hubType={currentHub}
               variant="icon"
               size="md"
               className="mx-auto mb-4"

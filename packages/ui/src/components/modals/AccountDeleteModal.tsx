@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Trash2, AlertTriangle } from "lucide-react";
 import { BaseModal, ModalButtonGroup, ModalButton } from "./BaseModal";
-import type { UnifiedAccount } from "../types";
+import type { UnifiedAccount } from "../../types";
 
 interface AccountDeleteModalProps {
   isOpen: boolean;
@@ -75,11 +75,11 @@ export const AccountDeleteModal: React.FC<AccountDeleteModalProps> = ({
         <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg p-4 border border-gray-200">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-gray-900 rounded-full flex items-center justify-center text-white font-semibold text-sm">
-              {account.name.charAt(0).toUpperCase()}
+              {account.name?.charAt(0).toUpperCase() || 'A'}
             </div>
             <div className="flex-1 min-w-0">
               <h3 className="text-sm font-semibold text-gray-900 truncate">
-                {account.name}
+                {account.name || 'Unknown Account'}
               </h3>
               <p className="text-xs text-gray-600 truncate">{account.email}</p>
             </div>

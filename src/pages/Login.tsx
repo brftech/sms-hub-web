@@ -194,7 +194,7 @@ export function Login() {
             />
             <CardTitle className="text-2xl font-bold">Welcome Back</CardTitle>
             <CardDescription>
-              Log in to your {hubConfig.displayName} account
+              Log in to your {hubConfig.name} account
             </CardDescription>
           </div>
         </CardHeader>

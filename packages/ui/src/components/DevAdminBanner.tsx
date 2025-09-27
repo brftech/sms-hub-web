@@ -85,17 +85,10 @@ const CloseButton = styled.button`
 `;
 
 interface DevAdminBannerProps {
-  environment: {
-    isDevelopment?: () => boolean;
-    isProduction?: () => boolean;
-    isTest?: () => boolean;
-    [key: string]: unknown;
-  };
   onboardingPath?: string;
 }
 
 export function DevAdminBanner({
-  environment,
   onboardingPath = "/onboarding",
 }: DevAdminBannerProps) {
   // const devAuth = useDevAuth({

@@ -8,7 +8,7 @@ import {
   Users,
 } from "lucide-react";
 import { BaseModal } from "./BaseModal";
-import type { UnifiedAccount } from "../types";
+import type { UnifiedAccount } from "../../types";
 
 interface AccountViewModalProps {
   isOpen: boolean;
@@ -57,8 +57,8 @@ export const AccountViewModal: React.FC<AccountViewModalProps> = ({
     <BaseModal
       isOpen={isOpen}
       onClose={onClose}
-      title={account.name}
-      subtitle={getEntityTypeLabel(account.type)}
+      title={account.name || 'Unknown Account'}
+      subtitle={getEntityTypeLabel(account.type || 'account')}
       icon={<Eye className="w-5 h-5" />}
       variant="view"
       size="sm"

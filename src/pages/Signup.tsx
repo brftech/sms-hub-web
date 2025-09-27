@@ -727,7 +727,7 @@ export function Signup() {
       case 3:
         return "Secure your account";
       default:
-        return "Start your business with " + hubConfig.displayName;
+        return "Start your business with " + hubConfig.name;
     }
   };
 

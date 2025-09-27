@@ -88,7 +88,7 @@ export function Layout() {
               <div className="flex-1" />
               <div className="flex items-center space-x-4">
                 <span className="text-sm text-muted-foreground">
-                  {hubConfig.displayName}
+                  {hubConfig.name}
                 </span>
               </div>
             </div>

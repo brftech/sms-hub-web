@@ -260,7 +260,7 @@ export function LiveMessagingProvider({
         const message: ChatMessage = {
           ...messageData,
           id: `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-          timestamp: new Date().toISOString(),
+          timestamp: new Date(),
         };
 
         dispatch({ type: "ADD_MESSAGE", message });

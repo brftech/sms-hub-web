@@ -12,6 +12,7 @@ export interface Company {
   id: string;
   name: string;
   hub_id: number;
+  is_active?: boolean;
 }
 
 export interface UserProfile {
@@ -19,6 +20,12 @@ export interface UserProfile {
   email: string;
   first_name?: string;
   last_name?: string;
+  company_id?: string;
+  hub_id?: number;
+  role?: string;
+  account_number?: string;
+  created_at?: string;
+  is_active?: boolean;
 }
 
 export interface SignupData {
@@ -31,4 +38,5 @@ export interface VerificationData {
   email?: string;
   mobile_phone?: string;
   verification_code: string;
+  verification_id?: string;
 }

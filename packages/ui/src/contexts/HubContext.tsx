@@ -130,7 +130,7 @@ export const HubProvider: React.FC<HubProviderProps> = ({
     dom.setDocumentElementAttribute("data-hub", currentHub);
 
     // Update document title
-    dom.setDocumentTitle(hubConfig.displayName);
+    dom.setDocumentTitle(hubConfig.name);
 
     // Apply hub CSS variables
     dom.setCSSVariable("--hub-primary", hubConfig.primaryColor);

@@ -37,13 +37,7 @@ export function DashboardLayout({
   return (
     <div className={`min-h-screen bg-gray-50 ${className}`}>
       {showDevBanner && (
-        <DevAdminBanner
-          environment={{
-            isDevelopment: () => true,
-            isProduction: () => false,
-            isTest: () => false,
-          }}
-        />
+        <DevAdminBanner />
       )}
 
       {/* Mobile sidebar backdrop */}

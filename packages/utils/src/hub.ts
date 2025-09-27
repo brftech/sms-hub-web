@@ -25,7 +25,13 @@ export const detectHubFromPort = (port: number): HubType => {
 }
 
 export const getHubUrl = (hubType: HubType, environment: 'development' | 'staging' | 'production' = 'development'): string => {
-  return HUB_CONFIGS[hubType].deploymentUrls[environment]
+  // Return appropriate URLs based on environment and hub
+  const baseUrls = {
+    development: 'http://localhost:3000',
+    staging: `https://staging.${hubType}.com`,
+    production: `https://www.${hubType}.com`
+  }
+  return baseUrls[environment]
 }
 
 export const isValidHub = (hub: string): hub is HubType => {
@@ -57,9 +63,16 @@ export const hexToRgb = (hex: string): string => {
 }
 
 export const getHubFeatures = (hubType: HubType): string[] => {
-  return HUB_CONFIGS[hubType].features
+  // Return hub-specific features
+  const features = {
+    gnymble: ['business-messaging', 'lead-capture', 'customer-support'],
+    percytech: ['technical-support', 'api-integration', 'webhook-management'],
+    percymd: ['medical-messaging', 'hipaa-compliance', 'appointment-scheduling'],
+    percytext: ['text-messaging', 'sms-campaigns', 'bulk-messaging']
+  }
+  return features[hubType] || []
 }
 
 export const hasHubFeature = (hubType: HubType, feature: string): boolean => {
-  return HUB_CONFIGS[hubType].features.includes(feature)
+  return getHubFeatures(hubType).includes(feature)
 }

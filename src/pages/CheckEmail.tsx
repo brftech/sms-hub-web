@@ -119,7 +119,7 @@ export function CheckEmail() {
         <div className="text-center mb-8">
           <HubLogo hubType={currentHub} size="lg" className="mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-white mb-2">
-            {hubConfig.displayName}
+            {hubConfig.name}
           </h1>
         </div>
 

@@ -253,8 +253,8 @@ export function VerifyAuth() {
                 </h2>
                 <p className="text-gray-600 mb-4">
                   {isExistingUser
-                    ? `Welcome back to ${hubConfig.displayName}!`
-                    : `Your ${hubConfig.displayName} account has been created successfully.`}
+                    ? `Welcome back to ${hubConfig.name}!`
+                    : `Your ${hubConfig.name} account has been created successfully.`}
                 </p>
                 <p className="text-sm text-gray-500">
                   {isExistingUser

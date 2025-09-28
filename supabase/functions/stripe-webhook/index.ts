@@ -78,9 +78,8 @@ serve(async (req) => {
         console.log("📊 Session metadata:", session.metadata);
 
         try {
-          // Determine if this is a one-time purchase or subscription
-          const isOneTimePurchase = !session.subscription;
           const customerEmail = session.customer_details?.email;
+          const customerName = session.customer_details?.name;
           const hubId = parseInt(session.metadata?.hub_id || "1");
 
           if (!customerEmail) {
@@ -91,122 +90,47 @@ serve(async (req) => {
             });
           }
 
-          console.log("💳 Payment-first flow - creating customer with Supabase Auth");
+          console.log("💳 Marketing site - creating converted lead from payment");
 
-          // Step 1: Create company record
-          const companyId = crypto.randomUUID();
-          const { data: company, error: companyError } = await supabaseAdmin
-            .from("companies")
+          // Create a converted lead record (marketing-focused approach)
+          const { data: lead, error: leadError } = await supabaseAdmin
+            .from("leads")
             .insert({
-              id: companyId,
               hub_id: hubId,
-              public_name: session.customer_details?.name || "New Company",
-              legal_name: session.customer_details?.name || "New Company",
-              company_account_number: `ACC-${Date.now()}`,
-              is_active: true,
-            })
-            .select()
-            .single();
-
-          if (companyError) {
-            console.error("❌ Failed to create company:", companyError);
-            throw companyError;
-          }
-
-          // Step 2: Create customer record
-          const customerId = crypto.randomUUID();
-          const { data: newCustomer, error: customerCreateError } =
-            await supabaseAdmin.from("customers").insert({
-              id: customerId,
-              hub_id: hubId,
-              company_id: companyId,
-              billing_email: customerEmail,
-              customer_type: session.metadata?.customer_type || "company",
-              stripe_customer_id: session.customer as string,
-              subscription_status: isOneTimePurchase ? "active" : "pending",
-              subscription_tier: isOneTimePurchase ? "one_time" : "core",
-              payment_status: "paid",
-              is_active: true,
-              metadata: {
+              email: customerEmail,
+              name: customerName,
+              status: "converted",
+              source: "stripe_payment",
+              campaign_source: session.metadata?.campaign_source || "direct",
+              utm_source: session.metadata?.utm_source,
+              utm_medium: session.metadata?.utm_medium,
+              utm_campaign: session.metadata?.utm_campaign,
+              utm_term: session.metadata?.utm_term,
+              utm_content: session.metadata?.utm_content,
+              lead_score: 100, // High score for paying customers
+              converted_at: new Date().toISOString(),
+              converted_to_customer_id: session.customer as string,
+              custom_fields: {
                 stripe_session_id: session.id,
-                payment_first: true,
-                created_via: "payment_first_webhook",
-                customer_email: customerEmail,
-                customer_name: session.customer_details?.name,
+                stripe_customer_id: session.customer,
+                payment_amount: session.amount_total,
+                payment_currency: session.currency,
+                payment_status: "completed",
+                created_via: "stripe_webhook",
+                redirect_to_app: true, // Flag to redirect to main app
               },
             })
             .select()
             .single();
 
-          if (customerCreateError) {
-            console.error("❌ Failed to create customer:", customerCreateError);
-            throw customerCreateError;
+          if (leadError) {
+            console.error("❌ Failed to create converted lead:", leadError);
+            throw leadError;
           }
 
-          // Step 3: Create Supabase Auth user
-          const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.createUser({
-            email: customerEmail,
-            email_confirm: false, // Will trigger email confirmation
-            user_metadata: {
-              stripe_customer_id: session.customer,
-              company_id: companyId,
-              customer_id: customerId,
-              created_via: "payment_first",
-              hub_id: hubId,
-            }
-          });
-
-          if (authError) {
-            console.error("❌ Failed to create Supabase Auth user:", authError);
-            throw authError;
-          }
-
-          // Step 4: Create user profile
-          const { error: profileError } = await supabaseAdmin
-            .from("user_profiles")
-            .insert({
-              id: authUser.user.id,
-              hub_id: hubId,
-              email: customerEmail,
-              first_name: null,
-              last_name: null,
-              company_id: companyId,
-              is_active: true,
-              email_confirmed: false,
-              verification_setup_completed: false,
-              metadata: {
-                stripe_customer_id: session.customer,
-                company_id: companyId,
-                customer_id: customerId,
-                created_via: "payment_first",
-                requires_profile_setup: true,
-              }
-            });
-
-          if (profileError) {
-            console.error("❌ Failed to create user profile:", profileError);
-            // Clean up auth user if profile creation fails
-            await supabaseAdmin.auth.admin.deleteUser(authUser.user.id);
-            throw profileError;
-          }
-
-          // Step 5: Create accounts_users relationship
-          const { error: membershipError } = await supabaseAdmin
-            .from("accounts_users")
-            .insert({
-              user_id: authUser.user.id,
-              company_id: companyId,
-              hub_id: hubId,
-              role: "OWNER",
-              is_active: true,
-              permissions: {},
-            });
-
-          if (membershipError) {
-            console.error("❌ Failed to create user-company relationship:", membershipError);
-          }
-
-          console.log("✅ Payment-first flow complete - email confirmation sent to:", customerEmail);
+          console.log("✅ Converted lead created successfully:", lead.id);
+          console.log("📧 Customer email:", customerEmail);
+          console.log("🔗 Stripe customer ID:", session.customer);
 
         } catch (error) {
           console.error("❌ Error in payment processing:", error);
@@ -216,60 +140,34 @@ serve(async (req) => {
       }
 
       case "customer.subscription.created":
-      case "customer.subscription.updated": {
-        const subscription = event.data.object as Stripe.Subscription;
-        console.log("📊 Subscription event:", subscription.id);
-
-        // Update customer subscription status
-        const status =
-          subscription.status === "active"
-            ? "active"
-            : subscription.status === "trialing"
-              ? "trialing"
-              : "inactive";
-
-        const { error } = await supabaseAdmin
-          .from("customers")
-          .update({
-            subscription_status: status,
-            stripe_subscription_id: subscription.id,
-            subscription_tier: subscription.metadata?.tier || "starter",
-            subscription_ends_at: subscription.current_period_end
-              ? new Date(subscription.current_period_end * 1000).toISOString()
-              : null,
-            trial_ends_at: subscription.trial_end
-              ? new Date(subscription.trial_end * 1000).toISOString()
-              : null,
-            updated_at: new Date().toISOString(),
-          })
-          .eq("stripe_customer_id", subscription.customer);
-
-        if (error) {
-          console.error("Failed to update customer subscription:", error);
-        } else {
-          console.log("✅ Updated customer subscription status");
-        }
-        break;
-      }
-
+      case "customer.subscription.updated":
       case "customer.subscription.deleted": {
         const subscription = event.data.object as Stripe.Subscription;
-        console.log("❌ Subscription cancelled:", subscription.id);
+        console.log("📊 Subscription event:", subscription.id, event.type);
 
-        // Update customer subscription status
-        const { error } = await supabaseAdmin
-          .from("customers")
-          .update({
-            subscription_status: "cancelled",
-            subscription_ends_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          })
-          .eq("stripe_customer_id", subscription.customer);
+        // For marketing site, we'll just log subscription events
+        // The main app will handle subscription management
+        console.log("ℹ️ Subscription event logged - main app handles subscription management");
+        
+        // Optionally, we could update the lead's custom_fields with subscription info
+        if (event.type === "customer.subscription.created" || event.type === "customer.subscription.updated") {
+          const { error } = await supabaseAdmin
+            .from("leads")
+            .update({
+              custom_fields: {
+                stripe_subscription_id: subscription.id,
+                subscription_status: subscription.status,
+                subscription_tier: subscription.metadata?.tier || "starter",
+                subscription_updated_at: new Date().toISOString(),
+              }
+            })
+            .eq("converted_to_customer_id", subscription.customer);
 
-        if (error) {
-          console.error("Failed to update cancelled subscription:", error);
-        } else {
-          console.log("✅ Updated customer subscription to cancelled");
+          if (error) {
+            console.log("⚠️ Could not update lead subscription info:", error.message);
+          } else {
+            console.log("✅ Updated lead with subscription info");
+          }
         }
         break;
       }
@@ -278,22 +176,8 @@ serve(async (req) => {
         const invoice = event.data.object as Stripe.Invoice;
         console.log("💰 Payment succeeded:", invoice.id);
 
-        // Record payment in payment_history
-        if (invoice.metadata?.customer_id) {
-          const { error } = await supabaseAdmin.from("payment_history").insert({
-            hub_id: parseInt(invoice.metadata.hub_id || "1"),
-            customer_id: invoice.metadata.customer_id,
-            stripe_payment_intent_id: invoice.payment_intent as string,
-            amount: invoice.amount_paid,
-            currency: invoice.currency,
-            status: "succeeded",
-            payment_method: "card",
-          });
-
-          if (error) {
-            console.error("Failed to record payment:", error);
-          }
-        }
+        // For marketing site, we'll just log successful payments
+        console.log("ℹ️ Payment succeeded - main app handles payment tracking");
         break;
       }
 
@@ -301,22 +185,8 @@ serve(async (req) => {
         const invoice = event.data.object as Stripe.Invoice;
         console.log("❌ Payment failed:", invoice.id);
 
-        // Record failed payment
-        if (invoice.metadata?.customer_id) {
-          const { error } = await supabaseAdmin.from("payment_history").insert({
-            hub_id: parseInt(invoice.metadata.hub_id || "1"),
-            customer_id: invoice.metadata.customer_id,
-            stripe_payment_intent_id: invoice.payment_intent as string,
-            amount: invoice.amount_due,
-            currency: invoice.currency,
-            status: "failed",
-            payment_method: "card",
-          });
-
-          if (error) {
-            console.error("Failed to record failed payment:", error);
-          }
-        }
+        // For marketing site, we'll just log failed payments
+        console.log("ℹ️ Payment failed - main app handles payment failure tracking");
         break;
       }
 

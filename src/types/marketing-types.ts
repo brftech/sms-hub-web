@@ -44,7 +44,7 @@ export interface Lead {
   assigned_to_user_id: string | null;
   notes: string | null;
   tags: string[];
-  custom_fields: Record<string, any>;
+  custom_fields: Record<string, unknown>;
   created_at: string;
   updated_at: string;
 }
@@ -54,7 +54,7 @@ export interface LeadActivity {
   lead_id: string;
   hub_id: number;
   activity_type: 'note' | 'email_sent' | 'email_opened' | 'email_clicked' | 'phone_call' | 'meeting' | 'demo' | 'proposal' | 'contract_sent' | 'converted' | 'lost';
-  activity_data: Record<string, any>;
+  activity_data: Record<string, unknown>;
   performed_by_user_id: string | null;
   created_at: string;
 }
@@ -96,7 +96,7 @@ export interface EmailSubscriber {
   last_email_clicked_at: string | null;
   email_score: number;
   tags: string[];
-  custom_fields: Record<string, any>;
+  custom_fields: Record<string, unknown>;
   created_at: string;
   updated_at: string;
 }
@@ -118,7 +118,7 @@ export interface EmailCampaign {
   unsubscribed_count: number;
   bounced_count: number;
   complaint_count: number;
-  campaign_data: Record<string, any>;
+  campaign_data: Record<string, unknown>;
   created_at: string;
   updated_at: string;
 }
@@ -160,7 +160,7 @@ export interface SmsSubscriber {
   last_sms_clicked_at: string | null;
   sms_score: number;
   tags: string[];
-  custom_fields: Record<string, any>;
+  custom_fields: Record<string, unknown>;
   created_at: string;
   updated_at: string;
 }
@@ -180,7 +180,7 @@ export interface SmsCampaign {
   clicked_count: number;
   unsubscribed_count: number;
   failed_count: number;
-  campaign_data: Record<string, any>;
+  campaign_data: Record<string, unknown>;
   created_at: string;
   updated_at: string;
 }
@@ -241,8 +241,8 @@ export interface MarketingCampaign {
   end_date: string | null;
   budget: number | null;
   spent: number;
-  target_audience: Record<string, any>;
-  metrics: Record<string, any>;
+  target_audience: Record<string, unknown>;
+  metrics: Record<string, unknown>;
   utm_source: string | null;
   utm_medium: string | null;
   utm_campaign: string | null;
@@ -254,12 +254,12 @@ export interface ContactFormSubmission {
   id: string;
   hub_id: number;
   form_name: string;
-  form_data: Record<string, any>;
+  form_data: Record<string, unknown>;
   ip_address: string | null;
   user_agent: string | null;
   referrer_url: string | null;
   landing_page_url: string | null;
-  utm_data: Record<string, any>;
+  utm_data: Record<string, unknown>;
   processed: boolean;
   processed_at: string | null;
   lead_id: string | null;
@@ -282,7 +282,7 @@ export interface WebsiteAnalytics {
   utm_term: string | null;
   utm_content: string | null;
   event_type: 'page_view' | 'click' | 'form_submit' | 'download' | 'video_play';
-  event_data: Record<string, any>;
+  event_data: Record<string, unknown>;
   created_at: string;
 }
 
@@ -307,7 +307,7 @@ export interface LeadUpdateData {
   assigned_to_user_id?: string;
   notes?: string;
   tags?: string[];
-  custom_fields?: Record<string, any>;
+  custom_fields?: Record<string, unknown>;
 }
 
 export interface EmailListCreateData {
@@ -327,7 +327,7 @@ export interface EmailSubscriberCreateData {
   utm_medium?: string;
   utm_campaign?: string;
   tags?: string[];
-  custom_fields?: Record<string, any>;
+  custom_fields?: Record<string, unknown>;
 }
 
 export interface SmsListCreateData {
@@ -347,7 +347,7 @@ export interface SmsSubscriberCreateData {
   utm_medium?: string;
   utm_campaign?: string;
   tags?: string[];
-  custom_fields?: Record<string, any>;
+  custom_fields?: Record<string, unknown>;
 }
 
 // =====================================================
@@ -356,40 +356,16 @@ export interface SmsSubscriberCreateData {
 
 export interface DatabaseResponse<T> {
   data: T | null;
-  error: any;
+  error: unknown;
 }
 
 export interface PaginatedResponse<T> {
   data: T[];
   count: number;
-  error: any;
+  error: unknown;
 }
 
 // =====================================================
 // EXPORT ALL TYPES
 // =====================================================
-
-export type {
-  Hub,
-  Lead,
-  LeadActivity,
-  EmailList,
-  EmailSubscriber,
-  EmailCampaign,
-  SmsList,
-  SmsSubscriber,
-  SmsCampaign,
-  Verification,
-  UserProfile,
-  MarketingCampaign,
-  ContactFormSubmission,
-  WebsiteAnalytics,
-  ContactFormData,
-  LeadUpdateData,
-  EmailListCreateData,
-  EmailSubscriberCreateData,
-  SmsListCreateData,
-  SmsSubscriberCreateData,
-  DatabaseResponse,
-  PaginatedResponse
-};
+// All types are already exported above as interfaces

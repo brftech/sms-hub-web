@@ -64,7 +64,7 @@ export default defineConfig(({ mode }) => ({
             return 'sms-ui';
           }
           if (id.includes('@sms-hub/supabase') || id.includes('@sms-hub/hub-logic')) {
-            return 'sms-core';
+            return 'sms-hub-core';
           }
           // Split large pages
           if (id.includes('/pages/Pricing.tsx')) {

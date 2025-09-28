@@ -79,7 +79,7 @@
 4. **forms**: React Hook Form + Zod
 5. **charts**: Recharts + React Table
 6. **sms-ui**: Our UI package
-7. **sms-core**: Our core logic
+7. **texting**: Our core SMS logic
 8. **pricing-page**: Large pricing component
 
 ### **New Scripts Added:**

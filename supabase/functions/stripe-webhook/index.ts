@@ -90,51 +90,163 @@ serve(async (req) => {
             });
           }
 
-          console.log("💳 Marketing site - creating converted lead from payment");
+          console.log("💳 Marketing site - processing successful payment");
 
-          // Create a converted lead record (marketing-focused approach)
-          const { data: lead, error: leadError } = await supabaseAdmin
+          // Check if this is a retry (existing lead) or new customer
+          const { data: existingLead } = await supabaseAdmin
             .from("leads")
-            .insert({
-              hub_id: hubId,
-              email: customerEmail,
-              name: customerName,
-              status: "converted",
-              source: "stripe_payment",
-              campaign_source: session.metadata?.campaign_source || "direct",
-              utm_source: session.metadata?.utm_source,
-              utm_medium: session.metadata?.utm_medium,
-              utm_campaign: session.metadata?.utm_campaign,
-              utm_term: session.metadata?.utm_term,
-              utm_content: session.metadata?.utm_content,
-              lead_score: 100, // High score for paying customers
-              converted_at: new Date().toISOString(),
-              converted_to_customer_id: session.customer as string,
-              custom_fields: {
-                stripe_session_id: session.id,
-                stripe_customer_id: session.customer,
-                payment_amount: session.amount_total,
-                payment_currency: session.currency,
-                payment_status: "completed",
-                created_via: "stripe_webhook",
-                redirect_to_app: true, // Flag to redirect to main app
-              },
-            })
-            .select()
+            .select("*")
+            .eq("email", customerEmail)
+            .eq("hub_id", hubId)
             .single();
 
-          if (leadError) {
-            console.error("❌ Failed to create converted lead:", leadError);
-            throw leadError;
+          let leadData;
+          let leadStatus;
+
+          if (existingLead) {
+            // Update existing lead to converted
+            console.log("🔄 Updating existing lead to converted:", existingLead.id);
+            leadStatus = "converted";
+            
+            const { data: updatedLead, error: updateError } = await supabaseAdmin
+              .from("leads")
+              .update({
+                status: "converted",
+                converted_at: new Date().toISOString(),
+                converted_to_customer_id: session.customer as string,
+                lead_score: 100,
+                custom_fields: {
+                  ...existingLead.custom_fields,
+                  stripe_session_id: session.id,
+                  stripe_customer_id: session.customer,
+                  payment_amount: session.amount_total,
+                  payment_currency: session.currency,
+                  payment_status: "completed",
+                  converted_via: "stripe_webhook",
+                  is_retry_success: true,
+                  redirect_to_app: true,
+                },
+              })
+              .eq("id", existingLead.id)
+              .select()
+              .single();
+
+            if (updateError) {
+              console.error("❌ Failed to update existing lead:", updateError);
+              throw updateError;
+            }
+            
+            leadData = updatedLead;
+          } else {
+            // Create new converted lead
+            console.log("🆕 Creating new converted lead");
+            
+            const { data: newLead, error: createError } = await supabaseAdmin
+              .from("leads")
+              .insert({
+                hub_id: hubId,
+                email: customerEmail,
+                name: customerName,
+                status: "converted",
+                source: "stripe_payment",
+                campaign_source: session.metadata?.campaign_source || "direct",
+                utm_source: session.metadata?.utm_source,
+                utm_medium: session.metadata?.utm_medium,
+                utm_campaign: session.metadata?.utm_campaign,
+                utm_term: session.metadata?.utm_term,
+                utm_content: session.metadata?.utm_content,
+                lead_score: 100,
+                converted_at: new Date().toISOString(),
+                converted_to_customer_id: session.customer as string,
+                custom_fields: {
+                  stripe_session_id: session.id,
+                  stripe_customer_id: session.customer,
+                  payment_amount: session.amount_total,
+                  payment_currency: session.currency,
+                  payment_status: "completed",
+                  created_via: "stripe_webhook",
+                  redirect_to_app: true,
+                },
+              })
+              .select()
+              .single();
+
+            if (createError) {
+              console.error("❌ Failed to create converted lead:", createError);
+              throw createError;
+            }
+            
+            leadData = newLead;
           }
 
-          console.log("✅ Converted lead created successfully:", lead.id);
+          console.log("✅ Payment processed successfully - Lead ID:", leadData.id);
           console.log("📧 Customer email:", customerEmail);
           console.log("🔗 Stripe customer ID:", session.customer);
+          console.log("🚀 Ready for app2 redirect");
 
         } catch (error) {
           console.error("❌ Error in payment processing:", error);
           throw error;
+        }
+        break;
+      }
+
+      case "checkout.session.expired": {
+        const session = event.data.object as Stripe.Checkout.Session;
+        console.log("⏰ Checkout session expired:", session.id);
+
+        try {
+          const customerEmail = session.customer_details?.email;
+          const hubId = parseInt(session.metadata?.hub_id || "1");
+
+          if (customerEmail) {
+            // Update or create lead with expired status
+            const { data: existingLead } = await supabaseAdmin
+              .from("leads")
+              .select("*")
+              .eq("email", customerEmail)
+              .eq("hub_id", hubId)
+              .single();
+
+            if (existingLead) {
+              // Update existing lead
+              await supabaseAdmin
+                .from("leads")
+                .update({
+                  status: "abandoned",
+                  custom_fields: {
+                    ...existingLead.custom_fields,
+                    stripe_session_id: session.id,
+                    payment_status: "expired",
+                    last_payment_attempt: new Date().toISOString(),
+                    needs_followup: true,
+                  },
+                })
+                .eq("id", existingLead.id);
+            } else {
+              // Create new abandoned lead
+              await supabaseAdmin
+                .from("leads")
+                .insert({
+                  hub_id: hubId,
+                  email: customerEmail,
+                  name: session.customer_details?.name,
+                  status: "abandoned",
+                  source: "stripe_payment",
+                  lead_score: 50, // Medium score for abandoned checkout
+                  custom_fields: {
+                    stripe_session_id: session.id,
+                    payment_status: "expired",
+                    created_via: "stripe_webhook",
+                    needs_followup: true,
+                  },
+                });
+            }
+
+            console.log("📝 Abandoned checkout recorded for:", customerEmail);
+          }
+        } catch (error) {
+          console.error("❌ Error processing expired checkout:", error);
         }
         break;
       }
@@ -185,8 +297,31 @@ serve(async (req) => {
         const invoice = event.data.object as Stripe.Invoice;
         console.log("❌ Payment failed:", invoice.id);
 
-        // For marketing site, we'll just log failed payments
-        console.log("ℹ️ Payment failed - main app handles payment failure tracking");
+        try {
+          // Update lead status to indicate payment failure
+          const { error } = await supabaseAdmin
+            .from("leads")
+            .update({
+              status: "payment_failed",
+              custom_fields: {
+                stripe_invoice_id: invoice.id,
+                payment_status: "failed",
+                last_payment_attempt: new Date().toISOString(),
+                payment_failure_reason: invoice.last_payment_error?.message || "Unknown",
+                needs_followup: true,
+                retry_eligible: true,
+              },
+            })
+            .eq("converted_to_customer_id", invoice.customer);
+
+          if (error) {
+            console.log("⚠️ Could not update lead payment failure:", error.message);
+          } else {
+            console.log("✅ Updated lead with payment failure info");
+          }
+        } catch (error) {
+          console.error("❌ Error processing payment failure:", error);
+        }
         break;
       }
 

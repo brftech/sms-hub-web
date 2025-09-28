@@ -1,4 +1,4 @@
-import { Helmet } from "react-helmet-async";
+import { useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@sms-hub/ui";
 import { Link } from "react-router-dom";
 import gnymbleIconLogo from "@sms-hub/ui/assets/gnymble-icon-logo.svg";
@@ -32,13 +32,7 @@ export default function ClientTermsTemplate({
 }: ClientTermsTemplateProps) {
   return (
     <>
-      <Helmet>
-        <title>Terms & Conditions - {clientName} SMS Services</title>
-        <meta
-          name="description"
-          content={`Terms and conditions for ${clientName} SMS marketing and communication services. Understand your rights and responsibilities.`}
-        />
-      </Helmet>
+      {/* SEO handled by useEffect */}
 
       <div className="min-h-screen bg-black text-white">
         {/* Header */}

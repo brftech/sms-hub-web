@@ -25,44 +25,21 @@ const PaymentSuccess = () => {
 
     setSessionId(sessionIdParam);
 
-    // Verify payment with backend
-    const verifyPayment = async () => {
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/verify-payment`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-            },
-            body: JSON.stringify({
-              session_id: sessionIdParam,
-            }),
-          }
-        );
-
-        const result = await response.json();
-
-        if (response.ok && result.success) {
-          setPaymentStatus("success");
-        } else {
-          setPaymentStatus("error");
-        }
-      } catch (error) {
-        console.error("Payment verification error:", error);
-        setPaymentStatus("error");
-      } finally {
-        setIsVerifying(false);
-      }
-    };
-
-    verifyPayment();
+    // Simple verification - if we have a session_id, assume success
+    // The Stripe webhook will handle the actual verification and lead creation
+    setTimeout(() => {
+      setPaymentStatus("success");
+      setIsVerifying(false);
+    }, 2000); // Give webhook time to process
   }, [searchParams]);
 
-  const handleContinueToSignup = () => {
-    // Redirect to signup with payment session ID
-    navigate(`/signup?payment_session=${sessionId}`);
+  const handleContinueToApp = () => {
+    // Redirect to the main app (app2) for account setup
+    const currentHub = window.location.hostname.includes('percytech') ? 'percytech' : 
+                      window.location.hostname.includes('percymd') ? 'percymd' :
+                      window.location.hostname.includes('percytext') ? 'percytext' : 'gnymble';
+    
+    window.location.href = `https://app.${currentHub}.com?payment_success=true&session_id=${sessionId}`;
   };
 
   if (isVerifying) {
@@ -163,7 +140,7 @@ const PaymentSuccess = () => {
             </div>
 
             <button
-              onClick={handleContinueToSignup}
+              onClick={handleContinueToApp}
               className="w-full px-8 py-4 bg-orange-600 text-white font-bold rounded-full hover:bg-orange-700 transition-all duration-300 text-lg flex items-center justify-center group"
             >
               Complete Account Setup

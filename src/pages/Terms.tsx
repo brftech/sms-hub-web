@@ -1,16 +1,17 @@
-import { Helmet } from "react-helmet-async";
+import { useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@sms-hub/ui";
 
 export default function Terms() {
+  useEffect(() => {
+    document.title = "Terms & Conditions - SMS Marketing Services";
+    const metaDescription = document.querySelector('meta[name="description"]');
+    if (metaDescription) {
+      metaDescription.setAttribute('content', 'Terms and conditions for SMS marketing and communication services. Understand your rights and responsibilities.');
+    }
+  }, []);
+
   return (
     <>
-      <Helmet>
-        <title>Terms & Conditions - SMS Marketing Services</title>
-        <meta
-          name="description"
-          content="Terms and conditions for SMS marketing and communication services. Understand your rights and responsibilities."
-        />
-      </Helmet>
 
       <div className="min-h-screen bg-background">
         <div className="container mx-auto px-4 py-16">

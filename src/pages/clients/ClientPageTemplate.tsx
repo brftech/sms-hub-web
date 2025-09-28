@@ -1,4 +1,4 @@
-import { Helmet } from "react-helmet-async";
+import { useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@sms-hub/ui";
 import { Link } from "react-router-dom";
 import { Phone, MapPin, Clock } from "lucide-react";
@@ -45,15 +45,16 @@ export default function ClientPageTemplate({
   privacyLink,
   termsLink,
 }: ClientPageTemplateProps) {
+  useEffect(() => {
+    document.title = `${clientName} SMS Marketing - Join Our Exclusive Community`;
+    const metaDescription = document.querySelector('meta[name="description"]');
+    if (metaDescription) {
+      metaDescription.setAttribute('content', `Join ${clientName}'s exclusive SMS community for updates, offers, and special events.`);
+    }
+  }, [clientName]);
+
   return (
     <>
-      <Helmet>
-        <title>{clientName} SMS Marketing - Join Our Exclusive Community</title>
-        <meta
-          name="description"
-          content={`Join ${clientName}'s exclusive SMS community for updates, offers, and special events.`}
-        />
-      </Helmet>
 
       <div className="min-h-screen bg-black text-white">
         {/* Header */}

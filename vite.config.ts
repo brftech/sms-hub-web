@@ -33,48 +33,11 @@ export default defineConfig(({ mode }) => ({
     },
     rollupOptions: {
       output: {
-        manualChunks: (id) => {
-          // More aggressive chunk splitting for better caching
-          if (id.includes('node_modules')) {
-            // Core React ecosystem
-            if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) {
-              return 'react-core';
-            }
-            // UI components and styling
-            if (id.includes('@radix-ui') || id.includes('lucide-react') || id.includes('styled-components')) {
-              return 'ui-components';
-            }
-            // Data fetching and state
-            if (id.includes('@tanstack/react-query') || id.includes('@supabase/supabase-js')) {
-              return 'data-layer';
-            }
-            // Form handling
-            if (id.includes('react-hook-form') || id.includes('zod')) {
-              return 'forms';
-            }
-            // Charts and visualization
-            if (id.includes('recharts') || id.includes('@tanstack/react-table')) {
-              return 'charts';
-            }
-            // Everything else
-            return 'vendor';
-          }
-          // Split our own packages
-          if (id.includes('@sms-hub/ui')) {
-            return 'sms-ui';
-          }
-          if (id.includes('@sms-hub/supabase') || id.includes('@sms-hub/hub-logic')) {
-            return 'sms-hub-core';
-          }
-          // Split large pages
-          if (id.includes('/pages/Pricing.tsx')) {
-            return 'pricing-page';
-          }
-          if (id.includes('/pages/FAQ.tsx')) {
-            return 'faq-page';
-          }
+        // Simplified chunking strategy
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'react-router-dom'],
+          ui: ['@sms-hub/ui'],
         },
-        // Optimize chunk names
         chunkFileNames: 'assets/[name]-[hash].js',
         entryFileNames: 'assets/[name]-[hash].js',
         assetFileNames: 'assets/[name]-[hash].[ext]',

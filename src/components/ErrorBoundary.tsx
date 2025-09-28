@@ -28,10 +28,8 @@ export class EnhancedErrorBoundary extends Component<Props, State> {
       errorInfo,
     });
 
-    // Log error to console in development
-    if (import.meta.env.DEV) {
-      console.error('ErrorBoundary caught an error:', error, errorInfo);
-    }
+    // Log error to console always (for debugging)
+    console.error('ErrorBoundary caught an error:', error, errorInfo);
 
     // Call custom error handler
     this.props.onError?.(error, errorInfo);
@@ -67,7 +65,7 @@ export class EnhancedErrorBoundary extends Component<Props, State> {
               We're sorry, but something unexpected happened. Please try again or contact support if the problem persists.
             </p>
             
-            {import.meta.env.DEV && this.state.error && (
+            {this.state.error && (
               <div className="mb-6 p-4 bg-red-900/20 rounded border border-red-500/30">
                 <h3 className="text-red-400 font-semibold mb-2">Error Details (Dev Only):</h3>
                 <pre className="text-xs text-red-300 text-left overflow-auto">

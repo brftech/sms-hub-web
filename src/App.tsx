@@ -1,7 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster, SonnerToaster, TooltipProvider } from "@sms-hub/ui";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { HelmetProvider } from "react-helmet-async";
 import { Suspense, lazy } from "react";
 
 import {
@@ -312,24 +311,32 @@ const AppRoutes = () => {
   );
 };
 
-const App = () => (
-  <ErrorBoundary>
-    <HelmetProvider>
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <Toaster />
-          <SonnerToaster />
-          <HubProvider environment={webEnvironment} defaultHub="gnymble">
-            <HubThemeWrapper>
-              <BrowserRouter>
-                <AppRoutes />
-              </BrowserRouter>
-            </HubThemeWrapper>
-          </HubProvider>
-        </TooltipProvider>
-      </QueryClientProvider>
-    </HelmetProvider>
-  </ErrorBoundary>
-);
+const App = () => {
+  // Debug environment detection
+  useEffect(() => {
+    console.log('App component mounted');
+    webEnvironment.debug();
+  }, []);
+
+  return (
+    <ErrorBoundary>
+      <div>
+        <QueryClientProvider client={queryClient}>
+          <TooltipProvider>
+            <Toaster />
+            <SonnerToaster />
+            <HubProvider environment={webEnvironment} defaultHub="gnymble">
+              <HubThemeWrapper>
+                <BrowserRouter>
+                  <AppRoutes />
+                </BrowserRouter>
+              </HubThemeWrapper>
+            </HubProvider>
+          </TooltipProvider>
+        </QueryClientProvider>
+      </div>
+    </ErrorBoundary>
+  );
+};
 
 export default App;

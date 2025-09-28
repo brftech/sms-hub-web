@@ -1,5 +1,4 @@
-import React from "react";
-import { Helmet } from "react-helmet-async";
+import React, { useEffect } from "react";
 
 interface SEOProps {
   title?: string;
@@ -24,33 +23,64 @@ const SEO: React.FC<SEOProps> = ({
     ? title 
     : `${title} | SMS Hub`;
 
-  return (
-    <Helmet>
-      {/* Basic Meta Tags */}
-      <title>{fullTitle}</title>
-      <meta name="description" content={description} />
-      <meta name="keywords" content={keywords} />
-      
-      {/* Open Graph Meta Tags */}
-      <meta property="og:title" content={fullTitle} />
-      <meta property="og:description" content={description} />
-      <meta property="og:image" content={image} />
-      <meta property="og:url" content={url} />
-      <meta property="og:type" content={type} />
-      <meta property="og:site_name" content={siteName} />
-      
-      {/* Twitter Meta Tags */}
-      <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:title" content={fullTitle} />
-      <meta name="twitter:description" content={description} />
-      <meta name="twitter:image" content={image} />
-      
-      {/* Additional Meta Tags */}
-      <meta name="viewport" content="width=device-width, initial-scale=1" />
-      <meta name="robots" content="index, follow" />
-      <link rel="canonical" href={url} />
-    </Helmet>
-  );
+  useEffect(() => {
+    // Update document title
+    document.title = fullTitle;
+
+    // Update meta description
+    const updateMetaTag = (name: string, content: string) => {
+      let meta = document.querySelector(`meta[name="${name}"]`) as HTMLMetaElement;
+      if (!meta) {
+        meta = document.createElement('meta');
+        meta.name = name;
+        document.head.appendChild(meta);
+      }
+      meta.content = content;
+    };
+
+    // Update property meta tags
+    const updatePropertyMetaTag = (property: string, content: string) => {
+      let meta = document.querySelector(`meta[property="${property}"]`) as HTMLMetaElement;
+      if (!meta) {
+        meta = document.createElement('meta');
+        meta.setAttribute('property', property);
+        document.head.appendChild(meta);
+      }
+      meta.content = content;
+    };
+
+    // Basic Meta Tags
+    updateMetaTag('description', description);
+    updateMetaTag('keywords', keywords);
+    
+    // Open Graph Meta Tags
+    updatePropertyMetaTag('og:title', fullTitle);
+    updatePropertyMetaTag('og:description', description);
+    updatePropertyMetaTag('og:image', image);
+    updatePropertyMetaTag('og:url', url);
+    updatePropertyMetaTag('og:type', type);
+    updatePropertyMetaTag('og:site_name', siteName);
+    
+    // Twitter Meta Tags
+    updateMetaTag('twitter:card', 'summary_large_image');
+    updateMetaTag('twitter:title', fullTitle);
+    updateMetaTag('twitter:description', description);
+    updateMetaTag('twitter:image', image);
+    
+    // Additional Meta Tags
+    updateMetaTag('robots', 'index, follow');
+    
+    // Update canonical link
+    let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
+    if (!canonical) {
+      canonical = document.createElement('link');
+      canonical.rel = 'canonical';
+      document.head.appendChild(canonical);
+    }
+    canonical.href = url;
+  }, [fullTitle, description, keywords, image, url, type, siteName]);
+
+  return null; // This component doesn't render anything
 };
 
 export default SEO;

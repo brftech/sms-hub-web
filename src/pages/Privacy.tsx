@@ -1,16 +1,17 @@
-import { Helmet } from "react-helmet-async";
+import { useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@sms-hub/ui";
 
 export default function Privacy() {
+  useEffect(() => {
+    document.title = "Privacy Policy - SMS Marketing & Communication";
+    const metaDescription = document.querySelector('meta[name="description"]');
+    if (metaDescription) {
+      metaDescription.setAttribute('content', 'Privacy policy for SMS marketing and communication services. Learn how we protect your data and respect your privacy.');
+    }
+  }, []);
+
   return (
     <>
-      <Helmet>
-        <title>Privacy Policy - SMS Marketing & Communication</title>
-        <meta
-          name="description"
-          content="Privacy policy for SMS marketing and communication services. Learn how we protect your data and respect your privacy."
-        />
-      </Helmet>
 
       <div className="min-h-screen bg-background">
         <div className="container mx-auto px-4 py-16">

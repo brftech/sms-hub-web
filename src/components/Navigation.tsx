@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Button, useHub, HubLogo, HubSwitcher } from "@sms-hub/ui";
+import { Button, useHub, HubLogo } from "@sms-hub/ui";
 import {
   Menu,
   X,
@@ -131,7 +131,6 @@ const Navigation = () => {
 
           {/* Right side - CTAs (Desktop only) */}
           <div className="hidden md:flex items-center space-x-4">
-            {webEnvironment.features.hubSwitcher() && <HubSwitcher />}
             <Button
               variant="outline"
               size="sm"

@@ -34,25 +34,25 @@ apps/web/
 ### All Tests
 
 ```bash
-pnpm test                    # Run all tests
-pnpm test:unit             # Run only unit tests
-pnpm test:integration      # Run only integration tests
-pnpm test:e2e              # Run only E2E tests
+npm test                    # Run all tests
+npm run test:unit             # Run only unit tests
+npm run test:integration      # Run only integration tests
+npm run test:e2e              # Run only E2E tests
 ```
 
 ### Package-Specific Tests
 
 ```bash
-pnpm test --filter=@sms-hub/ui
-pnpm test --filter=@sms-hub/web
-pnpm test --filter=@sms-hub/types
+npm test -- --grep "ui"
+npm test -- --grep "web"
+npm test -- --grep "types"
 ```
 
 ### Watch Mode
 
 ```bash
-pnpm test:watch            # Watch all tests
-pnpm test:watch --filter=@sms-hub/ui
+npm run test:watch            # Watch all tests
+npm run test:watch -- --grep "ui"
 ```
 
 ## 🛠️ Test Configuration
@@ -75,13 +75,13 @@ pnpm test:watch --filter=@sms-hub/ui
 
 ```typescript
 // packages/ui/__tests__/Button.test.tsx
-import { render, screen } from '@testing-library/react';
-import { Button } from '../src/components/Button';
+import { render, screen } from "@testing-library/react";
+import { Button } from "../src/components/Button";
 
-describe('Button', () => {
-  it('renders with correct text', () => {
+describe("Button", () => {
+  it("renders with correct text", () => {
     render(<Button>Click me</Button>);
-    expect(screen.getByText('Click me')).toBeInTheDocument();
+    expect(screen.getByText("Click me")).toBeInTheDocument();
   });
 });
 ```
@@ -139,8 +139,8 @@ test("complete signup flow", async ({ page }) => {
 ### Coverage Reports
 
 ```bash
-pnpm test:coverage         # Generate coverage report
-pnpm test:coverage:html    # HTML coverage report
+npm run test:coverage         # Generate coverage report
+npm run test:coverage:html    # HTML coverage report
 ```
 
 ## 🚨 Testing Best Practices
@@ -174,19 +174,19 @@ pnpm test:coverage:html    # HTML coverage report
 ### Debug Mode
 
 ```bash
-pnpm test:debug            # Run tests in debug mode
+npm run test:debug            # Run tests in debug mode
 ```
 
 ### Logging
 
 ```bash
-pnpm test --verbose        # Verbose test output
+npm test -- --verbose        # Verbose test output
 ```
 
 ### Single Test
 
 ```bash
-pnpm test --testNamePattern="Button renders correctly"
+npm test -- --testNamePattern="Button renders correctly"
 ```
 
 ## 📚 Testing Resources
@@ -194,4 +194,4 @@ pnpm test --testNamePattern="Button renders correctly"
 - [Jest Documentation](https://jestjs.io/)
 - [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/)
 - [Playwright Documentation](https://playwright.dev/)
-- [Turbo Testing Guide](https://turbo.build/repo/docs/core-concepts/monorepos/testing)
+- [Vitest Documentation](https://vitest.dev/)

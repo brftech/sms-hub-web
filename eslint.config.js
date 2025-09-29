@@ -82,16 +82,12 @@ export default [
       'node_modules/**',
       'dist/**',
       'build/**',
-      '.turbo/**',
       '*.config.js',
       '*.config.ts',
       'packages/types/src/database-comprehensive.ts', // Generated file
       'packages/supabase/src/database-comprehensive.ts', // Generated file
       'supabase/functions/**', // Deno edge functions
-      'apps/*/dist/**',
-      'apps/*/build/**',
       '**/*.d.ts', // Type declaration files
-      'apps/*/.vercel/**', // Vercel config
       '.vercel/**', // Vercel config
     ],
   },

@@ -31,16 +31,16 @@ export default defineConfig({
       use: { ...devices["Pixel 5"], baseURL: "http://localhost:3000" },
       testDir: "../test/e2e/web",
     },
-    // Unified app tests
+    // Admin dashboard tests (now part of web app)
     {
-      name: "unified-chromium",
-      use: { ...devices["Desktop Chrome"], baseURL: "http://localhost:3001" },
-      testDir: "../test/e2e/unified",
+      name: "admin-chromium",
+      use: { ...devices["Desktop Chrome"], baseURL: "http://localhost:3000" },
+      testDir: "../test/e2e/admin",
     },
     {
-      name: "unified-firefox",
-      use: { ...devices["Desktop Firefox"], baseURL: "http://localhost:3001" },
-      testDir: "../test/e2e/unified",
+      name: "admin-firefox",
+      use: { ...devices["Desktop Firefox"], baseURL: "http://localhost:3000" },
+      testDir: "../test/e2e/admin",
     },
     // Cross-app integration tests
     {
@@ -52,14 +52,8 @@ export default defineConfig({
 
   webServer: [
     {
-      command: "pnpm dev --filter=@sms-hub/web",
+      command: "npm run dev",
       url: "http://localhost:3000",
-      reuseExistingServer: !process.env.CI,
-      timeout: 120 * 1000,
-    },
-    {
-      command: "pnpm dev --filter=@sms-hub/unified",
-      url: "http://localhost:3001",
       reuseExistingServer: !process.env.CI,
       timeout: 120 * 1000,
     },

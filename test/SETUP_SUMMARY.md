@@ -38,13 +38,13 @@ test/
 ### **5. Package.json Scripts**
 
 ```bash
-pnpm test                    # Run all tests
-pnpm test:unit             # Run unit tests only
-pnpm test:integration      # Run integration tests only
-pnpm test:e2e              # Run E2E tests only
-pnpm test:watch            # Watch mode
-pnpm test:coverage         # Generate coverage report
-pnpm test:debug            # Debug mode
+npm test                    # Run all tests
+npm run test:unit             # Run unit tests only
+npm run test:integration      # Run integration tests only
+npm run test:e2e              # Run E2E tests only
+npm run test:watch            # Watch mode
+npm run test:coverage         # Generate coverage report
+npm run test:debug            # Debug mode
 ```
 
 ## 🚀 Next Steps
@@ -52,22 +52,22 @@ pnpm test:debug            # Debug mode
 ### **1. Install Dependencies**
 
 ```bash
-pnpm install
+npm install
 ```
 
 ### **2. Run Tests**
 
 ```bash
 # Run all tests
-pnpm test
+npm test
 
 # Run specific test types
-pnpm test:unit
-pnpm test:integration
-pnpm test:e2e
+npm test:unit
+npm test:integration
+npm test:e2e
 
 # Watch mode for development
-pnpm test:watch
+npm test:watch
 ```
 
 ### **3. Add Package-Level Tests**
@@ -90,7 +90,7 @@ packages/ui/src/__tests__/
 Each app should have its own tests:
 
 ```
-apps/web/src/__tests__/
+src/__tests__/
 ├── pages/
 │   ├── Home.test.tsx
 │   └── Contact.test.tsx

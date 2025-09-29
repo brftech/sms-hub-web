@@ -5,6 +5,7 @@ Standalone marketing and authentication gateway for the SMS Hub platform.
 ## Overview
 
 This is the public-facing web application for the SMS Hub multi-tenant B2B SMS SaaS platform. It provides:
+
 - Marketing landing pages for multiple hubs (Gnymble, PercyTech, PercyMD, PercyText)
 - User authentication (signup/login) with magic link flow
 - Hub-specific branding and content
@@ -40,6 +41,7 @@ sms-hub-web/
 ## Getting Started
 
 ### Prerequisites
+
 - Node.js 18+
 - npm
 
@@ -80,12 +82,13 @@ Create a `.env.local` file with:
 ```bash
 VITE_SUPABASE_URL=your-supabase-url
 VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
-VITE_UNIFIED_APP_URL=http://localhost:3001
+# VITE_UNIFIED_APP_URL removed - admin dashboard is now part of this app
 ```
 
 ## Hub System
 
 The app supports multiple business hubs with distinct branding:
+
 - **Gnymble** (Hub ID: 1)
 - **PercyTech** (Hub ID: 0)
 - **PercyMD** (Hub ID: 2)
@@ -104,7 +107,7 @@ vercel --prod
 
 ## Related Repositories
 
-- `sms-hub-app2` - The authenticated dashboard application (unified app)
+- Admin dashboard is now integrated into this app at `/admin`
 
 ## License
 

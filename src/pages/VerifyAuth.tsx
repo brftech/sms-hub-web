@@ -10,7 +10,13 @@ import {
   CardTitle,
 } from "@sms-hub/ui";
 import { Input, Label, Alert, AlertDescription } from "@sms-hub/ui";
-import { Shield, AlertCircle, CheckCircle, CheckCircle2, RefreshCw } from "lucide-react";
+import {
+  Shield,
+  AlertCircle,
+  CheckCircle,
+  CheckCircle2,
+  RefreshCw,
+} from "lucide-react";
 import { getSupabaseClient } from "../lib/supabaseSingleton";
 import styled from "styled-components";
 
@@ -44,19 +50,20 @@ export function VerifyAuth() {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();
-  
+
   // Determine mode based on route
-  const mode: VerificationMode = location.pathname === "/verify-otp" ? "otp" : "signup";
-  
+  const mode: VerificationMode =
+    location.pathname === "/verify-otp" ? "otp" : "signup";
+
   // OTP mode state
   const email = location.state?.email || sessionStorage.getItem("login_email");
-  
+
   // Signup mode state
   const verificationId = searchParams.get("id");
   const authMethod = searchParams.get("method") || "sms";
   const isExistingUser = searchParams.get("existing") === "true";
   const signupData = JSON.parse(sessionStorage.getItem("signup_data") || "{}");
-  
+
   const supabase = getSupabaseClient();
 
   const [code, setCode] = useState("");
@@ -70,7 +77,11 @@ export function VerifyAuth() {
   useEffect(() => {
     if (mode === "otp" && !email) {
       navigate("/login");
-    } else if (mode === "signup" && !verificationId && !signupData.verificationId) {
+    } else if (
+      mode === "signup" &&
+      !verificationId &&
+      !signupData.verificationId
+    ) {
       navigate("/signup");
     }
   }, [mode, email, verificationId, navigate, signupData.verificationId]);
@@ -122,13 +133,14 @@ export function VerifyAuth() {
         setSuccess(true);
         sessionStorage.removeItem("login_email");
 
-        // Redirect to unified app as the authenticated user
+        // Redirect to dashboard (admin dashboard is now part of this app)
         setTimeout(() => {
-          window.location.href = `${import.meta.env.VITE_UNIFIED_APP_URL || "http://localhost:3001"}/`;
+          window.location.href = "/admin";
         }, 1500);
       } else {
         // Signup verification via edge function
-        const actualVerificationId = verificationId || signupData.verificationId;
+        const actualVerificationId =
+          verificationId || signupData.verificationId;
 
         if (!actualVerificationId) {
           setError("Verification session expired. Please start over.");
@@ -163,14 +175,19 @@ export function VerifyAuth() {
         }
 
         setSuccess(true);
-        sessionStorage.setItem("verified_verification_id", verifyData.verification_id);
+        sessionStorage.setItem(
+          "verified_verification_id",
+          verifyData.verification_id
+        );
 
         setTimeout(() => {
-          window.location.href = `${import.meta.env.VITE_UNIFIED_APP_URL || "http://localhost:3001"}/account-details?id=${verifyData.verification_id}`;
+          window.location.href = "/admin";
         }, 1500);
       }
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Invalid verification code");
+      setError(
+        err instanceof Error ? err.message : "Invalid verification code"
+      );
       setCode("");
     } finally {
       setIsVerifying(false);
@@ -202,7 +219,9 @@ export function VerifyAuth() {
       } else {
         // Resend via edge function
         const response = await fetch(
-          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/resend-verification`,
+          `${
+            import.meta.env.VITE_SUPABASE_URL
+          }/functions/v1/resend-verification`,
           {
             method: "POST",
             headers: {
@@ -243,7 +262,9 @@ export function VerifyAuth() {
               <>
                 <CheckCircle className="w-16 h-16 text-green-600 mx-auto mb-4" />
                 <h2 className="text-2xl font-bold mb-2">Welcome Back!</h2>
-                <p className="text-gray-600">Redirecting to your dashboard...</p>
+                <p className="text-gray-600">
+                  Redirecting to your dashboard...
+                </p>
               </>
             ) : (
               <>
@@ -277,16 +298,22 @@ export function VerifyAuth() {
             <Shield className="w-8 h-8 text-white" />
           </div>
           <CardTitle>
-            {mode === "otp" 
-              ? "Enter Verification Code" 
-              : (isExistingUser ? "Welcome Back!" : `Verify Your ${authMethod === "sms" ? "Phone" : "Email"}`)}
+            {mode === "otp"
+              ? "Enter Verification Code"
+              : isExistingUser
+              ? "Welcome Back!"
+              : `Verify Your ${authMethod === "sms" ? "Phone" : "Email"}`}
           </CardTitle>
           <CardDescription>
             {mode === "otp"
               ? `We sent a 6-digit code to ${email}`
-              : (isExistingUser
-                  ? `We've sent a new verification code to your ${authMethod === "sms" ? "phone" : "email"}. Please enter it below to access your account.`
-                  : `We sent a 6-digit verification code to your ${authMethod === "sms" ? "phone" : "email"}. Please enter it below.`)}
+              : isExistingUser
+              ? `We've sent a new verification code to your ${
+                  authMethod === "sms" ? "phone" : "email"
+                }. Please enter it below to access your account.`
+              : `We sent a 6-digit verification code to your ${
+                  authMethod === "sms" ? "phone" : "email"
+                }. Please enter it below.`}
           </CardDescription>
         </CardHeader>
 
@@ -347,8 +374,8 @@ export function VerifyAuth() {
                 {isResending
                   ? "Sending..."
                   : canResend
-                    ? "Resend Code"
-                    : `Resend in ${resendTimer}s`}
+                  ? "Resend Code"
+                  : `Resend in ${resendTimer}s`}
               </ResendButton>
             </div>
 

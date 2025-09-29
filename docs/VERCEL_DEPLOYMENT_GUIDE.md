@@ -9,9 +9,9 @@
 
 ## 📋 Current Vercel Project
 
-| Project           | Domain              | Purpose          |
-| ----------------- | ------------------- | ---------------- |
-| `sms-hub-web`     | www.gnymble.com     | Marketing, Auth & Dashboard |
+| Project       | Domain          | Purpose                     |
+| ------------- | --------------- | --------------------------- |
+| `sms-hub-web` | www.gnymble.com | Marketing, Auth & Dashboard |
 
 ## ⚠️ CRITICAL DEPLOYMENT RULES
 
@@ -148,29 +148,29 @@ VITE_STRIPE_PAYMENT_LINK_ELITE=https://buy.stripe.com/elite
 
 ### Issue: Vercel creates new projects instead of deploying to existing ones
 
-**Solution**: Always run `vercel --prod --yes` from monorepo root. Never use `--cwd` flag or cd into app directories
+**Solution**: Always run `vercel --prod --yes` from project root. Never use `--cwd` flag or cd into subdirectories
 
 ### Issue: Root .vercel directory locks to one project
 
-**Problem**: The root `.vercel/project.json` hard-codes a single project ID (e.g., `sms-hub-unified`), making it impossible to deploy different apps from the same root directory.
+**Problem**: The root `.vercel/project.json` hard-codes a single project ID, making it impossible to deploy to different projects from the same root directory.
 
 **Solution**: Remove the root `.vercel` directory entirely. Use individual deployment scripts that handle project linking properly.
 
 ### Issue: Path errors like "apps/web/apps/web" not found
 
-**Solution**: The Vercel project root directory should be set to monorepo root in Vercel dashboard, not individual app directories
+**Solution**: The Vercel project root directory should be set to project root in Vercel dashboard
 
-### Issue: Vercel deployment fails with pnpm install error
+### Issue: Vercel deployment fails with npm install error
 
-**Solution**: Deploy from monorepo root, not from app directories
+**Solution**: Deploy from project root, not from subdirectories
 
-### Issue: 404 on unified.gnymble.com
+### Issue: 404 on admin dashboard
 
-**Solution**: Deploy the unified app - it may not have been deployed after configuration changes
+**Solution**: Admin dashboard is now part of the main app at `/admin` route
 
-### Issue: Redirect goes to app.gnymble.com instead of unified
+### Issue: Redirect goes to wrong URL
 
-**Solution**: Already fixed in Login.tsx to use environmentConfig
+**Solution**: All redirects now point to internal routes within the same app
 
 ### Issue: Authentication fails with "user not found"
 

@@ -1,86 +1,36 @@
 /**
- * Cross-app redirect utilities
- * Handles redirects between different apps in the monorepo
+ * Internal navigation utilities
+ * Handles navigation within the standalone SMS Hub Web app
  */
 
-export const getWebAppUrl = (path: string = '') => {
-  // In development, use localhost with different ports
-  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-    return `http://localhost:3000${path}`;
-  }
-  
-  // In production, use the same domain but different subdomain
-  // This assumes web app is on the main domain (e.g., gnymble.com)
-  // and other apps are on subdomains
-  const protocol = window.location.protocol;
-  const hostname = window.location.hostname;
-  
-  // Remove subdomain if it exists (e.g., app.gnymble.com -> gnymble.com)
-  const mainDomain = hostname.replace(/^[^.]+\./, '');
-  
-  return `${protocol}//${mainDomain}${path}`;
+export const getAdminUrl = (path: string = "") => {
+  return `/admin${path}`;
 };
 
-export const getUserAppUrl = (path: string = '') => {
-  // In development, use localhost with different ports
-  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-    return `http://localhost:3001${path}`;
-  }
-  
-  // In production, use subdomain
-  const protocol = window.location.protocol;
-  const hostname = window.location.hostname;
-  
-  // Remove subdomain if it exists and add user subdomain
-  const mainDomain = hostname.replace(/^[^.]+\./, '');
-  
-  return `${protocol}//unified.${mainDomain}${path}`;
+export const getPricingUrl = (path: string = "") => {
+  return `/pricing${path}`;
 };
 
-export const getTextingAppUrl = (path: string = '') => {
-  // In development, use localhost with different ports
-  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-    return `http://localhost:3002${path}`;
-  }
-  
-  // In production, use subdomain
-  const protocol = window.location.protocol;
-  const hostname = window.location.hostname;
-  
-  // Remove subdomain if it exists and add texting subdomain
-  const mainDomain = hostname.replace(/^[^.]+\./, '');
-  
-  return `${protocol}//texting.${mainDomain}${path}`;
+export const getContactUrl = (path: string = "") => {
+  return `/contact${path}`;
 };
 
-export const getAdminAppUrl = (path: string = '') => {
-  // In development, use localhost with different ports
-  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-    return `http://localhost:3003${path}`;
-  }
-  
-  // In production, use subdomain
-  const protocol = window.location.protocol;
-  const hostname = window.location.hostname;
-  
-  // Remove subdomain if it exists and add admin subdomain
-  const mainDomain = hostname.replace(/^[^.]+\./, '');
-  
-  return `${protocol}//admin.${mainDomain}${path}`;
+export const getHomeUrl = (path: string = "") => {
+  return `/${path}`;
 };
 
-export const redirectToWebApp = (path: string = '') => {
-  window.location.href = getWebAppUrl(path);
+export const redirectToAdmin = (path: string = "") => {
+  window.location.href = getAdminUrl(path);
 };
 
-export const redirectToUserApp = (path: string = '') => {
-  window.location.href = getUserAppUrl(path);
+export const redirectToPricing = (path: string = "") => {
+  window.location.href = getPricingUrl(path);
 };
 
-export const redirectToTextingApp = (path: string = '') => {
-  window.location.href = getTextingAppUrl(path);
+export const redirectToContact = (path: string = "") => {
+  window.location.href = getContactUrl(path);
 };
 
-export const redirectToAdminApp = (path: string = '') => {
-  window.location.href = getAdminAppUrl(path);
+export const redirectToHome = (path: string = "") => {
+  window.location.href = getHomeUrl(path);
 };

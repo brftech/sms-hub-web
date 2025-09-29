@@ -8,8 +8,10 @@ This folder contains comprehensive documentation for the SMS Hub Web application
 
 ### Core Documentation
 
-#### 🎯 [PROJECT_OVERVIEW.md](./PROJECT_OVERVIEW.md)
-**Start here** - High-level overview of the project architecture, features, and current status.
+#### 🎯 [CLAUDE.md](./CLAUDE.md)
+
+**Start here** - Complete development guide with project architecture and current status.
+
 - Project summary and technology stack
 - Multi-hub system configuration
 - Authentication and security features
@@ -17,17 +19,10 @@ This folder contains comprehensive documentation for the SMS Hub Web application
 - Development workflow
 - Migration notes from monorepo to standalone
 
-#### 📖 [PROJECT_SUMMARY.md](./PROJECT_SUMMARY.md)
-Comprehensive project documentation covering all aspects of the application.
-- Detailed architecture explanation
-- Core features and functionality
-- User journey and authentication flow
-- Database schema relationships
-- Edge functions documentation
-- Recent achievements and status
-
 #### 🚀 [QUICK_START.md](./QUICK_START.md)
+
 Quick start guide for developers getting started with the project.
+
 - Prerequisites and setup
 - Key concepts and hub system
 - Common tasks and commands
@@ -37,7 +32,9 @@ Quick start guide for developers getting started with the project.
 ### Technical Documentation
 
 #### 🔧 [CLAUDE.md](./CLAUDE.md)
+
 Detailed instructions for Claude AI code agents working on this project.
+
 - Project architecture and structure
 - Current application flow
 - Critical implementation details
@@ -46,14 +43,18 @@ Detailed instructions for Claude AI code agents working on this project.
 - Common issues and solutions
 
 #### 🌐 [PORT_ASSIGNMENTS.md](./PORT_ASSIGNMENTS.md)
+
 Port configuration and assignment strategy for the application.
+
 - Current port assignments
 - Production and development architecture
 - Port management and troubleshooting
 - Recent changes and consolidation
 
 #### 🚀 [VERCEL_DEPLOYMENT_GUIDE.md](./VERCEL_DEPLOYMENT_GUIDE.md)
+
 Complete deployment guide for Vercel platform.
+
 - Architecture overview
 - Deployment commands and setup
 - Vercel configuration
@@ -62,7 +63,9 @@ Complete deployment guide for Vercel platform.
 - Common issues and solutions
 
 #### 📊 [ADMIN_DASHBOARD.md](./ADMIN_DASHBOARD.md)
+
 Comprehensive guide for the admin dashboard functionality.
+
 - Features and capabilities
 - Access methods and authentication
 - CRUD operations for leads
@@ -70,7 +73,9 @@ Comprehensive guide for the admin dashboard functionality.
 - Troubleshooting guide
 
 #### 🔐 [ENVIRONMENT_VARIABLES_CHECKLIST.md](./ENVIRONMENT_VARIABLES_CHECKLIST.md)
+
 Checklist for required environment variables.
+
 - Required variables for Edge Functions
 - Local development setup
 - Production configuration
@@ -78,28 +83,33 @@ Checklist for required environment variables.
 ## 🎯 Quick Navigation
 
 ### For New Developers
+
 1. Start with [CLAUDE.md](./CLAUDE.md) for complete overview
 2. Follow [QUICK_START.md](./QUICK_START.md) for setup
 3. Review [ADMIN_DASHBOARD.md](./ADMIN_DASHBOARD.md) for admin features
 
 ### For Deployment
+
 1. Review [VERCEL_DEPLOYMENT_GUIDE.md](./VERCEL_DEPLOYMENT_GUIDE.md)
 2. Check [ENVIRONMENT_VARIABLES_CHECKLIST.md](./ENVIRONMENT_VARIABLES_CHECKLIST.md)
 3. Verify environment variables are properly configured
 
 ### For Understanding Admin Functionality
+
 1. Review [ADMIN_DASHBOARD.md](./ADMIN_DASHBOARD.md) for admin features
 2. Check [CLAUDE.md](./CLAUDE.md) for complete development overview
 
 ## 🔄 Recent Updates
 
 ### Documentation Optimization (Current)
+
 - **Consolidated**: Removed outdated monorepo documentation
 - **Updated**: All files reflect current standalone app structure
 - **Streamlined**: Eliminated redundant and conflicting information
 - **Modernized**: Updated to reflect current technology stack and deployment
 
 ### Migration Context
+
 The project has been successfully migrated from a Turbo monorepo structure to a standalone React application. All documentation has been updated to reflect this change:
 
 - **Before**: Multiple apps (web, unified, admin, user) with complex workspace configuration
@@ -118,6 +128,7 @@ The project has been successfully migrated from a Turbo monorepo structure to a 
 ## 🌐 Multi-Hub System
 
 The application supports multiple business hubs:
+
 - **PercyTech**: Hub ID 0
 - **Gnymble**: Hub ID 1 (default)
 - **PercyMD**: Hub ID 2

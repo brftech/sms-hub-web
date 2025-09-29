@@ -20,12 +20,17 @@ const handleDirectCheckout = async () => {
     console.log("🔗 Payment link from env:", paymentLink);
     console.log("🌍 Environment:", import.meta.env.MODE);
     console.log("🔧 All env vars:", import.meta.env);
-    
+
     if (!paymentLink) {
-      console.error("❌ Payment link not configured. Available env vars:", Object.keys(import.meta.env));
-      throw new Error("Payment link not configured. Please check environment variables.");
+      console.error(
+        "❌ Payment link not configured. Available env vars:",
+        Object.keys(import.meta.env)
+      );
+      throw new Error(
+        "Payment link not configured. Please check environment variables."
+      );
     }
-    
+
     console.log("🚀 Redirecting to:", paymentLink);
     window.location.href = paymentLink;
   } catch (error) {
@@ -44,7 +49,6 @@ const Navigation = () => {
   const getLogo = () => {
     return <HubLogo hubType={currentHub} variant="icon" size="lg" />;
   };
-
 
   const handleNavClick = (path: string) => {
     setIsMobileMenuOpen(false);
@@ -142,13 +146,8 @@ const Navigation = () => {
               variant="outline"
               size="sm"
               onClick={() => {
-                if (webEnvironment.isProduction()) {
-                  // In production, go to the existing app.{hub}.com
-                  window.location.href = `https://app.${currentHub}.com`;
-                } else {
-                  // In development, go to localhost:3001 (customer app)
-                  window.location.href = "http://localhost:3001";
-                }
+                // Navigate to admin dashboard (now part of this app)
+                window.location.href = "/admin";
               }}
               className="transition-all duration-300 backdrop-blur-sm px-4 py-1.5 text-xs bg-black/50 text-white border border-orange-500/50 hover:bg-orange-500/10 hover:border-orange-400"
             >
@@ -162,13 +161,8 @@ const Navigation = () => {
               variant="outline"
               size="sm"
               onClick={() => {
-                if (webEnvironment.isProduction()) {
-                  // In production, go to the existing app.{hub}.com
-                  window.location.href = `https://app.${currentHub}.com`;
-                } else {
-                  // In development, go to localhost:3001 (customer app)
-                  window.location.href = "http://localhost:3001";
-                }
+                // Navigate to admin dashboard (now part of this app)
+                window.location.href = "/admin";
               }}
               className="transition-all duration-300 backdrop-blur-sm px-3 py-1.5 text-xs bg-black/50 text-white border border-orange-500/50 hover:bg-orange-500/10 hover:border-orange-400"
             >

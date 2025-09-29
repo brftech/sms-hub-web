@@ -21,40 +21,10 @@ function detectHub(): string {
 }
 
 /**
- * Get unified app URL based on current hub and environment
+ * Get admin dashboard URL (now part of this app)
  */
-function getUnifiedUrl(env: Environment, hub: string): string {
-  // Allow environment variable override
-  if (import.meta.env.VITE_UNIFIED_APP_URL) {
-    return import.meta.env.VITE_UNIFIED_APP_URL;
-  }
-
-  // Development - always localhost
-  if (env === "development") {
-    return "http://localhost:3001";
-  }
-
-  // Production URLs - temporarily redirect all to app.gnymble.com
-  if (env === "production") {
-    return "https://app.gnymble.com";
-  }
-
-  // Staging URLs
-  if (env === "staging") {
-    switch (hub) {
-      case "percytech":
-        return "https://unified-staging.percytech.com";
-      case "percymd":
-        return "https://unified-staging.percymd.com";
-      case "percytext":
-        return "https://unified-staging.percytext.com";
-      default:
-        return "https://unified-staging.gnymble.com";
-    }
-  }
-
-  // Fallback
-  return "https://app.gnymble.com";
+function getAdminUrl(): string {
+  return "/admin";
 }
 
 interface EnvironmentConfig {
@@ -65,7 +35,7 @@ interface EnvironmentConfig {
 
   // URLs
   webAppUrl: string;
-  unifiedAppUrl: string;
+  adminUrl: string;
   supabaseUrl: string;
 
   // Features
@@ -143,7 +113,7 @@ function getSupabaseConfig(env: Environment) {
       };
     case "production":
       return {
-        url: "https://fwlivygerbqzowbzxesw.supabase.co", 
+        url: "https://fwlivygerbqzowbzxesw.supabase.co",
         anonKey: import.meta.env.VITE_SUPABASE_ANON_KEY || "",
       };
     case "staging":
@@ -181,7 +151,7 @@ export function getEnvironmentConfig(): EnvironmentConfig {
         isStaging: false,
         isProduction: true,
         webAppUrl: import.meta.env.VITE_WEB_APP_URL || window.location.origin,
-        unifiedAppUrl: getUnifiedUrl(env, hub),
+        adminUrl: getAdminUrl(),
         skipEmailConfirmation: false,
         enableDevAuth: false,
         enableDebugMode: false,
@@ -195,7 +165,7 @@ export function getEnvironmentConfig(): EnvironmentConfig {
         isStaging: true,
         isProduction: false,
         webAppUrl: import.meta.env.VITE_WEB_APP_URL || window.location.origin,
-        unifiedAppUrl: getUnifiedUrl(env, hub),
+        adminUrl: getAdminUrl(),
         skipEmailConfirmation: false,
         enableDevAuth: true, // Allow dev auth in staging for testing
         enableDebugMode: true,
@@ -211,7 +181,7 @@ export function getEnvironmentConfig(): EnvironmentConfig {
         isStaging: false,
         isProduction: false,
         webAppUrl: import.meta.env.VITE_WEB_APP_URL || "http://localhost:3000",
-        unifiedAppUrl: getUnifiedUrl(env, hub),
+        adminUrl: getAdminUrl(),
         skipEmailConfirmation:
           import.meta.env.VITE_SKIP_EMAIL_CONFIRMATION === "true",
         enableDevAuth: true,
@@ -236,11 +206,13 @@ if (environmentConfig.enableDebugMode) {
     environment: environmentConfig.name,
     urls: {
       web: environmentConfig.webAppUrl,
-      unified: environmentConfig.unifiedAppUrl,
+      admin: environmentConfig.adminUrl,
       supabase: environmentConfig.supabaseUrl,
     },
     database: {
-      project: environmentConfig.supabaseUrl.includes('hmumtnpnyxuplvqcmnfk') ? 'web-dev' : 'web-prod',
+      project: environmentConfig.supabaseUrl.includes("hmumtnpnyxuplvqcmnfk")
+        ? "web-dev"
+        : "web-prod",
       environment: environmentConfig.name,
     },
     features: {

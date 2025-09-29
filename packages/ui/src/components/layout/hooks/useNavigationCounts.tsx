@@ -52,6 +52,7 @@ export function useNavigationCounts(config: NavigationCountsConfig) {
         return () => clearInterval(interval);
       }
     }
+    return undefined;
   }, [fetchCounts, config.refreshInterval, config.enabled]);
 
   // Refetch when hubId or globalView changes

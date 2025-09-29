@@ -74,6 +74,7 @@ const FloatingHubSwitcher = () => {
       document.addEventListener("mousedown", handleClickOutside);
       return () => document.removeEventListener("mousedown", handleClickOutside);
     }
+    return undefined;
   }, [isExpanded]);
 
   // Only show if hub switcher is enabled

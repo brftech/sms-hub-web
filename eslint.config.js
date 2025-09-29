@@ -33,9 +33,9 @@ export default [
     rules: {
       ...typescript.configs.recommended.rules,
       ...react.configs.recommended.rules,
-      // React hooks rules - temporarily disabled due to ESLint 9.x compatibility issues
-      'react-hooks/rules-of-hooks': 'off',
-      'react-hooks/exhaustive-deps': 'off',
+      // React hooks rules
+      'react-hooks/rules-of-hooks': 'error',
+      'react-hooks/exhaustive-deps': 'warn',
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
       '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/no-unnecessary-type-constraint': 'error',
@@ -51,6 +51,16 @@ export default [
       'no-prototype-builtins': 'warn',
       'require-yield': 'warn',
       'no-empty': 'warn',
+      'prefer-const': 'error',
+      'no-var': 'error',
+      'object-shorthand': 'error',
+      'prefer-template': 'error',
+      'prefer-arrow-callback': 'error',
+      'arrow-spacing': 'error',
+      'no-duplicate-imports': 'error',
+      'no-useless-return': 'error',
+      'no-console': 'warn',
+      'no-debugger': 'warn',
     },
     settings: {
       react: {

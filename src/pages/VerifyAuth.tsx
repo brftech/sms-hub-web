@@ -92,6 +92,7 @@ export function VerifyAuth() {
       return () => clearTimeout(timer);
     } else {
       setCanResend(true);
+      return undefined;
     }
   }, [resendTimer]);
 

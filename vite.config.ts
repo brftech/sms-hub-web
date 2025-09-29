@@ -6,8 +6,13 @@ import path from "path";
 export default defineConfig(({ mode }) => ({
   envDir: ".", // Load .env from current directory
   server: {
-    host: "localhost",
+    host: true, // Allow external connections
     port: 3000,
+    open: false, // Don't auto-open browser
+    cors: true,
+    hmr: {
+      overlay: true, // Show error overlay
+    },
   },
   plugins: [react({
     jsxRuntime: 'automatic',
@@ -33,10 +38,15 @@ export default defineConfig(({ mode }) => ({
     },
     rollupOptions: {
       output: {
-        // Simplified chunking strategy
+        // Advanced chunking strategy for better caching
         manualChunks: {
-          vendor: ['react', 'react-dom', 'react-router-dom'],
-          ui: ['@sms-hub/ui'],
+          'react-core': ['react', 'react-dom'],
+          'react-router': ['react-router-dom'],
+          'ui-components': ['@sms-hub/ui'],
+          'data-layer': ['@supabase/supabase-js', '@tanstack/react-query'],
+          'utils': ['@sms-hub/utils', '@sms-hub/logger'],
+          'icons': ['lucide-react'],
+          'styling': ['styled-components', 'tailwindcss-animate'],
         },
         chunkFileNames: 'assets/[name]-[hash].js',
         entryFileNames: 'assets/[name]-[hash].js',

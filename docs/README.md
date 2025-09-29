@@ -61,12 +61,13 @@ Complete deployment guide for Vercel platform.
 - Environment variables
 - Common issues and solutions
 
-#### ⚡ [EDGE_FUNCTIONS_STATUS.md](./EDGE_FUNCTIONS_STATUS.md)
-Status and deployment information for Supabase Edge Functions.
-- Deployed functions list
-- Environment configuration
-- Deployment commands
-- Monitoring and debugging
+#### 📊 [ADMIN_DASHBOARD.md](./ADMIN_DASHBOARD.md)
+Comprehensive guide for the admin dashboard functionality.
+- Features and capabilities
+- Access methods and authentication
+- CRUD operations for leads
+- Security considerations
+- Troubleshooting guide
 
 #### 🔐 [ENVIRONMENT_VARIABLES_CHECKLIST.md](./ENVIRONMENT_VARIABLES_CHECKLIST.md)
 Checklist for required environment variables.
@@ -77,18 +78,18 @@ Checklist for required environment variables.
 ## 🎯 Quick Navigation
 
 ### For New Developers
-1. Start with [PROJECT_OVERVIEW.md](./PROJECT_OVERVIEW.md)
+1. Start with [CLAUDE.md](./CLAUDE.md) for complete overview
 2. Follow [QUICK_START.md](./QUICK_START.md) for setup
-3. Read [CLAUDE.md](./CLAUDE.md) for detailed development guidelines
+3. Review [ADMIN_DASHBOARD.md](./ADMIN_DASHBOARD.md) for admin features
 
 ### For Deployment
 1. Review [VERCEL_DEPLOYMENT_GUIDE.md](./VERCEL_DEPLOYMENT_GUIDE.md)
 2. Check [ENVIRONMENT_VARIABLES_CHECKLIST.md](./ENVIRONMENT_VARIABLES_CHECKLIST.md)
-3. Verify [EDGE_FUNCTIONS_STATUS.md](./EDGE_FUNCTIONS_STATUS.md)
+3. Verify environment variables are properly configured
 
-### For Understanding User Flow
-1. Review [PROJECT_SUMMARY.md](./PROJECT_SUMMARY.md) for complete overview
-2. Check [EDGE_FUNCTIONS_STATUS.md](./EDGE_FUNCTIONS_STATUS.md) for backend functions
+### For Understanding Admin Functionality
+1. Review [ADMIN_DASHBOARD.md](./ADMIN_DASHBOARD.md) for admin features
+2. Check [CLAUDE.md](./CLAUDE.md) for complete development overview
 
 ## 🔄 Recent Updates
 

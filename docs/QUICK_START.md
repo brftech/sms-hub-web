@@ -24,11 +24,9 @@ npm run dev
 ```
 
 ### Access Points
-- **Web App**: http://localhost:3000 (marketing and auth gateway)
-- **Development Superadmin**: http://localhost:3000/?superadmin=dev123
-- **Protected Superadmin Accounts**:
-  - superadmin@percytech.com (protected from deletion)
-  - superadmin@gnymble.com (protected from deletion)
+- **Web App**: http://localhost:3000 (marketing website with admin dashboard)
+- **Admin Dashboard**: Access via admin access code (set in Vercel environment variables)
+- **Development Mode**: Debug panels and hub switcher automatically visible
 
 ## 🔑 Key Concepts
 
@@ -38,20 +36,17 @@ npm run dev
 - **PercyMD**: Hub ID 2
 - **PercyText**: Hub ID 3
 
-### User Roles (Fixed Hierarchy)
-- **User**: Basic SMS functionality (corrected from MEMBER role)
-- **Onboarded**: Full access after completing onboarding
-- **Admin**: Company management with **global view default**
-- **Superadmin**: Cross-hub access with **account protection**
+### Admin Access
+- **Development**: Admin dashboard automatically accessible
+- **Production**: Requires admin access code for authentication
+- **Token Expiration**: 24-hour authentication tokens
+- **Security**: Access codes removed from URL after authentication
 
-### Authentication (Enhanced)
-- **Magic Link Auth**: Enhanced signup flow prevents session carryover
-- **Protected Superadmin Access**: 
-  - superadmin@percytech.com (protected from deletion)
-  - superadmin@gnymble.com (protected from deletion)
-- **Development Mode**: Add `?superadmin=dev123` to URL (bypass auth)
-- **B2B/B2C Support**: Comprehensive account creation for both business models
-- **Enhanced Security**: Proper session isolation and validation
+### Hub Branding
+- **PercyTech**: Red theme (Hub ID 0)
+- **Gnymble**: Orange theme (Hub ID 1, default)
+- **PercyMD**: Red theme (Hub ID 2)
+- **PercyText**: Purple theme (Hub ID 3)
 
 ## 🛠️ Common Tasks
 
@@ -69,50 +64,44 @@ supabase gen types typescript --project-id vgpovgpwqkjnpnrjelyg > packages/supab
 supabase db push
 ```
 
-### Clean Up Data (Enhanced Protection)
-1. Go to admin dashboard (defaults to **global view**)
-2. Scroll to "Data Cleanup" section
-3. Click "Preview Cleanup" to see what would be deleted
-4. Click "Execute Cleanup" to delete payment track data
-5. **Protected accounts** (superadmin@percytech.com, superadmin@gnymble.com) are automatically preserved
-6. **Delete buttons disabled** for protected accounts in user management
+### Admin Dashboard Access
+1. **Development**: Click red shield button in bottom-left corner
+2. **Production**: 
+   - Visit site with `?admin=YOUR_ACCESS_CODE` parameter
+   - Or click red shield button and enter access code when prompted
+3. **Features**: View database statistics, manage leads with CRUD operations
 
 ## 🐛 Common Issues (Updated)
 
-### "Magic link authentication failed"
-**Solution**: Clear browser storage, ensure proper session isolation, avoid mixing auth methods
-
-### "Incorrect role assignment (MEMBER instead of USER)"
-**Solution**: **FIXED** - Edge Functions now properly assign USER role
-
-### "Multiple GoTrueClient instances"
-**Solution**: Use `getSupabaseClient()` singleton in Unified app
+### "Process is not defined" Error
+**Solution**: Use `import.meta.env` in Vite apps, not `process.env`
 
 ### Type errors after schema changes
-**Solution**: Run `pnpm type-check` and update service files
+**Solution**: Run `npm run type-check` and update service files
 
-### "Superadmin account deletion blocked"
-**Solution**: **WORKING AS INTENDED** - Protected accounts cannot be deleted
+### "Admin access code not working"
+**Solution**: Verify `VITE_ADMIN_ACCESS_CODE` is set in Vercel environment variables
 
-### SMS not working
-**Solution**: Check Zapier webhook configuration and Edge Function logs
+### Contact form styling issues
+**Solution**: Check Tailwind CSS classes and hub-specific color configurations
 
-### Payment issues
-**Solution**: Verify Stripe configuration, webhook setup, and enhanced validation logic
+### "Debug panels showing in production"
+**Solution**: Verify environment detection - panels should be hidden in production
 
-### "Session carryover between users"
-**Solution**: **FIXED** - Magic link authentication prevents this issue
+### Build failures
+**Solution**: Run `npm run type-check` and `npm run lint` to identify issues
 
 ## 📁 Key Files
 
-- `src/pages/Signup.tsx` - User signup
-- `src/pages/Login.tsx` - User login
-- `packages/supabase/src/types.ts` - Database types
+- `src/pages/AdminDashboard.tsx` - Admin dashboard with CRUD operations
+- `src/pages/Contact.tsx` - Contact form with lead capture
+- `src/components/FloatingAdminButton.tsx` - Admin access button
+- `packages/supabase/src/types/database.ts` - Database types
 - `supabase/functions/` - Edge Functions
 
 ## 🎯 Development Rules
 
-1. **NO CSS files** - Use styled-components only
+1. **NO CSS files** - Use Tailwind CSS only
 2. **Always include hub_id** in database operations
 3. **Use import.meta.env** in Vite apps, not process.env
 4. **Never expose service role key** in frontend
@@ -120,52 +109,49 @@ supabase db push
 
 ## 📚 Documentation (Updated)
 
-- `CLAUDE.md` - Complete development guide with latest changes
-- `docs/ONBOARDING_FLOW.md` - User journey with **magic link authentication**
-- `docs/ARCHITECTURE_STATUS.md` - Current architecture with **security enhancements**
-- `docs/PROJECT_SUMMARY.md` - Comprehensive overview with **recent improvements**
+- `docs/CLAUDE.md` - Complete development guide with latest changes
+- `docs/ADMIN_DASHBOARD.md` - Admin dashboard documentation
 - `docs/ENVIRONMENT_VARIABLES_CHECKLIST.md` - Environment setup guide
-- `docs/PORT_ASSIGNMENTS.md` - Port configuration with **recent updates**
+- `docs/PORT_ASSIGNMENTS.md` - Port configuration
+- `docs/VERCEL_DEPLOYMENT_GUIDE.md` - Deployment instructions
 
 ## 🔧 Environment Variables
 
 ```bash
-# Required for all apps
-VITE_SUPABASE_URL=https://vgpovgpwqkjnpnrjelyg.supabase.co
+# Required for web app
+VITE_SUPABASE_URL=https://hmumtnpnyxuplvqcmnfk.supabase.co  # web-dev
 VITE_SUPABASE_ANON_KEY=[your-anon-key]
 
-# Development
-VITE_DEVELOPMENT_MODE=true
-VITE_DEV_AUTH_TOKEN=dev123
+# Admin access
+VITE_ADMIN_ACCESS_CODE=[your-secure-admin-code]
 
-# Edge Functions
-SUPABASE_SERVICE_ROLE_KEY=[your-service-role-key]
-ZAPIER_SMS_WEBHOOK_URL=[your-zapier-webhook]
-RESEND_API_KEY=[your-resend-key]
-STRIPE_SECRET_KEY=[your-stripe-key]
+# Stripe integration (optional)
+VITE_STRIPE_PAYMENT_LINK=[your-stripe-payment-link]
+VITE_STRIPE_PAYMENT_LINK_STARTER=[starter-plan-link]
+VITE_STRIPE_PAYMENT_LINK_CORE=[core-plan-link]
+VITE_STRIPE_PAYMENT_LINK_ELITE=[elite-plan-link]
 ```
 
-## 🎯 Current Status (September 2025)
+## 🎯 Current Status (December 2024)
 
 ### Recently Completed ✅
-- **Magic Link Authentication**: Prevents session carryover, enhanced security
-- **Role Management Fix**: USER role correctly assigned (was MEMBER)
-- **Superadmin Protection**: Account deletion prevention implemented
-- **B2B/B2C Enhancement**: Comprehensive account creation support
-- **Global View Default**: Admin dashboard improved UX
-- **UI Improvements**: Responsive design and better user experience
-- **Enhanced Edge Functions**: Comprehensive validation and error handling
-- **Schema Alignment**: Complete with type safety
-- **Payment Track Cleanup**: Implemented with protection
+- **Admin Dashboard CRUD**: Full Create, Read, Update, Delete functionality for leads
+- **Dynamic Database Connection**: web-dev in development, web-prod in production
+- **Contact Form Fixes**: Consistent styling and proper hub branding
+- **Environment Controls**: Debug panels and hub switcher hidden in production
+- **Logo Standardization**: Consistent branding across all hubs
+- **Accessibility Improvements**: Better contrast ratios and text visibility
+- **Code Quality**: Zero TypeScript and ESLint errors
+- **Documentation Updates**: All docs reflect current architecture
 
 ### Development Status
-- ✅ **Authentication & Security**: Enhanced and production-ready
-- ✅ **Role Management**: Fixed and working correctly
-- ✅ **Account Protection**: Superadmin accounts protected
-- ✅ **UI/UX**: Responsive and improved
-- ✅ **Type Safety**: Comprehensive
-- ✅ **Database**: Aligned with enhanced validation
+- ✅ **Admin Dashboard**: Full CRUD operations with secure authentication
+- ✅ **Contact Forms**: Consistent styling and proper branding
+- ✅ **Environment Controls**: Proper dev/prod behavior
+- ✅ **Logo Organization**: Standardized across all hubs
+- ✅ **Accessibility**: Improved contrast and WCAG compliance
+- ✅ **Type Safety**: Comprehensive with zero errors
 
-**Status: PRODUCTION READY with Enhanced Security!** 🚀
+**Status: PRODUCTION READY with Complete Admin Functionality!** 🚀
 
-**Latest Achievement**: Magic link authentication, role fixes, and comprehensive security enhancements implemented.
+**Latest Achievement**: Admin dashboard with full CRUD operations and dynamic database connections implemented.

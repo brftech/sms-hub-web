@@ -3,24 +3,23 @@
 ## 📋 Current Status
 
 **Architecture**: Standalone React application
-- ✅ **Web App (Port 3000)**: Marketing & authentication gateway
+- ✅ **Web App (Port 3000)**: Marketing website with admin dashboard
 - ❌ **Legacy Apps**: All removed/migrated (ports 3001-3005)
 
 ## 🚀 Production Ports
 
 ### Web App (Port 3000)
-- **Purpose**: Marketing site and authentication gateway
+- **Purpose**: Marketing website with admin dashboard
 - **URL**: http://localhost:3000
 - **Features**:
   - Hub-specific landing pages
-  - Lead capture forms
-  - Login/signup forms
-  - Authentication gateway
-  - User dashboard (authenticated users)
-  - Admin dashboard (admin users)
-  - SMS campaign management
-  - Contact management
-  - Account settings
+  - Contact forms with lead capture
+  - Pricing pages with Stripe integration
+  - Admin dashboard with CRUD operations
+  - Hub-specific branding and theming
+  - Floating debug panel (development only)
+  - Floating hub switcher (development only)
+  - Floating admin button with access code authentication
   
 ## 🗑️ Legacy Ports (Removed)
 

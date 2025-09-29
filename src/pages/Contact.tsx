@@ -161,7 +161,7 @@ const Contact = () => {
           {/* Contact Form Section */}
           <div className="mb-12 sm:mb-16 lg:mb-20">
             <div className="max-w-4xl mx-auto px-2 sm:px-0">
-              <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-2xl sm:rounded-3xl border border-gray-700/50 p-4 sm:p-6 lg:p-8 shadow-2xl relative overflow-hidden">
+              <div className="bg-black backdrop-blur-sm rounded-2xl sm:rounded-3xl border border-gray-800 p-4 sm:p-6 lg:p-8 shadow-2xl relative overflow-hidden">
                 {/* Background pattern */}
                 <div
                   className={`absolute inset-0 bg-gradient-to-br ${hubColors.gradient} opacity-5`}
@@ -173,6 +173,7 @@ const Contact = () => {
                     submitText="Send Message"
                     submitLoading={isSubmitting}
                     submitDisabled={isSubmitting}
+                    buttonClassName={`${hubColors.bg} ${hubColors.text} hover:${hubColors.bgHover} transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105`}
                   >
                     <div className="grid md:grid-cols-2 gap-6 mb-6">
                       <div className="group">
@@ -262,6 +263,7 @@ const Contact = () => {
                           onChange={(value) =>
                             setFormData((prev) => ({ ...prev, message: value }))
                           }
+                          className="[&_textarea]:bg-white [&_textarea]:text-black [&_textarea]:placeholder-gray-500"
                         />
                       </div>
                     </div>
@@ -273,9 +275,7 @@ const Contact = () => {
 
           {/* Additional Info Section */}
           <div className="mb-20">
-            <div
-              className={`bg-gradient-to-r ${hubColors.gradient} opacity-10 ${hubColors.borderLight} rounded-3xl p-12 backdrop-blur-sm`}
-            >
+            <div className="bg-black border border-gray-800 rounded-3xl p-12 backdrop-blur-sm">
               <div className="text-center mb-12">
                 <h2
                   className="text-3xl md:text-4xl font-bold text-white mb-6"
@@ -284,7 +284,7 @@ const Contact = () => {
                   Why We're Different
                 </h2>
                 <p
-                  className="text-xl text-gray-300 max-w-3xl mx-auto"
+                  className="text-xl text-gray-200 max-w-3xl mx-auto"
                   style={{ fontFamily: "Inter, system-ui, sans-serif" }}
                 >
                   We're not just another SMS provider. We're the platform that

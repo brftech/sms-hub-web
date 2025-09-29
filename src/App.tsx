@@ -301,17 +301,9 @@ const AppRoutes = () => {
 };
 
 const App = () => {
-  // Debug environment detection
+  // Environment detection
   useEffect(() => {
-    console.log("App component mounted");
-    console.log("Environment Debug:", {
-      hostname: window.location.hostname,
-      mode: import.meta.env.MODE,
-      isDev: webEnvironment.isDevelopment(),
-      isStaging: webEnvironment.isStaging(),
-      isProd: webEnvironment.isProduction(),
-      current: webEnvironment.getCurrent(),
-    });
+    // Environment is detected and configured via webEnvironment
   }, []);
 
   return (

@@ -10,27 +10,29 @@ import {
   CreditCard,
 } from "lucide-react";
 import { getHubColorClasses } from "@sms-hub/utils";
+import { getEnvironmentConfig } from "../config/environment";
+
+// Get login URL based on environment
+const getLoginUrl = () => {
+  const envConfig = getEnvironmentConfig();
+  if (envConfig.isProduction) {
+    return "https://app.gnymble.com";
+  }
+  return "http://localhost:3001/login";
+};
 
 // Direct Stripe checkout helper
 const handleDirectCheckout = async () => {
   try {
     // Redirect directly to Stripe Payment Link
     const paymentLink = import.meta.env.VITE_STRIPE_PAYMENT_LINK;
-    console.log("🔗 Payment link from env:", paymentLink);
-    console.log("🌍 Environment:", import.meta.env.MODE);
-    console.log("🔧 All env vars:", import.meta.env);
 
     if (!paymentLink) {
-      console.error(
-        "❌ Payment link not configured. Available env vars:",
-        Object.keys(import.meta.env)
-      );
       throw new Error(
         "Payment link not configured. Please check environment variables."
       );
     }
 
-    console.log("🚀 Redirecting to:", paymentLink);
     window.location.href = paymentLink;
   } catch (error) {
     console.error("Checkout error:", error);
@@ -145,8 +147,8 @@ const Navigation = () => {
               variant="outline"
               size="sm"
               onClick={() => {
-                // Navigate to login page on port 3001
-                window.location.href = "http://localhost:3001/login";
+                // Navigate to login page (production: app.gnymble.com, dev: localhost:3001)
+                window.location.href = getLoginUrl();
               }}
               className="transition-all duration-300 backdrop-blur-sm px-6 py-2 text-sm bg-black/50 text-white border border-orange-500/50 hover:bg-orange-500/10 hover:border-orange-400 min-w-[80px]"
             >
@@ -229,8 +231,8 @@ const Navigation = () => {
                 <Button
                   onClick={() => {
                     setIsMobileMenuOpen(false);
-                    // Navigate to login page on port 3001
-                    window.location.href = "http://localhost:3001/login";
+                    // Navigate to login page (production: app.gnymble.com, dev: localhost:3001)
+                    window.location.href = getLoginUrl();
                   }}
                   className="w-full bg-black/50 text-white border border-orange-500/50 hover:bg-orange-500/10 hover:border-orange-400 font-medium py-3 text-sm h-12"
                 >

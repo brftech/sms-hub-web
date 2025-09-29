@@ -37,7 +37,6 @@ const StripeSync = () => {
     const hubId = parseInt(formData.get("hub_id") as string) || 1;
 
     try {
-      console.log("🔄 Syncing Stripe customer:", stripeCustomerId);
 
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/sync-stripe-customer`,
@@ -63,9 +62,8 @@ const StripeSync = () => {
       }
 
       setResult(data);
-      console.log("✅ Sync successful:", data);
     } catch (err) {
-      console.error("❌ Sync failed:", err);
+      // Error handled by UI state
       setError(err instanceof Error ? err.message : "Failed to sync customer");
     } finally {
       setIsLoading(false);
@@ -86,7 +84,6 @@ const StripeSync = () => {
     const stripeCustomerId = formData.get("stripe_customer_id") as string;
 
     try {
-      console.log("🔐 Authenticating customer:", email);
 
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/authenticate-stripe-customer`,
@@ -111,9 +108,8 @@ const StripeSync = () => {
       }
 
       setResult(data);
-      console.log("✅ Authentication successful:", data);
     } catch (err) {
-      console.error("❌ Authentication failed:", err);
+      // Error handled by UI state
       setError(
         err instanceof Error ? err.message : "Failed to authenticate customer"
       );

@@ -105,9 +105,7 @@ export class EnhancedErrorBoundary extends Component<Props, State> {
 
 // Hook for error reporting
 export function useErrorHandler() {
-  return (error: Error, errorInfo?: ErrorInfo) => {
-    console.error('Error caught by useErrorHandler:', error, errorInfo);
-    
+  return (_error: Error, _errorInfo?: ErrorInfo) => {
     // In production, send to error reporting service
     if (import.meta.env.PROD) {
       // Example: sendToErrorReporting(error, errorInfo);

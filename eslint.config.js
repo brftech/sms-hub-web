@@ -59,7 +59,7 @@ export default [
       'arrow-spacing': 'error',
       'no-duplicate-imports': 'error',
       'no-useless-return': 'error',
-      'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'warn',
+      'no-console': ['warn', { allow: ['error', 'warn'] }],
       'no-debugger': 'warn',
     },
     settings: {

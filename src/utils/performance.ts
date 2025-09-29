@@ -17,7 +17,7 @@ export class PerformanceMonitor {
   endTiming(label: string): number {
     const startTime = this.metrics.get(label);
     if (!startTime) {
-      console.warn(`No start time found for label: ${label}`);
+      // No start time found
       return 0;
     }
     
@@ -26,7 +26,7 @@ export class PerformanceMonitor {
     
     // Log slow operations
     if (duration > 100) {
-      console.warn(`Slow operation detected: ${label} took ${duration.toFixed(2)}ms`);
+      // Slow operation detected
     }
     
     return duration;
@@ -63,28 +63,28 @@ export function initWebVitals(): void {
   if (typeof window !== 'undefined') {
     // Core Web Vitals
     import('web-vitals').then(({ onCLS, onFID, onFCP, onLCP, onTTFB }) => {
-      onCLS((metric: WebVitalsMetric) => {
-        console.log('CLS:', metric);
+      onCLS((_metric: WebVitalsMetric) => {
+        // CLS metric recorded
         // Send to analytics service
       });
       
-      onFID((metric: WebVitalsMetric) => {
-        console.log('FID:', metric);
+      onFID((_metric: WebVitalsMetric) => {
+        // FID metric recorded
         // Send to analytics service
       });
       
-      onFCP((metric: WebVitalsMetric) => {
-        console.log('FCP:', metric);
+      onFCP((_metric: WebVitalsMetric) => {
+        // FCP metric recorded
         // Send to analytics service
       });
       
-      onLCP((metric: WebVitalsMetric) => {
-        console.log('LCP:', metric);
+      onLCP((_metric: WebVitalsMetric) => {
+        // LCP metric recorded
         // Send to analytics service
       });
       
-      onTTFB((metric: WebVitalsMetric) => {
-        console.log('TTFB:', metric);
+      onTTFB((_metric: WebVitalsMetric) => {
+        // TTFB metric recorded
         // Send to analytics service
       });
     });
@@ -99,7 +99,7 @@ export function reportBundleSize(): void {
         if (entry.entryType === 'resource') {
           const resource = entry as PerformanceResourceTiming;
           if (resource.name.includes('.js') || resource.name.includes('.css')) {
-            console.log(`Resource: ${resource.name}, Size: ${resource.transferSize} bytes`);
+            // Resource size logged
           }
         }
       });

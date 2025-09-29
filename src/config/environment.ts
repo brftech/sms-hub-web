@@ -186,25 +186,4 @@ export const isStaging = () => environmentConfig.isStaging;
 export const isProduction = () => environmentConfig.isProduction;
 export const getEnvironment = () => environmentConfig.name;
 
-// Debug logging (only in dev/staging)
-if (environmentConfig.enableDebugMode) {
-  console.log("🌍 Environment Configuration:", {
-    environment: environmentConfig.name,
-    urls: {
-      web: environmentConfig.webAppUrl,
-      admin: environmentConfig.adminUrl,
-      supabase: environmentConfig.supabaseUrl,
-    },
-    database: {
-      project: environmentConfig.supabaseUrl.includes("hmumtnpnyxuplvqcmnfk")
-        ? "web-dev"
-        : "web-prod",
-      environment: environmentConfig.name,
-    },
-    features: {
-      skipEmail: environmentConfig.skipEmailConfirmation,
-      devAuth: environmentConfig.enableDevAuth,
-      debug: environmentConfig.enableDebugMode,
-    },
-  });
-}
+// Debug logging is handled by EnvironmentDebug component

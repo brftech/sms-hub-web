@@ -28,7 +28,7 @@ export class ContactService {
     })
 
     if (error) {
-      console.error('Contact submission error:', error)
+      // Error handled by caller
       throw new Error('Failed to submit contact form')
     }
 

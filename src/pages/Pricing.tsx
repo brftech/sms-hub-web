@@ -22,9 +22,6 @@ const Pricing = () => {
 
   // Payment link handler - much simpler!
   const handleDirectCheckout = async (planType: string) => {
-    console.log("🚀 handleDirectCheckout called with planType:", planType);
-    console.log("🌍 Environment:", import.meta.env.MODE);
-    console.log("🔧 All env vars:", import.meta.env);
     setIsLoading(true);
 
     try {
@@ -42,19 +39,16 @@ const Pricing = () => {
       };
 
       const paymentLink = paymentLinks[planType as keyof typeof paymentLinks];
-      console.log("🔗 Payment link:", paymentLink);
 
       if (!paymentLink) {
-        console.error("❌ No payment link found for plan:", planType);
-        console.error("Available env vars:", Object.keys(import.meta.env));
+        // Payment link not configured
         throw new Error(`Payment link not configured for plan: ${planType}. Please check environment variables.`);
       }
 
       // Redirect directly to Stripe Payment Link
-      console.log("🔄 Redirecting to Stripe Payment Link:", paymentLink);
       window.location.href = paymentLink;
-    } catch (error) {
-      console.error("Payment link error:", error);
+    } catch {
+      // Error handled by UI
       alert("Failed to start checkout. Please try again.");
     } finally {
       setIsLoading(false);

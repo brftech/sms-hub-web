@@ -96,14 +96,13 @@ export function CheckEmail() {
         throw new Error(result.error || "Failed to resend email");
       }
 
-      console.log("Resend verification response:", result);
       setResendMessage("Verification email sent successfully!");
       setResendCooldown(60); // 60 second cooldown
       
       // Clear success message after 5 seconds
       setTimeout(() => setResendMessage(""), 5000);
     } catch (error) {
-      console.error("Failed to resend email:", error);
+      // Error handled by UI state
       setResendMessage(error instanceof Error ? error.message : "Failed to resend email");
       
       // Clear error message after 5 seconds

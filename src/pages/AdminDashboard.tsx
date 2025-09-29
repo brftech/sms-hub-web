@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Card, 
   CardContent, 
@@ -76,12 +76,6 @@ export const AdminDashboard: React.FC = () => {
   // Use environment configuration for Supabase connection
   const [supabase] = useState(() => {
     const envConfig = getEnvironmentConfig();
-    console.log('🔗 Admin Dashboard Environment Config:', {
-      environment: envConfig.name,
-      supabaseUrl: envConfig.supabaseUrl,
-      isDevelopment: envConfig.isDevelopment,
-      isProduction: envConfig.isProduction
-    });
     return createClient(envConfig.supabaseUrl, import.meta.env.VITE_SUPABASE_ANON_KEY);
   });
   
@@ -172,12 +166,11 @@ export const AdminDashboard: React.FC = () => {
     }
   };
 
-  const fetchDatabaseStats = async () => {
+  const fetchDatabaseStats = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
 
-      console.log('📊 Fetching database statistics...');
 
       // Get table statistics with proper count queries
       const [leadsResult, emailSubscribersResult, hubsResult] = await Promise.all([
@@ -192,28 +185,14 @@ export const AdminDashboard: React.FC = () => {
           .select('*', { count: 'exact', head: true })
       ]);
 
-      console.log('📈 Database stats results:', {
-        emailSubscribers: emailSubscribersResult,
-        leads: leadsResult,
-        hubs: hubsResult
-      });
 
-      if (emailSubscribersResult.error) {
-        console.error('Email subscribers error:', emailSubscribersResult.error);
-      }
-      if (leadsResult.error) {
-        console.error('Leads error:', leadsResult.error);
-      }
-      if (hubsResult.error) {
-        console.error('Hubs error:', hubsResult.error);
-      }
+      // Check for errors silently
 
       // Use the count property from Supabase response
       const emailSubscribersCount = emailSubscribersResult.count || 0;
       const leadsCount = leadsResult.count || 0;
       const hubsCount = hubsResult.count || 0;
 
-      console.log('📊 Final counts:', { emailSubscribersCount, leadsCount, hubsCount });
 
       setTableStats([
         {
@@ -251,31 +230,23 @@ export const AdminDashboard: React.FC = () => {
           .order('hub_number', { ascending: true })
       ]);
 
-      console.log('📋 Recent data results:', {
-        emailSubscribers: emailSubscribersDataResult,
-        leads: leadsDataResult,
-        hubs: hubsDataResult
-      });
 
       if (emailSubscribersDataResult.error) {
-        console.error('Error fetching email subscribers:', emailSubscribersDataResult.error);
+        // Handle error silently
       } else {
         setRecentEmailSubscribers(emailSubscribersDataResult.data || []);
-        console.log('✅ Email subscribers loaded:', emailSubscribersDataResult.data?.length || 0);
       }
 
       if (leadsDataResult.error) {
-        console.error('Error fetching leads:', leadsDataResult.error);
+        // Handle error silently
       } else {
         setRecentLeads(leadsDataResult.data || []);
-        console.log('✅ Leads loaded:', leadsDataResult.data?.length || 0);
       }
 
       if (hubsDataResult.error) {
-        console.error('Error fetching hubs:', hubsDataResult.error);
+        // Handle error silently
       } else {
         setHubs(hubsDataResult.data || []);
-        console.log('✅ Hubs loaded:', hubsDataResult.data?.length || 0);
       }
 
       setLastRefresh(new Date());
@@ -284,13 +255,13 @@ export const AdminDashboard: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [supabase]);
 
   useEffect(() => {
     if (adminAuth) {
       fetchDatabaseStats();
     }
-  }, [adminAuth]);
+  }, [adminAuth, fetchDatabaseStats]);
 
   const exportData = async (tableName: string) => {
     try {
@@ -343,7 +314,6 @@ export const AdminDashboard: React.FC = () => {
         throw error;
       }
 
-      console.log('✅ Lead created successfully');
       setShowCreateLeadForm(false);
       resetLeadForm();
       await fetchDatabaseStats(); // Refresh data
@@ -370,7 +340,6 @@ export const AdminDashboard: React.FC = () => {
         throw error;
       }
 
-      console.log('✅ Lead updated successfully');
       setEditingLead(null);
       resetLeadForm();
       await fetchDatabaseStats(); // Refresh data
@@ -399,7 +368,6 @@ export const AdminDashboard: React.FC = () => {
         throw error;
       }
 
-      console.log('✅ Lead deleted successfully');
       setDeletingLead(null);
       await fetchDatabaseStats(); // Refresh data
     } catch (err) {

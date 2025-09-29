@@ -93,8 +93,8 @@ const Contact = () => {
           window.scrollTo({ top: 0, behavior: "smooth" });
         }, 100);
       }, 3000);
-    } catch (error) {
-      console.error("Submission error:", error);
+    } catch {
+      // Error handled by UI state
       toast({
         title: "Something went sideways",
         description: "Please try again or reach out directly.",

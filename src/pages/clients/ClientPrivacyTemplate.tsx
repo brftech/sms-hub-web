@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@sms-hub/ui";
 import { Link } from "react-router-dom";
 import gnymbleIconLogo from "@sms-hub/ui/assets/gnymble-icon-logo.svg";

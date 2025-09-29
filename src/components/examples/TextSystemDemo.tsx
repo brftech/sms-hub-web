@@ -1,12 +1,12 @@
 import React from 'react';
-import { Text, DescriptionText, CaptionText, SecondaryText, MutedText } from '../ui/Text';
+import { DescriptionText, CaptionText, SecondaryText, MutedText } from '../ui/Text';
 import { useTextStyles } from '../../hooks/useTextStyles';
 
 /**
  * Demo component showing the new text system in action
  */
 export const TextSystemDemo: React.FC = () => {
-  const { textClasses, getDescriptionText } = useTextStyles({
+  const { textClasses } = useTextStyles({
     variant: 'secondary',
     size: 'lg',
     center: true

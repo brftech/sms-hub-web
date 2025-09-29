@@ -49,33 +49,6 @@ export const webEnvironment: EnvironmentAdapter = {
     return "unknown";
   },
 
-  // Debug function to log environment detection
-  debug: () => {
-    const hostname = typeof window !== 'undefined' ? window.location.hostname : 'unknown';
-    const mode = import.meta.env.MODE;
-    const isDev = webEnvironment.isDevelopment();
-    const isStaging = webEnvironment.isStaging();
-    const isProd = webEnvironment.isProduction();
-    
-    console.log('Environment Debug:', {
-      hostname,
-      mode,
-      isDev,
-      isStaging,
-      isProd,
-      current: webEnvironment.getCurrent()
-    });
-    
-    return {
-      hostname,
-      mode,
-      isDev,
-      isStaging,
-      isProd,
-      current: webEnvironment.getCurrent()
-    };
-  },
-
   // Feature flags based on environment
   features: {
     hubSwitcher: () => webEnvironment.isDevelopment() || webEnvironment.isStaging(),

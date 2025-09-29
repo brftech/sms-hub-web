@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { PageLayout, SEO } from "@sms-hub/ui";
-import {
+import { 
+  PageLayout, 
+  SEO,
   Button,
   Card,
   CardContent,
@@ -96,7 +97,7 @@ const StripeSync = () => {
             Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
           },
           body: JSON.stringify({
-            email: email,
+            email,
             verification_code: verificationCode,
             stripe_customer_id: stripeCustomerId,
           }),

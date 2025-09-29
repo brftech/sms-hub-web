@@ -79,21 +79,10 @@ export const createAuthService = (client: SupabaseClient) => ({
       throw new Error("Verification not found");
     }
 
-    // Get hub name for account number generation
-    const { data: hub, error: hubError } = await client
-      .from("hubs")
-      .select("name")
-      .eq("hub_number", verification.hub_id)
-      .single();
-
-    if (hubError || !hub) {
-      throw new Error("Hub not found");
-    }
-
     // Create user in auth
     const { data: authData, error: authError } = await client.auth.signUp({
       email: verification.email,
-      phone: verification.mobile_phone_number,
+      phone: verification.mobile_phone,
       password: Math.random().toString(36), // Temporary password, user will set their own
     });
 
@@ -101,28 +90,19 @@ export const createAuthService = (client: SupabaseClient) => ({
       throw authError || new Error("Failed to create user");
     }
 
-    // Generate account number
-    const { data: accountNumber, error: accountError } = await client.rpc(
-      "generate_account_number",
-      { hub_name: hub.name }
-    );
-
-    if (accountError) throw accountError;
-
-    // Create user profile
+    // Create user profile (marketing-focused schema)
     const { data: profile, error: profileError } = await client
       .from("user_profiles")
       .insert([
         {
           id: authData.user.id,
           hub_id: verification.hub_id,
-          account_number: accountNumber,
-          first_name: verification.first_name,
-          last_name: verification.last_name,
-          mobile_phone_number: verification.mobile_phone_number,
           email: verification.email,
-          role: "MEMBER",
-          onboarding_step: "payment",
+          first_name: null, // Will be set by user later
+          last_name: null, // Will be set by user later
+          role: "marketing_user", // Marketing team role
+          is_active: true,
+          email_confirmed: true,
         },
       ])
       .select()

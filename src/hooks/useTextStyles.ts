@@ -1,11 +1,16 @@
 import { useMemo } from 'react';
 
 export type TextVariant = 
+  | 'heading'
+  | 'subheading'
+  | 'body'
   | 'primary' 
   | 'secondary' 
   | 'muted' 
   | 'caption' 
   | 'description'
+  | 'accent'
+  | 'destructive'
   | 'error'
   | 'warning'
   | 'success'
@@ -14,8 +19,8 @@ export type TextVariant =
 
 export interface TextStyleOptions {
   variant?: TextVariant;
-  size?: 'xs' | 'sm' | 'base' | 'lg' | 'xl';
-  weight?: 'normal' | 'medium' | 'semibold' | 'bold';
+  size?: 'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl';
+  weight?: 'light' | 'normal' | 'medium' | 'semibold' | 'bold' | 'extrabold';
   center?: boolean;
 }
 
@@ -109,19 +114,124 @@ export const useTextStyles = (options: TextStyleOptions = {}) => {
     return baseClasses.join(' ');
   }, [variant, size, weight, center]);
 
+  // Helper function to get text classes without hook
+  const getTextClasses = (options: TextStyleOptions) => {
+    const baseClasses = ['text'];
+    
+    // Variant styles
+    switch (options.variant) {
+      case 'heading':
+        baseClasses.push('font-bold text-foreground');
+        break;
+      case 'subheading':
+        baseClasses.push('font-semibold text-foreground');
+        break;
+      case 'body':
+        baseClasses.push('text-foreground');
+        break;
+      case 'description':
+        baseClasses.push('text-muted-foreground');
+        break;
+      case 'caption':
+        baseClasses.push('text-xs text-muted-foreground');
+        break;
+      case 'secondary':
+        baseClasses.push('text-muted-foreground');
+        break;
+      case 'muted':
+        baseClasses.push('text-muted-foreground');
+        break;
+      case 'accent':
+        baseClasses.push('text-accent-foreground');
+        break;
+      case 'destructive':
+        baseClasses.push('text-destructive');
+        break;
+      case 'success':
+        baseClasses.push('text-green-600');
+        break;
+      case 'warning':
+        baseClasses.push('text-yellow-600');
+        break;
+      default:
+        baseClasses.push('text-foreground');
+    }
+    
+    // Size styles
+    switch (options.size) {
+      case 'xs':
+        baseClasses.push('text-xs');
+        break;
+      case 'sm':
+        baseClasses.push('text-sm');
+        break;
+      case 'base':
+        baseClasses.push('text-base');
+        break;
+      case 'lg':
+        baseClasses.push('text-lg');
+        break;
+      case 'xl':
+        baseClasses.push('text-xl');
+        break;
+      case '2xl':
+        baseClasses.push('text-2xl');
+        break;
+      case '3xl':
+        baseClasses.push('text-3xl');
+        break;
+      case '4xl':
+        baseClasses.push('text-4xl');
+        break;
+      default:
+        baseClasses.push('text-base');
+    }
+    
+    // Weight styles
+    if (options.weight) {
+      switch (options.weight) {
+        case 'light':
+          baseClasses.push('font-light');
+          break;
+        case 'normal':
+          baseClasses.push('font-normal');
+          break;
+        case 'medium':
+          baseClasses.push('font-medium');
+          break;
+        case 'semibold':
+          baseClasses.push('font-semibold');
+          break;
+        case 'bold':
+          baseClasses.push('font-bold');
+          break;
+        case 'extrabold':
+          baseClasses.push('font-extrabold');
+          break;
+      }
+    }
+    
+    // Center alignment
+    if (options.center) {
+      baseClasses.push('text-center');
+    }
+    
+    return baseClasses.join(' ');
+  };
+
   return {
     textClasses,
-    // Helper functions for common patterns
+    // Helper functions for common patterns (without hook calls)
     getDescriptionText: (text: string, center = false) => ({
-      className: useTextStyles({ variant: 'description', center }).textClasses,
+      className: getTextClasses({ variant: 'description', center }),
       children: text
     }),
     getCaptionText: (text: string, center = false) => ({
-      className: useTextStyles({ variant: 'caption', center }).textClasses,
+      className: getTextClasses({ variant: 'caption', center }),
       children: text
     }),
     getSecondaryText: (text: string, size: TextStyleOptions['size'] = 'base') => ({
-      className: useTextStyles({ variant: 'secondary', size }).textClasses,
+      className: getTextClasses({ variant: 'secondary', size }),
       children: text
     })
   };

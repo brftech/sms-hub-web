@@ -47,10 +47,6 @@ const FloatingHubSwitcher = () => {
   const { currentHub, switchHub } = useHub();
 
   // Only show in development
-  if (import.meta.env.MODE !== 'development' && window.location.hostname !== 'localhost') {
-    return null;
-  }
-
   const hubs = Object.entries(HUB_CONFIGS).map(([hubType, config]) => ({
     hubType: hubType as HubType,
     id: config.id,
@@ -76,6 +72,11 @@ const FloatingHubSwitcher = () => {
     }
     return undefined;
   }, [isExpanded]);
+
+  // Only show in development
+  if (import.meta.env.MODE !== 'development' && window.location.hostname !== 'localhost') {
+    return null;
+  }
 
   // Only show if hub switcher is enabled
   if (!webEnvironment.features.hubSwitcher()) {

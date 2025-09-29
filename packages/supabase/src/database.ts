@@ -1,5 +1,5 @@
-// Comprehensive database types for SMS Hub Web standalone app
-// Based on the complete schema from the original monorepo
+// Marketing website database types for SMS Hub Web
+// Synchronized with migration: 0000001_initial_schema.sql
 
 export type Json =
   | string
@@ -37,460 +37,118 @@ export interface Database {
         }
         Relationships: []
       }
-      
-      // Companies table - core business entities
-      companies: {
-        Row: {
-          id: string
-          public_name: string
-          legal_name: string | null
-          legal_company_name: string | null
-          brand_name: string | null
-          hub_id: number
-          company_account_number: string | null
-          signup_type: string | null
-          is_active: boolean | null
-          created_by_user_id: string | null
-          first_admin_user_id: string | null
-          // Extended company fields
-          address: string | null
-          address_line_2: string | null
-          city: string | null
-          state: string | null
-          zip: string | null
-          country: string | null
-          phone: string | null
-          website: string | null
-          ein: string | null
-          company_type: string | null
-          industry_vertical: string | null
-          number_of_employees: string | null
-          annual_revenue: string | null
-          year_established: number | null
-          business_registration_number: string | null
-          business_registration_state: string | null
-          primary_contact_name: string | null
-          primary_contact_email: string | null
-          primary_contact_phone: string | null
-          primary_contact_title: string | null
-          tcr_brand_id: string | null
-          tcr_brand_status: string | null
-          metadata: Json | null
-          created_at: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          id?: string
-          public_name: string
-          legal_name?: string | null
-          legal_company_name?: string | null
-          brand_name?: string | null
-          hub_id: number
-          company_account_number?: string | null
-          signup_type?: string | null
-          is_active?: boolean | null
-          created_by_user_id?: string | null
-          first_admin_user_id?: string | null
-          address?: string | null
-          address_line_2?: string | null
-          city?: string | null
-          state?: string | null
-          zip?: string | null
-          country?: string | null
-          phone?: string | null
-          website?: string | null
-          ein?: string | null
-          company_type?: string | null
-          industry_vertical?: string | null
-          number_of_employees?: string | null
-          annual_revenue?: string | null
-          year_established?: number | null
-          business_registration_number?: string | null
-          business_registration_state?: string | null
-          primary_contact_name?: string | null
-          primary_contact_email?: string | null
-          primary_contact_phone?: string | null
-          primary_contact_title?: string | null
-          tcr_brand_id?: string | null
-          tcr_brand_status?: string | null
-          metadata?: Json | null
-          created_at?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          id?: string
-          public_name?: string
-          legal_name?: string | null
-          legal_company_name?: string | null
-          brand_name?: string | null
-          hub_id?: number
-          company_account_number?: string | null
-          signup_type?: string | null
-          is_active?: boolean | null
-          created_by_user_id?: string | null
-          first_admin_user_id?: string | null
-          address?: string | null
-          address_line_2?: string | null
-          city?: string | null
-          state?: string | null
-          zip?: string | null
-          country?: string | null
-          phone?: string | null
-          website?: string | null
-          ein?: string | null
-          company_type?: string | null
-          industry_vertical?: string | null
-          number_of_employees?: string | null
-          annual_revenue?: string | null
-          year_established?: number | null
-          business_registration_number?: string | null
-          business_registration_state?: string | null
-          primary_contact_name?: string | null
-          primary_contact_email?: string | null
-          primary_contact_phone?: string | null
-          primary_contact_title?: string | null
-          tcr_brand_id?: string | null
-          tcr_brand_status?: string | null
-          metadata?: Json | null
-          created_at?: string | null
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "companies_created_by_user_id_fkey"
-            columns: ["created_by_user_id"]
-            isOneToOne: false
-            referencedRelation: "user_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "companies_first_admin_user_id_fkey"
-            columns: ["first_admin_user_id"]
-            isOneToOne: false
-            referencedRelation: "user_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "companies_hub_id_fkey"
-            columns: ["hub_id"]
-            isOneToOne: false
-            referencedRelation: "hubs"
-            referencedColumns: ["hub_number"]
-          }
-        ]
-      }
 
-      // User profiles - core user management
-      user_profiles: {
-        Row: {
-          id: string
-          email: string
-          first_name: string | null
-          last_name: string | null
-          mobile_phone_number: string | null
-          hub_id: number
-          company_id: string | null
-          customer_id: string | null
-          account_number: string | null
-          role: string | null
-          signup_type: string | null
-          company_admin: boolean | null
-          company_admin_since: string | null
-          verification_setup_completed: boolean | null
-          verification_setup_completed_at: string | null
-          onboarding_completed: boolean | null
-          is_active: boolean | null
-          invited_by_user_id: string | null
-          invitation_accepted_at: string | null
-          permissions: Json | null
-          last_login_at: string | null
-          last_login_method: string | null
-          created_at: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          id: string
-          email: string
-          first_name?: string | null
-          last_name?: string | null
-          mobile_phone_number?: string | null
-          hub_id: number
-          company_id?: string | null
-          customer_id?: string | null
-          account_number?: string | null
-          role?: string | null
-          signup_type?: string | null
-          company_admin?: boolean | null
-          company_admin_since?: string | null
-          verification_setup_completed?: boolean | null
-          verification_setup_completed_at?: string | null
-          onboarding_completed?: boolean | null
-          is_active?: boolean | null
-          invited_by_user_id?: string | null
-          invitation_accepted_at?: string | null
-          permissions?: Json | null
-          last_login_at?: string | null
-          last_login_method?: string | null
-          created_at?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          id?: string
-          email?: string
-          first_name?: string | null
-          last_name?: string | null
-          mobile_phone_number?: string | null
-          hub_id?: number
-          company_id?: string | null
-          customer_id?: string | null
-          account_number?: string | null
-          role?: string | null
-          signup_type?: string | null
-          company_admin?: boolean | null
-          company_admin_since?: string | null
-          verification_setup_completed?: boolean | null
-          verification_setup_completed_at?: string | null
-          onboarding_completed?: boolean | null
-          is_active?: boolean | null
-          invited_by_user_id?: string | null
-          invitation_accepted_at?: string | null
-          permissions?: Json | null
-          last_login_at?: string | null
-          last_login_method?: string | null
-          created_at?: string | null
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "user_profiles_company_id_fkey"
-            columns: ["company_id"]
-            isOneToOne: false
-            referencedRelation: "companies"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "user_profiles_customer_id_fkey"
-            columns: ["customer_id"]
-            isOneToOne: false
-            referencedRelation: "customers"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "user_profiles_hub_id_fkey"
-            columns: ["hub_id"]
-            isOneToOne: false
-            referencedRelation: "hubs"
-            referencedColumns: ["hub_number"]
-          },
-          {
-            foreignKeyName: "user_profiles_invited_by_user_id_fkey"
-            columns: ["invited_by_user_id"]
-            isOneToOne: false
-            referencedRelation: "user_profiles"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-
-      // Customers - payment and billing
-      customers: {
-        Row: {
-          id: string
-          company_id: string | null
-          user_id: string | null
-          billing_email: string
-          customer_type: string | null
-          hub_id: number
-          payment_status: string | null
-          payment_type: string | null
-          stripe_customer_id: string | null
-          stripe_subscription_id: string | null
-          subscription_status: string | null
-          subscription_tier: string | null
-          subscription_ends_at: string | null
-          is_active: boolean | null
-          trial_ends_at: string | null
-          metadata: Json | null
-          created_at: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          id?: string
-          company_id?: string | null
-          user_id?: string | null
-          billing_email: string
-          customer_type?: string | null
-          hub_id: number
-          payment_status?: string | null
-          payment_type?: string | null
-          stripe_customer_id?: string | null
-          stripe_subscription_id?: string | null
-          subscription_status?: string | null
-          subscription_tier?: string | null
-          subscription_ends_at?: string | null
-          is_active?: boolean | null
-          trial_ends_at?: string | null
-          metadata?: Json | null
-          created_at?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          id?: string
-          company_id?: string | null
-          user_id?: string | null
-          billing_email?: string
-          customer_type?: string | null
-          hub_id?: number
-          payment_status?: string | null
-          payment_type?: string | null
-          stripe_customer_id?: string | null
-          stripe_subscription_id?: string | null
-          subscription_status?: string | null
-          subscription_tier?: string | null
-          subscription_ends_at?: string | null
-          is_active?: boolean | null
-          trial_ends_at?: string | null
-          metadata?: Json | null
-          created_at?: string | null
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "customers_company_id_fkey"
-            columns: ["company_id"]
-            isOneToOne: true
-            referencedRelation: "companies"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "customers_hub_id_fkey"
-            columns: ["hub_id"]
-            isOneToOne: false
-            referencedRelation: "hubs"
-            referencedColumns: ["hub_number"]
-          },
-          {
-            foreignKeyName: "customers_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_profiles"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-
-      // Leads - contact form submissions
+      // Leads - contact form submissions and lead capture
       leads: {
         Row: {
           id: string
+          hub_id: number
           email: string
           name: string | null
           phone: string | null
+          lead_phone_number: string | null
           company_name: string | null
           message: string | null
-          hub_id: number
+          status: string | null
           source: string | null
           campaign_source: string | null
-          platform_interest: string | null
-          status: string | null
-          lead_score: number | null
-          interaction_count: number | null
-          last_interaction_at: string | null
-          assigned_to_user_id: string | null
-          converted_at: string | null
-          converted_to_company_id: string | null
-          // UTM tracking
           utm_source: string | null
           utm_medium: string | null
           utm_campaign: string | null
-          utm_content: string | null
           utm_term: string | null
-          // Technical tracking
-          landing_page_url: string | null
-          referrer_url: string | null
+          utm_content: string | null
           ip_address: unknown | null
           user_agent: string | null
-          lead_phone_number: string | null
+          referrer_url: string | null
+          landing_page_url: string | null
+          lead_score: number | null
+          platform_interest: string | null
+          budget_range: string | null
+          timeline: string | null
+          interaction_count: number | null
+          last_interaction_at: string | null
+          converted_at: string | null
+          converted_to_customer_id: string | null
+          assigned_to_user_id: string | null
+          notes: string | null
+          tags: Json | null
+          custom_fields: Json | null
           created_at: string | null
           updated_at: string | null
         }
         Insert: {
           id?: string
+          hub_id: number
           email: string
           name?: string | null
           phone?: string | null
+          lead_phone_number?: string | null
           company_name?: string | null
           message?: string | null
-          hub_id: number
+          status?: string | null
           source?: string | null
           campaign_source?: string | null
-          platform_interest?: string | null
-          status?: string | null
-          lead_score?: number | null
-          interaction_count?: number | null
-          last_interaction_at?: string | null
-          assigned_to_user_id?: string | null
-          converted_at?: string | null
-          converted_to_company_id?: string | null
           utm_source?: string | null
           utm_medium?: string | null
           utm_campaign?: string | null
-          utm_content?: string | null
           utm_term?: string | null
-          landing_page_url?: string | null
-          referrer_url?: string | null
+          utm_content?: string | null
           ip_address?: unknown | null
           user_agent?: string | null
-          lead_phone_number?: string | null
+          referrer_url?: string | null
+          landing_page_url?: string | null
+          lead_score?: number | null
+          platform_interest?: string | null
+          budget_range?: string | null
+          timeline?: string | null
+          interaction_count?: number | null
+          last_interaction_at?: string | null
+          converted_at?: string | null
+          converted_to_customer_id?: string | null
+          assigned_to_user_id?: string | null
+          notes?: string | null
+          tags?: Json | null
+          custom_fields?: Json | null
           created_at?: string | null
           updated_at?: string | null
         }
         Update: {
           id?: string
+          hub_id?: number
           email?: string
           name?: string | null
           phone?: string | null
+          lead_phone_number?: string | null
           company_name?: string | null
           message?: string | null
-          hub_id?: number
+          status?: string | null
           source?: string | null
           campaign_source?: string | null
-          platform_interest?: string | null
-          status?: string | null
-          lead_score?: number | null
-          interaction_count?: number | null
-          last_interaction_at?: string | null
-          assigned_to_user_id?: string | null
-          converted_at?: string | null
-          converted_to_company_id?: string | null
           utm_source?: string | null
           utm_medium?: string | null
           utm_campaign?: string | null
-          utm_content?: string | null
           utm_term?: string | null
-          landing_page_url?: string | null
-          referrer_url?: string | null
+          utm_content?: string | null
           ip_address?: unknown | null
           user_agent?: string | null
-          lead_phone_number?: string | null
+          referrer_url?: string | null
+          landing_page_url?: string | null
+          lead_score?: number | null
+          platform_interest?: string | null
+          budget_range?: string | null
+          timeline?: string | null
+          interaction_count?: number | null
+          last_interaction_at?: string | null
+          converted_at?: string | null
+          converted_to_customer_id?: string | null
+          assigned_to_user_id?: string | null
+          notes?: string | null
+          tags?: Json | null
+          custom_fields?: Json | null
           created_at?: string | null
           updated_at?: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "leads_assigned_to_user_id_fkey"
-            columns: ["assigned_to_user_id"]
-            isOneToOne: false
-            referencedRelation: "user_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "leads_converted_to_company_id_fkey"
-            columns: ["converted_to_company_id"]
-            isOneToOne: false
-            referencedRelation: "companies"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "leads_hub_id_fkey"
             columns: ["hub_id"]
@@ -501,104 +159,921 @@ export interface Database {
         ]
       }
 
-      // SMS verification for phone numbers
-      sms_verifications: {
+      // Lead activities - tracking all lead interactions
+      lead_activities: {
         Row: {
           id: string
-          user_id: string
-          phone_number: string
-          verification_code: string
-          expires_at: string | null
-          verified_at: string | null
-          consent_given: boolean | null
-          consent_text: string | null
-          consent_timestamp: string | null
-          consent_ip_address: unknown | null
+          lead_id: string
+          hub_id: number
+          activity_type: string
+          activity_data: Json | null
+          performed_by_user_id: string | null
           created_at: string | null
         }
         Insert: {
           id?: string
-          user_id: string
-          phone_number: string
-          verification_code: string
-          expires_at?: string | null
-          verified_at?: string | null
-          consent_given?: boolean | null
-          consent_text?: string | null
-          consent_timestamp?: string | null
-          consent_ip_address?: unknown | null
+          lead_id: string
+          hub_id: number
+          activity_type: string
+          activity_data?: Json | null
+          performed_by_user_id?: string | null
           created_at?: string | null
         }
         Update: {
           id?: string
-          user_id?: string
-          phone_number?: string
-          verification_code?: string
-          expires_at?: string | null
-          verified_at?: string | null
-          consent_given?: boolean | null
-          consent_text?: string | null
-          consent_timestamp?: string | null
-          consent_ip_address?: unknown | null
-          created_at?: string | null
-        }
-        Relationships: []
-      }
-
-      // Payment history tracking
-      payment_history: {
-        Row: {
-          id: string
-          user_profile_id: string
-          hub_id: number
-          amount: number
-          currency: string | null
-          status: string
-          payment_method: string | null
-          description: string | null
-          stripe_payment_intent_id: string | null
-          metadata: Json | null
-          created_at: string | null
-        }
-        Insert: {
-          id?: string
-          user_profile_id: string
-          hub_id: number
-          amount: number
-          currency?: string | null
-          status: string
-          payment_method?: string | null
-          description?: string | null
-          stripe_payment_intent_id?: string | null
-          metadata?: Json | null
-          created_at?: string | null
-        }
-        Update: {
-          id?: string
-          user_profile_id?: string
+          lead_id?: string
           hub_id?: number
-          amount?: number
-          currency?: string | null
-          status?: string
-          payment_method?: string | null
-          description?: string | null
-          stripe_payment_intent_id?: string | null
-          metadata?: Json | null
+          activity_type?: string
+          activity_data?: Json | null
+          performed_by_user_id?: string | null
           created_at?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "payment_history_hub_id_fkey"
+            foreignKeyName: "lead_activities_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lead_activities_hub_id_fkey"
+            columns: ["hub_id"]
+            isOneToOne: false
+            referencedRelation: "hubs"
+            referencedColumns: ["hub_number"]
+          }
+        ]
+      }
+
+      // Email marketing lists
+      email_lists: {
+        Row: {
+          id: string
+          hub_id: number
+          list_name: string
+          description: string | null
+          list_type: string | null
+          status: string | null
+          subscriber_count: number | null
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          hub_id: number
+          list_name: string
+          description?: string | null
+          list_type?: string | null
+          status?: string | null
+          subscriber_count?: number | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          hub_id?: number
+          list_name?: string
+          description?: string | null
+          list_type?: string | null
+          status?: string | null
+          subscriber_count?: number | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_lists_hub_id_fkey"
+            columns: ["hub_id"]
+            isOneToOne: false
+            referencedRelation: "hubs"
+            referencedColumns: ["hub_number"]
+          }
+        ]
+      }
+
+      // Email subscribers
+      email_subscribers: {
+        Row: {
+          id: string
+          hub_id: number
+          email_list_id: string
+          email: string
+          first_name: string | null
+          last_name: string | null
+          phone: string | null
+          company_name: string | null
+          job_title: string | null
+          status: string | null
+          source: string | null
+          tags: Json | null
+          custom_fields: Json | null
+          subscribed_at: string | null
+          unsubscribed_at: string | null
+          last_activity_at: string | null
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          hub_id: number
+          email_list_id: string
+          email: string
+          first_name?: string | null
+          last_name?: string | null
+          phone?: string | null
+          company_name?: string | null
+          job_title?: string | null
+          status?: string | null
+          source?: string | null
+          tags?: Json | null
+          custom_fields?: Json | null
+          subscribed_at?: string | null
+          unsubscribed_at?: string | null
+          last_activity_at?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          hub_id?: number
+          email_list_id?: string
+          email?: string
+          first_name?: string | null
+          last_name?: string | null
+          phone?: string | null
+          company_name?: string | null
+          job_title?: string | null
+          status?: string | null
+          source?: string | null
+          tags?: Json | null
+          custom_fields?: Json | null
+          subscribed_at?: string | null
+          unsubscribed_at?: string | null
+          last_activity_at?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_subscribers_hub_id_fkey"
             columns: ["hub_id"]
             isOneToOne: false
             referencedRelation: "hubs"
             referencedColumns: ["hub_number"]
           },
           {
-            foreignKeyName: "payment_history_user_profile_id_fkey"
-            columns: ["user_profile_id"]
+            foreignKeyName: "email_subscribers_email_list_id_fkey"
+            columns: ["email_list_id"]
             isOneToOne: false
-            referencedRelation: "user_profiles"
+            referencedRelation: "email_lists"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+
+      // Email campaigns
+      email_campaigns: {
+        Row: {
+          id: string
+          hub_id: number
+          email_list_id: string
+          campaign_name: string
+          subject_line: string
+          preview_text: string | null
+          html_content: string | null
+          text_content: string | null
+          status: string | null
+          send_type: string | null
+          scheduled_at: string | null
+          sent_at: string | null
+          total_recipients: number | null
+          delivered_count: number | null
+          opened_count: number | null
+          clicked_count: number | null
+          bounced_count: number | null
+          unsubscribed_count: number | null
+          complaint_count: number | null
+          open_rate: number | null
+          click_rate: number | null
+          bounce_rate: number | null
+          created_by_user_id: string | null
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          hub_id: number
+          email_list_id: string
+          campaign_name: string
+          subject_line: string
+          preview_text?: string | null
+          html_content?: string | null
+          text_content?: string | null
+          status?: string | null
+          send_type?: string | null
+          scheduled_at?: string | null
+          sent_at?: string | null
+          total_recipients?: number | null
+          delivered_count?: number | null
+          opened_count?: number | null
+          clicked_count?: number | null
+          bounced_count?: number | null
+          unsubscribed_count?: number | null
+          complaint_count?: number | null
+          open_rate?: number | null
+          click_rate?: number | null
+          bounce_rate?: number | null
+          created_by_user_id?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          hub_id?: number
+          email_list_id?: string
+          campaign_name?: string
+          subject_line?: string
+          preview_text?: string | null
+          html_content?: string | null
+          text_content?: string | null
+          status?: string | null
+          send_type?: string | null
+          scheduled_at?: string | null
+          sent_at?: string | null
+          total_recipients?: number | null
+          delivered_count?: number | null
+          opened_count?: number | null
+          clicked_count?: number | null
+          bounced_count?: number | null
+          unsubscribed_count?: number | null
+          complaint_count?: number | null
+          open_rate?: number | null
+          click_rate?: number | null
+          bounce_rate?: number | null
+          created_by_user_id?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_campaigns_hub_id_fkey"
+            columns: ["hub_id"]
+            isOneToOne: false
+            referencedRelation: "hubs"
+            referencedColumns: ["hub_number"]
+          },
+          {
+            foreignKeyName: "email_campaigns_email_list_id_fkey"
+            columns: ["email_list_id"]
+            isOneToOne: false
+            referencedRelation: "email_lists"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+
+      // SMS marketing lists
+      sms_lists: {
+        Row: {
+          id: string
+          hub_id: number
+          list_name: string
+          description: string | null
+          list_type: string | null
+          status: string | null
+          subscriber_count: number | null
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          hub_id: number
+          list_name: string
+          description?: string | null
+          list_type?: string | null
+          status?: string | null
+          subscriber_count?: number | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          hub_id?: number
+          list_name?: string
+          description?: string | null
+          list_type?: string | null
+          status?: string | null
+          subscriber_count?: number | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sms_lists_hub_id_fkey"
+            columns: ["hub_id"]
+            isOneToOne: false
+            referencedRelation: "hubs"
+            referencedColumns: ["hub_number"]
+          }
+        ]
+      }
+
+      // SMS subscribers
+      sms_subscribers: {
+        Row: {
+          id: string
+          hub_id: number
+          sms_list_id: string
+          phone_number: string
+          first_name: string | null
+          last_name: string | null
+          email: string | null
+          company_name: string | null
+          status: string | null
+          source: string | null
+          consent_given: boolean | null
+          consent_timestamp: string | null
+          consent_ip_address: unknown | null
+          consent_text: string | null
+          tags: Json | null
+          custom_fields: Json | null
+          subscribed_at: string | null
+          unsubscribed_at: string | null
+          last_activity_at: string | null
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          hub_id: number
+          sms_list_id: string
+          phone_number: string
+          first_name?: string | null
+          last_name?: string | null
+          email?: string | null
+          company_name?: string | null
+          status?: string | null
+          source?: string | null
+          consent_given?: boolean | null
+          consent_timestamp?: string | null
+          consent_ip_address?: unknown | null
+          consent_text?: string | null
+          tags?: Json | null
+          custom_fields?: Json | null
+          subscribed_at?: string | null
+          unsubscribed_at?: string | null
+          last_activity_at?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          hub_id?: number
+          sms_list_id?: string
+          phone_number?: string
+          first_name?: string | null
+          last_name?: string | null
+          email?: string | null
+          company_name?: string | null
+          status?: string | null
+          source?: string | null
+          consent_given?: boolean | null
+          consent_timestamp?: string | null
+          consent_ip_address?: unknown | null
+          consent_text?: string | null
+          tags?: Json | null
+          custom_fields?: Json | null
+          subscribed_at?: string | null
+          unsubscribed_at?: string | null
+          last_activity_at?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sms_subscribers_hub_id_fkey"
+            columns: ["hub_id"]
+            isOneToOne: false
+            referencedRelation: "hubs"
+            referencedColumns: ["hub_number"]
+          },
+          {
+            foreignKeyName: "sms_subscribers_sms_list_id_fkey"
+            columns: ["sms_list_id"]
+            isOneToOne: false
+            referencedRelation: "sms_lists"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+
+      // SMS campaigns
+      sms_campaigns: {
+        Row: {
+          id: string
+          hub_id: number
+          sms_list_id: string
+          campaign_name: string
+          message: string
+          status: string | null
+          send_type: string | null
+          scheduled_at: string | null
+          sent_at: string | null
+          total_recipients: number | null
+          delivered_count: number | null
+          failed_count: number | null
+          delivery_rate: number | null
+          created_by_user_id: string | null
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          hub_id: number
+          sms_list_id: string
+          campaign_name: string
+          message: string
+          status?: string | null
+          send_type?: string | null
+          scheduled_at?: string | null
+          sent_at?: string | null
+          total_recipients?: number | null
+          delivered_count?: number | null
+          failed_count?: number | null
+          delivery_rate?: number | null
+          created_by_user_id?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          hub_id?: number
+          sms_list_id?: string
+          campaign_name?: string
+          message?: string
+          status?: string | null
+          send_type?: string | null
+          scheduled_at?: string | null
+          sent_at?: string | null
+          total_recipients?: number | null
+          delivered_count?: number | null
+          failed_count?: number | null
+          delivery_rate?: number | null
+          created_by_user_id?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sms_campaigns_hub_id_fkey"
+            columns: ["hub_id"]
+            isOneToOne: false
+            referencedRelation: "hubs"
+            referencedColumns: ["hub_number"]
+          },
+          {
+            foreignKeyName: "sms_campaigns_sms_list_id_fkey"
+            columns: ["sms_list_id"]
+            isOneToOne: false
+            referencedRelation: "sms_lists"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+
+      // Marketing campaigns - cross-channel campaign tracking
+      marketing_campaigns: {
+        Row: {
+          id: string
+          hub_id: number
+          campaign_name: string
+          campaign_type: string
+          description: string | null
+          status: string | null
+          start_date: string | null
+          end_date: string | null
+          budget: number | null
+          target_audience: string | null
+          goals: Json | null
+          metrics: Json | null
+          created_by_user_id: string | null
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          hub_id: number
+          campaign_name: string
+          campaign_type: string
+          description?: string | null
+          status?: string | null
+          start_date?: string | null
+          end_date?: string | null
+          budget?: number | null
+          target_audience?: string | null
+          goals?: Json | null
+          metrics?: Json | null
+          created_by_user_id?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          hub_id?: number
+          campaign_name?: string
+          campaign_type?: string
+          description?: string | null
+          status?: string | null
+          start_date?: string | null
+          end_date?: string | null
+          budget?: number | null
+          target_audience?: string | null
+          goals?: Json | null
+          metrics?: Json | null
+          created_by_user_id?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "marketing_campaigns_hub_id_fkey"
+            columns: ["hub_id"]
+            isOneToOne: false
+            referencedRelation: "hubs"
+            referencedColumns: ["hub_number"]
+          }
+        ]
+      }
+
+      // Website analytics - website traffic and engagement
+      website_analytics: {
+        Row: {
+          id: string
+          hub_id: number
+          page_url: string
+          page_title: string | null
+          visitor_id: string | null
+          session_id: string | null
+          ip_address: unknown | null
+          user_agent: string | null
+          referrer_url: string | null
+          utm_source: string | null
+          utm_medium: string | null
+          utm_campaign: string | null
+          utm_term: string | null
+          utm_content: string | null
+          event_type: string | null
+          event_data: Json | null
+          duration_seconds: number | null
+          bounce: boolean | null
+          created_at: string | null
+        }
+        Insert: {
+          id?: string
+          hub_id: number
+          page_url: string
+          page_title?: string | null
+          visitor_id?: string | null
+          session_id?: string | null
+          ip_address?: unknown | null
+          user_agent?: string | null
+          referrer_url?: string | null
+          utm_source?: string | null
+          utm_medium?: string | null
+          utm_campaign?: string | null
+          utm_term?: string | null
+          utm_content?: string | null
+          event_type?: string | null
+          event_data?: Json | null
+          duration_seconds?: number | null
+          bounce?: boolean | null
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          hub_id?: number
+          page_url?: string
+          page_title?: string | null
+          visitor_id?: string | null
+          session_id?: string | null
+          ip_address?: unknown | null
+          user_agent?: string | null
+          referrer_url?: string | null
+          utm_source?: string | null
+          utm_medium?: string | null
+          utm_campaign?: string | null
+          utm_term?: string | null
+          utm_content?: string | null
+          event_type?: string | null
+          event_data?: Json | null
+          duration_seconds?: number | null
+          bounce?: boolean | null
+          created_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "website_analytics_hub_id_fkey"
+            columns: ["hub_id"]
+            isOneToOne: false
+            referencedRelation: "hubs"
+            referencedColumns: ["hub_number"]
+          }
+        ]
+      }
+
+      // Contact form submissions
+      contact_form_submissions: {
+        Row: {
+          id: string
+          hub_id: number
+          form_name: string
+          email: string
+          name: string | null
+          phone: string | null
+          company_name: string | null
+          message: string | null
+          form_data: Json | null
+          ip_address: unknown | null
+          user_agent: string | null
+          referrer_url: string | null
+          utm_source: string | null
+          utm_medium: string | null
+          utm_campaign: string | null
+          utm_term: string | null
+          utm_content: string | null
+          status: string | null
+          assigned_to_user_id: string | null
+          notes: string | null
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          hub_id: number
+          form_name: string
+          email: string
+          name?: string | null
+          phone?: string | null
+          company_name?: string | null
+          message?: string | null
+          form_data?: Json | null
+          ip_address?: unknown | null
+          user_agent?: string | null
+          referrer_url?: string | null
+          utm_source?: string | null
+          utm_medium?: string | null
+          utm_campaign?: string | null
+          utm_term?: string | null
+          utm_content?: string | null
+          status?: string | null
+          assigned_to_user_id?: string | null
+          notes?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          hub_id?: number
+          form_name?: string
+          email?: string
+          name?: string | null
+          phone?: string | null
+          company_name?: string | null
+          message?: string | null
+          form_data?: Json | null
+          ip_address?: unknown | null
+          user_agent?: string | null
+          referrer_url?: string | null
+          utm_source?: string | null
+          utm_medium?: string | null
+          utm_campaign?: string | null
+          utm_term?: string | null
+          utm_content?: string | null
+          status?: string | null
+          assigned_to_user_id?: string | null
+          notes?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contact_form_submissions_hub_id_fkey"
+            columns: ["hub_id"]
+            isOneToOne: false
+            referencedRelation: "hubs"
+            referencedColumns: ["hub_number"]
+          }
+        ]
+      }
+
+      // User profiles - marketing team/admin users
+      user_profiles: {
+        Row: {
+          id: string
+          hub_id: number
+          email: string
+          first_name: string | null
+          last_name: string | null
+          role: string | null
+          is_active: boolean | null
+          email_confirmed: boolean | null
+          last_login_at: string | null
+          created_at: string | null
+          updated_at: string | null
+          metadata: Json | null
+        }
+        Insert: {
+          id: string
+          hub_id: number
+          email: string
+          first_name?: string | null
+          last_name?: string | null
+          role?: string | null
+          is_active?: boolean | null
+          email_confirmed?: boolean | null
+          last_login_at?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+          metadata?: Json | null
+        }
+        Update: {
+          id?: string
+          hub_id?: number
+          email?: string
+          first_name?: string | null
+          last_name?: string | null
+          role?: string | null
+          is_active?: boolean | null
+          email_confirmed?: boolean | null
+          last_login_at?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+          metadata?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_profiles_hub_id_fkey"
+            columns: ["hub_id"]
+            isOneToOne: false
+            referencedRelation: "hubs"
+            referencedColumns: ["hub_number"]
+          }
+        ]
+      }
+
+      // Verifications - email verification
+      verifications: {
+        Row: {
+          id: string
+          email: string
+          mobile_phone: string | null
+          hub_id: number
+          verification_code: string
+          verification_sent_at: string | null
+          verification_completed_at: string | null
+          preferred_verification_method: string | null
+          step_data: Json | null
+          metadata: Json | null
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          email: string
+          mobile_phone?: string | null
+          hub_id: number
+          verification_code: string
+          verification_sent_at?: string | null
+          verification_completed_at?: string | null
+          preferred_verification_method?: string | null
+          step_data?: Json | null
+          metadata?: Json | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          email?: string
+          mobile_phone?: string | null
+          hub_id?: number
+          verification_code?: string
+          verification_sent_at?: string | null
+          verification_completed_at?: string | null
+          preferred_verification_method?: string | null
+          step_data?: Json | null
+          metadata?: Json | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "verifications_hub_id_fkey"
+            columns: ["hub_id"]
+            isOneToOne: false
+            referencedRelation: "hubs"
+            referencedColumns: ["hub_number"]
+          }
+        ]
+      }
+
+      // Verification attempts
+      verification_attempts: {
+        Row: {
+          id: string
+          verification_id: string
+          attempted_code: string
+          is_successful: boolean | null
+          attempted_at: string | null
+          ip_address: unknown | null
+          user_agent: string | null
+        }
+        Insert: {
+          id?: string
+          verification_id: string
+          attempted_code: string
+          is_successful?: boolean | null
+          attempted_at?: string | null
+          ip_address?: unknown | null
+          user_agent?: string | null
+        }
+        Update: {
+          id?: string
+          verification_id?: string
+          attempted_code?: string
+          is_successful?: boolean | null
+          attempted_at?: string | null
+          ip_address?: unknown | null
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "verification_attempts_verification_id_fkey"
+            columns: ["verification_id"]
+            isOneToOne: false
+            referencedRelation: "verifications"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+
+      // Conversions - lead to customer conversion tracking
+      conversions: {
+        Row: {
+          id: string
+          hub_id: number
+          lead_id: string | null
+          conversion_type: string
+          conversion_value: number | null
+          customer_id: string | null
+          conversion_source: string | null
+          conversion_medium: string | null
+          conversion_campaign: string | null
+          conversion_date: string | null
+          notes: string | null
+          created_at: string | null
+        }
+        Insert: {
+          id?: string
+          hub_id: number
+          lead_id?: string | null
+          conversion_type: string
+          conversion_value?: number | null
+          customer_id?: string | null
+          conversion_source?: string | null
+          conversion_medium?: string | null
+          conversion_campaign?: string | null
+          conversion_date?: string | null
+          notes?: string | null
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          hub_id?: number
+          lead_id?: string | null
+          conversion_type?: string
+          conversion_value?: number | null
+          customer_id?: string | null
+          conversion_source?: string | null
+          conversion_medium?: string | null
+          conversion_campaign?: string | null
+          conversion_date?: string | null
+          notes?: string | null
+          created_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversions_hub_id_fkey"
+            columns: ["hub_id"]
+            isOneToOne: false
+            referencedRelation: "hubs"
+            referencedColumns: ["hub_number"]
+          },
+          {
+            foreignKeyName: "conversions_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
             referencedColumns: ["id"]
           }
         ]
@@ -608,14 +1083,7 @@ export interface Database {
       [_ in never]: never
     }
     Functions: {
-      generate_company_account_number: {
-        Args: { hub_name: string }
-        Returns: string
-      }
-      generate_user_account_number: {
-        Args: { hub_name: string }
-        Returns: string
-      }
+      [_ in never]: never
     }
     Enums: {
       [_ in never]: never
@@ -691,33 +1159,69 @@ export type TablesUpdate<
     : never
 
 // Simplified type aliases for common usage
-export type Company = Tables<'companies'>
-export type CompanyInsert = TablesInsert<'companies'>
-export type CompanyUpdate = TablesUpdate<'companies'>
-
-export type UserProfile = Tables<'user_profiles'>
-export type UserProfileInsert = TablesInsert<'user_profiles'>
-export type UserProfileUpdate = TablesUpdate<'user_profiles'>
-
-export type Customer = Tables<'customers'>
-export type CustomerInsert = TablesInsert<'customers'>
-export type CustomerUpdate = TablesUpdate<'customers'>
+export type Hub = Tables<'hubs'>
+export type HubInsert = TablesInsert<'hubs'>
+export type HubUpdate = TablesUpdate<'hubs'>
 
 export type Lead = Tables<'leads'>
 export type LeadInsert = TablesInsert<'leads'>
 export type LeadUpdate = TablesUpdate<'leads'>
 
-export type Hub = Tables<'hubs'>
-export type HubInsert = TablesInsert<'hubs'>
-export type HubUpdate = TablesUpdate<'hubs'>
+export type LeadActivity = Tables<'lead_activities'>
+export type LeadActivityInsert = TablesInsert<'lead_activities'>
+export type LeadActivityUpdate = TablesUpdate<'lead_activities'>
 
-export type SmsVerification = Tables<'sms_verifications'>
-export type SmsVerificationInsert = TablesInsert<'sms_verifications'>
-export type SmsVerificationUpdate = TablesUpdate<'sms_verifications'>
+export type EmailList = Tables<'email_lists'>
+export type EmailListInsert = TablesInsert<'email_lists'>
+export type EmailListUpdate = TablesUpdate<'email_lists'>
 
-export type PaymentHistory = Tables<'payment_history'>
-export type PaymentHistoryInsert = TablesInsert<'payment_history'>
-export type PaymentHistoryUpdate = TablesUpdate<'payment_history'>
+export type EmailSubscriber = Tables<'email_subscribers'>
+export type EmailSubscriberInsert = TablesInsert<'email_subscribers'>
+export type EmailSubscriberUpdate = TablesUpdate<'email_subscribers'>
+
+export type EmailCampaign = Tables<'email_campaigns'>
+export type EmailCampaignInsert = TablesInsert<'email_campaigns'>
+export type EmailCampaignUpdate = TablesUpdate<'email_campaigns'>
+
+export type SmsList = Tables<'sms_lists'>
+export type SmsListInsert = TablesInsert<'sms_lists'>
+export type SmsListUpdate = TablesUpdate<'sms_lists'>
+
+export type SmsSubscriber = Tables<'sms_subscribers'>
+export type SmsSubscriberInsert = TablesInsert<'sms_subscribers'>
+export type SmsSubscriberUpdate = TablesUpdate<'sms_subscribers'>
+
+export type SmsCampaign = Tables<'sms_campaigns'>
+export type SmsCampaignInsert = TablesInsert<'sms_campaigns'>
+export type SmsCampaignUpdate = TablesUpdate<'sms_campaigns'>
+
+export type MarketingCampaign = Tables<'marketing_campaigns'>
+export type MarketingCampaignInsert = TablesInsert<'marketing_campaigns'>
+export type MarketingCampaignUpdate = TablesUpdate<'marketing_campaigns'>
+
+export type WebsiteAnalytics = Tables<'website_analytics'>
+export type WebsiteAnalyticsInsert = TablesInsert<'website_analytics'>
+export type WebsiteAnalyticsUpdate = TablesUpdate<'website_analytics'>
+
+export type ContactFormSubmission = Tables<'contact_form_submissions'>
+export type ContactFormSubmissionInsert = TablesInsert<'contact_form_submissions'>
+export type ContactFormSubmissionUpdate = TablesUpdate<'contact_form_submissions'>
+
+export type UserProfile = Tables<'user_profiles'>
+export type UserProfileInsert = TablesInsert<'user_profiles'>
+export type UserProfileUpdate = TablesUpdate<'user_profiles'>
+
+export type Verification = Tables<'verifications'>
+export type VerificationInsert = TablesInsert<'verifications'>
+export type VerificationUpdate = TablesUpdate<'verifications'>
+
+export type VerificationAttempt = Tables<'verification_attempts'>
+export type VerificationAttemptInsert = TablesInsert<'verification_attempts'>
+export type VerificationAttemptUpdate = TablesUpdate<'verification_attempts'>
+
+export type Conversion = Tables<'conversions'>
+export type ConversionInsert = TablesInsert<'conversions'>
+export type ConversionUpdate = TablesUpdate<'conversions'>
 
 // Legacy type aliases for backward compatibility
 export interface SignupData {

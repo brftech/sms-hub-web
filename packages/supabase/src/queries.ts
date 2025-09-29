@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { createAuthService } from "./auth";
 import { createSupabaseClient } from "./client";
-import { Company, UserProfile, SignupData, VerificationData } from "./types";
+import { UserProfile, SignupData, VerificationData } from "./types";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 // Create a single supabase client instance
@@ -109,48 +109,9 @@ export const useHubConfig = (hubId: number) => {
   });
 };
 
-// Company Queries
-export const useCompanies = (hubId: number) => {
-  return useQuery({
-    queryKey: ["companies", hubId],
-    queryFn: async () => {
-      const supabase = getSupabaseClient();
-      const { data, error } = await supabase
-        .from("companies")
-        .select("*")
-        .eq("hub_id", hubId)
-        .eq("is_active", true)
-        .order("created_at", { ascending: false });
+// Company Queries - REMOVED (not used in marketing website)
 
-      if (error) throw error;
-      return data;
-    },
-  });
-};
-
-// Onboarding Queries
-export const useOnboardingSubmission = (companyId: string, hubId: number) => {
-  return useQuery({
-    queryKey: ["onboarding-submission", companyId, hubId],
-    queryFn: async () => {
-      if (!companyId) {
-        return null;
-      }
-
-      const supabase = getSupabaseClient();
-      const { data, error } = await supabase
-        .from("onboarding_submissions")
-        .select("*")
-        .eq("company_id", companyId)
-        .eq("hub_id", hubId)
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!companyId, // Only run query if companyId is truthy
-  });
-};
+// Onboarding Queries - REMOVED (not used in marketing website)
 
 export const useOnboardingSteps = (hubId: number) => {
   return useQuery({
@@ -187,28 +148,7 @@ export const useLeads = (hubId: number) => {
   });
 };
 
-// SMS Queries
-export const useBrands = (companyId: string) => {
-  return useQuery({
-    queryKey: ["brands", companyId],
-    queryFn: async () => {
-      if (!companyId) {
-        return [];
-      }
-
-      const supabase = getSupabaseClient();
-      const { data, error } = await supabase
-        .from("brands")
-        .select("*")
-        .eq("company_id", companyId)
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!companyId, // Only run query if companyId is truthy
-  });
-};
+// SMS Queries - REMOVED (not used in marketing website)
 
 // Mutations
 export const useCreateVerification = () => {
@@ -239,55 +179,7 @@ export const useVerifyCode = () => {
   });
 };
 
-export const useCreateCompany = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (data: {
-      hub_id: number;
-      public_name: string;
-      billing_email: string;
-      created_by_profile_id: string;
-    }) => {
-      // Get hub name for account number generation
-      const client = getSupabaseClient();
-      const { data: hub, error: hubError } = await client
-        .from("hubs")
-        .select("name")
-        .eq("hub_number", data.hub_id)
-        .single();
-
-      if (hubError || !hub) {
-        throw new Error("Hub not found");
-      }
-
-      // Generate company account number
-      const { data: accountNumber, error: accountError } = await client.rpc(
-        "generate_company_account_number",
-        { hub_name: hub.name }
-      );
-
-      if (accountError) throw accountError;
-
-      const { data: result, error } = await client
-        .from("companies")
-        .insert([
-          {
-            ...data,
-            company_account_number: accountNumber,
-          },
-        ])
-        .select()
-        .single();
-
-      if (error) throw error;
-      return result;
-    },
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["companies", data.hub_id] });
-    },
-  });
-};
+// useCreateCompany - REMOVED (not used in marketing website)
 
 export const useCreateLead = () => {
   const queryClient = useQueryClient();
@@ -379,26 +271,7 @@ export const useCreateOnboardingSubmission = () => {
 };
 
 // Current user's company hook
-export const useCurrentUserCompany = () => {
-  const { data: userProfile } = useUserProfile();
-  return useQuery({
-    queryKey: ["company", userProfile?.company_id],
-    queryFn: async () => {
-      if (!userProfile?.company_id) return null;
-      const supabase = getSupabaseClient();
-      const { data, error } = await supabase
-        .from("companies")
-        .select("*")
-        .eq("id", userProfile.company_id)
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!userProfile?.company_id,
-    staleTime: 5 * 60 * 1000,
-  });
-};
+// useCurrentUserCompany - REMOVED (not used in marketing website)
 
 // Current user's phone numbers hook
 export const useCurrentUserPhoneNumbers = () => {
@@ -503,20 +376,19 @@ export const useAdminStats = (hubId: number) => {
     queryKey: ["admin-stats", hubId],
     queryFn: async () => {
       const supabase = getSupabaseClient();
-      const { data: companies } = await supabase
-        .from("companies")
-        .select("*")
-        .eq("hub_id", hubId);
-
       const { data: users } = await supabase
         .from("user_profiles")
         .select("*")
         .eq("hub_id", hubId);
 
+      const { data: leads } = await supabase
+        .from("leads")
+        .select("*")
+        .eq("hub_id", hubId);
+
       return {
-        totalCompanies: companies?.length || 0,
-        activeCompanies:
-          companies?.filter((c: Company) => c.is_active)?.length || 0,
+        totalLeads: leads?.length || 0,
+        activeLeads: leads?.filter((l) => l.status === 'new')?.length || 0,
         totalUsers: users?.length || 0,
         activeUsers:
           users?.filter((u: UserProfile) => u.is_active)?.length || 0,
@@ -596,28 +468,7 @@ export const useSendMessage = () => {
 };
 
 // Update company mutation
-export const useUpdateCompany = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (data: { id: string; [key: string]: unknown }) => {
-      const supabase = getSupabaseClient();
-      const { data: result, error } = await supabase
-        .from("companies")
-        .update(data)
-        .eq("id", data.id)
-        .select()
-        .single();
-
-      if (error) throw error;
-      return result;
-    },
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["company", data.id] });
-      queryClient.invalidateQueries({ queryKey: ["companies"] });
-    },
-  });
-};
+// useUpdateCompany - REMOVED (not used in marketing website)
 
 // Update user profile mutation
 export const useUpdateProfile = () => {
@@ -643,7 +494,4 @@ export const useUpdateProfile = () => {
   });
 };
 
-// Backward compatibility aliases
-export const useCompany = useCurrentUserCompany;
-export const usePhoneNumbers = useCurrentUserPhoneNumbers;
-export const useCampaigns = useCurrentUserCampaigns;
+// Backward compatibility aliases - REMOVED (not used in marketing website)

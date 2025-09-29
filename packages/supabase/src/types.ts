@@ -1,4 +1,4 @@
-// Comprehensive database types for SMS Hub Web standalone app
+// Marketing website database types for SMS Hub Web
 // Re-export from the main database schema
 
 export * from './database'
@@ -13,26 +13,28 @@ export interface Database {
   }
 }
 
-// Simplified Company interface (legacy)
-export interface Company {
-  id: string;
+// Simplified Hub interface (legacy)
+export interface Hub {
+  hub_number: number;
   name: string;
-  hub_id: number;
-  is_active?: boolean;
+  domain?: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
 }
 
-// Simplified UserProfile interface (legacy)
+// Simplified UserProfile interface (legacy) - marketing focused
 export interface UserProfile {
   id: string;
   email: string;
   first_name?: string;
   last_name?: string;
-  company_id?: string;
-  hub_id?: number;
+  hub_id: number;
   role?: string;
-  account_number?: string;
-  created_at?: string;
   is_active?: boolean;
+  email_confirmed?: boolean;
+  last_login_at?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface SignupData {

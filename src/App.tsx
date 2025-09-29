@@ -1,17 +1,17 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Toaster, SonnerToaster, TooltipProvider } from "@sms-hub/ui";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { Suspense, lazy } from "react";
-
-import {
+import { 
+  Toaster, 
+  SonnerToaster, 
+  TooltipProvider,
   HubProvider,
   ErrorBoundary,
   PageTransition,
   useHub,
 } from "@sms-hub/ui";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Suspense, lazy, useEffect } from "react";
 import { useScrollToTop } from "@sms-hub/utils";
 import { webEnvironment } from "./config/webEnvironment";
-import { useEffect } from "react";
 import { EnvironmentDebug } from "./components/EnvironmentDebug";
 import AppFloatingComponents from "./components/AppFloatingComponents";
 

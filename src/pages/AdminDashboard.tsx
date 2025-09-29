@@ -38,15 +38,16 @@ interface TableStats {
   lastUpdated: string;
 }
 
-interface Company {
+interface EmailSubscriber {
   id: string;
-  public_name: string;
+  email: string;
+  first_name: string | null;
+  last_name: string | null;
   hub_id: number;
-  signup_type: string | null;
-  is_active: boolean | null;
-  industry_vertical: string | null;
+  status: string | null;
+  source: string | null;
   created_at: string | null;
-  primary_contact_email: string | null;
+  updated_at: string | null;
 }
 
 interface Lead {
@@ -87,7 +88,7 @@ export const AdminDashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [tableStats, setTableStats] = useState<TableStats[]>([]);
-  const [recentCompanies, setRecentCompanies] = useState<Company[]>([]);
+  const [recentEmailSubscribers, setRecentEmailSubscribers] = useState<EmailSubscriber[]>([]);
   const [recentLeads, setRecentLeads] = useState<Lead[]>([]);
   const [hubs, setHubs] = useState<Hub[]>([]);
   const [showSensitiveData, setShowSensitiveData] = useState(false);
@@ -179,12 +180,12 @@ export const AdminDashboard: React.FC = () => {
       console.log('📊 Fetching database statistics...');
 
       // Get table statistics with proper count queries
-      const [companiesResult, leadsResult, hubsResult] = await Promise.all([
-        supabase
-          .from('companies')
-          .select('*', { count: 'exact', head: true }),
+      const [leadsResult, emailSubscribersResult, hubsResult] = await Promise.all([
         supabase
           .from('leads')
+          .select('*', { count: 'exact', head: true }),
+        supabase
+          .from('email_subscribers')
           .select('*', { count: 'exact', head: true }),
         supabase
           .from('hubs')
@@ -192,13 +193,13 @@ export const AdminDashboard: React.FC = () => {
       ]);
 
       console.log('📈 Database stats results:', {
-        companies: companiesResult,
+        emailSubscribers: emailSubscribersResult,
         leads: leadsResult,
         hubs: hubsResult
       });
 
-      if (companiesResult.error) {
-        console.error('Companies error:', companiesResult.error);
+      if (emailSubscribersResult.error) {
+        console.error('Email subscribers error:', emailSubscribersResult.error);
       }
       if (leadsResult.error) {
         console.error('Leads error:', leadsResult.error);
@@ -208,11 +209,11 @@ export const AdminDashboard: React.FC = () => {
       }
 
       // Use the count property from Supabase response
-      const companiesCount = companiesResult.count || 0;
+      const emailSubscribersCount = emailSubscribersResult.count || 0;
       const leadsCount = leadsResult.count || 0;
       const hubsCount = hubsResult.count || 0;
 
-      console.log('📊 Final counts:', { companiesCount, leadsCount, hubsCount });
+      console.log('📊 Final counts:', { emailSubscribersCount, leadsCount, hubsCount });
 
       setTableStats([
         {
@@ -221,8 +222,8 @@ export const AdminDashboard: React.FC = () => {
           lastUpdated: new Date().toISOString()
         },
         {
-          name: 'Companies',
-          count: companiesCount,
+          name: 'Email Subscribers',
+          count: emailSubscribersCount,
           lastUpdated: new Date().toISOString()
         },
         {
@@ -233,9 +234,9 @@ export const AdminDashboard: React.FC = () => {
       ]);
 
       // Get recent data in parallel
-      const [companiesDataResult, leadsDataResult, hubsDataResult] = await Promise.all([
+      const [emailSubscribersDataResult, leadsDataResult, hubsDataResult] = await Promise.all([
         supabase
-          .from('companies')
+          .from('email_subscribers')
           .select('*')
           .order('created_at', { ascending: false })
           .limit(10),
@@ -251,16 +252,16 @@ export const AdminDashboard: React.FC = () => {
       ]);
 
       console.log('📋 Recent data results:', {
-        companies: companiesDataResult,
+        emailSubscribers: emailSubscribersDataResult,
         leads: leadsDataResult,
         hubs: hubsDataResult
       });
 
-      if (companiesDataResult.error) {
-        console.error('Error fetching companies:', companiesDataResult.error);
+      if (emailSubscribersDataResult.error) {
+        console.error('Error fetching email subscribers:', emailSubscribersDataResult.error);
       } else {
-        setRecentCompanies(companiesDataResult.data || []);
-        console.log('✅ Companies loaded:', companiesDataResult.data?.length || 0);
+        setRecentEmailSubscribers(emailSubscribersDataResult.data || []);
+        console.log('✅ Email subscribers loaded:', emailSubscribersDataResult.data?.length || 0);
       }
 
       if (leadsDataResult.error) {
@@ -706,52 +707,51 @@ export const AdminDashboard: React.FC = () => {
               </CardContent>
             </Card>
 
-            {/* Recent Companies */}
+            {/* Recent Email Subscribers */}
             <Card className="bg-gray-900/90 backdrop-blur-sm border-gray-800">
               <CardHeader>
                 <CardTitle className="flex items-center text-white">
                   <Users className="w-5 h-5 mr-2" />
-                  Recent Companies
+                  Recent Email Subscribers
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {recentCompanies.map((company) => (
-                    <div key={company.id} className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
+                  {recentEmailSubscribers.map((subscriber) => (
+                    <div key={subscriber.id} className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
                       <div>
                         <p className="font-medium text-white">
-                          {company.public_name}
+                          {subscriber.first_name && subscriber.last_name 
+                            ? `${subscriber.first_name} ${subscriber.last_name}`
+                            : subscriber.email
+                          }
                         </p>
                         <p className="text-sm text-gray-400">
-                          Created: {company.created_at ? new Date(company.created_at).toLocaleDateString() : 'N/A'}
+                          {subscriber.email}
+                        </p>
+                        <p className="text-sm text-gray-400">
+                          Created: {subscriber.created_at ? new Date(subscriber.created_at).toLocaleDateString() : 'N/A'}
                         </p>
                         <div className="flex gap-2 mt-1">
-                          {company.signup_type && (
+                          {subscriber.status && (
                             <span className="inline-block px-2 py-1 text-xs bg-blue-900/50 text-blue-300 rounded-full">
-                              {company.signup_type}
+                              {subscriber.status}
                             </span>
                           )}
-                          {company.is_active && (
+                          {subscriber.source && (
                             <span className="inline-block px-2 py-1 text-xs bg-green-900/50 text-green-300 rounded-full">
-                              Active
-                            </span>
-                          )}
-                          {company.industry_vertical && (
-                            <span className="inline-block px-2 py-1 text-xs bg-purple-900/50 text-purple-300 rounded-full">
-                              {company.industry_vertical}
+                              {subscriber.source}
                             </span>
                           )}
                         </div>
                       </div>
                       <div className="text-right">
                         <p className="text-xs text-gray-400">
-                          Hub: {hubs.find(h => h.hub_number === company.hub_id)?.name || company.hub_id}
+                          Hub: {hubs.find(h => h.hub_number === subscriber.hub_id)?.name || subscriber.hub_id}
                         </p>
-                        {company.primary_contact_email && (
-                          <p className="text-xs text-gray-400">
-                            {showSensitiveData ? company.primary_contact_email : '***@***.***'}
-                          </p>
-                        )}
+                        <p className="text-xs text-gray-400">
+                          {showSensitiveData ? subscriber.email : '***@***.***'}
+                        </p>
                       </div>
                     </div>
                   ))}

@@ -1,6 +1,9 @@
 import { Outlet, Link, useLocation } from "react-router-dom";
-import { useHub, HubLogo, Button, HubSwitcher } from "@sms-hub/ui";
-import {
+import { 
+  useHub, 
+  HubLogo, 
+  Button, 
+  HubSwitcher,
   Badge,
   Sidebar,
   SidebarContent,
@@ -66,7 +69,7 @@ export function Layout() {
                       {userProfile.first_name} {userProfile.last_name}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      {userProfile.account_number}
+                      {userProfile.email}
                     </p>
                     <Badge variant="secondary" className="mt-1">
                       {userProfile.role}

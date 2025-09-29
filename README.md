@@ -14,8 +14,8 @@ This is the public-facing web application for the SMS Hub multi-tenant B2B SMS S
 ## Tech Stack
 
 - **Framework**: React 19 + Vite + TypeScript
-- **Styling**: Tailwind CSS + CSS Modules
-- **Testing**: Vitest + Testing Library
+- **Styling**: Tailwind CSS + styled-components
+- **Testing**: Vitest (unit) + Playwright (E2E) + Testing Library
 - **Backend**: Supabase (PostgreSQL + Auth + Edge Functions)
 - **UI Components**: Custom component library in `packages/ui`
 - **Deployment**: Vercel
@@ -65,8 +65,11 @@ npm run dev
 # Run type checking
 npm run type-check
 
-# Run tests
+# Run unit tests
 npm run test
+
+# Run E2E tests
+npx playwright test
 
 # Run linting
 npm run lint
@@ -105,9 +108,14 @@ The app is configured for deployment on Vercel:
 vercel --prod
 ```
 
-## Related Repositories
+## Features
 
-- Admin dashboard is now integrated into this app at `/admin`
+- **Multi-Hub Support**: Automatic hub detection and switching
+- **Admin Dashboard**: Integrated at `/admin` route with CRUD operations
+- **Authentication**: Magic link flow with Supabase Auth
+- **Contact Forms**: Lead capture with hub-specific branding
+- **Responsive Design**: Mobile-first approach with Tailwind CSS
+- **Testing**: Comprehensive unit and E2E test coverage
 
 ## License
 

@@ -17,7 +17,7 @@ This folder contains comprehensive documentation for the SMS Hub Web application
 - Authentication and security features
 - Database schema overview
 - Development workflow
-- Migration notes from monorepo to standalone
+- Testing strategy (unit + E2E)
 
 #### 🚀 [QUICK_START.md](./QUICK_START.md)
 

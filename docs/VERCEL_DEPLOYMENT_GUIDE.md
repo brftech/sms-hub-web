@@ -6,6 +6,8 @@
 - **NPM Package Management** with internal packages
 - **Single Vercel project** for the web app
 - **Hub-specific branding** determined by domain
+- **Comprehensive Testing**: Vitest (unit) + Playwright (E2E)
+- **Admin Dashboard**: Integrated at `/admin` route
 
 ## 📋 Current Vercel Project
 

@@ -23,6 +23,7 @@
   - Floating hub switcher (development only)
   - Floating admin button with access code authentication
   - Comprehensive testing setup (Vitest + Playwright)
+  - Environment-based login routing
 
 ## 🗑️ Legacy Ports (Removed)
 
@@ -44,7 +45,8 @@
 - **Database**: PostgreSQL
 - **Auth**: Supabase Auth
 - **Edge Functions**: Deno runtime
-- **URL**: https://vgpovgpwqkjnpnrjelyg.supabase.co
+- **Development URL**: https://hmumtnpnyxuplvqcmnfk.supabase.co (web-dev)
+- **Production URL**: https://fwlivygerbqzowbzxesw.supabase.co (web-prod)
 
 ### Stripe
 
@@ -79,13 +81,13 @@ npm run dev -- --port 3000  # Web app
 ### Production Architecture
 
 ```
-User → Web App (3000)
+User → Web App (3000) → Supabase (Backend)
 ```
 
 ### Development Architecture
 
 ```
-Developer → Web App (3000)
+Developer → Web App (3000) → Supabase (web-dev)
 ```
 
 ## 🔧 Port Management
@@ -158,5 +160,17 @@ For external access:
 - **Enhanced Security**: Superadmin protection and proper session isolation
 - **Consolidated Dashboard**: All user types access same application with role-based features
 - **Responsive UI**: Improved mobile experience across all features
+- **Environment-Based Login**: Production redirects to app.gnymble.com, dev to localhost:3001
+- **Code Quality**: Clean codebase with zero console warnings and strict TypeScript
+
+## 🌐 Login URL Routing
+
+### Development Environment
+- **Login Button**: Redirects to `http://localhost:3001/login`
+- **Admin Access**: Available at `/admin` route
+
+### Production Environment
+- **Login Button**: Redirects to `https://app.gnymble.com`
+- **Admin Access**: Available at `/admin` route with password protection
 
 This port assignment strategy provides a clean, maintainable architecture with clear separation of concerns and efficient development workflow.

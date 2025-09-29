@@ -8,6 +8,7 @@
 - **Hub-specific branding** determined by domain
 - **Comprehensive Testing**: Vitest (unit) + Playwright (E2E)
 - **Admin Dashboard**: Integrated at `/admin` route
+- **Environment-Based Login**: Production redirects to app.gnymble.com
 
 ## 📋 Current Vercel Project
 
@@ -31,7 +32,10 @@
 ### Simple deployment (recommended):
 
 ```bash
-# Deploy from project root
+# Deploy preview
+vercel
+
+# Deploy to production
 vercel --prod --yes
 ```
 
@@ -49,7 +53,8 @@ Add to root `package.json`:
 ```json
 {
   "scripts": {
-    "deploy": "vercel --prod --yes"
+    "deploy": "vercel --prod --yes",
+    "deploy:preview": "vercel"
   }
 }
 ```
@@ -58,6 +63,7 @@ Then use:
 
 ```bash
 npm run deploy
+npm run deploy:preview
 ```
 
 ## ⚙️ Vercel Configuration
@@ -125,19 +131,59 @@ All domains are configured in Vercel:
 ### Required for All Projects
 
 ```bash
-VITE_SUPABASE_URL=https://howjinnvvtvaufihwers.supabase.co
-VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhvd2ppbm52dnR2YXVmaWh3ZXJzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc2ODYzNDksImV4cCI6MjA3MzI2MjM0OX0.moAI_eCWlrI9s7aLcaxIasL2UuWrEfiutMTUwPpgKOg
-VITE_SKIP_EMAIL_CONFIRMATION=false
-VITE_ENABLE_DEV_AUTH=false
+# Development Environment Configuration
+NODE_ENV=development
+VERCEL_ENV=development
+
+# Supabase Configuration (Development Database)
+VITE_SUPABASE_URL=https://hmumtnpnyxuplvqcmnfk.supabase.co
+VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
+
+# App URLs (Local Development)
+VITE_WEB_APP_URL=http://localhost:3000
+
+# Public URLs for Edge Functions
+PUBLIC_SITE_URL=http://localhost:3000
+
+# Feature Flags
+VITE_ENABLE_DEBUG=true
+VITE_ENABLE_DEV_AUTH=true
+VITE_ENABLE_HUB_SWITCHER=true
+
+# Dev Authentication Token
+VITE_DEV_AUTH_TOKEN=your-dev-auth-token
+
+# Stripe Payment Links
+VITE_STRIPE_PAYMENT_LINK=https://buy.stripe.com/test_28E5kF2Ag5jW9va1Ks3ZK0c
 ```
 
-### Stripe Integration (Optional)
+### Production Environment Variables
 
 ```bash
-VITE_STRIPE_PAYMENT_LINK=https://buy.stripe.com/9B67sM60Tg3S62RbCBefC0k
-VITE_STRIPE_PAYMENT_LINK_STARTER=https://buy.stripe.com/starter
-VITE_STRIPE_PAYMENT_LINK_CORE=https://buy.stripe.com/core
-VITE_STRIPE_PAYMENT_LINK_ELITE=https://buy.stripe.com/elite
+# Production Environment Configuration
+NODE_ENV=production
+VERCEL_ENV=production
+
+# Supabase Configuration (Production Database)
+VITE_SUPABASE_URL=https://fwlivygerbqzowbzxesw.supabase.co
+VITE_SUPABASE_ANON_KEY=your-production-anon-key
+
+# App URLs (Production)
+VITE_WEB_APP_URL=https://www.gnymble.com
+
+# Public URLs for Edge Functions
+PUBLIC_SITE_URL=https://www.gnymble.com
+
+# Feature Flags
+VITE_ENABLE_DEBUG=false
+VITE_ENABLE_DEV_AUTH=false
+VITE_ENABLE_HUB_SWITCHER=false
+
+# Admin Access Code
+VITE_ADMIN_ACCESS_CODE=your-secure-admin-code
+
+# Stripe Payment Links
+VITE_STRIPE_PAYMENT_LINK=https://buy.stripe.com/production-link
 ```
 
 ### Where to Add Variables
@@ -178,28 +224,39 @@ VITE_STRIPE_PAYMENT_LINK_ELITE=https://buy.stripe.com/elite
 
 **Solution**: Run migration 3 in production database to create superadmin users
 
+### Issue: Console warnings in production
+
+**Solution**: All console statements have been cleaned up - only console.error and console.warn are allowed
+
+### Issue: Login button redirects to wrong URL
+
+**Solution**: Login URLs are now environment-based - production redirects to app.gnymble.com, dev to localhost:3001
+
 ## 📁 File Structure
 
 ```
 /
-├── apps/
-│   ├── web/vercel.json          ✅ Keep
-│   └── unified/vercel.json      ✅ Keep
-├── scripts/
-│   ├── shell/deploy.sh          ✅ Main deployment script
-│   ├── deploy-web.sh            ✅ Individual web deployment
-│   └── deploy-unified.sh        ✅ Individual unified deployment
-├── .vercel/                     ❌ REMOVED (locks to one project)
-└── vercel.json                  ❌ Removed (conflicted)
+├── src/                    # Application source code
+├── packages/              # Internal packages
+├── supabase/             # Backend configuration
+├── test/                 # Test files
+├── public/               # Static assets
+├── .vercel/              # Vercel configuration (auto-generated)
+├── vercel.json           # Vercel deployment config
+├── package.json          # Dependencies and scripts
+├── vite.config.ts        # Vite configuration
+├── tsconfig.json         # TypeScript configuration
+├── eslint.config.js      # ESLint configuration
+└── .prettierrc           # Prettier configuration
 ```
 
 ## 🔄 Deployment Process
 
-The deployment script (`scripts/shell/deploy.sh`):
+The deployment process:
 
-1. **MUST be run from monorepo root** (`/Users/bryan/Dev/sms-hub-monorepo`)
+1. **MUST be run from project root** (`/Users/bryan/Dev/sms-hub-web`)
 2. Uses `vercel --prod --yes` to deploy from root directory
-3. Maintains pnpm workspace context automatically
+3. Maintains npm workspace context automatically
 4. Shows success/failure status with colored output
 5. **CRITICAL**: Never run `vercel` from individual app directories - always from root
 
@@ -218,7 +275,8 @@ vercel alias ls
 1. **Vercel Expert Advice**: Never use .vercel inside apps/, avoid CLI deployment from subfolders
 2. **Monorepo Context**: Root Directory setting uploads entire repo but builds from app folder
 3. **Dashboard vs Config**: Clear all dashboard overrides to use vercel.json
-4. **PNPM Workspace**: Install command must run from root where pnpm-lock.yaml exists
+4. **NPM Workspace**: Install command must run from root where package-lock.json exists
+5. **Code Quality**: Clean codebase with zero console warnings and strict TypeScript
 
 ## ✅ What Works Now
 
@@ -227,6 +285,8 @@ vercel alias ls
 - **No .vercel directories** in apps (removed per expert advice)
 - **No cd commands** in deploy scripts (deploy from root)
 - **Hub detection** via domain-based routing
+- **Environment-based login routing**
+- **Clean codebase** with comprehensive testing
 
 ## ❌ What We Tried (Didn't Work)
 
@@ -242,7 +302,8 @@ When ready to deploy multiple hubs:
 ```bash
 # Create additional projects
 sms-hub-web-percytech    → www.percytech.com
-sms-hub-unified-percytech → unified.percytech.com
+sms-hub-web-percymd      → www.percymd.com
+sms-hub-web-percytext    → www.percytext.com
 ```
 
 ## Next Steps
@@ -251,3 +312,4 @@ sms-hub-unified-percytech → unified.percytech.com
 2. **Set up remaining domains**: Configure percymd.com and percytext.com
 3. **Add monitoring**: Set up error tracking and analytics
 4. **Performance optimization**: Enable caching and CDN
+5. **Code quality**: Maintain zero console warnings and strict TypeScript

@@ -9,9 +9,11 @@ You are working on **SMS Hub Web**, a standalone React application that serves a
 - **Standalone React App**: Marketing website with contact forms, pricing, and admin dashboard
 - **Database**: Supabase (PostgreSQL) with web-dev and web-prod environments
 - **Authentication**: Admin access via access codes and 24-hour tokens
-- **Frontend**: React 19 + Vite + TypeScript with Tailwind CSS
+- **Frontend**: React 19 + Vite + TypeScript with Tailwind CSS + styled-components
 - **Backend**: Supabase Edge Functions for contact form handling
 - **Multi-tenancy**: 4 distinct business hubs with isolated branding and data
+- **Testing**: Vitest (unit) + Playwright (E2E) + Testing Library
+- **Code Quality**: ESLint + Prettier + TypeScript strict mode
 
 ## 📁 Project Structure
 
@@ -32,6 +34,10 @@ sms-hub-web/
 ├── supabase/
 │   ├── functions/    # Edge Functions (submit-contact, etc.)
 │   └── migrations/   # Database migrations
+├── test/             # Test files
+│   ├── unit/        # Unit tests
+│   ├── e2e/         # E2E tests
+│   └── integration/ # Integration tests
 ├── public/           # Static assets (logos, favicons)
 └── docs/             # Documentation
 ```
@@ -50,21 +56,30 @@ sms-hub-web/
    - Floating debug panel (development only)
    - Floating hub switcher (development only)
    - Floating admin button with access code authentication
+   - Environment-based login routing
 
 2. **Admin Dashboard Flow**:
    ```
    Marketing Site → Admin Access Code → Admin Dashboard → Database Management
    ```
 
-### Recent Major Updates (December 2024)
+3. **Login Flow**:
+   ```
+   Development: Login Button → localhost:3001/login
+   Production: Login Button → app.gnymble.com
+   ```
+
+### Recent Major Updates (January 2025)
 
 #### Latest Enhancements (Current)
 
+- ✅ **Console Cleanup**: Removed 55+ unnecessary console statements
+- ✅ **Code Quality**: Zero TypeScript and ESLint errors
+- ✅ **Login URL Updates**: Environment-based login routing
 - ✅ **Admin Dashboard**: Full CRUD functionality for leads management
 - ✅ **Dynamic Supabase Connection**: web-dev in dev, web-prod in production
 - ✅ **Contact Form Fixes**: Consistent styling and proper branding
 - ✅ **Environment Controls**: Debug and hub selector hidden in production
-- ✅ **Landing Page Cleanup**: Removed unused Landing and CigarLanding pages
 - ✅ **Logo Organization**: Consolidated and standardized all hub logos
 - ✅ **Accessibility Fixes**: Improved contrast ratios and WCAG compliance
 
@@ -75,6 +90,7 @@ sms-hub-web/
 - ✅ **Admin Authentication**: Secure access code system with token expiration
 - ✅ **Database Integration**: Dynamic connection to appropriate Supabase project
 - ✅ **Type Safety**: Comprehensive TypeScript coverage
+- ✅ **Testing Infrastructure**: Complete test coverage with Vitest + Playwright
 
 ## 🔑 Critical Implementation Details
 
@@ -132,6 +148,17 @@ const supabase = createClient(
 );
 ```
 
+### 6. Console Statements (STRICT)
+
+```typescript
+// ❌ NEVER do this
+console.log("Debug info");
+
+// ✅ ALLOWED for error logging
+console.error("Error occurred:", error);
+console.warn("Warning message");
+```
+
 ## 🛠️ Development Workflow
 
 ### Port Assignments
@@ -142,7 +169,10 @@ const supabase = createClient(
 
 ```bash
 # Install dependencies
-npm install
+npm install --legacy-peer-deps
+
+# Install Playwright browsers
+npx playwright install --with-deps
 
 # Start development server
 npm run dev
@@ -153,15 +183,24 @@ npm run type-check
 # Run linting
 npm run lint
 
+# Run tests
+npm run test
+
+# Run E2E tests
+npx playwright test
+
 # Build for production
 npm run build
+
+# Full build check
+npm run build:check
 ```
 
 ### Database Operations
 
 ```bash
 # Generate TypeScript types from database
-npx supabase gen types typescript --project-id vgpovgpwqkjnpnrjelyg > packages/supabase/src/types/database.ts
+npx supabase gen types typescript --project-id hmumtnpnyxuplvqcmnfk > packages/supabase/src/database.ts
 
 # Run migrations
 npx supabase db push
@@ -191,6 +230,14 @@ npx supabase migration new <migration_name>
 ### Admin Dashboard Access Issues
 
 **Solution**: Check environment variables for `VITE_ADMIN_ACCESS_CODE` in Vercel
+
+### Console Warnings in Production
+
+**Solution**: All console statements have been cleaned up - only console.error and console.warn are allowed
+
+### Login Button Redirects to Wrong URL
+
+**Solution**: Login URLs are now environment-based - production redirects to app.gnymble.com, dev to localhost:3001
 
 ## 🔐 Security Guidelines
 
@@ -222,7 +269,7 @@ npx supabase migration new <migration_name>
 
 ```bash
 # Deploy to preview
-vercel --yes
+vercel
 
 # Deploy to production
 vercel --prod --yes
@@ -245,14 +292,17 @@ supabase link --project-ref [ID]
 
 ## 📋 Current Tasks & Priorities
 
-### Current Status (December 2024)
+### Current Status (January 2025)
 
-1. ✅ **Admin Dashboard**: Complete with CRUD functionality for leads
-2. ✅ **Contact Form**: Fixed styling and branding consistency
-3. ✅ **Environment Controls**: Proper dev/prod behavior
-4. ✅ **Logo Organization**: Standardized across all hubs
-5. ✅ **Accessibility**: Improved contrast and WCAG compliance
-6. ✅ **Landing Pages**: Cleaned up unused components
+1. ✅ **Console Cleanup**: Removed 55+ unnecessary console statements
+2. ✅ **Code Quality**: Zero TypeScript and ESLint errors
+3. ✅ **Login URL Updates**: Environment-based login routing
+4. ✅ **Admin Dashboard**: Complete with CRUD functionality for leads
+5. ✅ **Contact Form**: Fixed styling and branding consistency
+6. ✅ **Environment Controls**: Proper dev/prod behavior
+7. ✅ **Logo Organization**: Standardized across all hubs
+8. ✅ **Accessibility**: Improved contrast and WCAG compliance
+9. ✅ **Testing Infrastructure**: Complete test coverage
 
 ### Development Focus
 
@@ -272,10 +322,12 @@ supabase link --project-ref [ID]
 
 1. Run type checking: `npm run type-check`
 2. Run linting: `npm run lint`
-3. Test contact form functionality
-4. Verify admin dashboard access
-5. Check responsive design
-6. Verify hub-specific branding
+3. Run tests: `npm run test`
+4. Run E2E tests: `npx playwright test`
+5. Test contact form functionality
+6. Verify admin dashboard access
+7. Check responsive design
+8. Verify hub-specific branding
 
 ### Admin Dashboard Testing
 
@@ -288,17 +340,20 @@ supabase link --project-ref [ID]
 
 ### Key Files
 
-- `/packages/supabase/src/types/database.ts` - Database schema
+- `/packages/supabase/src/database.ts` - Database schema
 - `/packages/hub-logic/src/index.ts` - Hub configurations
 - `/src/App.tsx` - Main routing
 - `/src/pages/AdminDashboard.tsx` - Admin dashboard
 - `/src/pages/Contact.tsx` - Contact form
+- `/src/components/Navigation.tsx` - Navigation with environment-based login
 - `/.env.local` - Environment variables
 
 ### Documentation
 
 - `docs/ADMIN_DASHBOARD.md` - Admin dashboard documentation
 - `docs/README.md` - Documentation overview
+- `docs/QUICK_START.md` - Quick start guide
+- `docs/VERCEL_DEPLOYMENT_GUIDE.md` - Deployment guide
 - `supabase/migrations/` - Database schema evolution
 - `packages/ui/src/` - Component library examples
 
@@ -314,6 +369,8 @@ supabase link --project-ref [ID]
 8. **ALWAYS** consider multi-tenant data isolation
 9. **ALWAYS** use environment-specific behavior
 10. **ALWAYS** test admin access in production
+11. **NEVER** use console.log - use console.error/warn only
+12. **ALWAYS** follow TypeScript strict mode
 
 ## 🎯 Architecture Principles
 
@@ -324,6 +381,7 @@ supabase link --project-ref [ID]
 5. **Security**: Proper authentication and data isolation
 6. **Maintainability**: Clear structure, consistent patterns
 7. **Scalability**: Modular architecture, efficient data queries
+8. **Code Quality**: Clean codebase with zero warnings
 
 ## 💡 Pro Tips
 
@@ -333,58 +391,52 @@ supabase link --project-ref [ID]
 4. **Test edge cases**: Empty states, errors, loading states
 5. **Consider mobile**: All interfaces must be responsive
 6. **Document decisions**: Add comments for non-obvious choices
+7. **Clean code**: Remove console statements and fix linting issues
+8. **Environment awareness**: Consider dev vs production behavior
 
-## 🔄 Recent Changes (Last Updated: 2024-12-29)
+## 🔄 Recent Changes (Last Updated: 2025-01-29)
 
-### Latest Updates (December 29, 2024)
+### Latest Updates (January 29, 2025)
 
-1. **Admin Dashboard CRUD**:
+1. **Console Cleanup**:
+   - Removed 55+ unnecessary console statements
+   - Updated ESLint config to allow console.error/warn
+   - Clean production builds with zero warnings
 
-   - Full Create, Read, Update, Delete functionality for leads
-   - Dynamic Supabase connection (web-dev/web-prod)
-   - 24-hour authentication tokens
-   - Hub-specific data isolation
+2. **Login URL Updates**:
+   - Environment-based login routing
+   - Production: app.gnymble.com
+   - Development: localhost:3001/login
 
-2. **Contact Form Improvements**:
+3. **Code Quality Improvements**:
+   - Zero TypeScript and ESLint errors
+   - Fixed React Hook dependencies with useCallback
+   - Clean codebase with proper error handling
 
-   - Fixed message field background (white instead of black)
-   - Improved "Why We're Different" section visibility
-   - Consistent styling across all form elements
-   - Proper hub branding on submit button
-
-3. **Environment Controls**:
-
-   - Debug panel and hub switcher hidden in production
-   - Proper development vs production behavior
-   - Admin button with secure access code system
-
-4. **Code Quality**:
-
-   - Fixed all TypeScript and ESLint errors
-   - Removed unused imports and components
-   - Clean build process with no warnings
-
-5. **Testing Infrastructure**:
-
+4. **Testing Infrastructure**:
    - Added Playwright for E2E testing
    - Comprehensive hub context tests
    - Complete test coverage (unit + E2E)
    - Proper mocking for environment, storage, and DOM adapters
 
-6. **Documentation Updates**:
+5. **Documentation Updates**:
    - Updated all documentation to reflect current architecture
    - Removed outdated monorepo references
    - Added current deployment and development instructions
    - Updated testing documentation
 
-## 🎯 Current State Summary (December 2024)
+## 🎯 Current State Summary (January 2025)
 
 **Status**: ✅ **PRODUCTION READY** - Standalone marketing website with admin dashboard fully functional.
 
-**Latest Achievement**: ✅ **COMPREHENSIVE TESTING SUITE** - Complete test coverage with Vitest (unit) + Playwright (E2E) + comprehensive hub context tests.
+**Latest Achievement**: ✅ **CLEAN CODEBASE** - Zero console warnings, strict TypeScript, comprehensive testing, and environment-based login routing.
 
 **Previous Achievements**:
 
+- ✅ **CONSOLE CLEANUP** - Removed 55+ unnecessary console statements
+- ✅ **LOGIN URL UPDATES** - Environment-based login routing
+- ✅ **CODE QUALITY** - Zero TypeScript and ESLint errors
+- ✅ **TESTING INFRASTRUCTURE** - Complete test coverage with Vitest + Playwright
 - ✅ **CONTACT FORM FIXES** - Consistent styling and proper branding
 - ✅ **ENVIRONMENT CONTROLS** - Proper dev/prod behavior
 - ✅ **LOGO ORGANIZATION** - Standardized across all hubs
@@ -392,14 +444,15 @@ supabase link --project-ref [ID]
 
 ### Key Improvements Completed
 
-1. **Admin Dashboard**: Full CRUD operations with dynamic Supabase connections
-2. **Contact Form**: Consistent styling and proper hub branding
-3. **Environment Controls**: Debug/hub selector hidden in production
-4. **Logo Standardization**: Consistent branding across all hubs
-5. **Accessibility**: Improved contrast ratios and text visibility
-6. **Code Quality**: Zero TypeScript/ESLint errors
-7. **Documentation**: Updated to reflect current architecture
+1. **Console Cleanup**: Removed all unnecessary console statements
+2. **Login URL Updates**: Environment-based login routing
+3. **Code Quality**: Zero TypeScript and ESLint errors
+4. **Admin Dashboard**: Full CRUD operations with dynamic Supabase connections
+5. **Contact Form**: Consistent styling and proper hub branding
+6. **Environment Controls**: Debug/hub selector hidden in production
+7. **Logo Standardization**: Consistent branding across all hubs
+8. **Accessibility**: Improved contrast ratios and text visibility
+9. **Testing**: Comprehensive unit and E2E test coverage
+10. **Documentation**: Updated all docs to reflect current architecture
 
-The SMS Hub Web platform has successfully evolved into a robust, maintainable marketing website with comprehensive admin functionality, proper security measures, and excellent user experience. The foundation is solid for continued development and scaling.
-
-Remember: You're working on a **production system**. Every change should maintain or improve stability, performance, and user experience. When in doubt, analyze thoroughly before making changes.
+The SMS Hub Web application is now a clean, production-ready React application with comprehensive testing, proper code quality, and environment-based functionality.

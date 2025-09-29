@@ -18,6 +18,7 @@ This folder contains comprehensive documentation for the SMS Hub Web application
 - Database schema overview
 - Development workflow
 - Testing strategy (unit + E2E)
+- AI code agent instructions
 
 #### 🚀 [QUICK_START.md](./QUICK_START.md)
 
@@ -30,17 +31,6 @@ Quick start guide for developers getting started with the project.
 - Development rules and best practices
 
 ### Technical Documentation
-
-#### 🔧 [CLAUDE.md](./CLAUDE.md)
-
-Detailed instructions for Claude AI code agents working on this project.
-
-- Project architecture and structure
-- Current application flow
-- Critical implementation details
-- Development workflow
-- Security guidelines
-- Common issues and solutions
 
 #### 🌐 [PORT_ASSIGNMENTS.md](./PORT_ASSIGNMENTS.md)
 
@@ -107,6 +97,7 @@ Checklist for required environment variables.
 - **Updated**: All files reflect current standalone app structure
 - **Streamlined**: Eliminated redundant and conflicting information
 - **Modernized**: Updated to reflect current technology stack and deployment
+- **Enhanced**: Added comprehensive testing and code quality documentation
 
 ### Migration Context
 
@@ -119,10 +110,12 @@ The project has been successfully migrated from a Turbo monorepo structure to a 
 ## 🛠️ Technology Stack
 
 - **Frontend**: React 19 + Vite + TypeScript
-- **Styling**: styled-components (CSS-in-JS)
+- **Styling**: Tailwind CSS + styled-components
+- **Testing**: Vitest (unit) + Playwright (E2E) + Testing Library
 - **Backend**: Supabase (PostgreSQL + Auth + Edge Functions)
 - **Authentication**: Magic link authentication
 - **State Management**: React Query (TanStack Query)
+- **Code Quality**: ESLint + Prettier + TypeScript strict mode
 - **Deployment**: Vercel
 
 ## 🌐 Multi-Hub System
@@ -135,6 +128,29 @@ The application supports multiple business hubs:
 - **PercyText**: Hub ID 3
 
 Each hub has distinct branding, theming, and isolated data.
+
+## 🔐 Authentication & Login
+
+- **Development**: Login button redirects to `localhost:3001/login`
+- **Production**: Login button redirects to `app.gnymble.com`
+- **Admin Access**: Available at `/admin` route with password protection
+
+## 📊 Database Schema
+
+The application uses a marketing-focused database schema with 15 tables:
+
+- **Core Tables**: `hubs`, `leads`, `email_subscribers`, `sms_subscribers`
+- **Campaigns**: `email_campaigns`, `sms_campaigns`, `marketing_campaigns`
+- **Analytics**: `website_analytics`, `conversions`, `lead_activities`
+- **User Management**: `user_profiles`, `verifications`, `verification_attempts`
+- **Forms**: `contact_form_submissions`
+
+## 🧪 Testing Strategy
+
+- **Unit Tests**: Vitest with Testing Library
+- **E2E Tests**: Playwright for browser automation
+- **Integration Tests**: Cross-hub functionality testing
+- **Code Quality**: ESLint + Prettier + TypeScript strict mode
 
 ## 📞 Support
 

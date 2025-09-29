@@ -5,20 +5,7 @@
 
 export type Environment = "development" | "staging" | "production";
 
-/**
- * Detect hub from current hostname
- */
-function detectHub(): string {
-  if (typeof window === "undefined") return "gnymble";
-
-  const hostname = window.location.hostname.toLowerCase();
-
-  if (hostname.includes("percytech")) return "percytech";
-  if (hostname.includes("percymd")) return "percymd";
-  if (hostname.includes("percytext")) return "percytext";
-
-  return "gnymble"; // Default
-}
+// Hub detection is now handled by the hub context, not environment config
 
 /**
  * Get admin dashboard URL (now part of this app)
@@ -135,7 +122,6 @@ function getSupabaseConfig(env: Environment) {
  */
 export function getEnvironmentConfig(): EnvironmentConfig {
   const env = detectEnvironment();
-  const hub = detectHub();
   const supabaseConfig = getSupabaseConfig(env);
 
   const baseConfig = {

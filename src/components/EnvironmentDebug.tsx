@@ -1,67 +1,109 @@
-import React, { useState } from 'react';
-import { ChevronDown, ChevronUp, Bug } from 'lucide-react';
+import React, { useState } from "react";
 
 interface EnvironmentDebugProps {
   show?: boolean;
 }
 
-export const EnvironmentDebug: React.FC<EnvironmentDebugProps> = ({ show = false }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
+export const EnvironmentDebug: React.FC<EnvironmentDebugProps> = ({
+  show = true,
+}) => {
+  const [isMinimized, setIsMinimized] = useState(false);
 
-  if (!show && import.meta.env.MODE !== 'development') {
-    return null;
-  }
-
-  const envVars = {
-    MODE: String(import.meta.env.MODE || 'unknown'),
-    DEV: String(import.meta.env.DEV || 'false'),
-    PROD: String(import.meta.env.PROD || 'false'),
-    VITE_STRIPE_PAYMENT_LINK: import.meta.env.VITE_STRIPE_PAYMENT_LINK ? '✅ Set' : '❌ Missing',
-    VITE_STRIPE_PAYMENT_LINK_STARTER: import.meta.env.VITE_STRIPE_PAYMENT_LINK_STARTER ? '✅ Set' : '❌ Missing',
-    VITE_STRIPE_PAYMENT_LINK_CORE: import.meta.env.VITE_STRIPE_PAYMENT_LINK_CORE ? '✅ Set' : '❌ Missing',
-    VITE_STRIPE_PAYMENT_LINK_ELITE: import.meta.env.VITE_STRIPE_PAYMENT_LINK_ELITE ? '✅ Set' : '❌ Missing',
-    VITE_SUPABASE_URL: import.meta.env.VITE_SUPABASE_URL ? '✅ Set' : '❌ Missing',
-    VITE_SUPABASE_ANON_KEY: import.meta.env.VITE_SUPABASE_ANON_KEY ? '✅ Set' : '❌ Missing',
-  };
+  if (!show) return null;
 
   return (
-    <div className="fixed bottom-4 left-4 bg-black/90 text-white rounded-lg text-xs font-mono max-w-sm z-40 border border-gray-700/50">
-      {/* Header with toggle button */}
-      <div 
-        className="flex items-center justify-between p-3 cursor-pointer hover:bg-gray-800/50 transition-colors rounded-t-lg"
-        onClick={() => setIsExpanded(!isExpanded)}
+    <div
+      style={{
+        position: "fixed",
+        bottom: 20,
+        left: "50%",
+        transform: "translateX(-50%)",
+        background: "rgba(0, 0, 0, 0.95)",
+        color: "#00ff00",
+        padding: isMinimized ? "8px 12px" : "12px 16px",
+        fontSize: "10px",
+        zIndex: 9998, // Lower than admin button (9999)
+        maxWidth: isMinimized ? "120px" : "400px",
+        wordBreak: "break-all",
+        border: "1px solid #00ff00",
+        borderRadius: "6px",
+        fontFamily: "monospace",
+        backdropFilter: "blur(8px)",
+        boxShadow: "0 2px 10px rgba(0, 255, 0, 0.3)",
+        lineHeight: "1.4",
+        cursor: "pointer",
+        transition: "all 0.3s ease",
+      }}
+      onClick={() => setIsMinimized(!isMinimized)}
+    >
+      <div
+        style={{
+          marginBottom: isMinimized ? "0" : "8px",
+          fontWeight: "bold",
+          color: "#00ff00",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
       >
-        <div className="flex items-center space-x-2">
-          <Bug className="w-4 h-4 text-orange-400" />
-          <span className="font-bold">Debug</span>
-        </div>
-        {isExpanded ? (
-          <ChevronDown className="w-4 h-4 text-gray-400" />
-        ) : (
-          <ChevronUp className="w-4 h-4 text-gray-400" />
-        )}
+        <span>🔍 ENV DEBUG</span>
+        <span style={{ fontSize: "8px", color: "#888" }}>
+          {isMinimized ? "click to expand" : "click to minimize"}
+        </span>
       </div>
 
-      {/* Collapsible content */}
-      {isExpanded && (
-        <div className="px-3 pb-3 border-t border-gray-700/50">
-          <div className="pt-2 space-y-1">
-            {Object.entries(envVars).map(([key, value]) => (
-              <div key={key} className="flex justify-between items-center">
-                <span className="text-gray-400 text-xs">{key}:</span> 
-                <span className={`text-xs ${value.includes('✅') ? 'text-green-400' : 'text-red-400'}`}>
-                  {value}
-                </span>
-              </div>
-            ))}
+      {!isMinimized && (
+        <div style={{ maxHeight: "200px", overflowY: "auto" }}>
+          <div style={{ marginBottom: "4px" }}>
+            <span style={{ color: "#888" }}>SUPABASE:</span>{" "}
+            <span style={{ color: "#00ff00" }}>
+              {import.meta.env.VITE_SUPABASE_URL || "NOT SET"}
+            </span>
           </div>
-          <div className="mt-2 pt-2 border-t border-gray-700/30 text-gray-400 text-xs">
-            Hostname: {typeof window !== 'undefined' ? window.location.hostname : 'unknown'}
+          <div style={{ marginBottom: "4px" }}>
+            <span style={{ color: "#888" }}>MODE:</span>{" "}
+            <span style={{ color: "#00ff00" }}>
+              {import.meta.env.MODE || "NOT SET"}
+            </span>
+          </div>
+          <div style={{ marginBottom: "4px" }}>
+            <span style={{ color: "#888" }}>NODE_ENV:</span>{" "}
+            <span style={{ color: "#00ff00" }}>
+              {import.meta.env.NODE_ENV || "NOT SET"}
+            </span>
+          </div>
+          <div style={{ marginBottom: "4px" }}>
+            <span style={{ color: "#888" }}>DEV:</span>{" "}
+            <span style={{ color: "#00ff00" }}>
+              {import.meta.env.DEV ? "true" : "false"}
+            </span>
+          </div>
+          <div style={{ marginBottom: "4px" }}>
+            <span style={{ color: "#888" }}>PROD:</span>{" "}
+            <span style={{ color: "#00ff00" }}>
+              {import.meta.env.PROD ? "true" : "false"}
+            </span>
+          </div>
+          <div style={{ marginBottom: "4px" }}>
+            <span style={{ color: "#888" }}>DEBUG:</span>{" "}
+            <span style={{ color: "#00ff00" }}>
+              {import.meta.env.VITE_ENABLE_DEBUG || "NOT SET"}
+            </span>
+          </div>
+          <div style={{ marginBottom: "4px" }}>
+            <span style={{ color: "#888" }}>DEV_AUTH:</span>{" "}
+            <span style={{ color: "#00ff00" }}>
+              {import.meta.env.VITE_ENABLE_DEV_AUTH || "NOT SET"}
+            </span>
+          </div>
+          <div style={{ marginBottom: "4px" }}>
+            <span style={{ color: "#888" }}>HUB_SWITCHER:</span>{" "}
+            <span style={{ color: "#00ff00" }}>
+              {import.meta.env.VITE_ENABLE_HUB_SWITCHER || "NOT SET"}
+            </span>
           </div>
         </div>
       )}
     </div>
   );
 };
-
-export default EnvironmentDebug;

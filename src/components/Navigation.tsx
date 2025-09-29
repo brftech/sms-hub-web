@@ -10,7 +10,6 @@ import {
   CreditCard,
 } from "lucide-react";
 import { getHubColorClasses } from "@sms-hub/utils";
-import { webEnvironment } from "../config/webEnvironment";
 
 // Direct Stripe checkout helper
 const handleDirectCheckout = async () => {
@@ -130,7 +129,7 @@ const Navigation = () => {
               variant="outline"
               size="sm"
               onClick={() => handleDesktopNavClick("/contact")}
-              className="transition-all duration-300 backdrop-blur-sm px-4 py-1.5 text-xs bg-black/50 text-white border border-orange-500/50 hover:bg-orange-500/10 hover:border-orange-400"
+              className="transition-all duration-300 backdrop-blur-sm px-6 py-2 text-sm bg-black/50 text-white border border-orange-500/50 hover:bg-orange-500/10 hover:border-orange-400 min-w-[80px]"
             >
               Contact
             </Button>
@@ -138,7 +137,7 @@ const Navigation = () => {
               variant="outline"
               size="sm"
               onClick={() => handleDirectCheckout()}
-              className="transition-all duration-300 backdrop-blur-sm px-4 py-1.5 text-xs bg-black/50 text-white border border-orange-500/50 hover:bg-orange-500/10 hover:border-orange-400"
+              className="transition-all duration-300 backdrop-blur-sm px-6 py-2 text-sm bg-black/50 text-white border border-orange-500/50 hover:bg-orange-500/10 hover:border-orange-400 min-w-[80px]"
             >
               SignUp
             </Button>
@@ -146,10 +145,10 @@ const Navigation = () => {
               variant="outline"
               size="sm"
               onClick={() => {
-                // Navigate to admin dashboard (now part of this app)
-                window.location.href = "/admin";
+                // Navigate to login page on port 3001
+                window.location.href = "http://localhost:3001/login";
               }}
-              className="transition-all duration-300 backdrop-blur-sm px-4 py-1.5 text-xs bg-black/50 text-white border border-orange-500/50 hover:bg-orange-500/10 hover:border-orange-400"
+              className="transition-all duration-300 backdrop-blur-sm px-6 py-2 text-sm bg-black/50 text-white border border-orange-500/50 hover:bg-orange-500/10 hover:border-orange-400 min-w-[80px]"
             >
               LogIn
             </Button>
@@ -214,7 +213,7 @@ const Navigation = () => {
                     setIsMobileMenuOpen(false);
                     handleNavClick("/contact");
                   }}
-                  className="w-full bg-black/50 text-white border border-orange-500/50 hover:bg-orange-500/10 hover:border-orange-400 font-medium py-3 text-sm"
+                  className="w-full bg-black/50 text-white border border-orange-500/50 hover:bg-orange-500/10 hover:border-orange-400 font-medium py-3 text-sm h-12"
                 >
                   Contact
                 </Button>
@@ -223,22 +222,17 @@ const Navigation = () => {
                     setIsMobileMenuOpen(false);
                     handleDirectCheckout();
                   }}
-                  className={`w-full ${hubColors.bg} hover:${hubColors.bgHover} text-white font-semibold py-4 text-base`}
+                  className={`w-full ${hubColors.bg} hover:${hubColors.bgHover} text-white font-semibold py-3 text-sm h-12`}
                 >
                   SignUp
                 </Button>
                 <Button
                   onClick={() => {
                     setIsMobileMenuOpen(false);
-                    if (webEnvironment.isProduction()) {
-                      // In production, go to the existing app.{hub}.com
-                      window.location.href = `https://app.${currentHub}.com`;
-                    } else {
-                      // In development, go to localhost:3001 (customer app)
-                      window.location.href = "http://localhost:3001";
-                    }
+                    // Navigate to login page on port 3001
+                    window.location.href = "http://localhost:3001/login";
                   }}
-                  className="w-full bg-black/50 text-white border border-orange-500/50 hover:bg-orange-500/10 hover:border-orange-400 font-medium py-3 text-sm"
+                  className="w-full bg-black/50 text-white border border-orange-500/50 hover:bg-orange-500/10 hover:border-orange-400 font-medium py-3 text-sm h-12"
                 >
                   LogIn
                 </Button>

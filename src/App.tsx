@@ -12,7 +12,7 @@ import {
 import { useScrollToTop } from "@sms-hub/utils";
 import { webEnvironment } from "./config/webEnvironment";
 import { useEffect } from "react";
-import EnvironmentDebug from "./components/EnvironmentDebug";
+import { EnvironmentDebug } from "./components/EnvironmentDebug";
 import AppFloatingComponents from "./components/AppFloatingComponents";
 
 // Import critical pages directly (frequently accessed)
@@ -303,14 +303,14 @@ const AppRoutes = () => {
 const App = () => {
   // Debug environment detection
   useEffect(() => {
-    console.log('App component mounted');
-    console.log('Environment Debug:', {
+    console.log("App component mounted");
+    console.log("Environment Debug:", {
       hostname: window.location.hostname,
       mode: import.meta.env.MODE,
       isDev: webEnvironment.isDevelopment(),
       isStaging: webEnvironment.isStaging(),
       isProd: webEnvironment.isProduction(),
-      current: webEnvironment.getCurrent()
+      current: webEnvironment.getCurrent(),
     });
   }, []);
 
@@ -332,7 +332,12 @@ const App = () => {
           </TooltipProvider>
         </QueryClientProvider>
         {/* Environment Debug - shows on preview/staging for debugging */}
-        <EnvironmentDebug show={import.meta.env.MODE === 'development' || window.location.hostname === 'localhost'} />
+        <EnvironmentDebug
+          show={
+            import.meta.env.MODE === "development" ||
+            window.location.hostname === "localhost"
+          }
+        />
       </div>
     </ErrorBoundary>
   );

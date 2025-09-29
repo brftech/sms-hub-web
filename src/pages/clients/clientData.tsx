@@ -11,10 +11,10 @@ import {
   Award,
   MapPin,
 } from "lucide-react";
-import donsBurlingameLogo from "@sms-hub/ui/assets/dons-burlingame-logo.png";
-import harlemCigarLogo from "@sms-hub/ui/assets/harlem-cigar-logo.png";
-import firstRoundAmmoLogo from "@sms-hub/ui/assets/1st-round-ammo-logo.png";
-import michaelsLogo from "@sms-hub/ui/assets/michaels-logo.png";
+import donsBurlingameLogo from "./shared-client-data/assets/dons-burlingame/dons-burlingame-logo.png";
+import harlemCigarLogo from "./shared-client-data/assets/harlem-cigar/harlem-cigar-logo.png";
+import firstRoundAmmoLogo from "./shared-client-data/assets/1st-round-ammo/1st-round-ammo-logo.png";
+import michaelsLogo from "./shared-client-data/assets/michaels-tobacco/michaels-logo.png";
 
 export interface ClientData {
   id: string;

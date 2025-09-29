@@ -106,7 +106,7 @@ export default function DemoFooter({ onNavigate }: DemoFooterProps) {
                   <span className={link.color}>{link.icon}</span>
                   <div className="ml-3 text-left">
                     <div className="text-white text-sm font-medium">{link.label}</div>
-                    <div className="text-gray-500 text-xs">{link.description}</div>
+                    <div className="text-gray-300 text-xs">{link.description}</div>
                   </div>
                 </Button>
               ))}

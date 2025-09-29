@@ -114,7 +114,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           <div>{content.tagline.line2}</div>
         </h2>
 
-        <p className="text-gray-500 text-sm mt-4">{content.ctaText}</p>
+        <p className="text-description mt-4">{content.ctaText}</p>
       </div>
     </div>
   );

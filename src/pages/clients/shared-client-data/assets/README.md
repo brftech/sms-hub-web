@@ -31,8 +31,8 @@ The new dynamic client system automatically loads the correct assets based on th
 
 ```tsx
 // In clientData.tsx
-import donsBurlingameLogo from "@sms-hub/ui/assets/dons-burlingame-logo.png";
-import harlemCigarLogo from "@sms-hub/ui/assets/harlem-cigar-logo.png";
+import donsBurlingameLogo from "./shared-client-data/assets/dons-burlingame/dons-burlingame-logo.png";
+import harlemCigarLogo from "./shared-client-data/assets/harlem-cigar/harlem-cigar-logo.png";
 // ... other imports
 
 export const clientData = {
@@ -55,7 +55,7 @@ To add assets for a new client:
 2. **Add assets**: `new-client-logo.png`, etc.
 3. **Import in clientData.tsx**:
    ```tsx
-   import newClientLogo from "@sms-hub/ui/assets/new-client-logo.png";
+   import newClientLogo from "./shared-client-data/assets/new-client/new-client-logo.png";
    ```
 4. **Add to clientData object**:
    ```tsx

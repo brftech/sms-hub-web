@@ -8,7 +8,6 @@ import {
   Users,
   HelpCircle,
   CreditCard,
-  Mail,
 } from "lucide-react";
 import { getHubColorClasses } from "@sms-hub/utils";
 import { webEnvironment } from "../config/webEnvironment";
@@ -19,9 +18,12 @@ const handleDirectCheckout = async () => {
     // Redirect directly to Stripe Payment Link
     const paymentLink = import.meta.env.VITE_STRIPE_PAYMENT_LINK;
     console.log("🔗 Payment link from env:", paymentLink);
+    console.log("🌍 Environment:", import.meta.env.MODE);
+    console.log("🔧 All env vars:", import.meta.env);
     
     if (!paymentLink) {
-      throw new Error("Payment link not configured");
+      console.error("❌ Payment link not configured. Available env vars:", Object.keys(import.meta.env));
+      throw new Error("Payment link not configured. Please check environment variables.");
     }
     
     console.log("🚀 Redirecting to:", paymentLink);
@@ -60,7 +62,6 @@ const Navigation = () => {
     { path: "/about", label: "About", icon: Users },
     { path: "/faq", label: "FAQ", icon: HelpCircle },
     { path: "/demo", label: "Demo", icon: MessageSquare },
-    { path: "/contact", label: "Contact", icon: Mail },
   ];
 
   return (
@@ -117,27 +118,25 @@ const Navigation = () => {
             >
               Demo
             </button>
-            <button
-              onClick={() => handleDesktopNavClick("/contact")}
-              className={`transition-colors text-sm font-medium ${
-                location.pathname === "/contact"
-                  ? `${hubColors.text} hub-text-primary`
-                  : "text-white hover:text-gray-300"
-              }`}
-            >
-              Contact
-            </button>
           </div>
 
           {/* Right side - CTAs (Desktop only) */}
-          <div className="hidden md:flex items-center space-x-4">
+          <div className="hidden md:flex items-center space-x-3">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleDesktopNavClick("/contact")}
+              className="transition-all duration-300 backdrop-blur-sm px-4 py-1.5 text-xs bg-black/50 text-white border border-orange-500/50 hover:bg-orange-500/10 hover:border-orange-400"
+            >
+              Contact
+            </Button>
             <Button
               variant="outline"
               size="sm"
               onClick={() => handleDirectCheckout()}
               className="transition-all duration-300 backdrop-blur-sm px-4 py-1.5 text-xs bg-black/50 text-white border border-orange-500/50 hover:bg-orange-500/10 hover:border-orange-400"
             >
-              Get Started
+              SignUp
             </Button>
             <Button
               variant="outline"
@@ -153,7 +152,7 @@ const Navigation = () => {
               }}
               className="transition-all duration-300 backdrop-blur-sm px-4 py-1.5 text-xs bg-black/50 text-white border border-orange-500/50 hover:bg-orange-500/10 hover:border-orange-400"
             >
-              Login
+              LogIn
             </Button>
           </div>
 
@@ -219,11 +218,35 @@ const Navigation = () => {
                 <Button
                   onClick={() => {
                     setIsMobileMenuOpen(false);
+                    handleNavClick("/contact");
+                  }}
+                  className="w-full bg-black/50 text-white border border-orange-500/50 hover:bg-orange-500/10 hover:border-orange-400 font-medium py-3 text-sm"
+                >
+                  Contact
+                </Button>
+                <Button
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
                     handleDirectCheckout();
                   }}
                   className={`w-full ${hubColors.bg} hover:${hubColors.bgHover} text-white font-semibold py-4 text-base`}
                 >
-                  Get Started
+                  SignUp
+                </Button>
+                <Button
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    if (webEnvironment.isProduction()) {
+                      // In production, go to the existing app.{hub}.com
+                      window.location.href = `https://app.${currentHub}.com`;
+                    } else {
+                      // In development, go to localhost:3001 (customer app)
+                      window.location.href = "http://localhost:3001";
+                    }
+                  }}
+                  className="w-full bg-black/50 text-white border border-orange-500/50 hover:bg-orange-500/10 hover:border-orange-400 font-medium py-3 text-sm"
+                >
+                  LogIn
                 </Button>
               </div>
             </div>

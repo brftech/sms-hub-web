@@ -180,7 +180,7 @@ const SMSAuthModal: React.FC<SMSAuthModalProps> = ({
                   <h3 className="font-medium text-gray-900">
                     Enter your phone number
                   </h3>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-gray-300">
                     We'll send you a verification code via SMS
                   </p>
                 </div>
@@ -198,7 +198,7 @@ const SMSAuthModal: React.FC<SMSAuthModalProps> = ({
                   className="text-center text-lg"
                   maxLength={14}
                 />
-                <div className="flex items-center justify-center space-x-2 text-xs text-gray-500">
+                <div className="flex items-center justify-center space-x-2 text-xs text-gray-300">
                   <Shield className="h-3 w-3" />
                   <span>Your number is secure and private</span>
                 </div>
@@ -226,7 +226,7 @@ const SMSAuthModal: React.FC<SMSAuthModalProps> = ({
                   <h3 className="font-medium text-gray-900">
                     Enter verification code
                   </h3>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-gray-300">
                     We sent a 6-digit code to {phoneNumber}
                   </p>
                 </div>
@@ -274,7 +274,7 @@ const SMSAuthModal: React.FC<SMSAuthModalProps> = ({
                 <h3 className="font-medium text-gray-900">
                   Verification successful!
                 </h3>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-300">
                   Your phone number has been verified
                 </p>
               </div>

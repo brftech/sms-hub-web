@@ -467,7 +467,7 @@ export default function PhoneInteractive() {
                         : "justify-start pl-3"
                     }`}
                   >
-                    <span className="text-[10px] text-gray-500">
+                    <span className="text-[10px] text-gray-300">
                       {new Date(message.timestamp).toLocaleTimeString([], {
                         hour: "numeric",
                         minute: "2-digit",

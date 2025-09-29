@@ -86,7 +86,7 @@ export const UserDeleteModal: React.FC<UserDeleteModalProps> = ({
                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-200 text-gray-800">
                   {user.role?.toUpperCase() || "USER"}
                 </span>
-                <span className="text-xs text-gray-500">
+                <span className="text-xs text-gray-300">
                   Account: {user.account_number || "N/A"}
                 </span>
               </div>

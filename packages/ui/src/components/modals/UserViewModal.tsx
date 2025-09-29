@@ -132,7 +132,7 @@ export const UserViewModal: React.FC<UserViewModalProps> = ({
                   {user.companies.public_name}
                 </span>
               ) : (
-                <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-500">
+                <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-300">
                   No Company
                 </span>
               )}
@@ -195,7 +195,7 @@ export const UserViewModal: React.FC<UserViewModalProps> = ({
                     : "Unknown date"}
                 </span>
               </p>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-gray-300">
                 Account has been active for {getAccountAge(user.created_at)} days
               </p>
             </div>

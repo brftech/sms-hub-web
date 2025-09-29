@@ -110,7 +110,7 @@ export const ProblemSolutionSection: React.FC = () => {
               <div className="space-y-3 md:space-y-4 text-white">
                 {content.overlook.items.map((item, index) => (
                   <div key={index} className="flex items-center text-white">
-                    <span className="text-gray-500 text-lg mr-3 flex-shrink-0">
+                    <span className="text-gray-300 text-lg mr-3 flex-shrink-0">
                       ✕
                     </span>
                     <span className="text-base md:text-lg">{item}</span>

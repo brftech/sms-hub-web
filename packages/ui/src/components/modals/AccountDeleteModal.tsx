@@ -88,7 +88,7 @@ export const AccountDeleteModal: React.FC<AccountDeleteModalProps> = ({
                 {getEntityTypeLabel().toUpperCase()}
               </span>
               {account.user_count && account.user_count > 0 && (
-                <span className="text-xs text-gray-500">
+                <span className="text-xs text-gray-300">
                   {account.user_count} users
                 </span>
               )}

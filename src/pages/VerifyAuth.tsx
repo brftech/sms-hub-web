@@ -256,7 +256,7 @@ export function VerifyAuth() {
                     ? `Welcome back to ${hubConfig.name}!`
                     : `Your ${hubConfig.name} account has been created successfully.`}
                 </p>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-300">
                   {isExistingUser
                     ? "Redirecting to login..."
                     : "Redirecting to your dashboard..."}
@@ -310,7 +310,7 @@ export function VerifyAuth() {
                 autoComplete="one-time-code"
               />
               {mode === "signup" && (
-                <p className="text-sm text-gray-500 text-center mt-2">
+                <p className="text-sm text-gray-300 text-center mt-2">
                   Code expires in 15 minutes
                 </p>
               )}

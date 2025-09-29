@@ -1,0 +1,62 @@
+/* Accessibility-compliant text utilities */
+@layer utilities {
+  /* Primary text colors with proper contrast ratios */
+  .text-primary {
+    @apply text-white;
+  }
+  
+  .text-secondary {
+    @apply text-gray-300;
+  }
+  
+  .text-muted {
+    @apply text-gray-400;
+  }
+  
+  /* Semantic text utilities */
+  .text-body {
+    @apply text-secondary leading-relaxed;
+  }
+  
+  .text-caption {
+    @apply text-muted text-sm;
+  }
+  
+  .text-description {
+    @apply text-secondary text-sm;
+  }
+  
+  /* Error and warning text */
+  .text-error {
+    @apply text-red-400;
+  }
+  
+  .text-warning {
+    @apply text-yellow-400;
+  }
+  
+  .text-success {
+    @apply text-green-400;
+  }
+  
+  /* Interactive text states */
+  .text-interactive {
+    @apply text-orange-400 hover:text-orange-300 transition-colors;
+  }
+  
+  /* Disabled text (only use for truly disabled states) */
+  .text-disabled {
+    @apply text-gray-500 opacity-50;
+  }
+}
+
+/* Dark theme specific overrides */
+@layer base {
+  .dark {
+    /* Ensure proper contrast in dark mode */
+    --text-primary: #ffffff;
+    --text-secondary: #d1d5db;
+    --text-muted: #9ca3af;
+    --text-disabled: #6b7280;
+  }
+}

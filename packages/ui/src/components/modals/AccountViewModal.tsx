@@ -89,7 +89,7 @@ export const AccountViewModal: React.FC<AccountViewModalProps> = ({
             <div className="flex items-center space-x-2">
               <Building2 className="w-4 h-4 text-gray-400" />
               <div>
-                <p className="text-xs text-gray-500">Hub</p>
+                <p className="text-xs text-gray-300">Hub</p>
                 <p className="font-medium text-gray-900">
                   {getHubName(account.hub_id)}
                 </p>
@@ -99,7 +99,7 @@ export const AccountViewModal: React.FC<AccountViewModalProps> = ({
             <div className="flex items-center space-x-2">
               <Mail className="w-4 h-4 text-gray-400" />
               <div>
-                <p className="text-xs text-gray-500">Email</p>
+                <p className="text-xs text-gray-300">Email</p>
                 <p className="font-medium text-gray-900 text-xs">
                   {account.email}
                 </p>
@@ -109,7 +109,7 @@ export const AccountViewModal: React.FC<AccountViewModalProps> = ({
             <div className="flex items-center space-x-2">
               <Users className="w-4 h-4 text-gray-400" />
               <div>
-                <p className="text-xs text-gray-500">Users</p>
+                <p className="text-xs text-gray-300">Users</p>
                 <p className="font-medium text-gray-900">
                   {account.user_count || 0}
                 </p>
@@ -120,7 +120,7 @@ export const AccountViewModal: React.FC<AccountViewModalProps> = ({
           {/* Right column */}
           <div className="space-y-3">
             <div>
-              <p className="text-xs text-gray-500">Status</p>
+              <p className="text-xs text-gray-300">Status</p>
               <span
                 className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
                   account.status === "active"
@@ -134,7 +134,7 @@ export const AccountViewModal: React.FC<AccountViewModalProps> = ({
 
             {account.payment_type && account.payment_type !== "none" && (
               <div>
-                <p className="text-xs text-gray-500">Payment</p>
+                <p className="text-xs text-gray-300">Payment</p>
                 <div className="flex items-center space-x-1">
                   <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
                     {account.payment_type}
@@ -156,7 +156,7 @@ export const AccountViewModal: React.FC<AccountViewModalProps> = ({
             )}
 
             <div>
-              <p className="text-xs text-gray-500">Services</p>
+              <p className="text-xs text-gray-300">Services</p>
               <div className="flex items-center space-x-1">
                 {account.has_texting && (
                   <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
@@ -176,19 +176,19 @@ export const AccountViewModal: React.FC<AccountViewModalProps> = ({
         {/* Company info if exists */}
         {account.company && (
           <div className="pt-3 border-t border-gray-200">
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+            <p className="text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">
               Company Details
             </p>
             <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
               <div>
-                <span className="text-gray-500">Account #:</span>
+                <span className="text-gray-300">Account #:</span>
                 <span className="ml-1 font-mono font-medium">
                   {account.company.company_account_number}
                 </span>
               </div>
               {account.company.legal_name && (
                 <div>
-                  <span className="text-gray-500">Legal:</span>
+                  <span className="text-gray-300">Legal:</span>
                   <span className="ml-1 font-medium">
                     {account.company.legal_name}
                   </span>
@@ -196,7 +196,7 @@ export const AccountViewModal: React.FC<AccountViewModalProps> = ({
               )}
               {account.company.ein && (
                 <div>
-                  <span className="text-gray-500">Tax ID:</span>
+                  <span className="text-gray-300">Tax ID:</span>
                   <span className="ml-1 font-medium">
                     {account.company.ein}
                   </span>
@@ -207,7 +207,7 @@ export const AccountViewModal: React.FC<AccountViewModalProps> = ({
         )}
 
         {/* Footer info */}
-        <div className="pt-3 border-t border-gray-200 flex items-center justify-between text-xs text-gray-500">
+        <div className="pt-3 border-t border-gray-200 flex items-center justify-between text-xs text-gray-300">
           <div className="flex items-center space-x-1">
             <Calendar className="w-3 h-3" />
             <span>

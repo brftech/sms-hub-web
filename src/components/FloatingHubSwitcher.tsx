@@ -46,6 +46,11 @@ const FloatingHubSwitcher = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const { currentHub, switchHub } = useHub();
 
+  // Only show in development
+  if (import.meta.env.MODE !== 'development' && window.location.hostname !== 'localhost') {
+    return null;
+  }
+
   const hubs = Object.entries(HUB_CONFIGS).map(([hubType, config]) => ({
     hubType: hubType as HubType,
     id: config.id,

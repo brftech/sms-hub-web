@@ -58,7 +58,7 @@ export const StaticPhoneDemo: React.FC<StaticPhoneDemoProps> = ({
                       {message.text}
                     </p>
                     {message.sender === "business" && message.businessName && (
-                      <div className="text-xs text-gray-500 mt-1 text-left">
+                      <div className="text-xs text-gray-300 mt-1 text-left">
                         {message.businessName}
                       </div>
                     )}

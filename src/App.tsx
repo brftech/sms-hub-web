@@ -12,6 +12,8 @@ import {
 import { useScrollToTop } from "@sms-hub/utils";
 import { webEnvironment } from "./config/webEnvironment";
 import { useEffect } from "react";
+import EnvironmentDebug from "./components/EnvironmentDebug";
+import AppFloatingComponents from "./components/AppFloatingComponents";
 
 // Import critical pages directly (frequently accessed)
 import Home from "./pages/Home";
@@ -22,8 +24,6 @@ const Terms = lazy(() => import("./pages/Terms"));
 const Privacy = lazy(() => import("./pages/Privacy"));
 const About = lazy(() => import("./pages/About"));
 const Pricing = lazy(() => import("./pages/Pricing"));
-const Landing = lazy(() => import("./pages/Landing"));
-const CigarLanding = lazy(() => import("./pages/CigarLanding"));
 const FAQ = lazy(() => import("./pages/FAQ"));
 const Demo = lazy(() => import("./pages/Demo"));
 
@@ -38,6 +38,9 @@ import PaymentSuccess from "./pages/PaymentSuccess";
 const ClientPage = lazy(() => import("./pages/clients/ClientPage"));
 const ClientPrivacy = lazy(() => import("./pages/clients/ClientPrivacy"));
 const ClientTerms = lazy(() => import("./pages/clients/ClientTerms"));
+
+// Lazy load admin dashboard
+const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
 
 const queryClient = new QueryClient();
 
@@ -70,38 +73,12 @@ const AppRoutes = () => {
   // Apply scroll-to-top on route changes
   useScrollToTop();
 
-  // Check if we're on the cigar subdomain
-  const isCigarSubdomain =
-    window.location.hostname.includes("cigar.") ||
-    window.location.hostname === "cigar.gnymble.com";
-
-  // Show Home page as default; Landing page is available at /landing
-  // But if we're on cigar subdomain, always show CigarLanding
-  const DefaultComponent = isCigarSubdomain ? CigarLanding : Home;
+  // Show Home page as default
+  const DefaultComponent = Home;
 
   return (
     <Routes>
       <Route path="/" element={<DefaultComponent />} />
-      <Route
-        path="/landing"
-        element={
-          <PageTransition>
-            <Suspense fallback={<PageLoader />}>
-              <Landing />
-            </Suspense>
-          </PageTransition>
-        }
-      />
-      <Route
-        path="/cigar"
-        element={
-          <PageTransition>
-            <Suspense fallback={<PageLoader />}>
-              <CigarLanding />
-            </Suspense>
-          </PageTransition>
-        }
-      />
       <Route
         path="/home"
         element={
@@ -245,6 +222,18 @@ const AppRoutes = () => {
         }
       />
 
+      {/* Admin Dashboard - Accessible in all environments with auth */}
+      <Route
+        path="/admin"
+        element={
+          <PageTransition>
+            <Suspense fallback={<PageLoader />}>
+              <AdminDashboard />
+            </Suspense>
+          </PageTransition>
+        }
+      />
+
       {/* Auth routes - Dev only */}
       {import.meta.env.MODE === "development" && (
         <Route
@@ -315,7 +304,14 @@ const App = () => {
   // Debug environment detection
   useEffect(() => {
     console.log('App component mounted');
-    webEnvironment.debug();
+    console.log('Environment Debug:', {
+      hostname: window.location.hostname,
+      mode: import.meta.env.MODE,
+      isDev: webEnvironment.isDevelopment(),
+      isStaging: webEnvironment.isStaging(),
+      isProd: webEnvironment.isProduction(),
+      current: webEnvironment.getCurrent()
+    });
   }, []);
 
   return (
@@ -329,11 +325,14 @@ const App = () => {
               <HubThemeWrapper>
                 <BrowserRouter>
                   <AppRoutes />
+                  <AppFloatingComponents />
                 </BrowserRouter>
               </HubThemeWrapper>
             </HubProvider>
           </TooltipProvider>
         </QueryClientProvider>
+        {/* Environment Debug - shows on preview/staging for debugging */}
+        <EnvironmentDebug show={import.meta.env.MODE === 'development' || window.location.hostname === 'localhost'} />
       </div>
     </ErrorBoundary>
   );

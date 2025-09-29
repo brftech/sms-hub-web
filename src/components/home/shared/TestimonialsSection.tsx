@@ -38,7 +38,7 @@ export const TestimonialsSection: React.FC = () => {
                 <div className="text-amber-400 text-sm">
                   {testimonial.company}
                 </div>
-                <div className="text-gray-500 text-xs">
+                <div className="text-gray-300 text-xs">
                   {testimonial.location}
                 </div>
               </div>

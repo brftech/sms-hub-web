@@ -28,6 +28,13 @@ export default {
 				ring: 'hsl(var(--ring))',
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
+				// Accessibility-compliant text colors
+				text: {
+					'primary': '#ffffff',     // Pure white for main text
+					'secondary': '#d1d5db',   // Gray-300 equivalent (better contrast)
+					'muted': '#9ca3af',       // Gray-400 equivalent (still accessible)
+					'disabled': '#6b7280',    // Gray-500 equivalent (for disabled states only)
+				},
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
 					foreground: 'hsl(var(--primary-foreground))',

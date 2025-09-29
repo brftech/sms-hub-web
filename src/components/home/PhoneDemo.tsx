@@ -28,7 +28,7 @@ export const PhoneDemo: React.FC = () => {
                     ? "🏥 REMINDER: Your annual checkup is tomorrow at 2:30 PM. Please arrive 15 minutes early. Reply STOP to opt out."
                     : "🔥 EXCLUSIVE: Drew Estate Masterclass this Saturday 7PM! Only 15 spots left. Call to RSVP!"}
                 </p>
-                <span className="text-xs text-gray-500">
+                <span className="text-xs text-gray-300">
                   {currentHub === "percymd"
                     ? "PercyMD Health Center"
                     : "Premium Cigars & Co"}
@@ -55,7 +55,7 @@ export const PhoneDemo: React.FC = () => {
                     ? "Great! Don't forget to bring your insurance card and ID. See you soon!"
                     : "Perfect! See you Saturday. Age 21+ required at door."}
                 </p>
-                <span className="text-xs text-gray-500">
+                <span className="text-xs text-gray-300">
                   {currentHub === "percymd"
                     ? "PercyMD Health Center"
                     : "Premium Cigars & Co"}

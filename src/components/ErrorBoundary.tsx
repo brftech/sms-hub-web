@@ -91,7 +91,7 @@ export class EnhancedErrorBoundary extends Component<Props, State> {
               </Button>
             </div>
             
-            <div className="mt-6 text-sm text-gray-500">
+            <div className="mt-6 text-sm text-gray-300">
               <p>If this problem continues, please contact support.</p>
             </div>
           </div>

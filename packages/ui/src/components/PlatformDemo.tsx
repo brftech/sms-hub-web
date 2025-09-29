@@ -613,19 +613,19 @@ export default function PlatformDemo() {
                 <table className="w-full">
                   <thead className="bg-gray-50 border-b border-gray-200">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                         <input
                           type="checkbox"
                           className="rounded border-gray-300"
                         />
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                         Persons
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                         Message
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                         Actions
                       </th>
                     </tr>
@@ -667,7 +667,7 @@ export default function PlatformDemo() {
                             {conversation.lastMessage}
                           </div>
                           <div className="flex items-center mt-1">
-                            <span className="text-xs text-gray-500">
+                            <span className="text-xs text-gray-300">
                               {conversation.lastMessageDate}
                             </span>
                             <CheckCircle className="w-3 h-3 text-green-500 ml-2" />
@@ -741,22 +741,22 @@ export default function PlatformDemo() {
                 <table className="w-full">
                   <thead className="bg-gray-50 border-b border-gray-200">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                         <input
                           type="checkbox"
                           className="rounded border-gray-300"
                         />
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                         Broadcast Details
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                         Message Content
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                         Statistics
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                         Actions
                       </th>
                     </tr>
@@ -774,13 +774,13 @@ export default function PlatformDemo() {
                           <div className="text-sm font-medium text-gray-900">
                             {broadcast.title}
                           </div>
-                          <div className="text-sm text-gray-500">
+                          <div className="text-sm text-gray-300">
                             Created: {broadcast.created}
                           </div>
-                          <div className="text-sm text-gray-500">
+                          <div className="text-sm text-gray-300">
                             Creator: {broadcast.creator}
                           </div>
-                          <div className="text-sm text-gray-500">
+                          <div className="text-sm text-gray-300">
                             {broadcast.messageType}: {broadcast.segments}
                           </div>
                         </td>
@@ -793,13 +793,13 @@ export default function PlatformDemo() {
                           <div className="text-sm text-gray-900">
                             Total Recipients: {broadcast.totalRecipients}
                           </div>
-                          <div className="text-sm text-gray-500">
+                          <div className="text-sm text-gray-300">
                             Delivered: {broadcast.delivered}
                           </div>
-                          <div className="text-sm text-gray-500">
+                          <div className="text-sm text-gray-300">
                             Sent: {broadcast.sent}
                           </div>
-                          <div className="text-sm text-gray-500">
+                          <div className="text-sm text-gray-300">
                             Failed: {broadcast.failed}
                           </div>
                         </td>
@@ -846,22 +846,22 @@ export default function PlatformDemo() {
                 <table className="w-full">
                   <thead className="bg-gray-50 border-b border-gray-200">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                         <input
                           type="checkbox"
                           className="rounded border-gray-300"
                         />
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                         Contact Info
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                         Company & Tags
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                         Activity
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                         Actions
                       </th>
                     </tr>
@@ -887,10 +887,10 @@ export default function PlatformDemo() {
                               <div className="text-sm font-medium text-gray-900">
                                 {contact.firstName} {contact.lastName}
                               </div>
-                              <div className="text-sm text-gray-500">
+                              <div className="text-sm text-gray-300">
                                 {contact.phoneNumber}
                               </div>
-                              <div className="text-sm text-gray-500">
+                              <div className="text-sm text-gray-300">
                                 {contact.email}
                               </div>
                             </div>
@@ -923,10 +923,10 @@ export default function PlatformDemo() {
                           <div className="text-sm text-gray-900">
                             Last Contact: {contact.lastContact}
                           </div>
-                          <div className="text-sm text-gray-500">
+                          <div className="text-sm text-gray-300">
                             Total Messages: {contact.totalMessages}
                           </div>
-                          <div className="text-sm text-gray-500">
+                          <div className="text-sm text-gray-300">
                             Opt-in: {contact.optInDate}
                           </div>
                         </td>

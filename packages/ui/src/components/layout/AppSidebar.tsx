@@ -62,7 +62,7 @@ export function AppSidebar({
           )}
           <button
             onClick={onClose}
-            className="lg:hidden text-gray-500 hover:text-gray-700"
+            className="lg:hidden text-gray-300 hover:text-gray-700"
           >
             <X className="h-5 w-5" />
           </button>
@@ -125,7 +125,7 @@ export function AppSidebar({
                 <span className="font-medium text-base flex-1">
                   {item.name}
                   {count !== undefined && count > 0 && (
-                    <span className="ml-1 text-gray-500">({count})</span>
+                    <span className="ml-1 text-gray-300">({count})</span>
                   )}
                   {item.badge && (
                     <span className={`ml-2 text-xs ${active ? 'text-blue-600' : 'text-orange-600'} font-medium`}>
@@ -203,7 +203,7 @@ export function AppSidebar({
                     <p className="text-sm font-medium text-gray-900">
                       {userProfile.first_name} {userProfile.last_name}
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-gray-300">
                       {getUserDisplayEmail()}
                     </p>
                     {userProfile.role && userProfile.role !== 'user' && (

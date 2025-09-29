@@ -149,7 +149,7 @@ const CTASection: React.FC<CTASectionProps> = ({
           </div>
         </div>
 
-        <p className="text-gray-500 text-sm mb-8">
+        <p className="text-gray-300 text-sm mb-8">
           <span className="text-amber-400">💯 Guarantee:</span>{" "}
           {ctaContent.guaranteeText}
         </p>

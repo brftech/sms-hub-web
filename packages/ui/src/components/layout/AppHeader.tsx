@@ -23,7 +23,7 @@ export function AppHeader({
           {/* Mobile menu button */}
           <button
             onClick={onMenuClick}
-            className="lg:hidden text-gray-500 hover:text-gray-700"
+            className="lg:hidden text-gray-300 hover:text-gray-700"
           >
             <Menu className="h-6 w-6" />
           </button>
@@ -68,7 +68,7 @@ export function AppHeader({
               {onRefreshCounts && (
                 <button
                   onClick={onRefreshCounts}
-                  className={`ml-2 p-1.5 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors ${
+                  className={`ml-2 p-1.5 rounded-md text-gray-300 hover:text-gray-700 hover:bg-gray-100 transition-colors ${
                     isRefreshingCounts ? 'animate-spin' : ''
                   }`}
                   title="Refresh counts"
@@ -99,7 +99,7 @@ export function AppHeader({
 
           {/* Notifications */}
           {config.showNotifications !== false && (
-            <button className="relative p-2 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100">
+            <button className="relative p-2 rounded-lg text-gray-300 hover:text-gray-700 hover:bg-gray-100">
               <Bell className="h-5 w-5" />
               <span className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full"></span>
             </button>

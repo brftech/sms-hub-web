@@ -1,5 +1,5 @@
 import { ArrowRight } from "lucide-react";
-import { useHub } from "@sms-hub/ui";
+import { useHub } from "@sms-hub/ui/marketing";
 
 export const PhoneDemo: React.FC = () => {
   const { currentHub } = useHub();

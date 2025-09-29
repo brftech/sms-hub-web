@@ -7,7 +7,7 @@ import {
   ErrorBoundary,
   PageTransition,
   useHub,
-} from "@sms-hub/ui";
+} from "@sms-hub/ui/marketing";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Suspense, lazy, useEffect } from "react";
 import { useScrollToTop } from "@sms-hub/utils";

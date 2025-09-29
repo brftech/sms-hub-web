@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button } from "@sms-hub/ui";
+import { Button } from "@sms-hub/ui/marketing";
 import { Shield, Lock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 

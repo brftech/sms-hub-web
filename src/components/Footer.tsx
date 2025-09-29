@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { useHub, HubLogo } from "@sms-hub/ui";
+import { useHub, HubLogo } from "@sms-hub/ui/marketing";
 
 const Footer = () => {
   const { currentHub } = useHub();

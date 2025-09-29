@@ -14,7 +14,7 @@ import {
   SidebarMenuItem,
   SidebarProvider,
   SidebarTrigger,
-} from "@sms-hub/ui";
+} from "@sms-hub/ui/marketing";
 import { Home, MessageSquare, Settings, Zap, LogOut } from "lucide-react";
 import { useUserProfile } from "@sms-hub/supabase";
 // ... existing code ...

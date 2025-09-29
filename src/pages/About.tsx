@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { PageLayout, SEO } from "@sms-hub/ui";
+import { PageLayout, SEO } from "@sms-hub/ui/marketing";
 
 import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";

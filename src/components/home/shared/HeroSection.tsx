@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useHub, HubLogo } from "@sms-hub/ui";
+import { useHub, HubLogo } from "@sms-hub/ui/marketing";
 
 interface HeroContent {
   fixedText: string;

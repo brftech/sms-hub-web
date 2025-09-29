@@ -1,5 +1,5 @@
 import { useSearchParams } from "react-router-dom";
-import { Card, CardContent, CardHeader, CardTitle } from "@sms-hub/ui";
+import { Card, CardContent, CardHeader, CardTitle } from "@sms-hub/ui/marketing";
 
 export function DebugAuth() {
   const [searchParams] = useSearchParams();

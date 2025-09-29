@@ -1,6 +1,6 @@
 import { Shield } from "lucide-react";
 import { PhoneDemo } from "../PhoneDemo";
-import { useHub } from "@sms-hub/ui";
+import { useHub } from "@sms-hub/ui/marketing";
 import { getHubProblemSolutionContent } from "@sms-hub/hub-logic";
 
 export const ProblemSolutionSection: React.FC = () => {

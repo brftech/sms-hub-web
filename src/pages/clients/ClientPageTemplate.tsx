@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@sms-hub/ui";
+import { Card, CardContent, CardHeader, CardTitle } from "@sms-hub/ui/marketing";
 import { Link } from "react-router-dom";
 import { Phone, MapPin, Clock } from "lucide-react";
 import gnymbleIconLogo from "@sms-hub/ui/assets/gnymble-icon-logo.svg";

@@ -1,4 +1,4 @@
-import { useHub } from "@sms-hub/ui";
+import { useHub } from "@sms-hub/ui/marketing";
 import { PercyMD } from "./PercyMD";
 import { Gnymble } from "./Gnymble";
 

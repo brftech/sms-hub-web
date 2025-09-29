@@ -1,5 +1,5 @@
 import React from "react";
-import { PageLayout } from "@sms-hub/ui";
+import { PageLayout } from "@sms-hub/ui/marketing";
 import Navigation from "./Navigation";
 import Footer from "./Footer";
 import FloatingHubSwitcher from "./FloatingHubSwitcher";

@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { useHub } from "@sms-hub/ui";
+import { useHub } from "@sms-hub/ui/marketing";
 import { getHubCTAContent } from "@sms-hub/hub-logic";
 
 export const CTASection: React.FC = () => {

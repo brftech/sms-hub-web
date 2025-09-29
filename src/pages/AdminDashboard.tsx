@@ -8,7 +8,7 @@ import {
   PageLayout,
   useHub,
   SEO
-} from "@sms-hub/ui";
+} from "@sms-hub/ui/marketing";
 import { getHubColorClasses } from "@sms-hub/utils";
 import { getEnvironmentConfig } from "../config/environment";
 import Navigation from "../components/Navigation";

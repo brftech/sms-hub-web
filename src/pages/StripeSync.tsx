@@ -10,7 +10,7 @@ import {
   CardTitle,
   Input,
   Label,
-} from "@sms-hub/ui";
+} from "@sms-hub/ui/marketing";
 import { CheckCircle, AlertCircle, Loader, ExternalLink } from "lucide-react";
 import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";

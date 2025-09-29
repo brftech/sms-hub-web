@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useHub, Card, CardContent, CardHeader, CardTitle, HubLogo } from "@sms-hub/ui";
+import { useHub, Card, CardContent, CardHeader, CardTitle, HubLogo } from "@sms-hub/ui/marketing";
 import { Mail, ArrowLeft, RefreshCw } from "lucide-react";
 import styled from "styled-components";
 

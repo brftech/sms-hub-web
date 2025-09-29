@@ -1,4 +1,4 @@
-import { EnvironmentAdapter } from "@sms-hub/ui";
+import { EnvironmentAdapter } from "@sms-hub/ui/marketing";
 
 // Web app environment configuration that implements the shared EnvironmentAdapter interface
 export const webEnvironment: EnvironmentAdapter = {

@@ -7,7 +7,7 @@ import {
   PageLayout,
   useHub,
   SEO,
-} from "@sms-hub/ui";
+} from "@sms-hub/ui/marketing";
 import { getHubColorClasses } from "@sms-hub/utils";
 import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";

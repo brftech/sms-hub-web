@@ -5,7 +5,7 @@ import {
   LiveMessagingProvider,
   PageLayout,
   SEO,
-} from "@sms-hub/ui";
+} from "@sms-hub/ui/marketing";
 import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";
 import {

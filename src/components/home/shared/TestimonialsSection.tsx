@@ -1,4 +1,4 @@
-import { useHub } from "@sms-hub/ui";
+import { useHub } from "@sms-hub/ui/marketing";
 import { getHubTestimonialsContent } from "@sms-hub/hub-logic";
 
 export const TestimonialsSection: React.FC = () => {

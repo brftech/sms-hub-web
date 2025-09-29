@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@sms-hub/ui";
+import { Card, CardContent, CardHeader, CardTitle } from "@sms-hub/ui/marketing";
 
 export default function Privacy() {
   useEffect(() => {

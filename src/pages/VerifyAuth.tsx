@@ -12,7 +12,7 @@ import {
   Label,
   Alert,
   AlertDescription,
-} from "@sms-hub/ui";
+} from "@sms-hub/ui/marketing";
 import {
   Shield,
   AlertCircle,

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useHub, HubLogo } from "@sms-hub/ui";
+import { useHub, HubLogo } from "@sms-hub/ui/marketing";
 import { webEnvironment } from "../config/webEnvironment";
 
 // Hub configurations

@@ -1,4 +1,4 @@
-import { useHub } from "@sms-hub/ui";
+import { useHub } from "@sms-hub/ui/marketing";
 import { getHubStatsContent } from "@sms-hub/hub-logic";
 
 export const StatsSection: React.FC = () => {

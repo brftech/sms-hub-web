@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Button, useHub, HubLogo } from "@sms-hub/ui";
+import { Button, useHub, HubLogo } from "@sms-hub/ui/marketing";
 import {
   Menu,
   X,

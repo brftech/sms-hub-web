@@ -1,4 +1,4 @@
-import { PageLayout, SEO } from "@sms-hub/ui";
+import { PageLayout, SEO } from "@sms-hub/ui/marketing";
 
 import { useState } from "react";
 import {

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { PageLayout, SEO } from "@sms-hub/ui";
+import { PageLayout, SEO } from "@sms-hub/ui/marketing";
 import { CheckCircle, ArrowRight, Loader } from "lucide-react";
 import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";

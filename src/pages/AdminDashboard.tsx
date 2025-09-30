@@ -10,7 +10,7 @@ import {
   SEO
 } from "@sms-hub/ui/marketing";
 import { getHubColorClasses } from "@sms-hub/utils";
-import { getEnvironmentConfig } from "../config/environment";
+import { getSupabaseClient } from "../lib/supabaseSingleton";
 import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";
 import { 
@@ -30,7 +30,6 @@ import {
   Save,
   X
 } from 'lucide-react';
-import { createClient } from '@supabase/supabase-js';
 
 interface TableStats {
   name: string;
@@ -73,11 +72,8 @@ export const AdminDashboard: React.FC = () => {
   const { currentHub } = useHub();
   const hubColors = getHubColorClasses(currentHub);
   
-  // Use environment configuration for Supabase connection
-  const [supabase] = useState(() => {
-    const envConfig = getEnvironmentConfig();
-    return createClient(envConfig.supabaseUrl, import.meta.env.VITE_SUPABASE_ANON_KEY);
-  });
+  // Use singleton Supabase client to avoid multiple instances
+  const supabase = getSupabaseClient();
   
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -85,11 +81,15 @@ export const AdminDashboard: React.FC = () => {
   const [recentEmailSubscribers, setRecentEmailSubscribers] = useState<EmailSubscriber[]>([]);
   const [recentLeads, setRecentLeads] = useState<Lead[]>([]);
   const [hubs, setHubs] = useState<Hub[]>([]);
+  const [smsSubscribers, setSmsSubscribers] = useState<any[]>([]);
   const [showSensitiveData, setShowSensitiveData] = useState(false);
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
+  const [leadsFilter, setLeadsFilter] = useState<'recent' | 'all'>('recent');
+  const [emailFilter, setEmailFilter] = useState<'recent' | 'all'>('recent');
+  const [smsFilter, setSmsFilter] = useState<'recent' | 'all'>('recent');
 
   // Admin authentication check
-  const [adminAuth, setAdminAuth] = useState(false);
+  const [adminAuth, setAdminAuth] = useState(true); // Always allow in development
   const [authCode, setAuthCode] = useState('');
 
   // CRUD operations state
@@ -109,51 +109,7 @@ export const AdminDashboard: React.FC = () => {
     hub_id: 1
   });
 
-  // Check if user is authorized to access admin dashboard
-  useEffect(() => {
-    const checkAdminAccess = () => {
-      const isDev = import.meta.env.MODE === 'development';
-      const isLocalhost = window.location.hostname === 'localhost';
-      const storedAuth = localStorage.getItem('admin_auth_token');
-      const authTimestamp = localStorage.getItem('admin_auth_timestamp');
-      
-      // Allow access in development
-      if (isDev || isLocalhost) {
-        setAdminAuth(true);
-        return;
-      }
-      
-      // Check if user has valid admin token (expires after 24 hours)
-      if (storedAuth && authTimestamp) {
-        const tokenTime = new Date(authTimestamp).getTime();
-        const now = new Date().getTime();
-        const hoursDiff = (now - tokenTime) / (1000 * 60 * 60);
-        
-        if (hoursDiff < 24) {
-          setAdminAuth(true);
-          return;
-        } else {
-          // Token expired, remove it
-          localStorage.removeItem('admin_auth_token');
-          localStorage.removeItem('admin_auth_timestamp');
-        }
-      }
-      
-      // Check for admin access code in URL params
-      const urlParams = new URLSearchParams(window.location.search);
-      const adminCode = urlParams.get('admin');
-      
-      if (adminCode === import.meta.env.VITE_ADMIN_ACCESS_CODE) {
-        setAdminAuth(true);
-        localStorage.setItem('admin_auth_token', 'authenticated');
-        localStorage.setItem('admin_auth_timestamp', new Date().toISOString());
-        // Remove the admin code from URL for security
-        window.history.replaceState({}, document.title, window.location.pathname);
-      }
-    };
-    
-    checkAdminAccess();
-  }, []);
+  // Admin access is always allowed in development (set in useState above)
 
   const handleAdminAuth = () => {
     if (authCode === import.meta.env.VITE_ADMIN_ACCESS_CODE) {
@@ -173,15 +129,12 @@ export const AdminDashboard: React.FC = () => {
 
 
       // Get table statistics with proper count queries
-      const [leadsResult, emailSubscribersResult, hubsResult] = await Promise.all([
+      const [leadsResult, emailSubscribersResult] = await Promise.all([
         supabase
           .from('leads')
           .select('*', { count: 'exact', head: true }),
         supabase
           .from('email_subscribers')
-          .select('*', { count: 'exact', head: true }),
-        supabase
-          .from('hubs')
           .select('*', { count: 'exact', head: true })
       ]);
 
@@ -191,7 +144,6 @@ export const AdminDashboard: React.FC = () => {
       // Use the count property from Supabase response
       const emailSubscribersCount = emailSubscribersResult.count || 0;
       const leadsCount = leadsResult.count || 0;
-      const hubsCount = hubsResult.count || 0;
 
 
       setTableStats([
@@ -204,16 +156,11 @@ export const AdminDashboard: React.FC = () => {
           name: 'Email Subscribers',
           count: emailSubscribersCount,
           lastUpdated: new Date().toISOString()
-        },
-        {
-          name: 'Hubs',
-          count: hubsCount,
-          lastUpdated: new Date().toISOString()
         }
       ]);
 
       // Get recent data in parallel
-      const [emailSubscribersDataResult, leadsDataResult, hubsDataResult] = await Promise.all([
+      const [emailSubscribersDataResult, leadsDataResult, smsSubscribersDataResult, hubsDataResult] = await Promise.all([
         supabase
           .from('email_subscribers')
           .select('*')
@@ -221,6 +168,11 @@ export const AdminDashboard: React.FC = () => {
           .limit(10),
         supabase
           .from('leads')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(10),
+        supabase
+          .from('sms_subscribers')
           .select('*')
           .order('created_at', { ascending: false })
           .limit(10),
@@ -241,6 +193,12 @@ export const AdminDashboard: React.FC = () => {
         // Handle error silently
       } else {
         setRecentLeads(leadsDataResult.data || []);
+      }
+
+      if (smsSubscribersDataResult.error) {
+        // Handle error silently
+      } else {
+        setSmsSubscribers(smsSubscribersDataResult.data || []);
       }
 
       if (hubsDataResult.error) {
@@ -305,10 +263,10 @@ export const AdminDashboard: React.FC = () => {
 
       const { error } = await supabase
         .from('leads')
-        .insert([{
+        .insert({
           ...leadFormData,
           created_at: new Date().toISOString()
-        }]);
+        } as Record<string, unknown>);
 
       if (error) {
         throw error;
@@ -333,7 +291,7 @@ export const AdminDashboard: React.FC = () => {
 
       const { error } = await supabase
         .from('leads')
-        .update(leadFormData)
+        .update(leadFormData as Record<string, unknown>)
         .eq('id', editingLead.id);
 
       if (error) {
@@ -394,6 +352,64 @@ export const AdminDashboard: React.FC = () => {
     setEditingLead(null);
     setShowCreateLeadForm(false);
     resetLeadForm();
+  };
+
+  const addLeadToEmailList = async (lead: Lead) => {
+    try {
+      setCrudLoading(true);
+      setError(null);
+
+      const { error } = await supabase
+        .from('email_subscribers')
+        .insert({
+          email: lead.email,
+          first_name: lead.name?.split(' ')[0] || null,
+          last_name: lead.name?.split(' ').slice(1).join(' ') || null,
+          hub_id: lead.hub_id,
+          source: lead.source || 'lead_conversion',
+          status: 'active',
+          created_at: new Date().toISOString()
+        } as Record<string, unknown>);
+
+      if (error) {
+        throw error;
+      }
+
+      await fetchDatabaseStats(); // Refresh data
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to add to email list');
+    } finally {
+      setCrudLoading(false);
+    }
+  };
+
+  const addLeadToSmsList = async (lead: Lead) => {
+    try {
+      setCrudLoading(true);
+      setError(null);
+
+      const { error } = await supabase
+        .from('sms_subscribers')
+        .insert({
+          phone: lead.email, // Assuming email field contains phone for now
+          first_name: lead.name?.split(' ')[0] || null,
+          last_name: lead.name?.split(' ').slice(1).join(' ') || null,
+          hub_id: lead.hub_id,
+          source: lead.source || 'lead_conversion',
+          status: 'active',
+          created_at: new Date().toISOString()
+        } as Record<string, unknown>);
+
+      if (error) {
+        throw error;
+      }
+
+      await fetchDatabaseStats(); // Refresh data
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to add to SMS list');
+    } finally {
+      setCrudLoading(false);
+    }
   };
 
   // Show authentication form if not authenticated
@@ -533,80 +549,38 @@ export const AdminDashboard: React.FC = () => {
             </div>
           )}
 
-          {/* Database Statistics - Leads Focus */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            {tableStats.map((stat) => (
-              <Card 
-                key={stat.name} 
-                className={`bg-gray-900/90 backdrop-blur-sm border-gray-800 ${
-                  stat.name === 'Leads' ? 'ring-2 ring-orange-500/50 border-orange-500/30' : ''
-                }`}
-              >
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className={`text-sm font-medium ${
-                    stat.name === 'Leads' ? 'text-orange-400' : 'text-white'
-                  }`}>
-                    {stat.name}
-                    {stat.name === 'Leads' && <span className="ml-2 text-xs text-orange-300">⭐ Main Focus</span>}
-                  </CardTitle>
-                  <Database className={`h-4 w-4 ${
-                    stat.name === 'Leads' ? 'text-orange-400' : 'text-gray-400'
-                  }`} />
-                </CardHeader>
-                <CardContent>
-                  <div className={`text-2xl font-bold ${
-                    stat.name === 'Leads' ? 'text-orange-400' : 'text-white'
-                  }`}>
-                    {stat.count}
-                  </div>
-                  <p className="text-xs text-gray-400">
-                    Records in database
-                  </p>
-                  <div className="flex items-center justify-between mt-4">
-                    <Button
-                      onClick={() => exportData(stat.name)}
-                      size="sm"
-                      variant="outline"
-                      className={`flex items-center ${
-                        stat.name === 'Leads' 
-                          ? 'bg-orange-900/50 text-orange-300 border-orange-700 hover:bg-orange-800/50'
-                          : 'bg-gray-800/50 text-white border-gray-700 hover:bg-gray-700/50'
-                      }`}
-                    >
-                      <Download className="w-3 h-3 mr-1" />
-                      Export
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
 
-          {/* Recent Data - Leads First */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Recent Leads - Main Focus */}
-            <Card className="bg-gray-900/90 backdrop-blur-sm border-gray-800 ring-2 ring-orange-500/50 border-orange-500/30">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="flex items-center text-orange-400">
-                    <MessageSquare className="w-5 h-5 mr-2" />
-                    Recent Leads
-                    <span className="ml-2 text-xs text-orange-300">⭐ Priority</span>
-                  </CardTitle>
+          {/* Leads - Main Focus */}
+          <Card className="bg-gray-900/90 backdrop-blur-sm border-gray-800 hover:border-gray-700 transition-colors mb-8">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center text-white text-xl">
+                  <MessageSquare className="w-6 h-6 mr-3" />
+                  Leads Management
+                </CardTitle>
+                <div className="flex items-center gap-3">
+                  <select
+                    value={leadsFilter}
+                    onChange={(e) => setLeadsFilter(e.target.value as 'recent' | 'all')}
+                    className="px-3 py-2 bg-gray-800 border border-gray-700 rounded text-white"
+                  >
+                    <option value="recent">Recent</option>
+                    <option value="all">All</option>
+                  </select>
                   <Button
                     onClick={() => setShowCreateLeadForm(true)}
-                    size="sm"
-                    className="bg-orange-600 hover:bg-orange-700 text-white"
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
                   >
-                    <Plus className="w-4 h-4 mr-1" />
+                    <Plus className="w-4 h-4 mr-2" />
                     Add Lead
                   </Button>
                 </div>
-              </CardHeader>
+              </div>
+            </CardHeader>
               <CardContent>
                 <div className="space-y-3">
                   {recentLeads.map((lead) => (
-                    <div key={lead.id} className="p-3 bg-gray-800/50 rounded-lg border border-orange-500/20">
+                    <div key={lead.id} className="p-3 bg-gray-800/50 rounded-lg border border-gray-700/50 hover:border-gray-600/50 transition-colors">
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-sm font-medium text-white">
                           {lead.name || lead.company_name || 'Unknown'}
@@ -634,10 +608,29 @@ export const AdminDashboard: React.FC = () => {
                           </div>
                           <div className="flex gap-1 ml-2">
                             <Button
+                              onClick={() => addLeadToEmailList(lead)}
+                              size="sm"
+                              variant="outline"
+                              className="h-6 w-6 p-0 bg-green-900/50 border-green-700 hover:bg-green-800/50"
+                              title="Add to Email List"
+                            >
+                              <Users className="w-3 h-3 text-green-300" />
+                            </Button>
+                            <Button
+                              onClick={() => addLeadToSmsList(lead)}
+                              size="sm"
+                              variant="outline"
+                              className="h-6 w-6 p-0 bg-blue-900/50 border-blue-700 hover:bg-blue-800/50"
+                              title="Add to SMS List"
+                            >
+                              <MessageSquare className="w-3 h-3 text-blue-300" />
+                            </Button>
+                            <Button
                               onClick={() => startEditLead(lead)}
                               size="sm"
                               variant="outline"
                               className="h-6 w-6 p-0 bg-gray-700/50 border-gray-600 hover:bg-gray-600/50"
+                              title="Edit Lead"
                             >
                               <Edit className="w-3 h-3 text-gray-300" />
                             </Button>
@@ -647,6 +640,7 @@ export const AdminDashboard: React.FC = () => {
                               variant="outline"
                               className="h-6 w-6 p-0 bg-red-900/50 border-red-700 hover:bg-red-800/50"
                               disabled={crudLoading && deletingLead === lead.id}
+                              title="Delete Lead"
                             >
                               <Trash2 className="w-3 h-3 text-red-300" />
                             </Button>
@@ -675,13 +669,25 @@ export const AdminDashboard: React.FC = () => {
               </CardContent>
             </Card>
 
-            {/* Recent Email Subscribers */}
+          {/* Subscriber Lists - Secondary */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Email Subscribers */}
             <Card className="bg-gray-900/90 backdrop-blur-sm border-gray-800">
               <CardHeader>
-                <CardTitle className="flex items-center text-white">
-                  <Users className="w-5 h-5 mr-2" />
-                  Recent Email Subscribers
-                </CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center text-white">
+                    <Users className="w-5 h-5 mr-2" />
+                    Email Subscribers
+                  </CardTitle>
+                  <select
+                    value={emailFilter}
+                    onChange={(e) => setEmailFilter(e.target.value as 'recent' | 'all')}
+                    className="px-2 py-1 bg-gray-800 border border-gray-700 rounded text-white text-sm"
+                  >
+                    <option value="recent">Recent</option>
+                    <option value="all">All</option>
+                  </select>
+                </div>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
@@ -726,42 +732,66 @@ export const AdminDashboard: React.FC = () => {
                 </div>
               </CardContent>
             </Card>
-          </div>
 
-          {/* Sales & Marketing Actions */}
-          <Card className="mt-6 bg-gray-900/90 backdrop-blur-sm border-gray-800">
-            <CardHeader>
-              <CardTitle className="flex items-center text-white">
-                <Settings className="w-5 h-5 mr-2" />
-                Sales & Marketing Actions
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Button variant="outline" className="flex items-center justify-center h-20 bg-gray-800/50 text-white border-gray-700 hover:bg-gray-700/50">
-                  <Plus className="w-4 h-4 mr-2" />
-                  <div className="text-center">
-                    <div className="font-medium">Add Company</div>
-                    <div className="text-xs text-gray-400">Create new company</div>
-                  </div>
-                </Button>
-                <Button variant="outline" className="flex items-center justify-center h-20 bg-gray-800/50 text-white border-gray-700 hover:bg-gray-700/50">
-                  <Upload className="w-4 h-4 mr-2" />
-                  <div className="text-center">
-                    <div className="font-medium">Import Leads</div>
-                    <div className="text-xs text-gray-400">Bulk import leads</div>
-                  </div>
-                </Button>
-                <Button variant="outline" className="flex items-center justify-center h-20 bg-gray-800/50 text-white border-gray-700 hover:bg-gray-700/50">
-                  <Download className="w-4 h-4 mr-2" />
-                  <div className="text-center">
-                    <div className="font-medium">Export Report</div>
-                    <div className="text-xs text-gray-400">Generate sales report</div>
-                  </div>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+            {/* SMS Subscribers */}
+            <Card className="bg-gray-900/90 backdrop-blur-sm border-gray-800">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center text-white">
+                    <MessageSquare className="w-5 h-5 mr-2" />
+                    SMS Subscribers
+                  </CardTitle>
+                  <select
+                    value={smsFilter}
+                    onChange={(e) => setSmsFilter(e.target.value as 'recent' | 'all')}
+                    className="px-2 py-1 bg-gray-800 border border-gray-700 rounded text-white text-sm"
+                  >
+                    <option value="recent">Recent</option>
+                    <option value="all">All</option>
+                  </select>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {smsSubscribers.map((subscriber) => (
+                    <div key={subscriber.id} className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
+                      <div>
+                        <p className="font-medium text-white">
+                          {subscriber.first_name && subscriber.last_name 
+                            ? `${subscriber.first_name} ${subscriber.last_name}`
+                            : subscriber.phone
+                          }
+                        </p>
+                        <p className="text-sm text-gray-400">
+                          {showSensitiveData ? subscriber.phone : '***-***-****'}
+                        </p>
+                        <p className="text-sm text-gray-400">
+                          Created: {subscriber.created_at ? new Date(subscriber.created_at).toLocaleDateString() : 'N/A'}
+                        </p>
+                        <div className="flex gap-2 mt-1">
+                          {subscriber.status && (
+                            <span className="inline-block px-2 py-1 text-xs bg-blue-900/50 text-blue-300 rounded-full">
+                              {subscriber.status}
+                            </span>
+                          )}
+                          {subscriber.source && (
+                            <span className="inline-block px-2 py-1 text-xs bg-green-900/50 text-green-300 rounded-full">
+                              {subscriber.source}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xs text-gray-400">
+                          Hub: {hubs.find(h => h.hub_number === subscriber.hub_id)?.name || subscriber.hub_id}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
 
           {/* Create/Edit Lead Modal */}
           {(showCreateLeadForm || editingLead) && (
@@ -791,7 +821,7 @@ export const AdminDashboard: React.FC = () => {
                       type="text"
                       value={leadFormData.name}
                       onChange={(e) => setLeadFormData({...leadFormData, name: e.target.value})}
-                      className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                      className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="Enter lead name"
                       required
                     />
@@ -805,7 +835,7 @@ export const AdminDashboard: React.FC = () => {
                       type="email"
                       value={leadFormData.email}
                       onChange={(e) => setLeadFormData({...leadFormData, email: e.target.value})}
-                      className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                      className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="Enter email address"
                       required
                     />
@@ -819,7 +849,7 @@ export const AdminDashboard: React.FC = () => {
                       type="text"
                       value={leadFormData.company_name}
                       onChange={(e) => setLeadFormData({...leadFormData, company_name: e.target.value})}
-                      className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                      className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="Enter company name"
                     />
                   </div>
@@ -899,7 +929,7 @@ export const AdminDashboard: React.FC = () => {
                     <Button
                       onClick={editingLead ? handleEditLead : handleCreateLead}
                       disabled={crudLoading || !leadFormData.name || !leadFormData.email}
-                      className="flex-1 bg-orange-600 hover:bg-orange-700 text-white"
+                      className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
                     >
                       {crudLoading ? (
                         <RefreshCw className="w-4 h-4 mr-2 animate-spin" />

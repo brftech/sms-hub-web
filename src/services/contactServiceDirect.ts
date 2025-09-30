@@ -9,6 +9,8 @@ export interface ContactFormData {
   message: string
   platform_interest?: string
   hub_id?: number
+  email_signup?: boolean
+  sms_signup?: boolean
 }
 
 export class ContactService {
@@ -23,7 +25,9 @@ export class ContactService {
         company: data.company,
         message: data.message,
         platform_interest: data.platform_interest || 'General inquiry',
-        hub_id: data.hub_id || 2 // Default to Gnymble
+        hub_id: data.hub_id || 2, // Default to Gnymble
+        email_signup: data.email_signup || false,
+        sms_signup: data.sms_signup || false
       }
     })
 

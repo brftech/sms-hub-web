@@ -25,6 +25,8 @@ const Contact = () => {
     phone: string;
     company: string;
     message: string;
+    emailSignup: boolean;
+    smsSignup: boolean;
   }>({
     firstName: "",
     lastName: "",
@@ -32,9 +34,13 @@ const Contact = () => {
     phone: "",
     company: "",
     message: "",
+    emailSignup: false,
+    smsSignup: false,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [honeypot, setHoneypot] = useState(""); // Spam protection
+  const [formStartTime] = useState(Date.now()); // Spam protection
   const { toast } = useToast();
   const navigate = useNavigate();
   const firstNameRef = useRef<HTMLInputElement>(null);
@@ -47,6 +53,28 @@ const Contact = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Spam protection checks
+    if (honeypot) {
+      // Honeypot field filled - likely spam
+      toast({
+        title: "Submission blocked",
+        description: "Please try again with a valid submission.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const formTime = Date.now() - formStartTime;
+    if (formTime < 3000) {
+      // Form submitted too quickly - likely spam
+      toast({
+        title: "Please take your time",
+        description: "Please fill out the form completely before submitting.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     // Client-side validation
     if (
@@ -63,13 +91,26 @@ const Contact = () => {
       return;
     }
 
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      toast({
+        title: "Invalid email address",
+        description: "Please enter a valid email address.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
-      // Submit to Edge Function
+      // Submit to Edge Function with signup preferences
       await contactService.submitContact({
         ...formData,
         hub_id: hubConfig.hubNumber,
+        email_signup: formData.emailSignup,
+        sms_signup: formData.smsSignup,
       });
 
       // Show success modal
@@ -83,6 +124,8 @@ const Contact = () => {
         phone: "",
         company: "",
         message: "",
+        emailSignup: false,
+        smsSignup: false,
       });
 
       // Redirect to landing page after 3 seconds
@@ -252,7 +295,7 @@ const Contact = () => {
                       </div>
                     </div>
 
-                    <div className="mb-8">
+                    <div className="mb-6">
                       <div className="group">
                         <FormFieldComponent
                           label="Message (Optional)"
@@ -266,6 +309,61 @@ const Contact = () => {
                           className="[&_textarea]:bg-white [&_textarea]:text-black [&_textarea]:placeholder-gray-500"
                         />
                       </div>
+                    </div>
+
+                    {/* Signup Preferences */}
+                    <div className="mb-6 p-4 bg-gray-800/30 rounded-lg border border-gray-700/50">
+                      <h3 className="text-sm font-medium text-white mb-3">
+                        Stay Updated (Optional)
+                      </h3>
+                      <div className="space-y-3">
+                        <label className="flex items-center space-x-3 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={formData.emailSignup}
+                            onChange={(e) =>
+                              setFormData((prev) => ({
+                                ...prev,
+                                emailSignup: e.target.checked,
+                              }))
+                            }
+                            className="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500 focus:ring-2"
+                          />
+                          <span className="text-sm text-gray-300">
+                            Email updates about SMS platform features and industry insights
+                          </span>
+                        </label>
+                        <label className="flex items-center space-x-3 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={formData.smsSignup}
+                            onChange={(e) =>
+                              setFormData((prev) => ({
+                                ...prev,
+                                smsSignup: e.target.checked,
+                              }))
+                            }
+                            className="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500 focus:ring-2"
+                          />
+                          <span className="text-sm text-gray-300">
+                            SMS notifications about important updates and new features
+                          </span>
+                        </label>
+                      </div>
+                    </div>
+
+                    {/* Honeypot field - hidden from users */}
+                    <div style={{ display: 'none' }}>
+                      <label htmlFor="website">Website (leave blank)</label>
+                      <input
+                        type="text"
+                        id="website"
+                        name="website"
+                        value={honeypot}
+                        onChange={(e) => setHoneypot(e.target.value)}
+                        tabIndex={-1}
+                        autoComplete="off"
+                      />
                     </div>
                   </FormContainerComponent>
                 </div>

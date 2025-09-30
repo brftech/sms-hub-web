@@ -17,13 +17,10 @@ import {
   Database, 
   Users, 
   MessageSquare, 
-  Settings, 
   RefreshCw,
   Shield,
   Eye,
   EyeOff,
-  Download,
-  Upload,
   Plus,
   Edit,
   Trash2,
@@ -31,11 +28,6 @@ import {
   X
 } from 'lucide-react';
 
-interface TableStats {
-  name: string;
-  count: number;
-  lastUpdated: string;
-}
 
 interface EmailSubscriber {
   id: string;
@@ -77,10 +69,10 @@ export const AdminDashboard: React.FC = () => {
   
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [tableStats, setTableStats] = useState<TableStats[]>([]);
   const [recentEmailSubscribers, setRecentEmailSubscribers] = useState<EmailSubscriber[]>([]);
   const [recentLeads, setRecentLeads] = useState<Lead[]>([]);
   const [hubs, setHubs] = useState<Hub[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [smsSubscribers, setSmsSubscribers] = useState<any[]>([]);
   const [showSensitiveData, setShowSensitiveData] = useState(false);
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
@@ -128,36 +120,12 @@ export const AdminDashboard: React.FC = () => {
       setError(null);
 
 
-      // Get table statistics with proper count queries
-      const [leadsResult, emailSubscribersResult] = await Promise.all([
-        supabase
-          .from('leads')
-          .select('*', { count: 'exact', head: true }),
-        supabase
-          .from('email_subscribers')
-          .select('*', { count: 'exact', head: true })
-      ]);
 
 
       // Check for errors silently
 
-      // Use the count property from Supabase response
-      const emailSubscribersCount = emailSubscribersResult.count || 0;
-      const leadsCount = leadsResult.count || 0;
 
 
-      setTableStats([
-        {
-          name: 'Leads',
-          count: leadsCount,
-          lastUpdated: new Date().toISOString()
-        },
-        {
-          name: 'Email Subscribers',
-          count: emailSubscribersCount,
-          lastUpdated: new Date().toISOString()
-        }
-      ]);
 
       // Get recent data in parallel
       const [emailSubscribersDataResult, leadsDataResult, smsSubscribersDataResult, hubsDataResult] = await Promise.all([
@@ -221,27 +189,6 @@ export const AdminDashboard: React.FC = () => {
     }
   }, [adminAuth, fetchDatabaseStats]);
 
-  const exportData = async (tableName: string) => {
-    try {
-      const { data, error } = await supabase
-        .from(tableName.toLowerCase())
-        .select('*');
-
-      if (error) throw error;
-
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${tableName.toLowerCase()}_export_${new Date().toISOString().split('T')[0]}.json`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Export failed');
-    }
-  };
 
   // CRUD Functions for Leads
   const resetLeadForm = () => {
@@ -261,12 +208,13 @@ export const AdminDashboard: React.FC = () => {
       setCrudLoading(true);
       setError(null);
 
-      const { error } = await supabase
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error } = await (supabase as any)
         .from('leads')
         .insert({
           ...leadFormData,
           created_at: new Date().toISOString()
-        } as Record<string, unknown>);
+        });
 
       if (error) {
         throw error;
@@ -289,9 +237,10 @@ export const AdminDashboard: React.FC = () => {
       setCrudLoading(true);
       setError(null);
 
-      const { error } = await supabase
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error } = await (supabase as any)
         .from('leads')
-        .update(leadFormData as Record<string, unknown>)
+        .update(leadFormData)
         .eq('id', editingLead.id);
 
       if (error) {
@@ -359,7 +308,8 @@ export const AdminDashboard: React.FC = () => {
       setCrudLoading(true);
       setError(null);
 
-      const { error } = await supabase
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error } = await (supabase as any)
         .from('email_subscribers')
         .insert({
           email: lead.email,
@@ -369,7 +319,7 @@ export const AdminDashboard: React.FC = () => {
           source: lead.source || 'lead_conversion',
           status: 'active',
           created_at: new Date().toISOString()
-        } as Record<string, unknown>);
+        });
 
       if (error) {
         throw error;
@@ -388,7 +338,8 @@ export const AdminDashboard: React.FC = () => {
       setCrudLoading(true);
       setError(null);
 
-      const { error } = await supabase
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error } = await (supabase as any)
         .from('sms_subscribers')
         .insert({
           phone: lead.email, // Assuming email field contains phone for now
@@ -398,7 +349,7 @@ export const AdminDashboard: React.FC = () => {
           source: lead.source || 'lead_conversion',
           status: 'active',
           created_at: new Date().toISOString()
-        } as Record<string, unknown>);
+        });
 
       if (error) {
         throw error;

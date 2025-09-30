@@ -11,7 +11,7 @@ import {
   ReactNode,
   useMemo,
 } from "react";
-import { logger, logError } from "@sms-hub/utils";
+// Removed logger import - using console for debugging
 import { ChatMessage, ConversationContext } from "../types";
 
 // =============================================================================
@@ -98,10 +98,7 @@ export interface LiveMessagingContextType {
 // REDUCER
 // =============================================================================
 
-function messagingReducer(
-  state: MessagingStateData,
-  action: MessagingAction
-): MessagingStateData {
+function messagingReducer(state: MessagingStateData, action: MessagingAction): MessagingStateData {
   switch (action.type) {
     case "CONNECT_START":
       return {
@@ -221,9 +218,7 @@ function messagingReducer(
 // CONTEXT CREATION
 // =============================================================================
 
-const LiveMessagingContext = createContext<
-  LiveMessagingContextType | undefined
->(undefined);
+const LiveMessagingContext = createContext<LiveMessagingContextType | undefined>(undefined);
 
 // =============================================================================
 // PROVIDER COMPONENT
@@ -233,9 +228,7 @@ interface LiveMessagingProviderProps {
   children: ReactNode;
 }
 
-export function LiveMessagingProvider({
-  children,
-}: LiveMessagingProviderProps) {
+export function LiveMessagingProvider({ children }: LiveMessagingProviderProps) {
   const [state, dispatch] = useReducer(messagingReducer, {
     connectionState: MessagingState.IDLE,
     isConnected: false,
@@ -278,13 +271,15 @@ export function LiveMessagingProvider({
           );
         }
 
-        logger.info("Message added successfully", {
-          messageId: message.id,
-          sessionId: state.sessionId,
-          sender: message.sender,
-        });
+        if (import.meta.env.DEV) {
+          console.log("Message added successfully", {
+            messageId: message.id,
+            sessionId: state.sessionId,
+            sender: message.sender,
+          });
+        }
       } catch (error) {
-        logError("Failed to add message", error, {
+        console.error("Failed to add message", error, {
           sessionId: state.sessionId,
           operation: "addMessage",
         });
@@ -294,12 +289,9 @@ export function LiveMessagingProvider({
     [state.sessionId]
   );
 
-  const updateMessage = useCallback(
-    (id: string, updates: Partial<ChatMessage>) => {
-      dispatch({ type: "UPDATE_MESSAGE", id, updates });
-    },
-    []
-  );
+  const updateMessage = useCallback((id: string, updates: Partial<ChatMessage>) => {
+    dispatch({ type: "UPDATE_MESSAGE", id, updates });
+  }, []);
 
   const removeMessage = useCallback((id: string) => {
     dispatch({ type: "REMOVE_MESSAGE", id });
@@ -318,11 +310,13 @@ export function LiveMessagingProvider({
 
       dispatch({ type: "CONNECT_SUCCESS" });
 
-      logger.info("Connected to messaging service", {
-        sessionId: state.sessionId,
-      });
+      if (import.meta.env.DEV) {
+        console.log("Connected to messaging service", {
+          sessionId: state.sessionId,
+        });
+      }
     } catch (error) {
-      logError("Failed to connect to messaging service", error, {
+      console.error("Failed to connect to messaging service", error, {
         sessionId: state.sessionId,
         operation: "connect",
       });
@@ -332,9 +326,11 @@ export function LiveMessagingProvider({
 
   const disconnect = useCallback(() => {
     dispatch({ type: "DISCONNECT" });
-    logger.info("Disconnected from messaging service", {
-      sessionId: state.sessionId,
-    });
+    if (import.meta.env.DEV) {
+      console.log("Disconnected from messaging service", {
+        sessionId: state.sessionId,
+      });
+    }
   }, [state.sessionId]);
 
   const resetState = useCallback(() => {
@@ -378,9 +374,7 @@ export function LiveMessagingProvider({
   );
 
   return (
-    <LiveMessagingContext.Provider value={contextValue}>
-      {children}
-    </LiveMessagingContext.Provider>
+    <LiveMessagingContext.Provider value={contextValue}>{children}</LiveMessagingContext.Provider>
   );
 }
 
@@ -391,9 +385,7 @@ export function LiveMessagingProvider({
 export function useLiveMessaging(): LiveMessagingContextType {
   const context = useContext(LiveMessagingContext);
   if (context === undefined) {
-    throw new Error(
-      "useLiveMessaging must be used within a LiveMessagingProvider"
-    );
+    throw new Error("useLiveMessaging must be used within a LiveMessagingProvider");
   }
   return context;
 }

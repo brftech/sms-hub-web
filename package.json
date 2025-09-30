@@ -33,7 +33,6 @@
   },
   "dependencies": {
     "@sms-hub/hub-logic": "file:./packages/hub-logic",
-    "@sms-hub/logger": "file:./packages/logger",
     "@sms-hub/supabase": "file:./packages/supabase",
     "@sms-hub/ui": "file:./packages/ui",
     "@sms-hub/utils": "file:./packages/utils",

@@ -8,6 +8,7 @@ import { useLiveMessaging } from "../contexts/LiveMessagingContext";
 import SMSAuthModal from "./SMSAuthModal";
 import { logger, logError } from "@sms-hub/utils";
 import { ChatMessage } from "../types";
+import "../styles/phone-components.css";
 
 // =============================================================================
 // TYPES & INTERFACES
@@ -403,76 +404,61 @@ export default function PhoneInteractive() {
   // =============================================================================
 
   return (
-    <div className="flex justify-center items-center my-8 mx-4">
-      {/* Phone Interface */}
+    <div className="phone-container">
+      {/* Authentic iPhone Interface */}
       <div
-        className="relative phone-3d"
+        className="phone-frame"
         onMouseEnter={handlePhoneMouseEnter}
         onMouseLeave={handlePhoneMouseLeave}
-        style={{
-          width: "280px",
-          height: "560px",
-        }}
       >
-        {/* Inner screen */}
+        {/* iPhone Screen */}
         <div className="phone-screen">
-          {/* Status bar */}
+          {/* Dynamic Island */}
+          <div className="phone-dynamic-island"></div>
+          
+          {/* Status Bar */}
           <div className="phone-status-bar">
-            <span className="text-white font-medium text-sm">
-              Customer Phone
-            </span>
-            <span>12:21</span>
-            <div className="flex items-center gap-1">
-              <span className="text-xs">●●●</span>
-              <span className="text-xs">100%</span>
+            <div className="phone-status-left">
+              <span>●●●</span>
+            </div>
+            <div className="phone-status-center">11:17 AM</div>
+            <div className="phone-status-right">
+              <div className="phone-battery">
+                <div className="phone-battery-fill"></div>
+              </div>
+              <span>100%</span>
             </div>
           </div>
 
-          {/* Messages area */}
-          <div className="phone-messages-area">
+          {/* Messages Area */}
+          <div className="phone-messages-container">
             <div
               className={`phone-messages ${
                 phoneState.isTransitioning ? "opacity-0" : "opacity-100"
               }`}
             >
+              {/* Date Separator */}
+              <div className="phone-date-separator">
+                <span>
+                  {new Date().toLocaleDateString([], {
+                    weekday: 'long',
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true
+                  })}
+                </span>
+              </div>
+              
+              {/* Messages */}
               {displayMessages.map((message) => (
-                <div key={message.id}>
-                  <div
-                    className={`flex ${
-                      message.sender === "user"
-                        ? "justify-end"
-                        : "justify-start"
-                    } mb-1`}
-                  >
-                    <div
-                      className={`max-w-[80%] px-3 py-2 rounded-[18px] text-sm leading-relaxed text-left ${
-                        message.sender === "user"
-                          ? "bg-blue-500 text-white"
-                          : "bg-gray-200 text-black"
-                      }`}
-                    >
-                      {message.businessName &&
-                        message.sender === "business" && (
-                          <div className="text-[10px] opacity-80 mb-1 font-semibold">
-                            {message.businessName}
-                          </div>
-                        )}
-                      {message.text}
-                    </div>
-                  </div>
-                  <div
-                    className={`flex ${
-                      message.sender === "user"
-                        ? "justify-end pr-3"
-                        : "justify-start pl-3"
-                    }`}
-                  >
-                    <span className="text-[10px] text-gray-300">
-                      {new Date(message.timestamp).toLocaleTimeString([], {
-                        hour: "numeric",
-                        minute: "2-digit",
-                      })}
-                    </span>
+                <div key={message.id} className={`phone-message ${message.sender}`}>
+                  <div className={`phone-message-bubble ${message.sender}`}>
+                    {message.businessName && message.sender === "business" && (
+                      <div className="phone-message-sender">
+                        {message.businessName}
+                      </div>
+                    )}
+                    <div>{message.content ?? message.text}</div>
                   </div>
                 </div>
               ))}
@@ -480,14 +466,13 @@ export default function PhoneInteractive() {
             </div>
           </div>
 
-          {/* Interactive text input area */}
-          <div className="phone-input-area">
+          {/* Input Area */}
+          <div className="phone-input-container">
             <input
               type="text"
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyPress={handleKeyPress}
-              // onClick={handleInputClick} // Disabled: Make message field unclickable
               onFocus={() =>
                 setPhoneState((prev) => ({ ...prev, isInputFocused: true }))
               }
@@ -514,7 +499,7 @@ export default function PhoneInteractive() {
       </div>
 
       {/* Status Indicator - Right of Phone */}
-      <div className="ml-8 flex flex-col items-center">
+      <div className="ml-12 flex flex-col items-center">
         {phoneState.isAuthenticated ? (
           phoneState.isDemoActive ? (
             <div className="px-4 py-3 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-700 text-sm font-medium">

@@ -413,126 +413,7 @@
   }
 
   /* === PHONE COMPONENT STYLES === */
-  .phone-3d {
-    background: #1a1a1a;
-    border-radius: 20px;
-    border: 1px solid #333;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-  }
-
-  .phone-screen {
-    width: 268px;
-    height: 548px;
-    background: #000000;
-    border-radius: 20px;
-    overflow: hidden;
-    position: relative;
-  }
-
-  .phone-status-bar {
-    height: 40px;
-    background: #000000;
-    color: white;
-    font-size: 13px;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 14px;
-    position: relative;
-    z-index: 10;
-  }
-
-  .phone-messages-area {
-    height: calc(548px - 40px - 40px);
-    background: #ffffff;
-    padding: 14px;
-    overflow: hidden;
-    position: relative;
-  }
-
-  .phone-messages {
-    transition: opacity 0.5s ease-in-out;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .phone-input-area {
-    height: 40px;
-    background: #f2f2f7;
-    display: flex;
-    align-items: center;
-    padding: 0 10px;
-    gap: 6px;
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-  }
-
-  .phone-input-field {
-    flex: 1;
-    height: 28px;
-    background: white;
-    border-radius: 14px;
-    padding: 0 10px;
-    font-size: 14px;
-    outline: none;
-    border: 2px solid transparent;
-    color: #000000;
-    transition: all 0.3s ease;
-  }
-
-  .phone-input-field:hover {
-    border-color: #007aff;
-    box-shadow: 0 0 10px rgba(0, 122, 255, 0.2);
-  }
-
-  .phone-input-field:focus {
-    border-color: #007aff;
-    box-shadow: 0 0 15px rgba(0, 122, 255, 0.3);
-  }
-
-  .phone-send-button {
-    width: 28px;
-    height: 28px;
-    background: #007aff;
-    border-radius: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 12px;
-    font-weight: 600;
-    border: none;
-    cursor: pointer;
-    transition: all 0.2s ease;
-  }
-
-  .phone-send-button:hover {
-    transform: scale(1.1);
-    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.4);
-  }
-
-  .phone-send-button:disabled {
-    background: #c7c7cc;
-    cursor: default;
-  }
-
-  .phone-scenario-indicator {
-    position: absolute;
-    top: 14px;
-    right: 14px;
-    background: rgba(255, 255, 255, 0.9);
-    padding: 3px 6px;
-    border-radius: 10px;
-    font-size: 9px;
-    font-weight: 600;
-    color: #333333;
-    z-index: 20;
-  }
+  /* Phone-specific styles moved to packages/ui/src/styles/phone-components.css */
 
   /* === CARD STYLES === */
   .card-modern {
@@ -589,17 +470,7 @@
   }
 
   /* === RESPONSIVE PHONE SCALING === */
-  @media (max-width: 640px) {
-    .phone-3d {
-      transform: scale(0.8) rotateY(15deg) rotateX(5deg) rotate(-8deg);
-    }
-  }
-
-  @media (max-width: 480px) {
-    .phone-3d {
-      transform: scale(0.7) rotateY(15deg) rotateX(5deg) rotate(-8deg);
-    }
-  }
+  /* Phone scaling now handled in phone-components.css */
 }
 
 @layer base {

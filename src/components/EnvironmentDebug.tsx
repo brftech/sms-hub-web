@@ -4,10 +4,8 @@ interface EnvironmentDebugProps {
   show?: boolean;
 }
 
-export const EnvironmentDebug: React.FC<EnvironmentDebugProps> = ({
-  show = true,
-}) => {
-  const [isMinimized, setIsMinimized] = useState(false);
+export const EnvironmentDebug: React.FC<EnvironmentDebugProps> = ({ show = true }) => {
+  const [isMinimized, setIsMinimized] = useState(true);
 
   if (!show) return null;
 
@@ -62,27 +60,19 @@ export const EnvironmentDebug: React.FC<EnvironmentDebugProps> = ({
           </div>
           <div style={{ marginBottom: "4px" }}>
             <span style={{ color: "#888" }}>MODE:</span>{" "}
-            <span style={{ color: "#00ff00" }}>
-              {import.meta.env.MODE || "NOT SET"}
-            </span>
+            <span style={{ color: "#00ff00" }}>{import.meta.env.MODE || "NOT SET"}</span>
           </div>
           <div style={{ marginBottom: "4px" }}>
             <span style={{ color: "#888" }}>NODE_ENV:</span>{" "}
-            <span style={{ color: "#00ff00" }}>
-              {import.meta.env.NODE_ENV || "NOT SET"}
-            </span>
+            <span style={{ color: "#00ff00" }}>{import.meta.env.NODE_ENV || "NOT SET"}</span>
           </div>
           <div style={{ marginBottom: "4px" }}>
             <span style={{ color: "#888" }}>DEV:</span>{" "}
-            <span style={{ color: "#00ff00" }}>
-              {import.meta.env.DEV ? "true" : "false"}
-            </span>
+            <span style={{ color: "#00ff00" }}>{import.meta.env.DEV ? "true" : "false"}</span>
           </div>
           <div style={{ marginBottom: "4px" }}>
             <span style={{ color: "#888" }}>PROD:</span>{" "}
-            <span style={{ color: "#00ff00" }}>
-              {import.meta.env.PROD ? "true" : "false"}
-            </span>
+            <span style={{ color: "#00ff00" }}>{import.meta.env.PROD ? "true" : "false"}</span>
           </div>
           <div style={{ marginBottom: "4px" }}>
             <span style={{ color: "#888" }}>DEBUG:</span>{" "}

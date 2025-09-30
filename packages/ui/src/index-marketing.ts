@@ -19,8 +19,23 @@ export * from "./components/error-boundary";
 
 // Hub components
 export { HubLogo } from "./components/hub-logo";
+export { HubSwitcher } from "./components/hub-switcher";
 export { useHub, HubProvider, type EnvironmentAdapter } from "./contexts/HubContext";
 export { LiveMessagingProvider, useLiveMessaging } from "./contexts/LiveMessagingContext";
+
+// Sidebar components
+export { Badge } from "./components/badge";
+export {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+  SidebarTrigger,
+} from "./components/sidebar";
 
 // Toast system
 export { Toaster } from "./components/toaster";
@@ -35,4 +50,4 @@ export { default as PhoneInteractive } from "./components/PhoneInteractive";
 export { default as PlatformDemo } from "./components/PlatformDemo";
 
 // Type exports needed
-export type { Hub, HubConfig } from "./types";
+export type { HubType, HubConfig } from "./types";

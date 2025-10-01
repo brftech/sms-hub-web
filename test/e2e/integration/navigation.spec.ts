@@ -6,17 +6,15 @@ test.describe("Cross-Page Navigation", () => {
     await page.goto("/");
     await expect(page).toHaveURL("/");
 
-    // Navigate to contact
-    const contactLink = page.locator('a[href="/contact"]').first();
-    if (await contactLink.isVisible()) {
-      await contactLink.click();
-      await expect(page).toHaveURL(/.*\/contact/);
+    // Navigate to contact (button or link)
+    const contactButton = page.locator('button:has-text("Contact"), a:has-text("Contact")').first();
+    await contactButton.click();
+    await expect(page).toHaveURL(/.*\/contact/);
 
-      // Navigate back home
-      const homeLink = page.locator('a[href="/"], a[href="/home"]').first();
-      await homeLink.click();
-      await expect(page).toHaveURL(/^\/$|\/home$/);
-    }
+    // Navigate back home via logo
+    const logoButton = page.locator('button:has-text("Logo"), img[alt*="Logo"]').first();
+    await logoButton.click();
+    await page.waitForURL("/");
   });
 
   test("should maintain navigation across routes", async ({ page }) => {

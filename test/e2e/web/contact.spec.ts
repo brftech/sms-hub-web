@@ -9,12 +9,14 @@ test.describe("Contact Page", () => {
     // Verify form is visible
     await expect(page.locator("form")).toBeVisible();
 
-    // Verify essential form fields exist
-    const emailInput = page.locator('input[type="email"], input[name*="email"]');
-    const nameInput = page.locator('input[name*="name"], input[placeholder*="name"]');
+    // Verify essential form fields exist (based on actual Contact.tsx structure)
+    const firstNameInput = page.locator('input[name="firstName"]');
+    const lastNameInput = page.locator('input[name="lastName"]');
+    const emailInput = page.locator('input[name="email"]');
 
-    await expect(emailInput.first()).toBeVisible();
-    await expect(nameInput.first()).toBeVisible();
+    await expect(firstNameInput).toBeVisible();
+    await expect(lastNameInput).toBeVisible();
+    await expect(emailInput).toBeVisible();
   });
 
   test("should have submit button", async ({ page }) => {
@@ -40,21 +42,24 @@ test.describe("Contact Page", () => {
   });
 
   test("should fill out contact form", async ({ page }) => {
-    // Fill out form fields
-    const emailInput = page.locator('input[type="email"], input[name*="email"]').first();
-    const nameInput = page.locator('input[name*="name"], input[placeholder*="name"]').first();
-    const messageInput = page.locator('textarea, input[name*="message"]').first();
-
-    await nameInput.fill("Test User");
-    await emailInput.fill("test@example.com");
-
+    // Fill out form fields (based on actual Contact.tsx structure)
+    const firstNameInput = page.locator('input[name="firstName"]');
+    const lastNameInput = page.locator('input[name="lastName"]');
+    const emailInput = page.locator('input[name="email"]');
+    const messageInput = page.locator('textarea[name="message"]');
+    
+    await firstNameInput.fill("John");
+    await lastNameInput.fill("Doe");
+    await emailInput.fill("john.doe@example.com");
+    
     if (await messageInput.isVisible()) {
       await messageInput.fill("This is a test message from Playwright");
     }
-
+    
     // Verify values were entered
-    await expect(nameInput).toHaveValue("Test User");
-    await expect(emailInput).toHaveValue("test@example.com");
+    await expect(firstNameInput).toHaveValue("John");
+    await expect(lastNameInput).toHaveValue("Doe");
+    await expect(emailInput).toHaveValue("john.doe@example.com");
   });
 
   test("should be mobile responsive", async ({ page }) => {

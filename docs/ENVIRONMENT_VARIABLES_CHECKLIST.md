@@ -3,28 +3,36 @@
 ## Required Environment Variables for Edge Functions
 
 Please ensure the following environment variables are set in your Supabase dashboard:
-https://supabase.com/dashboard/project/vgpovgpwqkjnpnrjelyg/settings/vault
+
+**Development**: https://supabase.com/dashboard/project/hmumtnpnyxuplvqcmnfk/settings/vault
+**Production**: https://supabase.com/dashboard/project/fwlivygerbqzowbzxesw/settings/vault
 
 **Note**: All Edge Functions have been updated with enhanced validation and security measures (September 2025). Ensure all environment variables are properly set for the enhanced authentication and account creation flow.
 
 ### SMS/Communication Variables
+
 - [ ] `ZAPIER_SMS_WEBHOOK_URL` - Your Zapier webhook URL for SMS via PercyTech
 - [ ] `RESEND_API_KEY` - Resend API key for email notifications
 
 ### Stripe Variables
+
 - [ ] `STRIPE_SECRET_KEY` - Your Stripe secret key
 - [ ] `STRIPE_WEBHOOK_SECRET` - Your Stripe webhook signing secret
 
 ### Application URLs
+
 - [ ] `PUBLIC_SITE_URL` - Your public website URL (e.g., https://yourdomain.com or http://localhost:3000 for dev)
 
 ### Development Variables (Optional)
+
 - [ ] `ENVIRONMENT` - Set to "development" for dev mode features
 - [ ] `DEV_AUTH_TOKEN` - Secure token for development authentication bypass
 
 ## How to Set Environment Variables
 
-1. Go to: https://supabase.com/dashboard/project/vgpovgpwqkjnpnrjelyg/settings/vault
+1. Go to your Supabase project vault:
+   - **Development**: https://supabase.com/dashboard/project/hmumtnpnyxuplvqcmnfk/settings/vault
+   - **Production**: https://supabase.com/dashboard/project/fwlivygerbqzowbzxesw/settings/vault
 2. Click "New secret"
 3. Add each variable with its value
 4. Save changes
@@ -35,18 +43,30 @@ You can verify these are set by checking the Edge Functions logs after deploymen
 
 ## Local Development
 
-For local development, ensure these are in your `.env.development` file:
+For local development, ensure these are in your `.env.local` file:
+
+**Development Database**:
+
 ```
-VITE_SUPABASE_URL=https://vgpovgpwqkjnpnrjelyg.supabase.co
+VITE_SUPABASE_URL=https://hmumtnpnyxuplvqcmnfk.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-key
 VITE_DEV_AUTH_TOKEN=your-secure-dev-token
 VITE_DEVELOPMENT_MODE=true
 ```
 
+**Production Database** (for testing production):
+
+```
+VITE_SUPABASE_URL=https://fwlivygerbqzowbzxesw.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key
+```
+
 ## Recent Updates (September 30, 2025)
 
 ### Enhanced Edge Functions
+
 All Edge Functions have been updated with:
+
 - **Enhanced validation** and error handling
 - **Magic link authentication** support
 - **B2B/B2C account creation** capabilities
@@ -54,6 +74,7 @@ All Edge Functions have been updated with:
 - **Improved security** and session management
 
 ### Environment Variable Usage
+
 - **Magic Link Authentication**: Uses existing Supabase Auth with enhanced flow
 - **Protected Accounts**: Built-in protection for superadmin@percytech.com and superadmin@gnymble.com
 - **Enhanced Validation**: All Edge Functions now include comprehensive input validation

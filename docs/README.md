@@ -115,21 +115,6 @@ Checklist for required environment variables.
 
 **Best for:** Setup, configuration, troubleshooting
 
-#### [DATABASE_MIGRATION.sql](./DATABASE_MIGRATION.sql)
-
-Complete database migration script for marketing-focused schema.
-
-**Contains:**
-
-- Migration from customer management to marketing focus
-- 15+ table definitions for email/SMS marketing
-- Indexes for performance optimization
-- Functions and triggers for automation
-- Default data insertion
-- Complete schema documentation
-
-**Best for:** Database administrators, schema changes, data migration
-
 ## 🎯 Quick Navigation
 
 ### For New Developers
@@ -143,7 +128,7 @@ Complete database migration script for marketing-focused schema.
 
 1. **Architecture**: Review [VERCEL_DEPLOYMENT_GUIDE.md](./VERCEL_DEPLOYMENT_GUIDE.md)
 2. **Environment**: Check [ENVIRONMENT_VARIABLES_CHECKLIST.md](./ENVIRONMENT_VARIABLES_CHECKLIST.md)
-3. **Database**: Review [DATABASE_MIGRATION.sql](./DATABASE_MIGRATION.sql) for schema
+3. **Database**: Review `supabase/migrations/0000001_initial_schema.sql` for schema
 4. **Verify**: Test all environment variables are properly configured
 
 ### For Understanding Admin Functionality
@@ -154,7 +139,7 @@ Complete database migration script for marketing-focused schema.
 
 ### For Database Work
 
-1. **Schema**: Review [DATABASE_MIGRATION.sql](./DATABASE_MIGRATION.sql) for complete schema
+1. **Schema**: Review `supabase/migrations/0000001_initial_schema.sql` for complete schema
 2. **Types**: Generate types from database (see [QUICK_START.md](./QUICK_START.md))
 3. **Development**: Use [CLAUDE.md](./CLAUDE.md) for database operation guidelines
 
@@ -237,7 +222,7 @@ Marketing-focused database schema with 15+ tables:
 - `verifications` - Email/phone verification
 - `verification_attempts` - Verification attempt tracking
 
-See [DATABASE_MIGRATION.sql](./DATABASE_MIGRATION.sql) for complete schema.
+See `supabase/migrations/0000001_initial_schema.sql` for complete schema.
 
 ## 🧪 Testing Strategy
 

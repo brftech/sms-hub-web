@@ -60,7 +60,7 @@ The application uses a marketing-focused database schema with 15+ tables:
 - **User Management**: `user_profiles`, `verifications`, `verification_attempts`
 - **Forms**: `contact_form_submissions`
 
-See `docs/DATABASE_MIGRATION.sql` for complete schema.
+See `supabase/migrations/0000001_initial_schema.sql` for complete schema.
 
 ## 🛠️ Common Tasks
 
@@ -193,7 +193,7 @@ supabase link --project-ref fwlivygerbqzowbzxesw
 
 - `supabase/functions/` - Edge Functions
 - `supabase/migrations/` - Database migrations
-- `docs/DATABASE_MIGRATION.sql` - Marketing schema migration
+- `supabase/migrations/0000001_initial_schema.sql` - Complete schema definition
 
 ## 🎯 Development Rules
 
@@ -216,7 +216,7 @@ supabase link --project-ref fwlivygerbqzowbzxesw
 - `docs/ENVIRONMENT_VARIABLES_CHECKLIST.md` - Environment setup guide
 - `docs/PORT_ASSIGNMENTS.md` - Port configuration
 - `docs/VERCEL_DEPLOYMENT_GUIDE.md` - Deployment instructions
-- `docs/DATABASE_MIGRATION.sql` - Database migration script
+- `supabase/migrations/0000001_initial_schema.sql` - Complete database schema
 
 ## 🔧 Environment Variables
 
@@ -379,7 +379,7 @@ VITE_STRIPE_PAYMENT_LINK=https://buy.stripe.com/production-link
 ### For Experienced Developers
 
 1. Review recent git commits for latest changes
-2. Check `docs/DATABASE_MIGRATION.sql` for schema changes
+2. Check `supabase/migrations/` for database schema
 3. Review optimized import patterns in `packages/ui/src/`
 4. Explore upcoming features in roadmap
 5. Consider contributing to documentation

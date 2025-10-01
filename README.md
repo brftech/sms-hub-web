@@ -79,7 +79,7 @@ The SMS Hub Web application is a mature, production-ready React application with
 - **Database**: Supabase PostgreSQL with separate dev/prod environments
   - Dev: `hmumtnpnyxuplvqcmnfk` (web-dev)
   - Prod: `fwlivygerbqzowbzxesw` (web-prod)
-  - Schema: 15+ marketing-focused tables (see DATABASE_MIGRATION.sql)
+  - Schema: 15+ marketing-focused tables (see supabase/migrations/)
 - **Deployment**: Vercel with automatic deployments
 - **CI/CD**: Type checking, linting, testing before deployment
 - **Monitoring**: Error tracking, analytics, performance monitoring
@@ -110,9 +110,9 @@ The SMS Hub Web application is a mature, production-ready React application with
 
 **Database & Architecture**:
 
-- ✅ Created DATABASE_MIGRATION.sql with marketing-focused schema
+- ✅ Implemented marketing-focused database schema
 - ✅ Defined 15+ tables for email/SMS marketing, analytics, and tracking
-- ✅ Documented migration path from customer management to marketing focus
+- ✅ Migrated from customer management to marketing focus
 - ✅ Synchronized TypeScript types with database schema
 
 ## 🚀 Future Roadmap: Strategic Direction
@@ -366,7 +366,7 @@ The application uses a marketing-focused database schema with 15+ tables:
 - **Analytics**: `marketing_campaigns`, `website_analytics`, `conversions`, `lead_activities`
 - **Forms & Verification**: `contact_form_submissions`, `verifications`, `verification_attempts`
 
-See `docs/DATABASE_MIGRATION.sql` for complete schema details and migration instructions.
+See `supabase/migrations/0000001_initial_schema.sql` for complete schema definition.
 
 ## Deployment
 
@@ -431,7 +431,6 @@ Complete documentation is available in the `/docs` folder:
 - **[VERCEL_DEPLOYMENT_GUIDE.md](./docs/VERCEL_DEPLOYMENT_GUIDE.md)**: Deployment instructions
 - **[PORT_ASSIGNMENTS.md](./docs/PORT_ASSIGNMENTS.md)**: Port configuration
 - **[ENVIRONMENT_VARIABLES_CHECKLIST.md](./docs/ENVIRONMENT_VARIABLES_CHECKLIST.md)**: Environment setup
-- **[DATABASE_MIGRATION.sql](./docs/DATABASE_MIGRATION.sql)**: Database migration script
 
 ## Contributing
 

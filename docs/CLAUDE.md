@@ -115,7 +115,7 @@ sms-hub-web/
 ├── packages/
 │   ├── ui/           # Shared UI components and styling
 │   │   ├── index.ts          # Full UI library
-│   │   ├── index-marketing.ts # Marketing-optimized (TODAY'S WORK)
+│   │   ├── index-marketing.ts # Marketing-optimized
 │   │   └── index-lean.ts      # Minimal imports
 │   ├── hub-logic/    # Hub configuration and branding
 │   ├── supabase/     # Supabase client and types
@@ -128,7 +128,7 @@ sms-hub-web/
 │   ├── e2e/         # E2E tests
 │   └── integration/ # Integration tests
 ├── docs/            # Comprehensive documentation
-│   ├── DATABASE_MIGRATION.sql # Created today
+│   ├── DATABASE_MIGRATION.sql # Marketing schema migration
 │   └── [other docs]
 ├── public/           # Static assets (logos, favicons)
 └── dist/            # Production build output
@@ -388,11 +388,11 @@ npx supabase migration new <migration_name>
 
 **Solution**: Check environment variables for `VITE_ADMIN_ACCESS_CODE` in Vercel
 
-### Missing Component Exports (Fixed Today)
+### Missing Component Exports (Fixed September 30, 2025)
 
 **Solution**: Components now properly exported from `@sms-hub/ui/marketing`
 
-### Type Export Errors (Fixed Today)
+### Type Export Errors (Fixed September 30, 2025)
 
 **Solution**: Use `HubType` instead of `Hub` for type imports
 
@@ -532,7 +532,19 @@ supabase link --project-ref [ID]
 
 ## 🔄 Recent Changes
 
-### September 30, 2025 (Today - Current)
+### October 1, 2025 (Current)
+
+**Sales Dashboard Enhancement & Code Simplification**
+
+- Rebranded Admin Dashboard to "Sales Dashboard"
+- Implemented hub-specific data filtering (leads, subscribers, campaigns)
+- Branded "Add Lead" button with hub-specific colors
+- Removed @sms-hub/logger package (~1,000 lines eliminated)
+- Simplified to console-based logging for marketing site
+- Improved layout and minimized debug float by default
+- Updated all documentation to reflect changes
+
+### September 30, 2025
 
 **UI Optimization & Documentation Excellence**
 
@@ -542,7 +554,6 @@ supabase link --project-ref [ID]
 - Production build: 91KB gzipped main bundle
 - Created DATABASE_MIGRATION.sql with 15+ tables
 - Complete documentation overhaul with clear history → present → future
-- All dates updated to September 30, 2025
 
 ### January 2025
 
@@ -567,7 +578,7 @@ supabase link --project-ref [ID]
 
 **Status**: ✅ **PRODUCTION READY & OPTIMIZED** - Mature, well-documented, production-deployed
 
-**Today's Achievement**: ✅ **BUILD OPTIMIZATION & DOCUMENTATION EXCELLENCE** - UI optimization complete, comprehensive documentation, zero errors
+**Latest Achievement**: ✅ **SALES DASHBOARD & CODE SIMPLIFICATION** - Hub-branded dashboard, logger removal, simplified architecture
 
 **Key Strengths**:
 
@@ -575,9 +586,10 @@ supabase link --project-ref [ID]
 - Optimized performance (91KB gzipped main bundle)
 - Comprehensive testing coverage (unit + E2E)
 - Clear historical context and future vision
-- Strong multi-tenant architecture
+- Strong multi-tenant architecture with hub-specific filtering
 - Production-proven reliability
 - Complete documentation suite
+- Simplified debugging with console-based logging
 
 The SMS Hub Web application is a mature, production-ready React application with comprehensive documentation, clear roadmap, strong foundation for future growth, and optimized performance achieved through strategic import patterns and bundle splitting.
 

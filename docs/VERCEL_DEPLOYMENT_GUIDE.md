@@ -7,7 +7,7 @@
 - **Single Vercel project** for the web app
 - **Hub-specific branding** determined by domain
 - **Comprehensive Testing**: Vitest (unit) + Playwright (E2E)
-- **Admin Dashboard**: Integrated at `/admin` route
+- **Sales Dashboard**: Integrated at `/admin` route with hub-filtered data
 - **Environment-Based Login**: Production redirects to app.gnymble.com
 
 ## 📋 Current Vercel Project

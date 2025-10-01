@@ -427,7 +427,7 @@ Complete documentation is available in the `/docs` folder:
 - **[CLAUDE.md](./docs/CLAUDE.md)**: AI agent instructions and development guide
 - **[QUICK_START.md](./docs/QUICK_START.md)**: Quick start guide for developers
 - **[README.md](./docs/README.md)**: Documentation overview and structure
-- **[ADMIN_DASHBOARD.md](./docs/ADMIN_DASHBOARD.md)**: Admin dashboard documentation
+- **[ADMIN_DASHBOARD.md](./docs/ADMIN_DASHBOARD.md)**: Sales Dashboard documentation
 - **[VERCEL_DEPLOYMENT_GUIDE.md](./docs/VERCEL_DEPLOYMENT_GUIDE.md)**: Deployment instructions
 - **[PORT_ASSIGNMENTS.md](./docs/PORT_ASSIGNMENTS.md)**: Port configuration
 - **[ENVIRONMENT_VARIABLES_CHECKLIST.md](./docs/ENVIRONMENT_VARIABLES_CHECKLIST.md)**: Environment setup

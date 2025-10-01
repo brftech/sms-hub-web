@@ -4,22 +4,22 @@
 
 **Architecture**: Standalone React application
 
-- ✅ **Web App (Port 3000)**: Marketing website with admin dashboard
+- ✅ **Web App (Port 3000)**: Marketing website with Sales Dashboard
 - ❌ **Legacy Apps**: All removed/migrated (ports 3001-3005)
 
 ## 🚀 Production Ports
 
 ### Web App (Port 3000)
 
-- **Purpose**: Marketing website with admin dashboard
+- **Purpose**: Marketing website with Sales Dashboard
 - **URL**: http://localhost:3000
 - **Features**:
   - Hub-specific landing pages
   - Contact forms with lead capture
   - Pricing pages with Stripe integration
-  - Admin dashboard with CRUD operations
+  - Sales Dashboard with hub-filtered CRUD operations
   - Hub-specific branding and theming
-  - Floating debug panel (development only)
+  - Floating debug panel (development only, minimized by default)
   - Floating hub switcher (development only)
   - Floating admin button with access code authentication
   - Comprehensive testing setup (Vitest + Playwright)
@@ -166,10 +166,12 @@ For external access:
 ## 🌐 Login URL Routing
 
 ### Development Environment
+
 - **Login Button**: Redirects to `http://localhost:3001/login`
 - **Admin Access**: Available at `/admin` route
 
 ### Production Environment
+
 - **Login Button**: Redirects to `https://app.gnymble.com`
 - **Admin Access**: Available at `/admin` route with password protection
 

@@ -17,11 +17,10 @@ test.describe("Sales Dashboard", () => {
     } else {
       // In development, should either show access prompt or dashboard
       const hasDashboard = await page.locator("text=/dashboard|sales|leads|statistics/i").count();
-      const hasAccessPrompt = await page
-        .locator('input[type="password"], text=/access code/i')
-        .count();
+      const hasPasswordInput = await page.locator('input[type="password"]').count();
+      const hasAccessCodeText = await page.locator("text=/access code/i").count();
 
-      expect(hasDashboard + hasAccessPrompt).toBeGreaterThan(0);
+      expect(hasDashboard + hasPasswordInput + hasAccessCodeText).toBeGreaterThan(0);
     }
   });
 

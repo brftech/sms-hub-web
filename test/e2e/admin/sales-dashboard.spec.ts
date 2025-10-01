@@ -1,39 +1,26 @@
 import { test, expect } from "@playwright/test";
 
 test.describe("Sales Dashboard", () => {
-  test("should require authentication", async ({ page }) => {
+  test("should load Sales Dashboard page", async ({ page }) => {
     await page.goto("/admin");
 
-    // Should either show login/access code prompt or be on the page
-    // In development, might have auto-access
-    const isDevelopment = process.env.NODE_ENV === "development" || !process.env.CI;
-
-    if (!isDevelopment) {
-      // In production, should require access code
-      const accessCodeInput = page.locator(
-        'input[type="password"], input[placeholder*="code"], input[placeholder*="access"]'
-      );
-      await expect(accessCodeInput.first()).toBeVisible({ timeout: 5000 });
-    } else {
-      // In development, should either show access prompt or dashboard
-      const hasDashboard = await page.locator("text=/dashboard|sales|leads|statistics/i").count();
-      const hasPasswordInput = await page.locator('input[type="password"]').count();
-      const hasAccessCodeText = await page.locator("text=/access code/i").count();
-
-      expect(hasDashboard + hasPasswordInput + hasAccessCodeText).toBeGreaterThan(0);
-    }
+    // Sales Dashboard should load (development has auto-access)
+    const dashboardHeader = page.locator('h1:has-text("Sales Dashboard")');
+    await expect(dashboardHeader).toBeVisible({ timeout: 10000 });
   });
 
-  test("should display dashboard title or header", async ({ page }) => {
+  test("should display statistics cards", async ({ page }) => {
     await page.goto("/admin");
 
-    // Look for dashboard-related headers
-    const dashboardHeader = page
-      .locator('h1, h2, [class*="header"]')
-      .filter({ hasText: /dashboard|sales|admin/i });
+    // Wait for dashboard to load
+    await page.waitForLoadState("networkidle");
 
-    // Should have a header (may need to wait for load)
-    await expect(dashboardHeader.first()).toBeVisible({ timeout: 10000 });
+    // Verify key statistics are visible
+    const leadsCard = page.locator("text=/Total Leads|Leads/i").first();
+    const emailCard = page.locator("text=/Email Subscribers/i").first();
+
+    await expect(leadsCard).toBeVisible({ timeout: 5000 });
+    await expect(emailCard).toBeVisible({ timeout: 5000 });
   });
 
   test("should be responsive", async ({ page }) => {

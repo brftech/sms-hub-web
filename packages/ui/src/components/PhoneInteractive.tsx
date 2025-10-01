@@ -6,7 +6,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { useLiveMessaging } from "../contexts/LiveMessagingContext";
 import SMSAuthModal from "./SMSAuthModal";
-import { logger, logError } from "@sms-hub/utils";
+// Removed logger import - using console for debugging
 import { ChatMessage } from "../types";
 import "../styles/phone-components.css";
 
@@ -41,7 +41,8 @@ const DEMO_SCENARIOS: DemoScenario[] = [
     messages: [
       {
         id: "scenario-1-1",
-        content: "Upcoming Events Bryan\n\n9/7  NFL Opener Lounge Potluck\n9/8  Now OPEN Mondays at 3p for Football\n9/19 Zino Davidoff Night 4p to 8p\n10/4 Quesada Oktoberfest",
+        content:
+          "Upcoming Events Bryan\n\n9/7  NFL Opener Lounge Potluck\n9/8  Now OPEN Mondays at 3p for Football\n9/19 Zino Davidoff Night 4p to 8p\n10/4 Quesada Oktoberfest",
         sender: "business",
         timestamp: new Date(),
         businessName: "",
@@ -70,7 +71,8 @@ const DEMO_SCENARIOS: DemoScenario[] = [
     messages: [
       {
         id: "scenario-2-1",
-        content: "🔥 EXCLUSIVE: Drew Estate Masterclass this Saturday 7PM! Master blender Jonathan Drew will be here. Only 15 spots left. Age 21+ required. Call to RSVP!",
+        content:
+          "🔥 EXCLUSIVE: Drew Estate Masterclass this Saturday 7PM! Master blender Jonathan Drew will be here. Only 15 spots left. Age 21+ required. Call to RSVP!",
         sender: "business",
         timestamp: new Date(),
         businessName: "Premium Cigars & Co",
@@ -91,7 +93,8 @@ const DEMO_SCENARIOS: DemoScenario[] = [
     messages: [
       {
         id: "scenario-3-1",
-        content: "Just Arrived at Gnymble Cigars: 🚨 Limited Edition Arturo Fuente Opus X 25th Anniversary! Only 2 boxes available. These won't last long. First come, first served!",
+        content:
+          "Just Arrived at Gnymble Cigars: 🚨 Limited Edition Arturo Fuente Opus X 25th Anniversary! Only 2 boxes available. These won't last long. First come, first served!",
         sender: "business",
         timestamp: new Date(),
         businessName: "",
@@ -121,7 +124,8 @@ const DEMO_SCENARIOS: DemoScenario[] = [
     messages: [
       {
         id: "scenario-4-1",
-        content: "🎉 BIG NEWS: We're now the exclusive regional dealer for Davidoff's new Master Selection series! Follow our Instagram @premiumcigarsco for the launch party details tomorrow!",
+        content:
+          "🎉 BIG NEWS: We're now the exclusive regional dealer for Davidoff's new Master Selection series! Follow our Instagram @premiumcigarsco for the launch party details tomorrow!",
         sender: "business",
         timestamp: new Date(),
         businessName: "Premium Cigars & Co",
@@ -135,7 +139,8 @@ const DEMO_SCENARIOS: DemoScenario[] = [
     messages: [
       {
         id: "scenario-5-1",
-        content: "🎵 LIVE MUSIC TONIGHT! The Blue Notes Jazz Trio performing 8-11pm at Gnymble Cigars! Special event pricing: 20% off premium cigars & craft cocktails. Reservations recommended!",
+        content:
+          "🎵 LIVE MUSIC TONIGHT! The Blue Notes Jazz Trio performing 8-11pm at Gnymble Cigars! Special event pricing: 20% off premium cigars & craft cocktails. Reservations recommended!",
         sender: "business",
         timestamp: new Date(),
         businessName: "",
@@ -150,7 +155,8 @@ const DEMO_SCENARIOS: DemoScenario[] = [
       },
       {
         id: "scenario-5-3",
-        content: "No cover charge, Bryan! Just purchase a drink or cigar to enjoy the show. VIP seating available with bottle service. Call us at (555) 123-GNYM to reserve your spot!",
+        content:
+          "No cover charge, Bryan! Just purchase a drink or cigar to enjoy the show. VIP seating available with bottle service. Call us at (555) 123-GNYM to reserve your spot!",
         sender: "business",
         timestamp: new Date(),
         businessName: "",
@@ -229,8 +235,7 @@ export default function PhoneInteractive() {
       setTimeout(() => {
         setPhoneState((prev) => ({
           ...prev,
-          currentScenarioIndex:
-            (prev.currentScenarioIndex + 1) % DEMO_SCENARIOS.length,
+          currentScenarioIndex: (prev.currentScenarioIndex + 1) % DEMO_SCENARIOS.length,
           isTransitioning: false,
         }));
       }, 500);
@@ -254,10 +259,13 @@ export default function PhoneInteractive() {
     if (!inputValue.trim()) return;
 
     try {
-      logger.info("User sending message from phone interface", {
-        messageLength: inputValue.length,
-        sessionId: messagingState.sessionId,
-      });
+      // Log message sending for debugging
+      if (import.meta.env.DEV) {
+        console.log("User sending message from phone interface", {
+          messageLength: inputValue.length,
+          sessionId: messagingState.sessionId,
+        });
+      }
 
       // Add message to live messaging context
       await addMessage({
@@ -269,12 +277,14 @@ export default function PhoneInteractive() {
       // Clear input
       setInputValue("");
 
-      logger.info("Message sent successfully", {
-        sessionId: messagingState.sessionId,
-        messageLength: inputValue.trim().length,
-      });
+      if (import.meta.env.DEV) {
+        console.log("Message sent successfully", {
+          sessionId: messagingState.sessionId,
+          messageLength: inputValue.trim().length,
+        });
+      }
     } catch (error) {
-      logError("Failed to send message from phone interface", error, {
+      console.error("Failed to send message from phone interface", error, {
         sessionId: messagingState.sessionId,
         operation: "handleSendMessage",
       });
@@ -304,10 +314,12 @@ export default function PhoneInteractive() {
 
   const startDemo = useCallback(() => {
     try {
-      logger.info("Starting interactive demo", {
-        sessionId: messagingState.sessionId,
-        isAuthenticated: phoneState.isAuthenticated,
-      });
+      if (import.meta.env.DEV) {
+        console.log("Starting interactive demo", {
+          sessionId: messagingState.sessionId,
+          isAuthenticated: phoneState.isAuthenticated,
+        });
+      }
 
       // Clear current messages and start demo
       setCurrentMessages([]);
@@ -336,7 +348,7 @@ export default function PhoneInteractive() {
         businessName: "SMS Hub AI",
       });
     } catch (error) {
-      logError("Failed to start demo", error, {
+      console.error("Failed to start demo", error, {
         sessionId: messagingState.sessionId,
         operation: "startDemo",
       });
@@ -346,10 +358,12 @@ export default function PhoneInteractive() {
   const handleSMSAuthSuccess = useCallback(
     (phoneNumber: string) => {
       try {
-        logger.info("SMS authentication successful", {
-          phoneNumber,
-          sessionId: messagingState.sessionId,
-        });
+        if (import.meta.env.DEV) {
+          console.log("SMS authentication successful", {
+            phoneNumber,
+            sessionId: messagingState.sessionId,
+          });
+        }
 
         setPhoneState((prev) => ({
           ...prev,
@@ -362,7 +376,7 @@ export default function PhoneInteractive() {
           startDemo();
         }, 500);
       } catch (error) {
-        logError("Failed to handle SMS auth success", error, {
+        console.error("Failed to handle SMS auth success", error, {
           phoneNumber,
           sessionId: messagingState.sessionId,
           operation: "handleSMSAuthSuccess",
@@ -394,9 +408,7 @@ export default function PhoneInteractive() {
   // =============================================================================
 
   const currentScenario = DEMO_SCENARIOS[phoneState.currentScenarioIndex];
-  const displayMessages = phoneState.isDemoActive
-    ? currentMessages
-    : currentScenario.messages;
+  const displayMessages = phoneState.isDemoActive ? currentMessages : currentScenario.messages;
   const isInputDisabled = messagingState.isAIProcessing;
 
   // =============================================================================
@@ -415,7 +427,7 @@ export default function PhoneInteractive() {
         <div className="phone-screen">
           {/* Dynamic Island */}
           <div className="phone-dynamic-island"></div>
-          
+
           {/* Status Bar */}
           <div className="phone-status-bar">
             <div className="phone-status-left">
@@ -441,22 +453,20 @@ export default function PhoneInteractive() {
               <div className="phone-date-separator">
                 <span>
                   {new Date().toLocaleDateString([], {
-                    weekday: 'long',
-                    hour: 'numeric',
-                    minute: '2-digit',
-                    hour12: true
+                    weekday: "long",
+                    hour: "numeric",
+                    minute: "2-digit",
+                    hour12: true,
                   })}
                 </span>
               </div>
-              
+
               {/* Messages */}
               {displayMessages.map((message) => (
                 <div key={message.id} className={`phone-message ${message.sender}`}>
                   <div className={`phone-message-bubble ${message.sender}`}>
                     {message.businessName && message.sender === "business" && (
-                      <div className="phone-message-sender">
-                        {message.businessName}
-                      </div>
+                      <div className="phone-message-sender">{message.businessName}</div>
                     )}
                     <div>{message.content ?? message.text}</div>
                   </div>
@@ -473,23 +483,15 @@ export default function PhoneInteractive() {
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyPress={handleKeyPress}
-              onFocus={() =>
-                setPhoneState((prev) => ({ ...prev, isInputFocused: true }))
-              }
-              onBlur={() =>
-                setPhoneState((prev) => ({ ...prev, isInputFocused: false }))
-              }
+              onFocus={() => setPhoneState((prev) => ({ ...prev, isInputFocused: true }))}
+              onBlur={() => setPhoneState((prev) => ({ ...prev, isInputFocused: false }))}
               placeholder={PLACEHOLDER_TEXTS[placeholderIndex]}
               disabled={isInputDisabled}
               className="phone-input-field"
             />
             <button
               onClick={handleSendMessage}
-              disabled={
-                !inputValue.trim() ||
-                isInputDisabled ||
-                !phoneState.isAuthenticated
-              }
+              disabled={!inputValue.trim() || isInputDisabled || !phoneState.isAuthenticated}
               className="phone-send-button"
             >
               ↑
@@ -505,18 +507,14 @@ export default function PhoneInteractive() {
             <div className="px-4 py-3 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-700 text-sm font-medium">
               <div className="text-center">
                 <div className="font-semibold">Simulation Active</div>
-                <div className="text-xs opacity-75">
-                  Interactive demo running
-                </div>
+                <div className="text-xs opacity-75">Interactive demo running</div>
               </div>
             </div>
           ) : (
             <div className="px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg text-slate-700 text-sm font-medium">
               <div className="text-center">
                 <div className="font-semibold">Access Granted</div>
-                <div className="text-xs opacity-75">
-                  Click message field to start
-                </div>
+                <div className="text-xs opacity-75">Click message field to start</div>
               </div>
             </div>
           )
@@ -560,13 +558,9 @@ export default function PhoneInteractive() {
           >
             <div className="bg-white rounded-lg p-6 max-w-md mx-4 shadow-xl">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  About Phone Verification
-                </h3>
+                <h3 className="text-lg font-semibold text-gray-900">About Phone Verification</h3>
                 <button
-                  onClick={() =>
-                    setPhoneState((prev) => ({ ...prev, showInfo: false }))
-                  }
+                  onClick={() => setPhoneState((prev) => ({ ...prev, showInfo: false }))}
                   className="text-gray-400 hover:text-gray-600 text-xl font-bold"
                 >
                   ×
@@ -574,37 +568,30 @@ export default function PhoneInteractive() {
               </div>
               <div className="text-sm text-gray-600 space-y-3">
                 <p>
-                  <strong>How to start the demo:</strong> Click on the message
-                  input field in the phone above, or use the demo button. We'll
-                  verify your phone number to show you our interactive SMS
-                  simulation.
+                  <strong>How to start the demo:</strong> Click on the message input field in the
+                  phone above, or use the demo button. We'll verify your phone number to show you
+                  our interactive SMS simulation.
                 </p>
                 <p>
-                  <strong>Important:</strong> This is a simulation - no real SMS
-                  messages will be sent to your phone or anyone else's phone
-                  during this demo.
+                  <strong>Important:</strong> This is a simulation - no real SMS messages will be
+                  sent to your phone or anyone else's phone during this demo.
                 </p>
                 <p>
-                  <strong>Why we need your phone number:</strong> We're a
-                  business SMS platform, so we need to verify you're real before
-                  showing our interactive demo.
+                  <strong>Why we need your phone number:</strong> We're a business SMS platform, so
+                  we need to verify you're real before showing our interactive demo.
                 </p>
                 <p>
-                  <strong>What we do with it:</strong> We only use it to send
-                  you a one-time verification code. We don't store it
-                  permanently or use it for marketing.
+                  <strong>What we do with it:</strong> We only use it to send you a one-time
+                  verification code. We don't store it permanently or use it for marketing.
                 </p>
                 <p>
-                  <strong>Privacy & Control:</strong> You can text "STOP"
-                  anytime to opt out. We respect your privacy and follow strict
-                  data protection standards.
+                  <strong>Privacy & Control:</strong> You can text "STOP" anytime to opt out. We
+                  respect your privacy and follow strict data protection standards.
                 </p>
               </div>
               <div className="mt-6 flex justify-end">
                 <button
-                  onClick={() =>
-                    setPhoneState((prev) => ({ ...prev, showInfo: false }))
-                  }
+                  onClick={() => setPhoneState((prev) => ({ ...prev, showInfo: false }))}
                   className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
                 >
                   Got it

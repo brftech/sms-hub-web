@@ -4,7 +4,7 @@ export * from "./validation";
 export * from "./hub-colors";
 export * from "./errors";
 export * from "./validation-advanced";
-export * from "./logger";
+// Logger removed - using console for debugging
 export * from "./tcr-validation";
 export * from "./crossAppRedirects";
 

@@ -30,9 +30,9 @@ npm run dev
 
 ### Access Points
 
-- **Web App**: http://localhost:3000 (marketing website with admin dashboard)
-- **Admin Dashboard**: Access via admin access code (set in Vercel environment variables)
-- **Development Mode**: Debug panels and hub switcher automatically visible
+- **Web App**: http://localhost:3000 (marketing website with Sales Dashboard)
+- **Sales Dashboard**: Access via admin access code at `/admin` route
+- **Development Mode**: Debug panels and hub switcher automatically visible (debug float minimized by default)
 
 ## 🔑 Key Concepts
 
@@ -73,7 +73,7 @@ The application uses a marketing-focused database schema with 15+ tables:
 - **User Management**: `user_profiles`, `verifications`, `verification_attempts`
 - **Forms**: `contact_form_submissions`
 
-See `docs/DATABASE_MIGRATION.sql` for complete schema.
+See `supabase/migrations/0000001_initial_schema.sql` for complete schema.
 
 ## 🛠️ Common Tasks
 
@@ -104,17 +104,20 @@ npm run build:check
 # Run unit tests
 npm run test
 
-# Run E2E tests
-npx playwright test
+# Run E2E tests (48 tests across 6 browsers)
+npm run test:e2e
+
+# Run E2E tests with interactive UI (recommended)
+npm run test:e2e:ui
 
 # Run tests in watch mode
 npm run test:watch
 
-# E2E tests with UI
-npm run test:e2e:ui
-
 # Test coverage
 npm run test:coverage
+
+# View E2E test report
+npx playwright show-report
 ```
 
 ### Database Operations
@@ -136,64 +139,77 @@ supabase link --project-ref hmumtnpnyxuplvqcmnfk
 supabase link --project-ref fwlivygerbqzowbzxesw
 ```
 
-### Admin Dashboard Access
+### Sales Dashboard Access
 
 1. **Development**: Click red shield button in bottom-left corner
 2. **Production**:
    - Visit site with `?admin=YOUR_ACCESS_CODE` parameter
    - Or click red shield button and enter access code when prompted
-3. **Features**: 
-   - View database statistics
-   - Manage leads with full CRUD operations
+3. **Features**:
+   - Hub-specific sales statistics
+   - Manage leads with full CRUD operations (hub-branded UI)
    - Export data as JSON
-   - Monitor recent activity
+   - Filter by timeframe (24h, 7d, 30d, all time)
+   - View email/SMS subscribers per hub
 
 ## 🐛 Common Issues
 
 ### "Process is not defined" Error
+
 **Solution**: Use `import.meta.env` in Vite apps, not `process.env`
 
 ### Type errors after schema changes
+
 **Solution**: Run `npm run type-check` and regenerate database types
 
 ### "Admin access code not working"
+
 **Solution**: Verify `VITE_ADMIN_ACCESS_CODE` is set in Vercel environment variables
 
 ### Contact form styling issues
+
 **Solution**: Check Tailwind CSS classes and hub-specific color configurations
 
 ### "Debug panels showing in production"
+
 **Solution**: Verify environment detection - panels should be hidden in production
 
 ### Build failures
+
 **Solution**: Run `npm run type-check` and `npm run lint` to identify issues
 
 ### Console warnings in production
+
 **Solution**: All console statements have been cleaned up - only `console.error` and `console.warn` are allowed
 
 ### Import errors after UI optimization
+
 **Solution**: Use optimized imports from `@sms-hub/ui/marketing` or `@sms-hub/ui/lean`
 
 ## 📁 Key Files
 
 ### Application Files
-- `src/pages/AdminDashboard.tsx` - Admin dashboard with CRUD operations
+
+- `src/pages/AdminDashboard.tsx` - Sales Dashboard with hub-filtered CRUD operations
 - `src/pages/Contact.tsx` - Contact form with lead capture
 - `src/components/FloatingAdminButton.tsx` - Admin access button
 - `src/components/Navigation.tsx` - Navigation with environment-based login URLs
 - `src/App.tsx` - Main application routing
 
 ### Package Files
+
 - `packages/supabase/src/database.ts` - Database types
 - `packages/hub-logic/src/index.ts` - Hub configurations
 - `packages/ui/src/index.ts` - Full UI component library
 - `packages/ui/src/index-marketing.ts` - Marketing-specific components
 - `packages/ui/src/index-lean.ts` - Lean component imports
+- `packages/utils/src/hub-colors.ts` - Hub-specific color utilities
 
 ### Backend Files
+
 - `supabase/functions/` - Edge Functions
 - `supabase/migrations/` - Database migrations
-- `docs/DATABASE_MIGRATION.sql` - Marketing schema migration
+- `supabase/migrations/0000001_initial_schema.sql` - Complete schema definition
 
 ## 🎯 Development Rules
 
@@ -214,11 +230,11 @@ supabase link --project-ref fwlivygerbqzowbzxesw
 
 - `docs/CLAUDE.md` - Complete development guide with latest changes
 - `docs/README.md` - Documentation overview
-- `docs/ADMIN_DASHBOARD.md` - Admin dashboard documentation
+- `docs/ADMIN_DASHBOARD.md` - Sales Dashboard documentation
 - `docs/ENVIRONMENT_VARIABLES_CHECKLIST.md` - Environment setup guide
 - `docs/PORT_ASSIGNMENTS.md` - Port configuration
 - `docs/VERCEL_DEPLOYMENT_GUIDE.md` - Deployment instructions
-- `docs/DATABASE_MIGRATION.sql` - Database migration script
+- `supabase/migrations/0000001_initial_schema.sql` - Complete database schema
 
 ## 🔧 Environment Variables
 
@@ -280,17 +296,28 @@ VITE_ADMIN_ACCESS_CODE=your-secure-admin-code
 VITE_STRIPE_PAYMENT_LINK=https://buy.stripe.com/production-link
 ```
 
-## 🎯 Current Status (September 30, 2025)
+## 🎯 Current Status (October 1, 2025)
 
 ### Recently Completed ✅
 
-#### Latest (September 30, 2025)
+#### Latest (October 1, 2025)
+
+- **Sales Dashboard**: Rebranded with hub-specific filtering and statistics
+- **Logger Removal**: Eliminated @sms-hub/logger package (~1,000 lines)
+- **Code Simplification**: Simple console-based logging for marketing site
+- **Branded UI**: Hub-specific colors on "Add Lead" and action buttons
+- **Layout Optimization**: Improved button placement and minimized debug float
+- **E2E Testing**: Complete Playwright overhaul with 48 tests across 6 browsers
+
+#### Previous (September 30, 2025)
+
 - **UI Optimization**: Lean import options for better bundle splitting
 - **Database Migration**: Marketing-focused schema with 15+ tables
 - **Import Patterns**: Optimized component imports, reduced bundle size
 - **Documentation**: Complete overhaul with history and roadmap
 
-#### Previous Milestones (January 2025)
+#### Milestones (January 2025)
+
 - **Console Cleanup**: Removed 55+ unnecessary console statements
 - **Code Quality**: Zero TypeScript and ESLint errors
 - **Login URL Updates**: Environment-based login routing
@@ -304,13 +331,13 @@ VITE_STRIPE_PAYMENT_LINK=https://buy.stripe.com/production-link
 
 ### Development Status
 
-- ✅ **Admin Dashboard**: Full CRUD operations with secure authentication
+- ✅ **Sales Dashboard**: Hub-filtered CRUD operations with branded UI
 - ✅ **Contact Forms**: Consistent styling and proper branding
 - ✅ **Environment Controls**: Proper dev/prod behavior
 - ✅ **Logo Organization**: Standardized across all hubs
 - ✅ **Accessibility**: Improved contrast and WCAG compliance
 - ✅ **Type Safety**: Comprehensive with zero errors
-- ✅ **Code Quality**: Clean codebase with proper error handling
+- ✅ **Code Quality**: Clean codebase with simple logging
 - ✅ **Testing**: Comprehensive unit and E2E test coverage
 - ✅ **Performance**: Optimized bundle splitting and lazy loading
 - ✅ **Database Schema**: Marketing-focused with migration script
@@ -318,6 +345,7 @@ VITE_STRIPE_PAYMENT_LINK=https://buy.stripe.com/production-link
 ### Upcoming Features (Roadmap)
 
 #### Short Term (Q4 2025)
+
 - [ ] Email marketing integration with Resend API
 - [ ] SMS campaign management UI
 - [ ] Analytics dashboard visualization
@@ -325,6 +353,7 @@ VITE_STRIPE_PAYMENT_LINK=https://buy.stripe.com/production-link
 - [ ] A/B testing for landing pages
 
 #### Medium Term (Q1-Q2 2026)
+
 - [ ] Advanced audience segmentation
 - [ ] Marketing automation workflows
 - [ ] Third-party integrations (Zapier, Make)
@@ -332,6 +361,7 @@ VITE_STRIPE_PAYMENT_LINK=https://buy.stripe.com/production-link
 - [ ] Multi-language support (i18n)
 
 #### Long Term (Q3-Q4 2026)
+
 - [ ] AI-powered content generation
 - [ ] Predictive analytics
 - [ ] White label solution
@@ -340,7 +370,7 @@ VITE_STRIPE_PAYMENT_LINK=https://buy.stripe.com/production-link
 
 **Status: PRODUCTION READY with Clear Roadmap!** 🚀
 
-**Latest Achievement**: Optimized codebase with comprehensive documentation and clear future vision.
+**Latest Achievement**: Sales Dashboard with hub-specific branding, simplified codebase with logger removal, comprehensive documentation updates.
 
 ## 💡 Pro Tips
 
@@ -358,6 +388,7 @@ VITE_STRIPE_PAYMENT_LINK=https://buy.stripe.com/production-link
 ## 🚀 Next Steps
 
 ### For New Developers
+
 1. Read `docs/CLAUDE.md` for complete overview
 2. Complete initial setup above
 3. Run all tests to verify setup
@@ -365,12 +396,13 @@ VITE_STRIPE_PAYMENT_LINK=https://buy.stripe.com/production-link
 5. Try accessing admin dashboard
 
 ### For Experienced Developers
+
 1. Review recent git commits for latest changes
-2. Check `docs/DATABASE_MIGRATION.sql` for schema changes
+2. Check `supabase/migrations/` for database schema
 3. Review optimized import patterns in `packages/ui/src/`
 4. Explore upcoming features in roadmap
 5. Consider contributing to documentation
 
 ---
 
-**Last Updated**: September 30, 2025 | **Status**: Production Ready | **Version**: 0.1.0
+**Last Updated**: October 1, 2025 | **Status**: Production Ready | **Version**: 0.1.0

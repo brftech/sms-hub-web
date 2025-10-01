@@ -6,10 +6,23 @@ The Admin Dashboard provides secure access to database information and managemen
 
 - **Database Statistics**: View table counts and record statistics
 - **User Management**: Monitor user accounts and activity
+- **Subscription Monitoring**: Track customer subscriptions and tier usage
 - **Message Monitoring**: Track SMS message delivery and status
 - **Data Export**: Export database tables as JSON files
 - **Security Controls**: Hide/show sensitive data
 - **Authentication**: Secure access control for production environments
+
+## Subscription Tiers Monitored
+
+The admin dashboard can monitor customers across all subscription tiers:
+
+- **Starter ($79/month)**: 200 SMS/month, 50 contacts, 1 user
+- **Core ($179/month)**: 1,500 SMS/month, 500 contacts, 3 users
+- **Elite ($349/month)**: 8,000 SMS/month, 3,000 contacts, unlimited users
+- **Enterprise**: 50,000+ SMS/month, unlimited features
+- **VIP**: Unlimited everything
+
+Dashboard displays subscription_tier and subscription_status from the customers table.
 
 ## Access Methods
 
@@ -60,8 +73,11 @@ VITE_ADMIN_ACCESS_CODE=your_secure_admin_code_here
 ## Database Tables Monitored
 
 - **Profiles**: User accounts and authentication data
+- **Customers**: Customer records with subscription tier and status
 - **Messages**: SMS message history and delivery status
 - **Campaigns**: Marketing campaign information
+- **Leads**: Lead capture and management
+- **Subscribers**: Email and SMS subscriber lists
 
 ## Security Considerations
 

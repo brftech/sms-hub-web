@@ -49,11 +49,24 @@ npm run dev
 - **Production**: Login button redirects to `app.gnymble.com`
 - **Admin Access**: Available at `/admin` route with password protection
 
+### Subscription Tiers
+
+The platform supports multiple subscription tiers with enforced limits:
+
+- **Starter ($79/month)**: 200 SMS/month, 50 contacts, 1 user, 1 phone number, 10/min throughput, 1 segment
+- **Core ($179/month)**: 1,500 SMS/month, 500 contacts, 3 users, 1 phone number, 40/min throughput, 3 segments
+- **Elite ($349/month)**: 8,000 SMS/month, 3,000 contacts, unlimited users, 2 phone numbers, 200/min throughput, 8 segments, AI/Zapier
+- **Enterprise**: 50,000+ SMS/month, all unlimited
+- **VIP**: Unlimited everything, white-glove service
+
+Limits are enforced via `getSubscriptionLimits()` in `packages/supabase/src/subscription-queries.ts`.
+
 ### Database Schema
 
 The application uses a marketing-focused database schema with 15+ tables:
 
 - **Core Tables**: `hubs`, `leads`, `email_subscribers`, `sms_subscribers`
+- **Subscription Management**: `customers` table with subscription_tier and subscription_status
 - **Lists**: `email_lists`, `sms_lists`
 - **Campaigns**: `email_campaigns`, `sms_campaigns`, `marketing_campaigns`
 - **Analytics**: `website_analytics`, `conversions`, `lead_activities`
@@ -194,6 +207,8 @@ supabase link --project-ref fwlivygerbqzowbzxesw
 8. **Use optimized imports** - Import from specific paths when possible
 9. **Test multi-tenant isolation** - Verify hub_id filtering works
 10. **Document non-obvious code** - Add comments for complex logic
+11. **Check subscription limits** - Enforce tier limits before operations
+12. **Validate tier access** - Ensure features match subscription tier
 
 ## 📚 Documentation
 

@@ -318,14 +318,31 @@ Hub detection is automatic based on the domain and environment configuration.
 - **Production**: Login button redirects to `app.gnymble.com`
 - **Admin Access**: Available at `/admin` route with password protection
 
+## Subscription Tiers
+
+The platform offers multiple subscription tiers with varying limits and features:
+
+### Monthly Plans
+- **Starter ($79/month)**: 200 SMS/month, 50 contacts, 1 user, 1 phone number, 10/min throughput, 1 segment, basic campaigns
+- **Core ($179/month)**: 1,500 SMS/month, 500 contacts, 3 users, 1 phone number, 40/min throughput, 3 segments, basic campaigns
+- **Elite ($349/month)**: 8,000 SMS/month, 3,000 contacts, unlimited users, 2 phone numbers, 200/min throughput, 8 segments, AI, Zapier, VIP support
+- **Enterprise**: 50,000+ SMS/month, all unlimited
+- **VIP**: Unlimited everything, white-glove service
+
+### Onboarding
+- **Get Started Package ($179 one-time)**: Complete setup, compliance consultation, training, first month included
+
+See `packages/supabase/src/subscription-queries.ts` for tier limit definitions.
+
 ## Database Schema
 
 The application uses a marketing-focused database schema with 15+ tables:
 
-- **Core Tables**: `hubs`, `leads`, `user_profiles`
+- **Core Tables**: `hubs`, `leads`, `user_profiles`, `customers`
 - **Email Marketing**: `email_lists`, `email_subscribers`, `email_campaigns`
 - **SMS Marketing**: `sms_lists`, `sms_subscribers`, `sms_campaigns`
 - **Analytics**: `marketing_campaigns`, `website_analytics`, `conversions`, `lead_activities`
+- **Subscriptions**: `customers` table tracks subscription_tier and subscription_status
 - **Forms & Verification**: `contact_form_submissions`, `verifications`, `verification_attempts`
 
 See `docs/DATABASE_MIGRATION.sql` for complete schema details and migration instructions.

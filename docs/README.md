@@ -184,6 +184,22 @@ Each hub has:
 - **Production**: Requires secure access code
 - **Features**: Database statistics, CRUD operations, data export
 
+## 💳 Subscription Tiers
+
+The platform offers multiple subscription tiers with varying limits and features:
+
+### Monthly Plans
+- **Starter ($79/month)**: 200 SMS/month, 50 contacts, 1 user, 1 phone number, 10/min throughput, 1 segment, basic campaigns
+- **Core ($179/month)**: 1,500 SMS/month, 500 contacts, 3 users, 1 phone number, 40/min throughput, 3 segments, basic campaigns
+- **Elite ($349/month)**: 8,000 SMS/month, 3,000 contacts, unlimited users, 2 phone numbers, 200/min throughput, 8 segments, AI, Zapier, VIP support
+- **Enterprise**: 50,000+ SMS/month, all unlimited features
+- **VIP**: Unlimited everything, white-glove service
+
+### Onboarding
+- **Get Started Package ($179 one-time)**: Complete setup, compliance consultation, training, first month included
+
+Tier limits are enforced via the `getSubscriptionLimits()` function in `packages/supabase/src/subscription-queries.ts`.
+
 ## 📊 Database Schema
 
 Marketing-focused database schema with 15+ tables:
@@ -192,6 +208,12 @@ Marketing-focused database schema with 15+ tables:
 - `hubs` - Business hub configurations
 - `leads` - Lead management with scoring
 - `user_profiles` - User account information
+- `customers` - Customer records with subscription tracking
+
+### Subscription Management
+- `customers.subscription_tier` - Current tier (starter, core, elite, enterprise, vip)
+- `customers.subscription_status` - Status (active, trialing, canceled, past_due)
+- Tier limits enforced in application code
 
 ### Email Marketing
 - `email_lists` - Email marketing lists

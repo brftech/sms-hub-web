@@ -277,7 +277,25 @@ console.error("Error occurred:", error);
 console.warn("Warning message");
 ```
 
-### 7. Optimized Imports (NEW - September 30, 2025)
+### 7. Subscription Tier Limits (CRITICAL)
+
+```typescript
+// Always check subscription limits before operations
+import { useSubscriptionUsage } from "@sms-hub/supabase";
+
+const { data: usage } = useSubscriptionUsage(companyId);
+if (usage && usage.current.sms_sent >= usage.limits.sms_monthly) {
+  throw new Error("SMS monthly limit reached");
+}
+
+// Tier limits defined in packages/supabase/src/subscription-queries.ts
+// Starter: 200 SMS, 50 contacts, 1 user, 1 phone
+// Core: 1,500 SMS, 500 contacts, 3 users, 1 phone
+// Elite: 8,000 SMS, 3,000 contacts, unlimited users, 2 phones
+// Enterprise/VIP: All unlimited
+```
+
+### 8. Optimized Imports (NEW - September 30, 2025)
 
 ```typescript
 // ❌ AVOID - Imports entire UI library

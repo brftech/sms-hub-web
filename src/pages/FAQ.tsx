@@ -115,7 +115,7 @@ const FAQ = () => {
           id: "what-included",
           question: "What's included in every plan?",
           answer:
-            "Every plan includes: dedicated phone number, full compliance monitoring, customer support, message delivery, analytics, and all core platform features. The only difference between plans is contact limits and message volume.",
+            "Every plan includes: dedicated phone number(s), full compliance monitoring, customer support, message delivery, analytics, and all core platform features. Plans differ by SMS volume (200-8,000+ per month), contacts (50-3,000+), users (1-unlimited), phone numbers (1-2+), throughput (10-200+/min), and segments (1-8+). Elite tier adds AI, Zapier integration, and VIP support. Enterprise and VIP tiers offer unlimited everything.",
         },
       ],
     },

@@ -368,12 +368,63 @@ export const useSubscriptionUsage = (companyId: string) => {
 function getSubscriptionLimits(tier: string) {
   const limits: Record<
     string,
-    { sms_monthly: number; users: number; phone_numbers: number }
+    { 
+      sms_monthly: number; 
+      users: number; 
+      phone_numbers: number;
+      contacts: number;
+      throughput_per_min: number;
+      max_segments: number;
+    }
   > = {
-    free: { sms_monthly: 100, users: 1, phone_numbers: 1 },
-    starter: { sms_monthly: 2500, users: 3, phone_numbers: 3 },
-    professional: { sms_monthly: 10000, users: 10, phone_numbers: 10 },
-    enterprise: { sms_monthly: 50000, users: -1, phone_numbers: -1 }, // -1 means unlimited
+    free: { 
+      sms_monthly: 100, 
+      users: 1, 
+      phone_numbers: 1,
+      contacts: 25,
+      throughput_per_min: 5,
+      max_segments: 1
+    },
+    starter: { 
+      sms_monthly: 200, 
+      users: 1, 
+      phone_numbers: 1,
+      contacts: 50,
+      throughput_per_min: 10,
+      max_segments: 1
+    },
+    core: { 
+      sms_monthly: 1500, 
+      users: 3, 
+      phone_numbers: 1,
+      contacts: 500,
+      throughput_per_min: 40,
+      max_segments: 3
+    },
+    elite: { 
+      sms_monthly: 8000, 
+      users: -1, // unlimited
+      phone_numbers: 2,
+      contacts: 3000,
+      throughput_per_min: 200,
+      max_segments: 8
+    },
+    enterprise: { 
+      sms_monthly: 50000, 
+      users: -1, // unlimited
+      phone_numbers: -1, // unlimited
+      contacts: -1, // unlimited
+      throughput_per_min: -1, // unlimited
+      max_segments: -1 // unlimited
+    },
+    vip: { 
+      sms_monthly: -1, // unlimited
+      users: -1, // unlimited
+      phone_numbers: -1, // unlimited
+      contacts: -1, // unlimited
+      throughput_per_min: -1, // unlimited
+      max_segments: -1 // unlimited
+    },
   };
 
   return limits[tier] || limits.free;

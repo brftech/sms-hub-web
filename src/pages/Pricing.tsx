@@ -77,10 +77,13 @@ const Pricing = () => {
       description:
         "Perfect for small shops starting with customer communications.",
       features: [
-        "1 dedicated phone number",
+        "200 SMS per month",
         "Up to 50 contacts",
-        "Up to 200 messages per month",
-        "Text-centered customer support",
+        "1 user account",
+        "1 phone number",
+        "10/min throughput",
+        "1 max segment",
+        "Basic campaigns",
       ],
     },
     {
@@ -90,10 +93,13 @@ const Pricing = () => {
       description:
         "For established shops ready to grow their customer communications.",
       features: [
-        "1 dedicated phone number",
+        "1,500 SMS per month",
         "Up to 500 contacts",
-        "Up to 1,500 messages per month",
-        "Text-centered customer support",
+        "3 user accounts",
+        "1 phone number",
+        "40/min throughput",
+        "3 max segments",
+        "Basic campaigns",
       ],
     },
     {
@@ -102,10 +108,13 @@ const Pricing = () => {
       period: "per month",
       description: "For retailers with a thriving customer base.",
       features: [
-        "1 dedicated or hosted phone number",
+        "8,000 SMS per month",
         "Up to 3,000 contacts",
-        "Up to 8,000 messages per month",
-        "Priority text and video support",
+        "Unlimited users",
+        "2 phone numbers",
+        "200/min throughput",
+        "8 max segments",
+        "AI, Zapier, VIP support",
       ],
     },
   ];

@@ -47,15 +47,15 @@ test.describe("Contact Page", () => {
     const lastNameInput = page.locator('input[name="lastName"]');
     const emailInput = page.locator('input[name="email"]');
     const messageInput = page.locator('textarea[name="message"]');
-    
+
     await firstNameInput.fill("John");
     await lastNameInput.fill("Doe");
     await emailInput.fill("john.doe@example.com");
-    
+
     if (await messageInput.isVisible()) {
       await messageInput.fill("This is a test message from Playwright");
     }
-    
+
     // Verify values were entered
     await expect(firstNameInput).toHaveValue("John");
     await expect(lastNameInput).toHaveValue("Doe");

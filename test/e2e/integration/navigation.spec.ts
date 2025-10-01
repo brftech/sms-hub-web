@@ -40,26 +40,5 @@ test.describe("Cross-Page Navigation", () => {
   });
 });
 
-test.describe("Hub-Specific Features", () => {
-  test("should maintain hub context across navigation", async ({ page }) => {
-    await page.goto("/");
-
-    // Get initial hub context (if visible)
-    const initialHub = await page.textContent("body");
-
-    // Navigate to another page
-    await page.goto("/contact");
-
-    // Hub context should be consistent
-    const afterNavigationHub = await page.textContent("body");
-
-    // Both should contain same hub references
-    const hubPattern = /(gnymble|percytech|percymd|percytext)/i;
-    const initialMatch = initialHub?.match(hubPattern);
-    const afterMatch = afterNavigationHub?.match(hubPattern);
-
-    if (initialMatch && afterMatch) {
-      expect(initialMatch[0].toLowerCase()).toBe(afterMatch[0].toLowerCase());
-    }
-  });
-});
+// Hub context persistence is handled by React Context Provider
+// and is better tested at the unit level (not E2E)

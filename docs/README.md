@@ -241,6 +241,7 @@ See `supabase/migrations/0000001_initial_schema.sql` for complete schema.
 - **Code Simplification**: Replaced structured logging with simple console methods
 - **UI Enhancement**: Branded "Add Lead" button with hub-specific colors
 - **Layout Improvements**: Optimized button placement and minimized debug float
+- **E2E Testing**: Complete Playwright overhaul (48 tests, 6 browsers, proper test organization)
 
 ### September 30, 2025
 

@@ -91,17 +91,20 @@ npm run build:check
 # Run unit tests
 npm run test
 
-# Run E2E tests
-npx playwright test
+# Run E2E tests (48 tests across 6 browsers)
+npm run test:e2e
+
+# Run E2E tests with interactive UI (recommended)
+npm run test:e2e:ui
 
 # Run tests in watch mode
 npm run test:watch
 
-# E2E tests with UI
-npm run test:e2e:ui
-
 # Test coverage
 npm run test:coverage
+
+# View E2E test report
+npx playwright show-report
 ```
 
 ### Database Operations
@@ -289,6 +292,7 @@ VITE_STRIPE_PAYMENT_LINK=https://buy.stripe.com/production-link
 - **Code Simplification**: Simple console-based logging for marketing site
 - **Branded UI**: Hub-specific colors on "Add Lead" and action buttons
 - **Layout Optimization**: Improved button placement and minimized debug float
+- **E2E Testing**: Complete Playwright overhaul with 48 tests across 6 browsers
 
 #### Previous (September 30, 2025)
 

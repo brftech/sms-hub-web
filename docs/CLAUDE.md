@@ -172,6 +172,15 @@ sms-hub-web/
 - ✅ Reduced bundle size and code complexity
 - ✅ Maintained clean build with zero errors
 
+**E2E Testing Overhaul**:
+
+- ✅ Rebuilt Playwright test suite from scratch (48 tests, 6 browsers)
+- ✅ Removed outdated signup/login tests from monorepo era
+- ✅ Created proper test structure: web/, admin/, integration/
+- ✅ Fixed all selectors to match actual component structure (buttons vs links)
+- ✅ Tests now cover: home, contact, pricing, Sales Dashboard, navigation
+- ✅ Added comprehensive E2E test documentation
+
 **Previous (September 30, 2025)**:
 
 - ✅ Fixed all TypeScript export errors
@@ -451,19 +460,44 @@ supabase link --project-ref [ID]
 
 1. Run type checking: `npm run type-check`
 2. Run linting: `npm run lint`
-3. Run tests: `npm run test`
-4. Run E2E tests: `npx playwright test`
+3. Run unit tests: `npm run test`
+4. Run E2E tests: `npm run test:e2e`
 5. Test contact form functionality
-6. Verify admin dashboard access
+6. Verify Sales Dashboard access
 7. Check responsive design
 8. Verify hub-specific branding
 
-### Admin Dashboard Testing
+### E2E Testing (Playwright)
 
-- **Access**: Use access code in production
-- **Development**: Automatic access in dev mode
+**Test Structure** (48 tests across 6 browsers):
+
+- `test/e2e/web/` - Marketing pages (home, contact, pricing)
+- `test/e2e/admin/` - Sales Dashboard tests
+- `test/e2e/integration/` - Cross-page navigation
+
+**Running Tests**:
+
+```bash
+npm run test:e2e        # Run all tests
+npm run test:e2e:ui     # Interactive UI mode (best for debugging)
+npx playwright show-report  # View last test results
+```
+
+**Key Learnings**:
+
+- ✅ Use specific selectors: `input[name="firstName"]` not `input[name*="name"]`
+- ✅ Your nav uses `<button>` elements, not `<a>` tags
+- ✅ Mobile nav buttons are hidden in collapsed menu
+- ✅ Test main content, not navigation elements
+- ✅ Avoid testing React state (hub context) - use unit tests instead
+
+### Sales Dashboard Testing
+
+- **Access**: Use access code in production, auto-access in development
+- **Development**: Dashboard loads directly at `/admin`
 - **CRUD Operations**: Test create, read, update, delete for leads
 - **Data Isolation**: Verify hub-specific data separation
+- **Hub Branding**: Verify branded UI elements match hub colors
 
 ## 📚 Important Resources
 
@@ -476,6 +510,8 @@ supabase link --project-ref [ID]
 - `/src/pages/AdminDashboard.tsx` - Sales Dashboard with hub-filtered CRUD
 - `/src/pages/Contact.tsx` - Contact form
 - `/src/components/Navigation.tsx` - Navigation with environment-based login
+- `/config/playwright.config.ts` - E2E test configuration
+- `/test/e2e/` - E2E test suites (web, admin, integration)
 - `/.env.local` - Environment variables
 
 ### Documentation
@@ -485,6 +521,7 @@ supabase link --project-ref [ID]
 - `docs/QUICK_START.md` - Quick start guide
 - `docs/VERCEL_DEPLOYMENT_GUIDE.md` - Deployment guide
 - `supabase/migrations/0000001_initial_schema.sql` - Complete database schema
+- `test/e2e/README.md` - E2E testing guide and best practices
 - `packages/ui/src/` - Component library examples
 
 ## ⚠️ Critical Rules - NEVER Break These
@@ -540,6 +577,7 @@ supabase link --project-ref [ID]
 - Removed @sms-hub/logger package (~1,000 lines eliminated)
 - Simplified to console-based logging for marketing site
 - Improved layout and minimized debug float by default
+- Complete Playwright E2E test overhaul (48 tests, 6 browsers)
 - Updated all documentation to reflect changes
 
 ### September 30, 2025

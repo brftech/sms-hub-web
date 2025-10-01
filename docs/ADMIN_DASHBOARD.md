@@ -1,24 +1,28 @@
-# Admin Dashboard
+# Sales Dashboard
 
-The Admin Dashboard provides secure access to database information and management tools for the SMS Hub application.
+The Sales Dashboard (formerly Admin Dashboard) provides secure, hub-specific access to leads management and sales analytics for the SMS Hub application.
 
 ## Features
 
-- **Database Statistics**: View table counts and record statistics
-- **User Management**: Monitor user accounts and activity
-- **Message Monitoring**: Track SMS message delivery and status
-- **Data Export**: Export database tables as JSON files
-- **Security Controls**: Hide/show sensitive data
-- **Authentication**: Secure access control for production environments
+- **Hub-Specific Filtering**: All data automatically filtered by current hub
+- **Sales Statistics**: View leads, email subscribers, SMS subscribers, and conversion rates
+- **Leads Management**: Full CRUD operations with hub-branded UI elements
+- **Data Export**: Export leads and subscriber data as JSON files
+- **Branded UI**: "Add Lead" and action buttons styled with hub-specific colors
+- **Recent Activity**: Monitor recent leads and activity by hub
+- **Security Controls**: Secure access control for production environments
+- **Responsive Design**: Optimized layout for desktop and mobile
 
 ## Access Methods
 
 ### Development Environment
+
 - Admin dashboard is automatically accessible in development mode
 - No authentication required
 - Floating admin button appears in bottom-left corner
 
 ### Production Environment
+
 - Requires admin access code for authentication
 - Access via URL parameter: `?admin=YOUR_ACCESS_CODE`
 - Or use the floating admin button to enter access code
@@ -46,22 +50,29 @@ VITE_ADMIN_ACCESS_CODE=your_secure_admin_code_here
 ### Accessing the Dashboard
 
 1. **Development**: Click the red shield button in bottom-left corner
-2. **Production**: 
+2. **Production**:
    - Visit `https://yoursite.com?admin=YOUR_ACCESS_CODE`
    - Or click the red shield button and enter access code when prompted
 
-### Dashboard Features
+### Sales Dashboard Features
 
-- **Refresh Data**: Click the refresh button to update all statistics
-- **Export Data**: Click export buttons to download table data as JSON
-- **Toggle Sensitive Data**: Use the eye icon to show/hide sensitive information
-- **View Recent Activity**: Monitor recent users and messages
+- **Hub Selection**: Switch between hubs to view hub-specific data
+- **Sales Statistics Cards**: View key metrics (Total Leads, Email Subscribers, SMS Subscribers, Conversion Rate)
+- **Leads Management**: Create, read, update, and delete leads with hub-branded UI
+- **Filter by Timeframe**: View recent leads (24h, 7d, 30d, all time)
+- **Add Lead Button**: Hub-branded button positioned next to section header
+- **Export Data**: Download leads and subscriber data as JSON
+- **Responsive Layout**: Optimized for all screen sizes
+- **Debug Float**: Minimized by default for cleaner interface
 
-## Database Tables Monitored
+## Hub-Specific Data
 
-- **Profiles**: User accounts and authentication data
-- **Messages**: SMS message history and delivery status
-- **Campaigns**: Marketing campaign information
+All data in the Sales Dashboard is automatically filtered by the current hub:
+
+- **Leads**: Only shows leads for the selected hub
+- **Email Subscribers**: Hub-specific email marketing lists
+- **SMS Subscribers**: Hub-specific SMS marketing lists
+- **Statistics**: Calculated per hub (conversion rates, totals, etc.)
 
 ## Security Considerations
 
@@ -73,18 +84,34 @@ VITE_ADMIN_ACCESS_CODE=your_secure_admin_code_here
 ## Troubleshooting
 
 ### Access Issues
+
 - Verify the admin access code is correct
 - Check if the token has expired (24-hour limit)
 - Ensure environment variables are properly set
 
 ### Data Loading Issues
+
 - Check Supabase connection and credentials
 - Verify database table permissions
 - Check browser console for error messages
 
 ## Development Notes
 
-- Admin dashboard is built with React and TypeScript
-- Uses Supabase for database connectivity
+- Sales Dashboard is built with React 19 and TypeScript
+- Uses Supabase for database connectivity with hub-specific filtering
+- All queries include `hub_id` for proper multi-tenant data isolation
+- Branded UI elements use hub-specific color schemes from `@sms-hub/utils`
 - Implements responsive design for mobile and desktop
 - Follows accessibility best practices
+- Uses simple console-based logging (no external logger package)
+
+## UI Branding
+
+The Sales Dashboard implements hub-specific branding:
+
+- **Gnymble** (Hub 1): Orange accent colors on buttons and highlights
+- **PercyTech** (Hub 0): Red accent colors on buttons and highlights
+- **PercyMD** (Hub 2): Red accent colors on buttons and highlights
+- **PercyText** (Hub 3): Purple accent colors on buttons and highlights
+
+All "Add Lead" buttons and modal action buttons use the current hub's color scheme for a consistent branded experience.

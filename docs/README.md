@@ -13,7 +13,7 @@ This folder contains comprehensive documentation for the SMS Hub Web application
 - **2024**: Started as complex Turbo monorepo with multiple apps
 - **Late 2024 - Early 2025**: Migrated to focused standalone React application
 - **January 2025**: Achieved production readiness with comprehensive testing
-- **September 2025**: Optimized for performance with clear future roadmap
+- **September - October 2025**: Optimized performance, enhanced Sales Dashboard, simplified codebase
 
 ## 📋 Documentation Structure
 
@@ -22,9 +22,11 @@ This folder contains comprehensive documentation for the SMS Hub Web application
 Start with these documents for complete understanding:
 
 #### [CLAUDE.md](./CLAUDE.md) - **START HERE**
+
 Complete development guide with project architecture, historical context, and AI agent instructions.
 
 **Contains:**
+
 - Project overview and core architecture
 - Historical context and lessons learned
 - Current status and recent accomplishments
@@ -37,9 +39,11 @@ Complete development guide with project architecture, historical context, and AI
 **Best for:** Developers, AI agents, technical leads
 
 #### [QUICK_START.md](./QUICK_START.md)
+
 Quick start guide for developers getting started with the project.
 
 **Contains:**
+
 - Prerequisites and initial setup
 - Key concepts (hub system, authentication, database)
 - Common development tasks
@@ -53,22 +57,27 @@ Quick start guide for developers getting started with the project.
 ### 🔧 Technical Documentation
 
 #### [ADMIN_DASHBOARD.md](./ADMIN_DASHBOARD.md)
-Comprehensive guide for the admin dashboard functionality.
+
+Comprehensive guide for the Sales Dashboard (formerly Admin Dashboard).
 
 **Contains:**
-- Features and capabilities overview
+
+- Sales Dashboard features and capabilities
+- Hub-specific data filtering and statistics
 - Access methods and authentication
 - CRUD operations for leads management
+- Branded UI elements per hub
 - Security considerations
-- Usage instructions
-- Troubleshooting guide
+- Usage instructions and troubleshooting
 
-**Best for:** Product managers, administrators, feature developers
+**Best for:** Product managers, administrators, sales teams, feature developers
 
 #### [VERCEL_DEPLOYMENT_GUIDE.md](./VERCEL_DEPLOYMENT_GUIDE.md)
+
 Complete deployment guide for Vercel platform.
 
 **Contains:**
+
 - Architecture overview
 - Deployment commands and setup
 - Vercel configuration details
@@ -80,9 +89,11 @@ Complete deployment guide for Vercel platform.
 **Best for:** DevOps, deployment managers, CI/CD setup
 
 #### [PORT_ASSIGNMENTS.md](./PORT_ASSIGNMENTS.md)
+
 Port configuration and assignment strategy for the application.
 
 **Contains:**
+
 - Current port assignments
 - Production and development architecture
 - Port management and troubleshooting
@@ -92,9 +103,11 @@ Port configuration and assignment strategy for the application.
 **Best for:** Infrastructure, local development setup
 
 #### [ENVIRONMENT_VARIABLES_CHECKLIST.md](./ENVIRONMENT_VARIABLES_CHECKLIST.md)
+
 Checklist for required environment variables.
 
 **Contains:**
+
 - Required variables for Edge Functions
 - Local development setup
 - Production configuration
@@ -103,9 +116,11 @@ Checklist for required environment variables.
 **Best for:** Setup, configuration, troubleshooting
 
 #### [DATABASE_MIGRATION.sql](./DATABASE_MIGRATION.sql)
+
 Complete database migration script for marketing-focused schema.
 
 **Contains:**
+
 - Migration from customer management to marketing focus
 - 15+ table definitions for email/SMS marketing
 - Indexes for performance optimization
@@ -165,6 +180,7 @@ The application supports multiple business hubs with isolated data:
 - **PercyText** (Hub ID: 3) - Purple theme, text messaging focus
 
 Each hub has:
+
 - Distinct branding and theming
 - Isolated database records (via `hub_id`)
 - Hub-specific contact forms
@@ -174,11 +190,13 @@ Each hub has:
 ## 🔐 Authentication & Access
 
 ### User Authentication
+
 - **Development**: Login redirects to `localhost:3001/login`
 - **Production**: Login redirects to `app.gnymble.com`
 - **Method**: Magic link authentication via Supabase Auth
 
 ### Admin Access
+
 - **Location**: Available at `/admin` route
 - **Development**: Automatic access with debug features
 - **Production**: Requires secure access code
@@ -189,27 +207,32 @@ Each hub has:
 Marketing-focused database schema with 15+ tables:
 
 ### Core Tables
+
 - `hubs` - Business hub configurations
 - `leads` - Lead management with scoring
 - `user_profiles` - User account information
 
 ### Email Marketing
+
 - `email_lists` - Email marketing lists
 - `email_subscribers` - Subscribers with engagement tracking
 - `email_campaigns` - Campaign performance
 
 ### SMS Marketing
+
 - `sms_lists` - SMS marketing lists
 - `sms_subscribers` - Subscribers with engagement tracking
 - `sms_campaigns` - Campaign performance
 
 ### Analytics & Tracking
+
 - `marketing_campaigns` - Cross-channel campaign tracking
 - `website_analytics` - Website visit and event tracking
 - `conversions` - Conversion tracking
 - `lead_activities` - Lead engagement history
 
 ### Forms & Verification
+
 - `contact_form_submissions` - Contact form data
 - `verifications` - Email/phone verification
 - `verification_attempts` - Verification attempt tracking
@@ -226,7 +249,16 @@ See [DATABASE_MIGRATION.sql](./DATABASE_MIGRATION.sql) for complete schema.
 
 ## 🔄 Recent Updates
 
-### September 30, 2025 (Current)
+### October 1, 2025 (Current)
+
+- **Sales Dashboard**: Rebranded admin dashboard with hub-specific filtering
+- **Logger Removal**: Eliminated @sms-hub/logger package (~1,000 lines)
+- **Code Simplification**: Replaced structured logging with simple console methods
+- **UI Enhancement**: Branded "Add Lead" button with hub-specific colors
+- **Layout Improvements**: Optimized button placement and minimized debug float
+
+### September 30, 2025
+
 - **UI Optimization**: Added lean import options for better bundle splitting
 - **Database Migration**: Created marketing-focused schema migration script
 - **Import Patterns**: Optimized component imports to reduce bundle size
@@ -234,6 +266,7 @@ See [DATABASE_MIGRATION.sql](./DATABASE_MIGRATION.sql) for complete schema.
 - **Roadmap**: Defined clear short/medium/long term goals
 
 ### January 2025
+
 - **Consolidation**: Removed outdated monorepo documentation
 - **Updates**: All files reflect current standalone app structure
 - **Streamlined**: Eliminated redundant and conflicting information
@@ -277,12 +310,15 @@ The SMS Hub Web application is a mature, production-ready React application with
 ## 🚀 Future Roadmap
 
 ### Short Term (Q4 2025)
+
 Email marketing integration, SMS campaign management, analytics dashboard, lead scoring, A/B testing
 
 ### Medium Term (Q1-Q2 2026)
+
 Advanced segmentation, marketing automation, third-party integrations, custom reports, multi-language support
 
 ### Long Term (Q3-Q4 2026)
+
 AI-powered features, predictive analytics, white label solution, native mobile apps, API marketplace
 
 See [CLAUDE.md](./CLAUDE.md) for detailed roadmap with specific features.
@@ -302,12 +338,14 @@ When updating documentation:
 ## 🎓 Learning Resources
 
 ### For Understanding the Codebase
+
 1. Start with [CLAUDE.md](./CLAUDE.md) - Full architectural overview
 2. Review [QUICK_START.md](./QUICK_START.md) - Hands-on development guide
 3. Explore source code in `src/` directory
 4. Check test files for usage examples
 
 ### For Contributing
+
 1. Read development rules in [QUICK_START.md](./QUICK_START.md)
 2. Follow patterns in existing code
 3. Write tests for new features
@@ -315,6 +353,7 @@ When updating documentation:
 5. Run `npm run build:check` before committing
 
 ### For Deployment
+
 1. Follow [VERCEL_DEPLOYMENT_GUIDE.md](./VERCEL_DEPLOYMENT_GUIDE.md)
 2. Check [ENVIRONMENT_VARIABLES_CHECKLIST.md](./ENVIRONMENT_VARIABLES_CHECKLIST.md)
 3. Review [PORT_ASSIGNMENTS.md](./PORT_ASSIGNMENTS.md) for configuration
@@ -324,4 +363,4 @@ When updating documentation:
 
 **The SMS Hub Web application is a focused, maintainable React application with comprehensive documentation to support continued development and scaling.**
 
-**Last Updated**: September 30, 2025 | **Status**: Production Ready | **Version**: 0.1.0
+**Last Updated**: October 1, 2025 | **Status**: Production Ready | **Version**: 0.1.0

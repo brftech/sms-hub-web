@@ -1,4 +1,5 @@
 import { PageLayout, SEO } from "@sms-hub/ui/marketing";
+import { handleDirectCheckout } from "../utils/checkout";
 
 import { useState } from "react";
 import {
@@ -20,36 +21,11 @@ import Footer from "../components/Footer";
 const Pricing = () => {
   const [isLoading, setIsLoading] = useState(false);
 
-  // Payment link handler - much simpler!
-  const handleDirectCheckout = async (planType: string) => {
+  // Wrapper for loading state
+  const handleCheckoutWithLoading = async () => {
     setIsLoading(true);
-
     try {
-      // Map plan types to payment links
-      const paymentLinks = {
-        starter:
-          import.meta.env.VITE_STRIPE_PAYMENT_LINK_STARTER ||
-          import.meta.env.VITE_STRIPE_PAYMENT_LINK,
-        core:
-          import.meta.env.VITE_STRIPE_PAYMENT_LINK_CORE ||
-          import.meta.env.VITE_STRIPE_PAYMENT_LINK,
-        elite:
-          import.meta.env.VITE_STRIPE_PAYMENT_LINK_ELITE ||
-          import.meta.env.VITE_STRIPE_PAYMENT_LINK,
-      };
-
-      const paymentLink = paymentLinks[planType as keyof typeof paymentLinks];
-
-      if (!paymentLink) {
-        // Payment link not configured
-        throw new Error(`Payment link not configured for plan: ${planType}. Please check environment variables.`);
-      }
-
-      // Redirect directly to Stripe Payment Link
-      window.location.href = paymentLink;
-    } catch {
-      // Error handled by UI
-      alert("Failed to start checkout. Please try again.");
+      handleDirectCheckout();
     } finally {
       setIsLoading(false);
     }
@@ -274,7 +250,7 @@ const Pricing = () => {
               </ul>
 
               <button
-                onClick={() => handleDirectCheckout("starter")}
+                onClick={() => handleCheckoutWithLoading()}
                 disabled={isLoading}
                 className="px-10 py-4 bg-orange-600 text-white font-bold rounded-full hover:bg-orange-700 disabled:bg-orange-400 disabled:cursor-not-allowed transition-all duration-300 text-lg tracking-wide uppercase flex items-center justify-center mx-auto group mb-6"
                 style={{ fontFamily: "Inter, system-ui, sans-serif" }}
@@ -489,7 +465,7 @@ const Pricing = () => {
                 texting that works.
               </p>
               <button
-                onClick={() => handleDirectCheckout("starter")}
+                onClick={() => handleCheckoutWithLoading()}
                 disabled={isLoading}
                 className="px-10 py-4 bg-orange-600 text-white font-bold rounded-full hover:bg-orange-700 disabled:bg-orange-400 disabled:cursor-not-allowed transition-all duration-300 text-lg tracking-wide uppercase flex items-center justify-center mx-auto group"
                 style={{ fontFamily: "Inter, system-ui, sans-serif" }}

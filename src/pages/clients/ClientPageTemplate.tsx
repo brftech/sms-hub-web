@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@sms-hub/ui/marketing"
 import { Link } from "react-router-dom";
 import { Phone, MapPin, Clock } from "lucide-react";
 import gnymbleIconLogo from "@sms-hub/ui/assets/gnymble-icon-logo.svg";
+import { handleDirectCheckout } from "../../utils/checkout";
 
 interface ClientPageTemplateProps {
   clientName: string;
@@ -146,12 +147,7 @@ export default function ClientPageTemplate({
                 </h2>
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
                   <button
-                    onClick={() => {
-                      const paymentLink = import.meta.env.VITE_STRIPE_PAYMENT_LINK;
-                      if (paymentLink) {
-                        window.location.href = paymentLink;
-                      }
-                    }}
+                    onClick={handleDirectCheckout}
                     className="bg-orange-500 hover:bg-orange-600 text-black font-bold py-3 px-8 rounded-lg transition-colors"
                   >
                     {ctaButtonText}

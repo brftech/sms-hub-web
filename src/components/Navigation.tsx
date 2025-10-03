@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { getHubColorClasses } from "@sms-hub/utils";
 import { getEnvironmentConfig } from "../config/environment";
+import { handleDirectCheckout } from "../utils/checkout";
 
 // Get login URL based on environment
 const getLoginUrl = () => {
@@ -21,24 +22,6 @@ const getLoginUrl = () => {
   return "http://localhost:3001/login";
 };
 
-// Direct Stripe checkout helper
-const handleDirectCheckout = async () => {
-  try {
-    // Redirect directly to Stripe Payment Link
-    const paymentLink = import.meta.env.VITE_STRIPE_PAYMENT_LINK;
-
-    if (!paymentLink) {
-      throw new Error(
-        "Payment link not configured. Please check environment variables."
-      );
-    }
-
-    window.location.href = paymentLink;
-  } catch (error) {
-    console.error("Checkout error:", error);
-    alert("Failed to start checkout. Please try again.");
-  }
-};
 
 const Navigation = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);

@@ -1,67 +1,191 @@
-# SMS Hub Web
+# SMS Hub Web - Marketing Platform
 
-Production-ready marketing website and sales dashboard for multi-tenant B2B SMS platform.
+## 🎯 Project Overview
+
+SMS Hub Web is a production-ready multi-tenant marketing website and sales dashboard for the SMS Hub B2B platform. It serves 4 business brands with isolated data, branded experiences, and comprehensive lead management capabilities.
+
+**Current Status**: ✅ **Production Ready** - Fully operational with Sales Dashboard, lead capture, and multi-tenant support
+
+## 📁 Repository Structure
+
+### **Core Application**
+
+- **`src/`** - React application source code
+- **`packages/`** - Internal packages (ui, hub-logic, supabase, utils)
+- **`supabase/`** - Database migrations and Edge Functions
+- **`test/`** - Unit, E2E, and integration tests
+- **`docs/`** - Comprehensive documentation
+- **`public/`** - Static assets and favicons
+
+### **Documentation**
+
+- **`docs/`** - Consolidated documentation (see below)
+- **`docs/archive/`** - Historical documentation and guides
+
+## 🏢 Multi-Tenant Hub System
+
+### **Supported Brands**
+
+- **Hub 0**: PercyTech (percytech.com) - Red theme, technology focus
+- **Hub 1**: Gnymble (gnymble.com) - Orange theme, primary brand (default)
+- **Hub 2**: PercyMD (percymd.com) - Blue theme, medical focus
+- **Hub 3**: PercyText (percytext.com) - Purple theme, messaging focus
+
+### **Hub-Specific Features**
+
+- **Branded UI**: Hub-specific colors, logos, and theming
+- **Data Isolation**: All data filtered by `hub_id`
+- **Domain Detection**: Automatic hub detection from domain
+- **Sales Dashboard**: Hub-filtered leads management
 
 ## 🚀 Quick Start
 
-```bash
-# Install and start
-npm install --legacy-peer-deps
-npm run dev
+### **1. Clone and Install**
 
-# Full development setup
-npm run setup
+```bash
+git clone https://github.com/brftech/sms-hub-web.git
+cd sms-hub-web
+npm install --legacy-peer-deps
 ```
 
-**Access Points:**
-- **Web App**: http://localhost:3000
+### **2. Environment Setup**
+
+```bash
+# Create .env.local
+cp .env.example .env.local
+# Edit .env.local with your Supabase credentials
+```
+
+### **3. Start Development**
+
+```bash
+npm run dev
+```
+
+### **4. Access Applications**
+
+- **Marketing Site**: http://localhost:3000
 - **Sales Dashboard**: http://localhost:3000/admin (dev mode)
-- **Documentation**: See [/docs](./docs/) folder
+- **Hub Switching**: Use floating hub switcher (dev mode)
 
-## 🎯 What This Is
+## 🗄️ Database Architecture
 
-Multi-tenant marketing website serving 4 business brands with isolated data and branded experiences:
+### **Marketing Database**
 
-- **PercyTech** (Hub 0) - Red theme, technology focus  
-- **Gnymble** (Hub 1) - Orange theme, primary brand
-- **PercyMD** (Hub 2) - Blue theme, medical focus
-- **PercyText** (Hub 3) - Purple theme, messaging focus
+- **Project**: `hmumtnpnyxuplvqcmnfk` (dev) / `fwlivygerbqzowbzxesw` (prod)
+- **Purpose**: Lead capture, email marketing, contact forms
+- **Key Tables**: `leads`, `email_lists`, `contact_form_submissions`, `verifications`
+
+### **Database Schema**
+
+- **Multi-tenant**: All tables include `hub_id` for tenant isolation
+- **Marketing Focus**: Optimized for lead capture and conversion
+- **Clean Slate**: Designed for new databases (no existing data)
+- **Hub Isolation**: Proper data separation between brands
+
+## 🏗️ Architecture
+
+### **Technology Stack**
+
+| Technology       | Purpose      | Version |
+| ---------------- | ------------ | ------- |
+| **React**        | UI Framework | 19.1.1  |
+| **Vite**         | Build Tool   | 7.1.7   |
+| **TypeScript**   | Type Safety  | 5.9.2   |
+| **Tailwind CSS** | Styling      | 3.4.17  |
+| **Supabase**     | Backend      | 2.57.4  |
+| **Playwright**   | E2E Testing  | 1.55.1  |
+
+### **Package Architecture**
+
+- **`@sms-hub/ui/marketing`** - Optimized UI components for marketing
+- **`@sms-hub/hub-logic`** - Hub configurations and branding
+- **`@sms-hub/supabase`** - Database client and queries
+- **`@sms-hub/utils`** - Shared utilities and validation
+
+### **Key Design Principles**
+
+- **Separation of Concerns**: Marketing vs Customer applications
+- **Multi-Tenant**: Hub-based data isolation
+- **Performance**: Optimized bundles and code splitting
+- **Maintainability**: Type safety and comprehensive testing
 
 ## ✨ Key Features
 
-- **Sales Dashboard**: Hub-filtered leads management with branded UI
-- **Contact Forms**: Lead capture with hub-specific branding
-- **Subscription Tiers**: Starter ($79), Core ($179), Elite ($349), Enterprise, VIP
-- **Authentication**: Magic link flow (dev: localhost:3001, prod: app.[hub].com)
-- **Responsive Design**: Mobile-first with Tailwind CSS
-- **Testing**: 48 E2E tests + comprehensive unit coverage
+### **Sales Dashboard**
 
-## 🛠 Tech Stack
+- **Hub-Filtered Data**: All operations include `hub_id` filtering
+- **Lead Management**: CRUD operations for leads and contacts
+- **Branded UI**: Hub-specific colors and theming
+- **Admin Access**: Secure access with admin codes
 
-- **Frontend**: React 19 + Vite + TypeScript
-- **Styling**: Tailwind CSS + styled-components
-- **Backend**: Supabase (PostgreSQL + Auth + Edge Functions)
-- **Testing**: Vitest + Playwright + Testing Library
-- **Deployment**: Vercel
-- **Code Quality**: ESLint + Prettier + TypeScript strict mode
+### **Contact Forms**
 
-## 📁 Project Structure
+- **Lead Capture**: Hub-specific contact form submissions
+- **Validation**: Comprehensive form validation
+- **Integration**: Supabase Edge Functions for processing
+- **Analytics**: Lead tracking and conversion metrics
 
-```
-sms-hub-web/
-├── src/                # Application source
-├── packages/           # Internal packages (ui, hub-logic, supabase, utils)
-├── supabase/          # Database migrations and Edge Functions
-├── test/              # Unit, E2E, and integration tests
-├── docs/              # Comprehensive documentation
-└── public/            # Static assets
-```
+### **Subscription Tiers**
+
+| Tier       | Price  | SMS/Month | Contacts | Users | Phone #s | Throughput | Segments |
+| ---------- | ------ | --------- | -------- | ----- | -------- | ---------- | -------- |
+| Starter    | $79    | 200       | 50       | 1     | 1        | 10/min     | 1        |
+| Core       | $179   | 1,500     | 500      | 3     | 1        | 40/min     | 3        |
+| Elite      | $349   | 8,000     | 3,000    | ∞     | 2        | 200/min    | 8        |
+| Enterprise | Custom | 50,000+   | ∞        | ∞     | ∞        | ∞          | ∞        |
+| VIP        | Custom | ∞         | ∞        | ∞     | ∞        | ∞          | ∞        |
+
+### **Authentication Flow**
+
+- **Payment-First**: Stripe → Email confirmation → Profile setup
+- **Magic Link**: Email-based authentication
+- **Cross-App**: Redirects to sms-hub-app2 for customer management
+- **Dev Mode**: Local development with simplified auth
+
+## 📚 Documentation
+
+### **🚀 Getting Started**
+
+- **[CLAUDE.md](CLAUDE.md)** - Development context and quick reference
+- **[Architecture Guide](docs/architecture.md)** - Technical architecture and design decisions
+- **[Deployment Guide](docs/deployment.md)** - Production deployment instructions
+
+### **🔧 Development & Operations**
+
+- **[Troubleshooting](docs/troubleshooting.md)** - Common issues and solutions
+- **[Performance Guide](docs/performance.md)** - Optimization strategies
+- **[SMS-Hub-App2 Integration](docs/sms-hub-app2-integration.md)** - Customer app integration
+
+### **📱 App-Specific Documentation**
+
+- **`docs/archive/`** - Historical documentation and guides
+
+## 🎯 Current Status
+
+### **✅ Production Ready**
+
+- **Zero Errors**: Clean codebase with zero TypeScript/ESLint errors
+- **Performance**: 91KB gzipped main bundle (70% reduction from 302KB)
+- **Testing**: 48 E2E tests across 6 browsers
+- **Multi-Tenant**: Proper hub isolation and data filtering
+- **Documentation**: Comprehensive documentation suite
+
+### **🔄 Recent Achievements (October 2025)**
+
+- **Sales Dashboard**: Rebranded with hub-specific filtering and branded UI
+- **Code Simplification**: Removed @sms-hub/logger package (~1,000 lines eliminated)
+- **Bundle Optimization**: 91KB gzipped main bundle with strategic code splitting
+- **E2E Testing**: Complete Playwright overhaul with 48 tests
+- **Documentation**: Comprehensive updates with clear structure
 
 ## 🚀 Development
 
+### **Development Commands**
+
 ```bash
 # Development
-npm run dev              # Start dev server
+npm run dev              # Start dev server (port 3000)
 npm run type-check       # TypeScript check
 npm run lint             # Lint code
 npm run build:check      # Full build check
@@ -76,9 +200,7 @@ npm run build            # Production build
 npm run preview          # Preview build
 ```
 
-## 🔧 Environment Setup
-
-Create `.env.local`:
+### **Environment Variables**
 
 ```bash
 # Supabase (Development)
@@ -98,73 +220,58 @@ VITE_ENABLE_HUB_SWITCHER=true
 VITE_STRIPE_PAYMENT_LINK=https://buy.stripe.com/test_28E5kF2Ag5jW9va1Ks3ZK0c
 ```
 
-## 💳 Subscription Tiers
-
-| Tier | Price | SMS/Month | Contacts | Users | Phone #s | Throughput | Segments |
-|------|-------|-----------|----------|-------|----------|------------|----------|
-| Starter | $79 | 200 | 50 | 1 | 1 | 10/min | 1 |
-| Core | $179 | 1,500 | 500 | 3 | 1 | 40/min | 3 |
-| Elite | $349 | 8,000 | 3,000 | ∞ | 2 | 200/min | 8 |
-| Enterprise | Custom | 50,000+ | ∞ | ∞ | ∞ | ∞ | ∞ |
-| VIP | Custom | ∞ | ∞ | ∞ | ∞ | ∞ | ∞ |
-
-**Onboarding**: $179 one-time setup fee (includes first month)
-
-## 🗄 Database
-
-Marketing-focused schema with 15+ tables:
-- **Core**: `hubs`, `leads`, `customers`, `user_profiles`
-- **Marketing**: `email_lists`, `sms_lists`, `email_campaigns`, `sms_campaigns`
-- **Analytics**: `website_analytics`, `conversions`, `lead_activities`
-- **Subscriptions**: `customers.subscription_tier`, `customers.subscription_status`
-
-## 📚 Documentation
-
-Complete documentation in [/docs](./docs/):
-
-- **[QUICK_START.md](./docs/QUICK_START.md)** - Developer setup and common tasks
-- **[CLAUDE.md](./docs/CLAUDE.md)** - AI agent instructions and architecture
-- **[ADMIN_DASHBOARD.md](./docs/ADMIN_DASHBOARD.md)** - Sales Dashboard features
-- **[VERCEL_DEPLOYMENT_GUIDE.md](./docs/VERCEL_DEPLOYMENT_GUIDE.md)** - Deployment
-- **[ENVIRONMENT_VARIABLES_CHECKLIST.md](./docs/ENVIRONMENT_VARIABLES_CHECKLIST.md)** - Environment setup
-
 ## 🚀 Deployment
+
+### **Production URLs**
+
+- **Gnymble**: gnymble.com
+- **PercyTech**: percytech.com
+- **PercyMD**: percymd.com
+- **PercyText**: percytext.com
+
+### **Deployment Process**
 
 ```bash
 # Deploy to Vercel
 vercel --prod
+
+# Check deployment
+vercel ls
 ```
 
-**Production URLs:**
-- Gnymble: www.gnymble.com
-- PercyTech: www.percytech.com
-- PercyMD: www.percymd.com (planned)
-- PercyText: www.percytext.com (planned)
+## 🆘 Quick Help
 
-## 🎯 Current Status
+### **Common Tasks**
 
-**✅ Production Ready** - Mature, optimized React application with:
-- Zero TypeScript/ESLint errors
-- 91KB gzipped main bundle
-- 48 E2E tests across 6 browsers
-- Hub-specific data isolation
-- Comprehensive documentation
+- **Start Development**: See [Quick Start](#-quick-start) above
+- **Deploy to Production**: See [Deployment Guide](docs/deployment.md)
+- **Fix Issues**: Check [Troubleshooting Guide](docs/troubleshooting.md)
+- **Optimize Performance**: See [Performance Guide](docs/performance.md)
 
-## 🔄 Recent Updates
+### **Need More Help?**
 
-- **Sales Dashboard**: Hub-filtered leads management with branded UI
-- **Logger Removal**: Simplified codebase (~1,000 lines eliminated)
-- **E2E Testing**: Complete test suite rebuild with 48 working tests
-- **Bundle Optimization**: Lean imports and strategic code splitting
-- **Documentation**: Comprehensive overhaul with clear structure
+- **Development Context**: [CLAUDE.md](CLAUDE.md) - Complete development reference
+- **Architecture Questions**: [Architecture Guide](docs/architecture.md)
+- **Customer App Integration**: [SMS-Hub-App2 Integration](docs/sms-hub-app2-integration.md)
+- **Historical Docs**: Check `docs/archive/` folder
+
+## 🚨 Important Notes
+
+- **Multi-Tenant**: All operations must include `hub_id` for proper data isolation
+- **Database Separation**: Uses separate marketing database from customer app
+- **Bundle Optimization**: Use `@sms-hub/ui/marketing` for optimized imports
+- **Code Quality**: Zero TypeScript/ESLint errors required
+- **Testing**: Comprehensive E2E test coverage required
 
 ## 🤝 Contributing
 
-1. Follow development rules in [QUICK_START.md](./docs/QUICK_START.md)
+1. Follow development rules in [CLAUDE.md](CLAUDE.md)
 2. Run `npm run build:check` before committing
 3. Write tests for new features
 4. Update documentation for significant changes
+5. Ensure zero TypeScript/ESLint errors
 
 ---
 
-**Status**: ✅ Production Ready | **Version**: 0.1.0 | **Last Updated**: October 1, 2025
+**Last Updated**: October 2025  
+**Status**: Production Ready - Marketing platform fully operational with Sales Dashboard and multi-tenant support

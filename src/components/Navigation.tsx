@@ -10,17 +10,8 @@ import {
   CreditCard,
 } from "lucide-react";
 import { getHubColorClasses } from "@sms-hub/utils";
-import { getEnvironmentConfig } from "../config/environment";
-import { handleDirectCheckout } from "../utils/checkout";
+import { handleDirectCheckout, handleDirectLogin } from "../utils/checkout";
 
-// Get login URL based on environment
-const getLoginUrl = () => {
-  const envConfig = getEnvironmentConfig();
-  if (envConfig.isProduction) {
-    return "https://app.gnymble.com";
-  }
-  return "http://localhost:3001/login";
-};
 
 
 const Navigation = () => {
@@ -129,10 +120,7 @@ const Navigation = () => {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => {
-                // Navigate to login page (production: app.gnymble.com, dev: localhost:3001)
-                window.location.href = getLoginUrl();
-              }}
+              onClick={handleDirectLogin}
               className="transition-all duration-300 backdrop-blur-sm px-6 py-2 text-sm bg-black/50 text-white border border-orange-500/50 hover:bg-orange-500/10 hover:border-orange-400 min-w-[80px]"
             >
               LogIn
@@ -214,8 +202,7 @@ const Navigation = () => {
                 <Button
                   onClick={() => {
                     setIsMobileMenuOpen(false);
-                    // Navigate to login page (production: app.gnymble.com, dev: localhost:3001)
-                    window.location.href = getLoginUrl();
+                    handleDirectLogin();
                   }}
                   className="w-full bg-black/50 text-white border border-orange-500/50 hover:bg-orange-500/10 hover:border-orange-400 font-medium py-3 text-sm h-12"
                 >

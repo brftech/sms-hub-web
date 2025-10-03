@@ -1,5 +1,7 @@
 # SMS Hub Web Architecture Guide
 
+**Last Updated**: October 3, 2025 at 12:30 PM ET
+
 ## 🎯 Overview
 
 SMS Hub Web is a production-ready multi-tenant marketing website and sales dashboard built with React 19, Vite, TypeScript, and Supabase. It serves 4 business brands with isolated data, branded experiences, and comprehensive lead management capabilities.
@@ -38,7 +40,7 @@ SMS Hub Web is a production-ready multi-tenant marketing website and sales dashb
 
 - **Hub 0**: PercyTech (percytech.com) - Red theme, technology focus
 - **Hub 1**: Gnymble (gnymble.com) - Orange theme, primary brand (default)
-- **Hub 2**: PercyMD (percymd.com) - Blue theme, medical focus
+- **Hub 2**: PercyMD (percymd.com) - Red theme, medical focus
 - **Hub 3**: PercyText (percytext.com) - Purple theme, messaging focus
 
 ## 🗄️ Database Architecture
@@ -247,5 +249,5 @@ npx supabase functions deploy stripe-webhook --project-ref fwlivygerbqzowbzxesw
 
 ---
 
-**Last Updated**: October 2025  
+**Last Updated**: October 3, 2025 at 12:30 PM ET  
 **Status**: Production Ready - Marketing platform architecture implemented, optimized, and deployed

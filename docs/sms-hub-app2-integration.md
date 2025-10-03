@@ -1,5 +1,7 @@
 # SMS Hub App2 Integration Guide
 
+**Last Updated**: October 3, 2025 at 12:30 PM ET
+
 ## 🎯 Overview
 
 This document outlines the integration between SMS Hub Web (marketing platform) and SMS Hub App2 (customer application). It covers the authentication flow, data sharing, and cross-app functionality that enables a seamless user experience.
@@ -520,5 +522,5 @@ const integrationMetrics = {
 
 ---
 
-**Last Updated**: October 2025  
+**Last Updated**: October 3, 2025 at 12:30 PM ET  
 **Status**: Integration guide complete and production ready

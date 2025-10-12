@@ -77,6 +77,26 @@ vercel --prod
 vercel ls
 ```
 
+## 🧭 Homepage Content Workflow (New)
+
+- **Single Source of Truth**: Homepage hero copy lives in `packages/hub-logic/src/hubContent.ts` under the active hub (`hero.tagline.line1/line2`).
+- **Render Path**: `src/pages/Home.tsx` → `components/home/HubSelector` → `components/home/Gnymble` → `components/home/shared/HeroSection`.
+- **Best Practices**:
+  - Do not hardcode hero text inside components.
+  - Edit hub content, then hard refresh the browser.
+  - If dev still shows stale text, run `npm run clean && npm run dev` (clears Vite cache) and refresh.
+- **SHAFT Positioning**:
+  - The Platform Advantage section highlights SHAFT explicitly.
+  - Short SHAFT note appears under the section (brief regulatory context).
+
+### **QA Checklist (Homepage)**
+
+1. Confirm hero headline renders and both tagline lines are visible.
+2. Verify problem/solution headings: “BUILT FOR SHAFT-COMPLIANT MESSAGING” and “WHAT OTHERS WON’T DO”.
+3. Ensure SHAFT note card is visible beneath the grids (Gnymble hub).
+4. Confirm Stats and CTA sections use neutral styling and match hero rhythm.
+5. Switch hubs and verify hero pulls the correct hub content.
+
 ## 📝 Coding Standards
 
 ### **TypeScript/React**
@@ -169,59 +189,8 @@ npm run build:check
 
 ## 🚨 Known Issues and Solutions
 
-### **Common Issues**
-
-- **Vite Build**: Use `preserveSymlinks: true` for local packages
-- **Database**: Always include `hub_id` in queries
-- **Hub Detection**: Check domain-based hub detection
-- **Performance**: Monitor bundle size with `npm run build:analyze`
-
-### **Debugging**
-
-- **Edge Functions**: `npx supabase functions logs [function-name]`
-- **Database**: Check Supabase dashboard for query performance
-- **Vercel**: `vercel logs [deployment-url]`
-
-## 📚 Learning Log
-
-### **Recent Insights (October 2025)**
-
-- **Bundle Optimization**: Achieved 91KB gzipped main bundle (70% reduction)
-- **Logger Removal**: Eliminated @sms-hub/logger package (~1,000 lines)
-- **E2E Testing**: Complete Playwright overhaul with 48 tests
-- **Zero Errors**: Clean codebase with zero TypeScript/ESLint errors
-- **Multi-tenant**: Proper hub isolation and data filtering
-
-### **Key Learnings**
-
-- **Local Packages**: Work perfectly with Vite `preserveSymlinks: true`
-- **Bundle Splitting**: Route-based code splitting is highly effective
-- **Performance**: Tree shaking and optimized imports make huge difference
-- **Testing**: Comprehensive E2E tests catch integration issues
-- **Documentation**: Clear structure and examples are essential
-
-## 🔄 Integration with SMS-Hub-App2
-
-### **Authentication Flow**
-
-- **Payment-First**: Stripe → Email confirmation → Profile setup
-- **Cross-App Redirect**: Marketing site redirects to app2 for customer management
-- **Magic Link**: Email-based authentication between apps
-- **Hub Consistency**: Same hub detection across both applications
-
-### **Data Flow**
-
-- **Lead Capture**: Marketing site captures leads in marketing database
-- **Customer Conversion**: Leads convert to customers in app2 database
-- **Hub Isolation**: Both apps maintain proper `hub_id` filtering
-- **Brand Consistency**: Shared hub logic and theming
-
-### **Development Workflow**
-
-- **Shared Packages**: Both apps use same local package structure
-- **Independent Deployment**: Each app deploys separately to Vercel
-- **Database Separation**: Marketing vs Customer data isolation
-- **Testing**: Separate test suites for each application
+- **Local package cache (Vite)**: If content edits don’t appear, run `npm run clean && npm run dev` and hard refresh.
+- **Hub mismatch**: Verify `document.body.getAttribute('data-hub')` equals the expected hub.
 
 ---
 

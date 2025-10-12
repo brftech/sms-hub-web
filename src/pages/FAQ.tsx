@@ -15,6 +15,7 @@ import {
   Target,
 } from "lucide-react";
 import { useState } from "react";
+import { PRICING_PATH } from "@/utils/routes";
 
 const FAQ = () => {
   const [openItems, setOpenItems] = useState<Set<string>>(new Set());
@@ -177,9 +178,7 @@ const FAQ = () => {
           <div className="text-center mb-20">
             <div className="inline-flex items-center px-4 py-2 rounded-full bg-orange-500/20 border border-orange-500/30 mb-8">
               <Target className="w-4 h-4 text-orange-400 mr-2" />
-              <span className="text-sm font-medium text-orange-400">
-                COMMON QUESTIONS
-              </span>
+              <span className="text-sm font-medium text-orange-400">COMMON QUESTIONS</span>
             </div>
 
             <h1
@@ -194,8 +193,8 @@ const FAQ = () => {
               className="text-xl text-gray-300 max-w-3xl mx-auto mb-12 leading-relaxed"
               style={{ fontFamily: "Inter, system-ui, sans-serif" }}
             >
-              The most common questions we get from cigar retailers, private
-              clubs, and premium venues about SMS compliance and our platform.
+              The most common questions we get from cigar retailers, private clubs, and premium
+              venues about SMS compliance and our platform.
             </p>
 
             <div className="flex items-center justify-center space-x-8 text-gray-400 text-sm">
@@ -289,8 +288,8 @@ const FAQ = () => {
                 className="text-gray-300 mb-10 max-w-2xl mx-auto text-lg leading-relaxed"
                 style={{ fontFamily: "Inter, system-ui, sans-serif" }}
               >
-                No more SMS rejections. No compliance headaches. Just
-                professional texting that works for your regulated business.
+                No more SMS rejections. No compliance headaches. Just professional texting that
+                works for your regulated business.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <button
@@ -302,7 +301,7 @@ const FAQ = () => {
                   <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
                 </button>
                 <a
-                  href="/pricing"
+                  href={PRICING_PATH}
                   className="px-10 py-4 border border-orange-500/50 text-orange-400 font-bold rounded-full hover:bg-orange-500/10 hover:border-orange-400 transition-all duration-300 text-lg tracking-wide uppercase flex items-center justify-center"
                   style={{ fontFamily: "Inter, system-ui, sans-serif" }}
                 >

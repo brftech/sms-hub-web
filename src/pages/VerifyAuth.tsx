@@ -13,15 +13,10 @@ import {
   Alert,
   AlertDescription,
 } from "@sms-hub/ui/marketing";
-import {
-  Shield,
-  AlertCircle,
-  CheckCircle,
-  CheckCircle2,
-  RefreshCw,
-} from "lucide-react";
+import { Shield, AlertCircle, CheckCircle, CheckCircle2, RefreshCw } from "lucide-react";
 import { getSupabaseClient } from "../lib/supabaseSingleton";
 import styled from "styled-components";
+import { ADMIN_PATH, LOGIN_PATH, SIGNUP_PATH } from "@/utils/routes";
 
 const VerificationContainer = styled.div`
   min-height: 100vh;
@@ -55,8 +50,7 @@ export function VerifyAuth() {
   const [searchParams] = useSearchParams();
 
   // Determine mode based on route
-  const mode: VerificationMode =
-    location.pathname === "/verify-otp" ? "otp" : "signup";
+  const mode: VerificationMode = location.pathname === "/verify-otp" ? "otp" : "signup";
 
   // OTP mode state
   const email = location.state?.email || sessionStorage.getItem("login_email");
@@ -79,13 +73,9 @@ export function VerifyAuth() {
 
   useEffect(() => {
     if (mode === "otp" && !email) {
-      navigate("/login");
-    } else if (
-      mode === "signup" &&
-      !verificationId &&
-      !signupData.verificationId
-    ) {
-      navigate("/signup");
+      navigate(LOGIN_PATH);
+    } else if (mode === "signup" && !verificationId && !signupData.verificationId) {
+      navigate(SIGNUP_PATH);
     }
   }, [mode, email, verificationId, navigate, signupData.verificationId]);
 
@@ -139,16 +129,15 @@ export function VerifyAuth() {
 
         // Redirect to dashboard (admin dashboard is now part of this app)
         setTimeout(() => {
-          window.location.href = "/admin";
+          window.location.href = ADMIN_PATH;
         }, 1500);
       } else {
         // Signup verification via edge function
-        const actualVerificationId =
-          verificationId || signupData.verificationId;
+        const actualVerificationId = verificationId || signupData.verificationId;
 
         if (!actualVerificationId) {
           setError("Verification session expired. Please start over.");
-          setTimeout(() => navigate("/signup"), 2000);
+          setTimeout(() => navigate(SIGNUP_PATH), 2000);
           return;
         }
 
@@ -179,19 +168,14 @@ export function VerifyAuth() {
         }
 
         setSuccess(true);
-        sessionStorage.setItem(
-          "verified_verification_id",
-          verifyData.verification_id
-        );
+        sessionStorage.setItem("verified_verification_id", verifyData.verification_id);
 
         setTimeout(() => {
-          window.location.href = "/admin";
+          window.location.href = ADMIN_PATH;
         }, 1500);
       }
     } catch (err: unknown) {
-      setError(
-        err instanceof Error ? err.message : "Invalid verification code"
-      );
+      setError(err instanceof Error ? err.message : "Invalid verification code");
       setCode("");
     } finally {
       setIsVerifying(false);
@@ -223,9 +207,7 @@ export function VerifyAuth() {
       } else {
         // Resend via edge function
         const response = await fetch(
-          `${
-            import.meta.env.VITE_SUPABASE_URL
-          }/functions/v1/resend-verification`,
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/resend-verification`,
           {
             method: "POST",
             headers: {
@@ -266,9 +248,7 @@ export function VerifyAuth() {
               <>
                 <CheckCircle className="w-16 h-16 text-green-600 mx-auto mb-4" />
                 <h2 className="text-2xl font-bold mb-2">Welcome Back!</h2>
-                <p className="text-gray-600">
-                  Redirecting to your dashboard...
-                </p>
+                <p className="text-gray-600">Redirecting to your dashboard...</p>
               </>
             ) : (
               <>
@@ -282,9 +262,7 @@ export function VerifyAuth() {
                     : `Your ${hubConfig.name} account has been created successfully.`}
                 </p>
                 <p className="text-sm text-gray-300">
-                  {isExistingUser
-                    ? "Redirecting to login..."
-                    : "Redirecting to your dashboard..."}
+                  {isExistingUser ? "Redirecting to login..." : "Redirecting to your dashboard..."}
                 </p>
               </>
             )}
@@ -305,19 +283,19 @@ export function VerifyAuth() {
             {mode === "otp"
               ? "Enter Verification Code"
               : isExistingUser
-              ? "Welcome Back!"
-              : `Verify Your ${authMethod === "sms" ? "Phone" : "Email"}`}
+                ? "Welcome Back!"
+                : `Verify Your ${authMethod === "sms" ? "Phone" : "Email"}`}
           </CardTitle>
           <CardDescription>
             {mode === "otp"
               ? `We sent a 6-digit code to ${email}`
               : isExistingUser
-              ? `We've sent a new verification code to your ${
-                  authMethod === "sms" ? "phone" : "email"
-                }. Please enter it below to access your account.`
-              : `We sent a 6-digit verification code to your ${
-                  authMethod === "sms" ? "phone" : "email"
-                }. Please enter it below.`}
+                ? `We've sent a new verification code to your ${
+                    authMethod === "sms" ? "phone" : "email"
+                  }. Please enter it below to access your account.`
+                : `We sent a 6-digit verification code to your ${
+                    authMethod === "sms" ? "phone" : "email"
+                  }. Please enter it below.`}
           </CardDescription>
         </CardHeader>
 
@@ -341,9 +319,7 @@ export function VerifyAuth() {
                 autoComplete="one-time-code"
               />
               {mode === "signup" && (
-                <p className="text-sm text-gray-300 text-center mt-2">
-                  Code expires in 15 minutes
-                </p>
+                <p className="text-sm text-gray-300 text-center mt-2">Code expires in 15 minutes</p>
               )}
             </div>
 
@@ -364,9 +340,7 @@ export function VerifyAuth() {
 
             <div className="text-center">
               {mode === "signup" && (
-                <p className="text-sm text-gray-600 mb-2">
-                  Didn't receive the code?
-                </p>
+                <p className="text-sm text-gray-600 mb-2">Didn't receive the code?</p>
               )}
               <ResendButton
                 variant={mode === "otp" ? "ghost" : "outline"}
@@ -378,8 +352,8 @@ export function VerifyAuth() {
                 {isResending
                   ? "Sending..."
                   : canResend
-                  ? "Resend Code"
-                  : `Resend in ${resendTimer}s`}
+                    ? "Resend Code"
+                    : `Resend in ${resendTimer}s`}
               </ResendButton>
             </div>
 
@@ -388,11 +362,11 @@ export function VerifyAuth() {
                 <p className="text-sm text-gray-600">
                   Wrong information?{" "}
                   <a
-                    href="/signup"
+                    href={SIGNUP_PATH}
                     className="text-blue-600 hover:underline"
                     onClick={(e) => {
                       e.preventDefault();
-                      navigate("/signup");
+                      navigate(SIGNUP_PATH);
                     }}
                   >
                     Start over

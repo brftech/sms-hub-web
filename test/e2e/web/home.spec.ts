@@ -18,6 +18,13 @@ test.describe("Home Page", () => {
     const heroHeading = page.locator("main h1").first();
     await expect(heroHeading).toBeVisible();
 
+    // Verify hero taglines via stable test ids
+    await expect(page.getByTestId("hero-tagline-1")).toHaveText(/We do texting very well\./i);
+    await expect(page.getByTestId("hero-tagline-2")).toHaveText(/Others won’t do it, at all\./i);
+
+    // Verify the interactive phone container exists
+    await expect(page.getByTestId("hero-phone")).toBeVisible();
+
     // Verify at least one logo exists on page
     const logos = page.locator('img[alt*="Logo"]');
     const logoCount = await logos.count();

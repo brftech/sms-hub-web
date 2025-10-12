@@ -14,6 +14,7 @@ import Footer from "../components/Footer";
 import { contactService } from "../services/contactService";
 
 import { CheckCircle, Loader2, Star, Shield, Zap } from "lucide-react";
+import { HOME_PATH } from "@/utils/routes";
 
 const Contact = () => {
   const { hubConfig, currentHub } = useHub();
@@ -77,15 +78,10 @@ const Contact = () => {
     }
 
     // Client-side validation
-    if (
-      !formData.firstName.trim() ||
-      !formData.lastName.trim() ||
-      !formData.email.trim()
-    ) {
+    if (!formData.firstName.trim() || !formData.lastName.trim() || !formData.email.trim()) {
       toast({
         title: "Required fields missing",
-        description:
-          "Please fill in your first name, last name, and email address.",
+        description: "Please fill in your first name, last name, and email address.",
         variant: "destructive",
       });
       return;
@@ -130,7 +126,7 @@ const Contact = () => {
 
       // Redirect to landing page after 3 seconds
       setTimeout(() => {
-        navigate("/");
+        navigate(HOME_PATH);
         // Ensure we scroll to the top after navigation
         setTimeout(() => {
           window.scrollTo({ top: 0, behavior: "smooth" });
@@ -178,9 +174,7 @@ const Contact = () => {
             <div
               className={`inline-flex items-center px-4 py-2 rounded-full ${hubColors.bgLight} ${hubColors.borderLight} mb-8`}
             >
-              <span className={`text-sm font-medium ${hubColors.text}`}>
-                GET IN TOUCH
-              </span>
+              <span className={`text-sm font-medium ${hubColors.text}`}>GET IN TOUCH</span>
             </div>
 
             <h1
@@ -195,9 +189,9 @@ const Contact = () => {
               className="text-xl text-gray-300 max-w-3xl mx-auto mb-12 leading-relaxed"
               style={{ fontFamily: "Inter, system-ui, sans-serif" }}
             >
-              No more SMS rejections. No compliance headaches. Just professional
-              texting that works for your regulated business. Let's discuss how
-              we can transform your customer communication.
+              No more SMS rejections. No compliance headaches. Just professional texting that works
+              for your regulated business. Let's discuss how we can transform your customer
+              communication.
             </p>
           </div>
 
@@ -260,9 +254,7 @@ const Contact = () => {
                           type="email"
                           placeholder="john@speakeasy.com"
                           value={formData.email}
-                          onChange={(value) =>
-                            setFormData((prev) => ({ ...prev, email: value }))
-                          }
+                          onChange={(value) => setFormData((prev) => ({ ...prev, email: value }))}
                         />
                       </div>
 
@@ -273,9 +265,7 @@ const Contact = () => {
                           type="tel"
                           placeholder="(555) 123-4567"
                           value={formData.phone}
-                          onChange={(value) =>
-                            setFormData((prev) => ({ ...prev, phone: value }))
-                          }
+                          onChange={(value) => setFormData((prev) => ({ ...prev, phone: value }))}
                         />
                       </div>
                     </div>
@@ -288,9 +278,7 @@ const Contact = () => {
                           type="text"
                           placeholder="Company Name"
                           value={formData.company}
-                          onChange={(value) =>
-                            setFormData((prev) => ({ ...prev, company: value }))
-                          }
+                          onChange={(value) => setFormData((prev) => ({ ...prev, company: value }))}
                         />
                       </div>
                     </div>
@@ -303,9 +291,7 @@ const Contact = () => {
                           type="textarea"
                           placeholder="Tell us about your venue, your needs, and how we can help elevate your customer communication..."
                           value={formData.message}
-                          onChange={(value) =>
-                            setFormData((prev) => ({ ...prev, message: value }))
-                          }
+                          onChange={(value) => setFormData((prev) => ({ ...prev, message: value }))}
                           className="[&_textarea]:bg-white [&_textarea]:text-black [&_textarea]:placeholder-gray-500"
                         />
                       </div>
@@ -353,7 +339,7 @@ const Contact = () => {
                     </div>
 
                     {/* Honeypot field - hidden from users */}
-                    <div style={{ display: 'none' }}>
+                    <div style={{ display: "none" }}>
                       <label htmlFor="website">Website (leave blank)</label>
                       <input
                         type="text"
@@ -385,8 +371,8 @@ const Contact = () => {
                   className="text-xl text-gray-200 max-w-3xl mx-auto"
                   style={{ fontFamily: "Inter, system-ui, sans-serif" }}
                 >
-                  We're not just another SMS provider. We're the platform that
-                  actually works for regulated businesses.
+                  We're not just another SMS provider. We're the platform that actually works for
+                  regulated businesses.
                 </p>
               </div>
 
@@ -407,8 +393,8 @@ const Contact = () => {
                     className="text-gray-300 text-sm leading-relaxed"
                     style={{ fontFamily: "Inter, system-ui, sans-serif" }}
                   >
-                    Built-in compliance features that exceed industry standards
-                    and regulatory requirements.
+                    Built-in compliance features that exceed industry standards and regulatory
+                    requirements.
                   </p>
                 </div>
 
@@ -428,8 +414,8 @@ const Contact = () => {
                     className="text-gray-300 text-sm leading-relaxed"
                     style={{ fontFamily: "Inter, system-ui, sans-serif" }}
                   >
-                    Dedicated assistance that matches your business standards
-                    and exceeds expectations.
+                    Dedicated assistance that matches your business standards and exceeds
+                    expectations.
                   </p>
                 </div>
 
@@ -449,8 +435,8 @@ const Contact = () => {
                     className="text-gray-300 text-sm leading-relaxed"
                     style={{ fontFamily: "Inter, system-ui, sans-serif" }}
                   >
-                    Tailored platforms built specifically for regulated
-                    businesses that demand excellence.
+                    Tailored platforms built specifically for regulated businesses that demand
+                    excellence.
                   </p>
                 </div>
               </div>
@@ -482,9 +468,7 @@ const Contact = () => {
               </div>
             </div>
 
-            <h3 className="text-2xl font-bold text-white mb-4">
-              Message Sent Successfully!
-            </h3>
+            <h3 className="text-2xl font-bold text-white mb-4">Message Sent Successfully!</h3>
 
             <p className="text-gray-300 mb-6 leading-relaxed">
               Thank you for reaching out. We'll respond within 24 hours.

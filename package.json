@@ -28,7 +28,7 @@
     "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,css,md}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx,js,jsx,json,css,md}\"",
     "setup": "bash scripts/dev-setup.sh",
-    "prepare": "npm run type-check && npm run lint:check",
+    "prepare": "husky install && npm run type-check && npm run lint:check",
     "postinstall": "npm run clean"
   },
   "dependencies": {
@@ -64,7 +64,9 @@
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.2.0",
     "globals": "^16.4.0",
+    "husky": "^9.0.11",
     "jsdom": "^25.0.1",
+    "lint-staged": "^15.2.9",
     "postcss": "^8.4.47",
     "prettier": "^3.4.2",
     "tailwindcss": "^3.4.17",
@@ -74,5 +76,15 @@
     "vite-bundle-analyzer": "^0.11.0",
     "vitest": "^3.2.4",
     "web-vitals": "^4.2.4"
+  },
+  "lint-staged": {
+    "src/**/*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "packages/**/src/**/*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ]
   }
 }

@@ -145,6 +145,19 @@ npm run dev
 - **Cross-App**: Redirects to sms-hub-app2 for customer management
 - **Dev Mode**: Local development with simplified auth
 
+## 🧭 Homepage Content Architecture (New)
+
+- **Source of Truth**: All homepage hero copy is defined in `packages/hub-logic/src/hubContent.ts` under the active hub (e.g., `gnymble` → `hero.tagline.line1/line2`).
+- **Render Path**: `src/pages/Home.tsx` → `components/home/HubSelector` → hub component (e.g., `Gnymble.tsx`) → `shared/HeroSection.tsx`.
+- **Best Practice**: Avoid component-level text overrides. Always edit hub content, then hard refresh in dev to bust Vite HMR caches.
+- **SHAFT Emphasis**: The Platform Advantage explicitly features SHAFT (Sex, Hate, Alcohol, Firearms, Tobacco) support. Copy is in hub content; `ProblemSolutionSection` renders it and shows a brief SHAFT compliance note.
+
+### Edit Workflow (Hero copy)
+
+1. Edit `packages/hub-logic/src/hubContent.ts` for the active hub.
+2. Save; if changes don’t show, run `npm run clean && npm run dev` and hard refresh (Cmd+Shift+R).
+3. Verify both tagline lines render under the hero headline.
+
 ## 📚 Documentation
 
 ### **🚀 Getting Started**
@@ -172,14 +185,6 @@ npm run dev
 - **Testing**: 48 E2E tests across 6 browsers
 - **Multi-Tenant**: Proper hub isolation and data filtering
 - **Documentation**: Comprehensive documentation suite
-
-### **🔄 Recent Achievements (October 2025)**
-
-- **Sales Dashboard**: Rebranded with hub-specific filtering and branded UI
-- **Code Simplification**: Removed @sms-hub/logger package (~1,000 lines eliminated)
-- **Bundle Optimization**: 91KB gzipped main bundle with strategic code splitting
-- **E2E Testing**: Complete Playwright overhaul with 48 tests
-- **Documentation**: Comprehensive updates with clear structure
 
 ## 🚀 Development
 
@@ -272,6 +277,18 @@ vercel ls
 3. Write tests for new features
 4. Update documentation for significant changes
 5. Ensure zero TypeScript/ESLint errors
+
+### Git Hooks (Recommended)
+
+- Install hooks (auto-run by `npm run prepare`):
+  - Pre-commit: `lint-staged` formats and lints staged files
+  - Pre-push: `npm run type-check && npm run test:run` for fast safety checks
+
+### Homepage Content Workflow (Hero)
+
+- Edit copy in `packages/hub-logic/src/hubContent.ts`
+- Hard refresh if needed; for stubborn cache, `npm run clean && npm run dev`
+- Validate both hero tagline lines render; E2E asserts both in `test/e2e/web/home.spec.ts`
 
 ---
 

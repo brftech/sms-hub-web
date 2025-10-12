@@ -20,6 +20,8 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
       "@sms-hub/ui/marketing": path.resolve(__dirname, "./packages/ui/src/index-marketing.ts"),
       "@sms-hub/ui": path.resolve(__dirname, "./packages/ui/src"),
+      "@sms-hub/hub-logic": path.resolve(__dirname, "./packages/hub-logic/src/index.ts"),
+      "@sms-hub/supabase": path.resolve(__dirname, "./packages/supabase/src/index.ts"),
     },
     dedupe: ["react", "react-dom"],
     preserveSymlinks: true,

@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { 
-  Toaster, 
-  SonnerToaster, 
+import {
+  Toaster,
+  SonnerToaster,
   TooltipProvider,
   HubProvider,
   ErrorBoundary,
@@ -14,6 +14,29 @@ import { useScrollToTop } from "@sms-hub/utils";
 import { webEnvironment } from "./config/webEnvironment";
 import { EnvironmentDebug } from "./components/EnvironmentDebug";
 import AppFloatingComponents from "./components/AppFloatingComponents";
+import {
+  HOME_PATH,
+  HOME_ALIAS_PATH,
+  CONTACT_PATH,
+  FAQ_PATH,
+  TERMS_PATH,
+  PRIVACY_PATH,
+  CLIENT_PAGE_STATIC_PATH,
+  CLIENTS_PATH,
+  CLIENTS_PRIVACY_PATH,
+  CLIENTS_TERMS_PATH,
+  ABOUT_PATH,
+  PRICING_PATH,
+  DEMO_PATH,
+  ADMIN_PATH,
+  TEST_AUTH_PATH,
+  DEBUG_AUTH_PATH,
+  PAYMENT_SUCCESS_PATH,
+  CHECK_EMAIL_PATH,
+  VERIFY_OTP_PATH,
+  VERIFY_PATH,
+  NOT_FOUND_PATH,
+} from "./utils/routes";
 
 // Import critical pages directly (frequently accessed)
 import Home from "./pages/Home";
@@ -78,9 +101,9 @@ const AppRoutes = () => {
 
   return (
     <Routes>
-      <Route path="/" element={<DefaultComponent />} />
+      <Route path={HOME_PATH} element={<DefaultComponent />} />
       <Route
-        path="/home"
+        path={HOME_ALIAS_PATH}
         element={
           <PageTransition>
             <Home />
@@ -88,7 +111,7 @@ const AppRoutes = () => {
         }
       />
       <Route
-        path="/contact"
+        path={CONTACT_PATH}
         element={
           <PageTransition>
             <Contact />
@@ -97,7 +120,7 @@ const AppRoutes = () => {
       />
 
       <Route
-        path="/faq"
+        path={FAQ_PATH}
         element={
           <PageTransition>
             <Suspense fallback={<PageLoader />}>
@@ -107,7 +130,7 @@ const AppRoutes = () => {
         }
       />
       <Route
-        path="/terms"
+        path={TERMS_PATH}
         element={
           <PageTransition>
             <Suspense fallback={<PageLoader />}>
@@ -117,7 +140,7 @@ const AppRoutes = () => {
         }
       />
       <Route
-        path="/privacy"
+        path={PRIVACY_PATH}
         element={
           <PageTransition>
             <Suspense fallback={<PageLoader />}>
@@ -128,7 +151,7 @@ const AppRoutes = () => {
       />
       {/* Dynamic Client Routes */}
       <Route
-        path="/donsbt"
+        path={CLIENT_PAGE_STATIC_PATH}
         element={
           <PageTransition>
             <Suspense
@@ -144,7 +167,7 @@ const AppRoutes = () => {
         }
       />
       <Route
-        path="/clients/:clientId"
+        path={CLIENTS_PATH}
         element={
           <PageTransition>
             <Suspense
@@ -160,7 +183,7 @@ const AppRoutes = () => {
         }
       />
       <Route
-        path="/clients/:clientId/privacy"
+        path={CLIENTS_PRIVACY_PATH}
         element={
           <PageTransition>
             <Suspense
@@ -176,7 +199,7 @@ const AppRoutes = () => {
         }
       />
       <Route
-        path="/clients/:clientId/terms"
+        path={CLIENTS_TERMS_PATH}
         element={
           <PageTransition>
             <Suspense
@@ -192,7 +215,7 @@ const AppRoutes = () => {
         }
       />
       <Route
-        path="/about"
+        path={ABOUT_PATH}
         element={
           <PageTransition>
             <Suspense fallback={<PageLoader />}>
@@ -202,7 +225,7 @@ const AppRoutes = () => {
         }
       />
       <Route
-        path="/pricing"
+        path={PRICING_PATH}
         element={
           <PageTransition>
             <Suspense fallback={<PageLoader />}>
@@ -212,7 +235,7 @@ const AppRoutes = () => {
         }
       />
       <Route
-        path="/demo"
+        path={DEMO_PATH}
         element={
           <PageTransition>
             <Suspense fallback={<PageLoader />}>
@@ -224,7 +247,7 @@ const AppRoutes = () => {
 
       {/* Admin Dashboard - Accessible in all environments with auth */}
       <Route
-        path="/admin"
+        path={ADMIN_PATH}
         element={
           <PageTransition>
             <Suspense fallback={<PageLoader />}>
@@ -237,7 +260,7 @@ const AppRoutes = () => {
       {/* Auth routes - Dev only */}
       {import.meta.env.MODE === "development" && (
         <Route
-          path="/test-auth"
+          path={TEST_AUTH_PATH}
           element={
             <PageTransition>
               <TestAuth />
@@ -247,7 +270,7 @@ const AppRoutes = () => {
       )}
       {import.meta.env.MODE === "development" && (
         <Route
-          path="/debug-auth"
+          path={DEBUG_AUTH_PATH}
           element={
             <PageTransition>
               <DebugAuth />
@@ -256,7 +279,7 @@ const AppRoutes = () => {
         />
       )}
       <Route
-        path="/payment-success"
+        path={PAYMENT_SUCCESS_PATH}
         element={
           <PageTransition>
             <PaymentSuccess />
@@ -264,7 +287,7 @@ const AppRoutes = () => {
         }
       />
       <Route
-        path="/check-email"
+        path={CHECK_EMAIL_PATH}
         element={
           <PageTransition>
             <CheckEmail />
@@ -272,7 +295,7 @@ const AppRoutes = () => {
         }
       />
       <Route
-        path="/verify-otp"
+        path={VERIFY_OTP_PATH}
         element={
           <PageTransition>
             <VerifyAuth />
@@ -280,7 +303,7 @@ const AppRoutes = () => {
         }
       />
       <Route
-        path="/verify"
+        path={VERIFY_PATH}
         element={
           <PageTransition>
             <VerifyAuth />
@@ -289,7 +312,7 @@ const AppRoutes = () => {
       />
 
       <Route
-        path="*"
+        path={NOT_FOUND_PATH}
         element={
           <PageTransition>
             <Home />
@@ -325,10 +348,7 @@ const App = () => {
         </QueryClientProvider>
         {/* Environment Debug - shows on preview/staging for debugging */}
         <EnvironmentDebug
-          show={
-            import.meta.env.MODE === "development" ||
-            window.location.hostname === "localhost"
-          }
+          show={import.meta.env.MODE === "development" || window.location.hostname === "localhost"}
         />
       </div>
     </ErrorBoundary>

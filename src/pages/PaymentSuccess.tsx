@@ -4,14 +4,13 @@ import { PageLayout, SEO } from "@sms-hub/ui/marketing";
 import { CheckCircle, ArrowRight, Loader } from "lucide-react";
 import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";
+import { PRICING_PATH } from "@/utils/routes";
 
 const PaymentSuccess = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [isVerifying, setIsVerifying] = useState(true);
-  const [paymentStatus, setPaymentStatus] = useState<
-    "success" | "error" | "pending"
-  >("pending");
+  const [paymentStatus, setPaymentStatus] = useState<"success" | "error" | "pending">("pending");
   const [sessionId, setSessionId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -35,32 +34,29 @@ const PaymentSuccess = () => {
 
   const handleContinueToApp = () => {
     // Redirect to the main app (app2) for account setup
-    const currentHub = window.location.hostname.includes('percytech') ? 'percytech' : 
-                      window.location.hostname.includes('percymd') ? 'percymd' :
-                      window.location.hostname.includes('percytext') ? 'percytext' : 'gnymble';
-    
+    const currentHub = window.location.hostname.includes("percytech")
+      ? "percytech"
+      : window.location.hostname.includes("percymd")
+        ? "percymd"
+        : window.location.hostname.includes("percytext")
+          ? "percytext"
+          : "gnymble";
+
     window.location.href = `https://app.${currentHub}.com?payment_success=true&session_id=${sessionId}`;
   };
 
   if (isVerifying) {
     return (
       <PageLayout>
-        <SEO
-          title="Verifying Payment - SMS Hub"
-          description="Verifying your payment..."
-        />
+        <SEO title="Verifying Payment - SMS Hub" description="Verifying your payment..." />
         <Navigation />
 
         <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center px-4 pt-24">
           <div className="max-w-md w-full text-center">
             <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-3xl border border-gray-700/50 p-8">
               <Loader className="w-16 h-16 text-orange-500 animate-spin mx-auto mb-6" />
-              <h1 className="text-2xl font-bold text-white mb-4">
-                Verifying Payment...
-              </h1>
-              <p className="text-gray-300">
-                Please wait while we confirm your payment.
-              </p>
+              <h1 className="text-2xl font-bold text-white mb-4">Verifying Payment...</h1>
+              <p className="text-gray-300">Please wait while we confirm your payment.</p>
             </div>
           </div>
         </div>
@@ -73,10 +69,7 @@ const PaymentSuccess = () => {
   if (paymentStatus === "error") {
     return (
       <PageLayout>
-        <SEO
-          title="Payment Error - SMS Hub"
-          description="There was an issue with your payment."
-        />
+        <SEO title="Payment Error - SMS Hub" description="There was an issue with your payment." />
         <Navigation />
 
         <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center px-4 pt-24">
@@ -85,15 +78,12 @@ const PaymentSuccess = () => {
               <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
                 <span className="text-red-500 text-2xl">✕</span>
               </div>
-              <h1 className="text-2xl font-bold text-white mb-4">
-                Payment Issue
-              </h1>
+              <h1 className="text-2xl font-bold text-white mb-4">Payment Issue</h1>
               <p className="text-gray-300 mb-8">
-                We couldn't verify your payment. Please try again or contact
-                support.
+                We couldn't verify your payment. Please try again or contact support.
               </p>
               <button
-                onClick={() => navigate("/pricing")}
+                onClick={() => navigate(PRICING_PATH)}
                 className="px-8 py-3 bg-orange-600 text-white font-bold rounded-full hover:bg-orange-700 transition-all duration-300"
               >
                 Back to Pricing
@@ -120,13 +110,11 @@ const PaymentSuccess = () => {
           <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-3xl border border-gray-700/50 p-8">
             <CheckCircle className="w-20 h-20 text-green-500 mx-auto mb-6" />
 
-            <h1 className="text-3xl font-bold text-white mb-4">
-              Payment Successful! 🎉
-            </h1>
+            <h1 className="text-3xl font-bold text-white mb-4">Payment Successful! 🎉</h1>
 
             <p className="text-gray-300 mb-8 text-lg">
-              Thank you for your payment. Now let's create your account and get
-              you set up with SMS messaging.
+              Thank you for your payment. Now let's create your account and get you set up with SMS
+              messaging.
             </p>
 
             <div className="bg-gradient-to-r from-green-900/20 to-green-800/20 rounded-2xl border border-green-700/30 p-6 mb-8">
@@ -147,9 +135,7 @@ const PaymentSuccess = () => {
               <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
             </button>
 
-            <p className="text-gray-400 text-sm mt-4">
-              Session ID: {sessionId?.slice(-8)}...
-            </p>
+            <p className="text-gray-400 text-sm mt-4">Session ID: {sessionId?.slice(-8)}...</p>
           </div>
         </div>
       </div>

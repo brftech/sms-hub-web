@@ -41,8 +41,12 @@ test.describe("Contact Page", () => {
     await expect(page).toHaveURL(/.*\/contact/);
   });
 
-  test("should fill out contact form", async ({ page }) => {
-    // Fill out form fields (based on actual Contact.tsx structure)
+  test("should fill and submit contact form (intercept)", async ({ page }) => {
+    // Intercept Edge Function call and assert payload
+    const intercepted = page.waitForRequest(
+      (req) => req.url().includes("/api/submit-contact") && req.method() === "POST"
+    );
+
     const firstNameInput = page.locator('input[name="firstName"]');
     const lastNameInput = page.locator('input[name="lastName"]');
     const emailInput = page.locator('input[name="email"]');
@@ -51,15 +55,21 @@ test.describe("Contact Page", () => {
     await firstNameInput.fill("John");
     await lastNameInput.fill("Doe");
     await emailInput.fill("john.doe@example.com");
-
     if (await messageInput.isVisible()) {
       await messageInput.fill("This is a test message from Playwright");
     }
 
-    // Verify values were entered
-    await expect(firstNameInput).toHaveValue("John");
-    await expect(lastNameInput).toHaveValue("Doe");
-    await expect(emailInput).toHaveValue("john.doe@example.com");
+    // Submit
+    const submitButton = page.locator(
+      'button[type="submit"], button:has-text("Submit"), button:has-text("Send")'
+    );
+    await submitButton.first().click();
+
+    const req = await intercepted;
+    const body = JSON.parse(req.postData() || "{}");
+    expect(body).toMatchObject({
+      email: "john.doe@example.com",
+    });
   });
 
   test("should be mobile responsive", async ({ page }) => {

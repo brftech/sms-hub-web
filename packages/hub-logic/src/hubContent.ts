@@ -50,6 +50,7 @@ export interface ProblemSolutionContent {
     items: string[];
   };
   badge: string;
+  shaftNote?: string; // optional brief note about SHAFT regulations
 }
 
 // Stats Content Types
@@ -96,18 +97,17 @@ const gnymbleContent: HubContentData = {
   hero: {
     fixedText: "Compliant SMS texting for",
     tagline: {
-      line1: "We do it really well.",
-      line2: "Others...don't do it at all.",
+      line1: "We do texting very well.",
+      line2: "Others won’t do it, at all.",
     },
     description:
-      "Built for businesses that need reliable, compliant messaging.",
+      "Most SMS platforms block SHAFT categories. We don’t. We build compliant, working messaging for cigar retailers, wineries, craft distillers, firearm ranges/dealers and more.",
     ctaText: "🔥 For business owners who demand SMS that delivers",
   },
   cta: {
     title: "Ready to Find Your",
     titleHighlight: "SMS Home?",
-    description:
-      "Experience the platform built for businesses that dare to be different.",
+    description: "Experience the platform built for businesses that dare to be different.",
     descriptionHighlight: "Your success demands SMS that delivers results.",
     steps: [
       {
@@ -118,20 +118,17 @@ const gnymbleContent: HubContentData = {
       {
         number: "02",
         title: "GET SET UP",
-        description:
-          "Lightning-fast 8-day deployment. Master-level compliance included.",
+        description: "Lightning-fast 8-day deployment. Master-level compliance included.",
       },
       {
         number: "03",
         title: "GROW YOUR BUSINESS",
-        description:
-          "Connect powerfully with customers, employees, and stakeholders.",
+        description: "Connect powerfully with customers, employees, and stakeholders.",
       },
     ],
     ctaText: "🚀 GET STARTED NOW",
     ctaSubtext: "📱 SEE IT IN ACTION",
-    guaranteeText:
-      "If we can't get you set up in 8 days, your $179 onboarding is free.",
+    guaranteeText: "If we can't get you set up in 8 days, your $179 onboarding is free.",
     badge: {
       text: "PCA PREMIUM CIGAR ASSOCIATION",
       variant: "component",
@@ -140,29 +137,31 @@ const gnymbleContent: HubContentData = {
   problemSolution: {
     title: {
       prefix: "The Platform",
-      highlight: "Advantage",
+      highlight: "Advantage for SHAFT",
     },
     description:
-      "While others exclude, we excel. We champion every business that dares to be different.",
+      "We’re built for restricted categories others won’t touch. Our compliance-first approach makes SHAFT messaging work—without getting filtered.",
     deliver: {
-      title: "WE DELIVER WHAT OTHERS PROMISE",
+      title: "BUILT FOR SHAFT-COMPLIANT MESSAGING",
       features: [
-        "Master-level compliance expertise for every industry",
-        "8-day setup guarantee that we actually honor",
-        "White-glove service that exceeds expectations",
+        "CTIA/TCPA-aligned opt-in flows and consent records",
+        "Age-gated journeys and compliant content templates",
+        "Carrier/10DLC registration support for restricted categories",
         "Expert humans who solve problems fast",
       ],
     },
     overlook: {
-      title: "WHAT OTHERS OVERLOOK",
+      title: "WHAT OTHERS WON’T DO",
       items: [
-        "Complex industries need expert guidance",
-        "Regulated businesses demand proven compliance",
-        "Growing companies require scalable solutions",
-        "Professional teams deserve premium support",
+        "Most providers refuse SHAFT categories (Sex, Hate, Alcohol, Firearms, Tobacco)",
+        "No appetite for carrier/review workflows and brand vetting",
+        "Generic compliance that breaks for regulated segments",
+        "Little guidance when messages start getting filtered",
       ],
     },
     badge: "COMPLIANT ✓",
+    shaftNote:
+      "SHAFT refers to Sex, Hate, Alcohol, Firearms, and Tobacco. Many providers exclude these categories. We design compliant programs that meet carrier and industry policies for alcohol/tobacco and similar businesses.",
   },
   stats: {
     title: "BATTLE-TESTED RESULTS",
@@ -194,8 +193,7 @@ const gnymbleContent: HubContentData = {
     testimonials: [
       {
         category: "CIGAR LOUNGE",
-        quote:
-          "The first time we used Gnymble to publicize an event..we had a record turnout!",
+        quote: "The first time we used Gnymble to publicize an event..we had a record turnout!",
         name: "Charles Oxendine",
         company: "Anstead's Tobacco",
         location: "Premium Cigar Association",
@@ -243,20 +241,17 @@ const percymdContent: HubContentData = {
       {
         number: "01",
         title: "REACH OUT",
-        description:
-          "Share your practice needs. We craft the perfect HIPAA-compliant solution.",
+        description: "Share your practice needs. We craft the perfect HIPAA-compliant solution.",
       },
       {
         number: "02",
         title: "GET SECURED",
-        description:
-          "Lightning-fast 8-day deployment. Bulletproof HIPAA compliance included.",
+        description: "Lightning-fast 8-day deployment. Bulletproof HIPAA compliance included.",
       },
       {
         number: "03",
         title: "IMPROVE OUTCOMES",
-        description:
-          "Connect powerfully with patients, reduce no-shows, and improve care quality.",
+        description: "Connect powerfully with patients, reduce no-shows, and improve care quality.",
       },
     ],
     ctaText: "🏥 GET STARTED NOW",
@@ -365,21 +360,15 @@ export const getHubCTAContent = (hubType: HubType): CTAContent => {
   return hubContentMap[hubType]?.cta || gnymbleContent.cta;
 };
 
-export const getHubProblemSolutionContent = (
-  hubType: HubType
-): ProblemSolutionContent => {
-  return (
-    hubContentMap[hubType]?.problemSolution || gnymbleContent.problemSolution
-  );
+export const getHubProblemSolutionContent = (hubType: HubType): ProblemSolutionContent => {
+  return hubContentMap[hubType]?.problemSolution || gnymbleContent.problemSolution;
 };
 
 export const getHubStatsContent = (hubType: HubType): StatsContent => {
   return hubContentMap[hubType]?.stats || gnymbleContent.stats;
 };
 
-export const getHubTestimonialsContent = (
-  hubType: HubType
-): TestimonialsContent => {
+export const getHubTestimonialsContent = (hubType: HubType): TestimonialsContent => {
   return hubContentMap[hubType]?.testimonials || gnymbleContent.testimonials;
 };
 

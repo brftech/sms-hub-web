@@ -20,6 +20,7 @@ import {
   Users,
 } from "lucide-react";
 import { useState } from "react";
+import { CONTACT_PATH } from "@/utils/routes";
 
 export default function Demo() {
   const navigate = useNavigate();
@@ -50,9 +51,7 @@ export default function Demo() {
           <div className="text-center mb-20">
             <div className="inline-flex items-center px-4 py-2 rounded-full bg-orange-500/20 border border-orange-500/30 mb-8">
               <Target className="w-4 h-4 text-orange-400 mr-2" />
-              <span className="text-sm font-medium text-orange-400">
-                STATIC PREVIEW
-              </span>
+              <span className="text-sm font-medium text-orange-400">STATIC PREVIEW</span>
             </div>
 
             <h1
@@ -67,9 +66,8 @@ export default function Demo() {
               className="text-xl text-gray-300 max-w-3xl mx-auto mb-12 leading-relaxed"
               style={{ fontFamily: "Inter, system-ui, sans-serif" }}
             >
-              Preview both sides of our SMS platform through this static
-              representation. See what your customers receive and how easy it is
-              to manage from your business dashboard.
+              Preview both sides of our SMS platform through this static representation. See what
+              your customers receive and how easy it is to manage from your business dashboard.
             </p>
 
             <div className="flex items-center justify-center space-x-8 text-gray-400 text-sm">
@@ -149,8 +147,8 @@ export default function Demo() {
                       className="text-gray-300 text-lg"
                       style={{ fontFamily: "Inter, system-ui, sans-serif" }}
                     >
-                      Professional, engaging SMS messages that build trust and
-                      drive action. (Static preview)
+                      Professional, engaging SMS messages that build trust and drive action. (Static
+                      preview)
                     </p>
                   </div>
                   <div className="flex justify-center">
@@ -170,8 +168,8 @@ export default function Demo() {
                       className="text-gray-300 text-lg"
                       style={{ fontFamily: "Inter, system-ui, sans-serif" }}
                     >
-                      Simple, powerful tools to manage conversations and grow
-                      your business. (Static preview)
+                      Simple, powerful tools to manage conversations and grow your business. (Static
+                      preview)
                     </p>
                   </div>
                   <div className="flex justify-center">
@@ -196,8 +194,8 @@ export default function Demo() {
                   className="text-gray-300 text-lg leading-relaxed max-w-3xl mx-auto"
                   style={{ fontFamily: "Inter, system-ui, sans-serif" }}
                 >
-                  See how messages flow between your business dashboard and your
-                  customer's phone in this static preview.
+                  See how messages flow between your business dashboard and your customer's phone in
+                  this static preview.
                 </p>
               </div>
 
@@ -312,16 +310,15 @@ export default function Demo() {
                 className="text-gray-300 mb-10 max-w-2xl mx-auto text-lg leading-relaxed"
                 style={{ fontFamily: "Inter, system-ui, sans-serif" }}
               >
-                This was just a static preview. No more SMS rejections. No
-                compliance headaches. Just professional texting that works for
-                your regulated business.
+                This was just a static preview. No more SMS rejections. No compliance headaches.
+                Just professional texting that works for your regulated business.
                 <br />
                 <span className="text-orange-400 font-medium">
                   Submit our contact form to schedule a live demo with real SMS.
                 </span>
               </p>
               <button
-                onClick={() => navigate("/contact")}
+                onClick={() => navigate(CONTACT_PATH)}
                 className="px-10 py-4 bg-orange-600 text-white font-bold rounded-full hover:bg-orange-700 transition-all duration-300 text-lg tracking-wide uppercase flex items-center justify-center mx-auto group"
                 style={{ fontFamily: "Inter, system-ui, sans-serif" }}
               >

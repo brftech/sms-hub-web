@@ -136,13 +136,15 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ businessTypes, content
             >
               Contact
             </button>
-            <button
-              onClick={() => handleDirectCheckout()}
-              className="px-6 py-3 border border-orange-600 text-orange-400 hover:bg-orange-600/10 rounded-md font-semibold transition-colors"
-              style={{ fontFamily: "Inter, system-ui, sans-serif" }}
-            >
-              SignUp
-            </button>
+            {import.meta.env.DEV && (
+              <button
+                onClick={() => handleDirectCheckout()}
+                className="px-6 py-3 border border-orange-600 text-orange-400 hover:bg-orange-600/10 rounded-md font-semibold transition-colors"
+                style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+              >
+                SignUp
+              </button>
+            )}
           </div>
           <div className="text-xs text-gray-400">
             Compliance-ready • Age-verified • TCPA compliant

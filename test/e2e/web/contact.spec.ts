@@ -42,10 +42,25 @@ test.describe("Contact Page", () => {
   });
 
   test("should fill and submit contact form (intercept)", async ({ page }) => {
-    // Intercept Edge Function call and assert payload
-    const intercepted = page.waitForRequest(
-      (req) => req.url().includes("/api/submit-contact") && req.method() === "POST"
-    );
+    // Intercept Supabase Edge Function call and assert payload
+    let capturedBody: any = null;
+    const intercepted = new Promise<void>((resolve) => {
+      page.route("**/functions/v1/submit-contact", async (route) => {
+        const req = route.request();
+        const bodyText = req.postData() || "{}";
+        try {
+          capturedBody = JSON.parse(bodyText);
+        } catch {
+          capturedBody = {};
+        }
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({ ok: true }),
+        });
+        resolve();
+      });
+    });
 
     const firstNameInput = page.locator('input[name="firstName"]');
     const lastNameInput = page.locator('input[name="lastName"]');
@@ -59,17 +74,18 @@ test.describe("Contact Page", () => {
       await messageInput.fill("This is a test message from Playwright");
     }
 
+    // Satisfy 3s anti-spam timer in Contact.tsx before submitting
+    await page.waitForTimeout(3100);
+
     // Submit
     const submitButton = page.locator(
       'button[type="submit"], button:has-text("Submit"), button:has-text("Send")'
     );
     await submitButton.first().click();
 
-    const req = await intercepted;
-    const body = JSON.parse(req.postData() || "{}");
-    expect(body).toMatchObject({
-      email: "john.doe@example.com",
-    });
+    await intercepted; // wait for the route to capture the request
+    expect(capturedBody).toBeTruthy();
+    expect(capturedBody.email).toBe("john.doe@example.com");
   });
 
   test("should be mobile responsive", async ({ page }) => {

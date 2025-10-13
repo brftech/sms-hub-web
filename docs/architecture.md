@@ -6,7 +6,13 @@
 
 SMS Hub Web is a production-ready multi-tenant marketing website and sales dashboard built with React 19, Vite, TypeScript, and Supabase. It serves 4 business brands with isolated data, branded experiences, and comprehensive lead management capabilities.
 
-**Current Status**: ✅ **Production Ready** - Marketing platform fully operational with Sales Dashboard and multi-tenant support
+**Current Status**: ✅ **Production Ready** - Live at gnymble.com with SHAFT-compliant messaging
+
+**Production Architecture (October 13, 2025)**:
+- Contact-first conversion funnel (SignUp temporarily disabled)
+- Feature flags via `import.meta.env.DEV` for controlled rollout
+- AFT-focused compliance messaging (Alcohol, Firearms, Tobacco)
+- Streamlined hero design with 0.75 scale interactive phone demo
 
 ## 🏗️ System Architecture
 
@@ -246,6 +252,15 @@ npx supabase functions deploy stripe-webhook --project-ref fwlivygerbqzowbzxesw
 - **Performance**: 91KB gzipped main bundle (down from 302KB)
 - **Testing**: Complete E2E test overhaul (48 tests, 6 browsers)
 - **Documentation**: Comprehensive updates with clear structure
+
+### **Production Launch Updates (October 13, 2025)**
+
+- **Homepage Redesign**: Interactive phone at 0.75 scale, tagline below
+- **SHAFT Messaging**: Clear AFT focus (Alcohol, Firearms, Tobacco only)
+- **Conversion Strategy**: Contact-first approach with SignUp in development
+- **Feature Flags**: Environment-based button visibility (`import.meta.env.DEV`)
+- **Visual Cleanup**: Removed all section divider lines for seamless flow
+- **Mobile Optimization**: Logo left + Login right in mobile navigation
 
 ## 🗺️ Centralized Routing Architecture
 

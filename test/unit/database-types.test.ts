@@ -5,7 +5,7 @@ import type {
   EmailSubscriber,
   ContactFormSubmission,
   Verification,
-} from "@sms-hub/supabase/src/database";
+} from "@sms-hub/supabase";
 
 // These tests are compile-time leaning: if schema changes break the exported
 // types (missing/renamed fields, wrong shapes), the suite will catch it.

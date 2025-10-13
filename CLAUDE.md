@@ -1,6 +1,6 @@
 # SMS Hub Web Development Context
 
-**Last Updated**: October 3, 2025 at 12:30 PM ET
+**Last Updated**: October 13, 2025
 
 ## 🎯 Project Overview
 
@@ -192,7 +192,87 @@ npm run build:check
 - **Local package cache (Vite)**: If content edits don’t appear, run `npm run clean && npm run dev` and hard refresh.
 - **Hub mismatch**: Verify `document.body.getAttribute('data-hub')` equals the expected hub.
 
+## 🗺️ Centralized Routing (Recent Addition)
+
+All application routes are now centralized in `src/utils/routes.ts` for consistency, type safety, and easier refactoring.
+
+### **Usage**
+
+```typescript
+// Import routes
+import { HOME_PATH, CONTACT_PATH, PRICING_PATH, ADMIN_PATH, SIGNUP_PATH } from "@/utils/routes";
+
+// Use in navigation
+<Link to={CONTACT_PATH}>Contact</Link>
+<button onClick={() => navigate(PRICING_PATH)}>View Pricing</button>
+```
+
+### **Benefits**
+
+- Single source of truth for all paths
+- Compile-time checking prevents broken links
+- Easy to refactor routes across the entire app
+- Consistent paths in navigation, buttons, and redirects
+
+### **When to Use**
+
+- Always use route constants instead of hardcoded strings
+- Import from `@/utils/routes` in any component needing navigation
+- Update `routes.ts` when adding new pages
+
+## 🧪 Testing Strategy (Updated)
+
+### **Unit Tests (Vitest)**
+
+```bash
+# Run all unit tests
+npm run test:run
+
+# Watch mode
+npm run test
+
+# Specific test file
+npx vitest run test/unit/database-types.test.ts
+```
+
+**Key Unit Tests:**
+- `test/unit/database-types.test.ts` - Database schema validation
+- `test/unit/hub-context-mock.test.tsx` - Hub provider testing
+- `test/unit/simple.test.ts` - Basic smoke tests
+
+### **E2E Tests (Playwright)**
+
+```bash
+# Run all E2E tests (from config/)
+cd config && npx playwright test
+
+# Run with UI (interactive mode)
+cd config && npx playwright test --ui
+
+# Run specific test suite
+cd config && npx playwright test test/e2e/web/home.spec.ts
+
+# View HTML report
+cd config && npx playwright show-report
+```
+
+**E2E Test Organization:**
+- `test/e2e/web/` - Homepage, contact, navigation tests
+- `test/e2e/admin/` - Sales dashboard tests
+- `test/e2e/integration/` - Cross-feature integration tests
+
+**Important:** E2E tests use existing dev server (`reuseExistingServer: true`), so start dev server before running tests.
+
+### **Git Hooks (Husky)**
+
+Automated quality checks run on every commit/push:
+
+- **Pre-commit**: `lint-staged` (formats and lints staged files)
+- **Pre-push**: `npm run type-check && npm run test:run` (type safety + unit tests)
+
+Hooks are installed automatically via `npm run prepare`.
+
 ---
 
-**Last Updated**: October 3, 2025 at 12:30 PM ET  
+**Last Updated**: October 13, 2025  
 **Status**: Production Ready - Marketing platform fully operational with Sales Dashboard and multi-tenant support

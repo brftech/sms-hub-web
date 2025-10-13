@@ -1,6 +1,6 @@
 # SMS Hub Web - Marketing Platform
 
-**Last Updated**: October 3, 2025 at 12:30 PM ET
+**Last Updated**: October 13, 2025
 
 ## 🎯 Project Overview
 
@@ -145,18 +145,43 @@ npm run dev
 - **Cross-App**: Redirects to sms-hub-app2 for customer management
 - **Dev Mode**: Local development with simplified auth
 
-## 🧭 Homepage Content Architecture (New)
+## 🧭 Homepage Content Architecture
 
-- **Source of Truth**: All homepage hero copy is defined in `packages/hub-logic/src/hubContent.ts` under the active hub (e.g., `gnymble` → `hero.tagline.line1/line2`).
+### **Content Source of Truth**
+
+- **Location**: All homepage hero copy is defined in `packages/hub-logic/src/hubContent.ts` under the active hub (e.g., `gnymble` → `hero.tagline.line1/line2`).
 - **Render Path**: `src/pages/Home.tsx` → `components/home/HubSelector` → hub component (e.g., `Gnymble.tsx`) → `shared/HeroSection.tsx`.
-- **Best Practice**: Avoid component-level text overrides. Always edit hub content, then hard refresh in dev to bust Vite HMR caches.
-- **SHAFT Emphasis**: The Platform Advantage explicitly features SHAFT (Sex, Hate, Alcohol, Firearms, Tobacco) support. Copy is in hub content; `ProblemSolutionSection` renders it and shows a brief SHAFT compliance note.
+- **Best Practice**: Always edit hub content centrally, never override text in components.
+- **SHAFT Emphasis**: The Platform Advantage explicitly features SHAFT (Sex, Hate, Alcohol, Firearms, Tobacco) support. This is our primary value proposition for small businesses in regulated industries.
 
-### Edit Workflow (Hero copy)
+### **Edit Workflow (Hero Copy)**
 
 1. Edit `packages/hub-logic/src/hubContent.ts` for the active hub.
-2. Save; if changes don’t show, run `npm run clean && npm run dev` and hard refresh (Cmd+Shift+R).
+2. Save; if changes don't show, run `npm run clean && npm run dev` and hard refresh (Cmd+Shift+R).
 3. Verify both tagline lines render under the hero headline.
+4. Run E2E tests to verify: `cd config && npx playwright test test/e2e/web/home.spec.ts`
+
+## 🗺️ Centralized Routing
+
+All application routes are centralized in `src/utils/routes.ts` for consistency and maintainability.
+
+### **Route Management**
+
+```typescript
+// Import centralized routes
+import { HOME_PATH, CONTACT_PATH, PRICING_PATH, ADMIN_PATH } from "@/utils/routes";
+
+// Use in components
+<Link to={CONTACT_PATH}>Contact</Link>
+<button onClick={() => navigate(PRICING_PATH)}>Pricing</button>
+```
+
+### **Benefits**
+
+- **Type Safety**: Compile-time checking for all routes
+- **Refactor Safe**: Change paths in one place
+- **Consistency**: Same paths across navigation, links, and redirects
+- **Maintainability**: Easy to add/modify routes
 
 ## 📚 Documentation
 
@@ -196,15 +221,23 @@ npm run dev              # Start dev server (port 3000)
 npm run type-check       # TypeScript check
 npm run lint             # Lint code
 npm run build:check      # Full build check
+npm run clean            # Clean Vite cache and rebuild
 
 # Testing
-npm run test             # Unit tests
-npm run test:e2e         # E2E tests
-npx playwright test      # Playwright tests
+npm run test             # Unit tests (watch mode)
+npm run test:run         # Unit tests (single run)
+npm run test:e2e         # E2E tests (all browsers)
+
+# Playwright E2E Testing
+cd config && npx playwright test                    # Run all E2E tests
+cd config && npx playwright test --ui              # Run with UI
+cd config && npx playwright show-report            # View HTML report
+cd config && npx playwright test test/e2e/web/     # Run web tests only
 
 # Building
 npm run build            # Production build
 npm run preview          # Preview build
+npm run build:analyze    # Analyze bundle size
 ```
 
 ### **Environment Variables**
@@ -272,25 +305,50 @@ vercel ls
 
 ## 🤝 Contributing
 
+### **Development Workflow**
+
 1. Follow development rules in [CLAUDE.md](CLAUDE.md)
-2. Run `npm run build:check` before committing
-3. Write tests for new features
-4. Update documentation for significant changes
-5. Ensure zero TypeScript/ESLint errors
+2. Use centralized routes from `src/utils/routes.ts`
+3. Edit hub content in `packages/hub-logic/src/hubContent.ts`
+4. Run `npm run build:check` before committing
+5. Write tests for new features
+6. Update documentation for significant changes
+7. Ensure zero TypeScript/ESLint errors
 
-### Git Hooks (Recommended)
+### **Git Hooks (Husky)**
 
-- Install hooks (auto-run by `npm run prepare`):
-  - Pre-commit: `lint-staged` formats and lints staged files
-  - Pre-push: `npm run type-check && npm run test:run` for fast safety checks
+Git hooks are automatically installed via `npm run prepare` and enforce code quality:
 
-### Homepage Content Workflow (Hero)
+- **Pre-commit**: Runs `lint-staged` to format and lint staged files
+- **Pre-push**: Runs `npm run type-check && npm run test:run` for safety checks
 
-- Edit copy in `packages/hub-logic/src/hubContent.ts`
-- Hard refresh if needed; for stubborn cache, `npm run clean && npm run dev`
-- Validate both hero tagline lines render; E2E asserts both in `test/e2e/web/home.spec.ts`
+To bypass hooks (not recommended):
+```bash
+git commit --no-verify  # Skip pre-commit
+git push --no-verify    # Skip pre-push
+```
+
+### **Testing Workflow**
+
+```bash
+# Unit tests (fast, run before push)
+npm run test:run
+
+# E2E tests (comprehensive, run before major changes)
+cd config && npx playwright test
+
+# Watch test results
+cd config && npx playwright test --ui
+```
+
+### **Homepage Content Workflow**
+
+1. Edit copy in `packages/hub-logic/src/hubContent.ts`
+2. If changes don't appear, run `npm run clean && npm run dev` and hard refresh
+3. Validate both hero tagline lines render in browser
+4. Run E2E test: `cd config && npx playwright test test/e2e/web/home.spec.ts`
 
 ---
 
-**Last Updated**: October 3, 2025 at 12:30 PM ET  
+**Last Updated**: October 13, 2025  
 **Status**: Production Ready - Marketing platform fully operational with Sales Dashboard and multi-tenant support

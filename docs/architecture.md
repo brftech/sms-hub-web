@@ -1,6 +1,6 @@
 # SMS Hub Web Architecture Guide
 
-**Last Updated**: October 3, 2025 at 12:30 PM ET
+**Last Updated**: October 13, 2025
 
 ## 🎯 Overview
 
@@ -247,7 +247,84 @@ npx supabase functions deploy stripe-webhook --project-ref fwlivygerbqzowbzxesw
 - **Testing**: Complete E2E test overhaul (48 tests, 6 browsers)
 - **Documentation**: Comprehensive updates with clear structure
 
+## 🗺️ Centralized Routing Architecture
+
+### **Route Management System**
+
+All application routes are centralized in `src/utils/routes.ts` to ensure consistency and type safety across the application.
+
+**File Location**: `src/utils/routes.ts`
+
+```typescript
+export const HOME_PATH = "/";
+export const CONTACT_PATH = "/contact";
+export const PRICING_PATH = "/pricing";
+export const ADMIN_PATH = "/admin";
+// ... all other routes
+```
+
+### **Benefits of Centralization**
+
+- **Type Safety**: Compile-time checking for all route references
+- **Refactor Safety**: Change paths in one place, affects entire codebase
+- **Consistency**: Same paths across navigation, links, buttons, and redirects
+- **Maintainability**: Easy to add, modify, or deprecate routes
+- **Documentation**: Single source of truth for all application paths
+
+### **Implementation Details**
+
+**Components Using Routes:**
+- `src/App.tsx` - Route definitions
+- `src/components/Navigation.tsx` - Navigation links
+- `src/components/Footer.tsx` - Footer links
+- All page components - Programmatic navigation
+
+**Usage Pattern:**
+```typescript
+import { CONTACT_PATH, PRICING_PATH } from "@/utils/routes";
+
+// In React Router
+<Route path={CONTACT_PATH} element={<Contact />} />
+
+// In navigation
+<Link to={PRICING_PATH}>Pricing</Link>
+
+// In programmatic navigation
+navigate(CONTACT_PATH);
+```
+
+## 🔧 Vite Configuration Enhancements
+
+### **Package Aliases**
+
+Vite is configured with direct source aliases to ensure fresh content during development:
+
+```typescript
+// vite.config.ts
+resolve: {
+  alias: {
+    '@sms-hub/hub-logic': path.resolve(__dirname, './packages/hub-logic/src'),
+    '@sms-hub/supabase': path.resolve(__dirname, './packages/supabase/src'),
+    // ... other aliases
+  }
+}
+```
+
+**Benefits:**
+- Bypasses package build cache
+- Ensures latest content from `hubContent.ts`
+- Eliminates HMR cache issues
+- Direct source resolution in development
+
+### **Cache Management**
+
+```bash
+# Clean Vite cache when content doesn't update
+npm run clean  # Removes .vite cache and dist
+npm run dev    # Fresh development build
+```
+
 ---
 
-**Last Updated**: October 3, 2025 at 12:30 PM ET  
+**Last Updated**: October 13, 2025  
 **Status**: Production Ready - Marketing platform architecture implemented, optimized, and deployed

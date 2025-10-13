@@ -18,13 +18,13 @@ export const ProblemSolutionSection: React.FC = () => {
   const content: ProblemSolutionWithShaftNote = raw;
   const isGnymble = currentHub === "gnymble";
 
-  const deliverTitle = isGnymble ? "BUILT FOR SHAFT-COMPLIANT MESSAGING" : content.deliver.title;
+  const deliverTitle = isGnymble ? "BUILT FOR SHAFT COMPLIANCE" : content.deliver.title;
   const overlookTitle = isGnymble ? "WHAT OTHERS WON'T DO" : content.overlook.title;
   const shaftNoteFallback =
-    "SHAFT refers to Sex, Hate, Alcohol, Firearms, and Tobacco. Many providers exclude these categories. We design compliant programs that meet carrier and industry policies for alcohol/tobacco and similar businesses.";
+    "SHAFT refers to Sex, Hate, Alcohol, Firearms, and Tobacco. To be clear: we specialize in the 'AFT' part—Alcohol, Firearms, and Tobacco businesses. We help legitimate retailers like craft breweries, cigar shops, and sporting goods stores navigate compliant messaging. We're not in the business of the other two letters.";
 
   return (
-    <div className="bg-black py-16 md:py-20 lg:py-24 relative border-t border-gray-800/60">
+    <div className="bg-black py-16 md:py-20 lg:py-24 relative">
       <div className="max-w-4xl mx-auto px-6 relative">
         <div className="text-center mb-10 md:mb:12">
           <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">

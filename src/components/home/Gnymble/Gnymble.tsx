@@ -16,7 +16,7 @@ export const Gnymble: React.FC<GnymbleProps> = ({ businessTypes }) => {
         <ProblemSolutionSection />
       </div>
       {/* <TestimonialsSection /> */}
-      <div className="bg-black py-20 md:py-28 lg:py-36 border-t border-amber-900/30 relative">
+      <div className="bg-black py-20 md:py-28 lg:py-36 relative">
         <div className="max-w-6xl mx-auto px-6 relative">
           <StatsSection />
         </div>

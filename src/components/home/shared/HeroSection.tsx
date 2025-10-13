@@ -83,7 +83,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ businessTypes, content
         </div>
 
         {/* Header */}
-        <div className="text-center py-6 md:py-8">
+        <div className="text-center py-6 md:py-8 mb-2">
           <h1
             className="text-3xl md:text-5xl font-bold text-white mb-6 leading-tight"
             style={{ fontFamily: "Inter, system-ui, sans-serif" }}
@@ -95,26 +95,25 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ businessTypes, content
               <span className="animate-pulse">|</span>
             </span>
           </h1>
-
-          <div className="text-base md:text-lg max-w-2xl mx-auto">
-            <div className="text-gray-300" data-testid="hero-tagline-1">
-              {content.tagline.line1}
-            </div>
-            {content.tagline.line2 && (
-              <div className="text-gray-400" data-testid="hero-tagline-2">
-                {content.tagline.line2}
-              </div>
-            )}
-          </div>
         </div>
 
-        {/* Interactive Phone - centered */}
-        <div className="flex justify-center" data-testid="hero-phone">
+        {/* Interactive Phone - centered at 0.75 scale */}
+        <div className="flex justify-center mb-8" data-testid="hero-phone">
           <LiveMessagingProvider>
-            <div className="scale-95 md:scale-100 origin-center">
+            <div className="scale-75 origin-center">
               <PhoneInteractive />
             </div>
           </LiveMessagingProvider>
+        </div>
+
+        {/* Tagline - underneath phone */}
+        <div className="text-center text-xl md:text-2xl max-w-2xl mx-auto mb-8">
+          <div className="text-amber-400 font-bold" data-testid="hero-tagline-1">
+            We do regulated texting really well.
+          </div>
+          <div className="text-amber-400 font-bold" data-testid="hero-tagline-2">
+            Others...don't do it at all.
+          </div>
         </div>
 
         {/* Minimal helper text */}

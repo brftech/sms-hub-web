@@ -6,7 +6,7 @@ export const StatsSection: React.FC = () => {
   const content = getHubStatsContent(currentHub);
 
   return (
-    <div className="bg-black border-t border-gray-800/60 pt-12 md:pt-16 pb-8">
+    <div className="bg-black pt-12 md:pt-16 pb-8">
       <h3 className="text-xl md:text-2xl font-semibold text-white text-center mb-8">
         {content.title}
       </h3>

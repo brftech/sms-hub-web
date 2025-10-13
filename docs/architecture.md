@@ -9,6 +9,7 @@ SMS Hub Web is a production-ready multi-tenant marketing website and sales dashb
 **Current Status**: ✅ **Production Ready** - Live at gnymble.com with SHAFT-compliant messaging
 
 **Production Architecture (October 13, 2025)**:
+
 - Contact-first conversion funnel (SignUp temporarily disabled)
 - Feature flags via `import.meta.env.DEV` for controlled rollout
 - AFT-focused compliance messaging (Alcohol, Firearms, Tobacco)

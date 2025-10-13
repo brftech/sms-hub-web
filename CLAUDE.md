@@ -236,6 +236,7 @@ npx vitest run test/unit/database-types.test.ts
 ```
 
 **Key Unit Tests:**
+
 - `test/unit/database-types.test.ts` - Database schema validation
 - `test/unit/hub-context-mock.test.tsx` - Hub provider testing
 - `test/unit/simple.test.ts` - Basic smoke tests
@@ -257,6 +258,7 @@ cd config && npx playwright show-report
 ```
 
 **E2E Test Organization:**
+
 - `test/e2e/web/` - Homepage, contact, navigation tests
 - `test/e2e/admin/` - Sales dashboard tests
 - `test/e2e/integration/` - Cross-feature integration tests

@@ -323,6 +323,7 @@ Git hooks are automatically installed via `npm run prepare` and enforce code qua
 - **Pre-push**: Runs `npm run type-check && npm run test:run` for safety checks
 
 To bypass hooks (not recommended):
+
 ```bash
 git commit --no-verify  # Skip pre-commit
 git push --no-verify    # Skip pre-push

@@ -274,12 +274,14 @@ export const ADMIN_PATH = "/admin";
 ### **Implementation Details**
 
 **Components Using Routes:**
+
 - `src/App.tsx` - Route definitions
 - `src/components/Navigation.tsx` - Navigation links
 - `src/components/Footer.tsx` - Footer links
 - All page components - Programmatic navigation
 
 **Usage Pattern:**
+
 ```typescript
 import { CONTACT_PATH, PRICING_PATH } from "@/utils/routes";
 
@@ -311,6 +313,7 @@ resolve: {
 ```
 
 **Benefits:**
+
 - Bypasses package build cache
 - Ensures latest content from `hubContent.ts`
 - Eliminates HMR cache issues

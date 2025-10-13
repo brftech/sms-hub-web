@@ -193,37 +193,60 @@ export const AdminDashboard: React.FC = () => {
     }
   };
 
-  // Check subscription status for all leads
+  // Check subscription status for all leads (optimized batch query)
   const checkLeadSubscriptionStatus = useCallback(
     async (leads: Lead[]) => {
       const statusMap: Record<string, { isEmailSubscriber: boolean; isSmsSubscriber: boolean }> =
         {};
 
-      for (const lead of leads) {
-        // Check email subscription
-        const { data: emailSub } = await supabase
+      if (leads.length === 0) return;
+
+      // Get the hub ID (should be consistent across all leads in the query)
+      const hubId = leads[0]?.hub_id;
+      if (!hubId) return;
+
+      // BATCH QUERY 1: Get ALL email subscriptions in one query
+      const emails = leads.map((l) => l.email).filter(Boolean);
+      const emailSet = new Set<string>();
+
+      if (emails.length > 0) {
+        const { data: emailSubs, error: emailError } = await supabase
           .from("email_subscribers")
-          .select("id")
-          .eq("email", lead.email)
-          .eq("hub_id", lead.hub_id)
-          .limit(1);
+          .select("email")
+          .eq("hub_id", hubId)
+          .in("email", emails);
 
-        // Check SMS subscription
-        const phoneNumber = lead.phone || lead.lead_phone_number;
-        let smsSub = null;
-        if (phoneNumber) {
-          const result = await supabase
-            .from("sms_subscribers")
-            .select("id")
-            .eq("phone_number", phoneNumber)
-            .eq("hub_id", lead.hub_id)
-            .limit(1);
-          smsSub = result.data;
+        if (emailError) {
+          console.error("Error batch checking email subscriptions:", emailError);
+        } else if (emailSubs && Array.isArray(emailSubs)) {
+          emailSubs.forEach((sub: { email: string }) => emailSet.add(sub.email));
         }
+      }
 
+      // BATCH QUERY 2: Get ALL SMS subscriptions in one query
+      const phones = leads.map((l) => l.phone || l.lead_phone_number).filter(Boolean) as string[];
+      const smsSet = new Set<string>();
+
+      if (phones.length > 0) {
+        const { data: smsSubs, error: smsError } = await supabase
+          .from("sms_subscribers")
+          .select("phone_number")
+          .eq("hub_id", hubId)
+          .in("phone_number", phones);
+
+        if (smsError) {
+          console.error("Error batch checking SMS subscriptions:", smsError);
+        } else if (smsSubs && Array.isArray(smsSubs)) {
+          smsSubs.forEach((sub: { phone_number: string }) => smsSet.add(sub.phone_number));
+        }
+      }
+
+      // Build status map from batch results
+      for (const lead of leads) {
+        const phoneNumber = lead.phone || lead.lead_phone_number;
         statusMap[lead.id] = {
-          isEmailSubscriber: !!(emailSub && emailSub.length > 0),
-          isSmsSubscriber: !!(smsSub && smsSub.length > 0),
+          isEmailSubscriber: emailSet.has(lead.email),
+          isSmsSubscriber: phoneNumber ? smsSet.has(phoneNumber) : false,
         };
       }
 

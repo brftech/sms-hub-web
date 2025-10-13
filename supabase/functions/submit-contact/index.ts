@@ -1,4 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.52.0";
+import { parseFullName } from "../_shared/nameUtils.ts";
+import { addEmailSubscriber, addSmsSubscriber } from "../_shared/subscriberHelpers.ts";
 import { Resend } from "npm:resend@2.0.0";
 
 const corsHeaders = {
@@ -93,10 +95,8 @@ Deno.serve(async (req) => {
       hub_id,
     });
 
-    // Parse name into first_name and last_name
-    const nameParts = (name || "").trim().split(" ");
-    const firstName = nameParts[0] || "";
-    const lastName = nameParts.slice(1).join(" ") || "";
+    // Parse name into first_name and last_name using shared utility
+    const { firstName, lastName } = parseFullName(name);
 
     // First, search for existing lead with this email
     console.log("Searching for existing lead with email:", email);
@@ -497,74 +497,40 @@ Deno.serve(async (req) => {
     // Handle email/SMS signup preferences
     // Reuse firstName and lastName already parsed at the top of the function
 
-    // Email signup
+    // Email signup - using shared utility
     if (email_signup) {
       console.log("Processing email signup preference...");
 
-      // Get default email marketing list for this hub
-      const { data: emailLists, error: emailListError } = await supabase
-        .from("email_lists")
-        .select("id")
-        .eq("hub_id", hub_id || 1)
-        .eq("list_type", "marketing")
-        .limit(1);
+      const result = await addEmailSubscriber(supabase, {
+        email,
+        name,
+        hubId: hub_id || 1,
+        company: company || null,
+      });
 
-      if (emailListError) {
-        console.error("Error fetching email list:", emailListError);
-      } else if (emailLists && emailLists.length > 0) {
-        const { error: emailSubError } = await supabase.from("email_subscribers").insert({
-          email: email,
-          email_list_id: emailLists[0].id,
-          first_name: firstName || null,
-          last_name: lastName,
-          hub_id: hub_id || 1,
-          source: "website",
-          status: "active",
-        });
-
-        if (emailSubError) {
-          console.error("Error adding email subscriber:", emailSubError);
-        } else {
-          console.log("Email subscriber added successfully");
-        }
+      if (result.success) {
+        console.log("Email subscriber added successfully");
       } else {
-        console.warn("No default email list found for hub", hub_id);
+        console.error("Error adding email subscriber:", result.error);
       }
     }
 
-    // SMS signup
+    // SMS signup - using shared utility
     if (sms_signup && phone) {
       console.log("Processing SMS signup preference...");
 
-      // Get default SMS marketing list for this hub
-      const { data: smsLists, error: smsListError } = await supabase
-        .from("sms_lists")
-        .select("id")
-        .eq("hub_id", hub_id || 1)
-        .eq("list_type", "marketing")
-        .limit(1);
+      const result = await addSmsSubscriber(supabase, {
+        phoneNumber: phone,
+        email,
+        name,
+        hubId: hub_id || 1,
+        company: company || null,
+      });
 
-      if (smsListError) {
-        console.error("Error fetching SMS list:", smsListError);
-      } else if (smsLists && smsLists.length > 0) {
-        const { error: smsSubError } = await supabase.from("sms_subscribers").insert({
-          phone_number: phone,
-          sms_list_id: smsLists[0].id,
-          first_name: firstName || null,
-          last_name: lastName,
-          hub_id: hub_id || 1,
-          email: email,
-          source: "website",
-          status: "active",
-        });
-
-        if (smsSubError) {
-          console.error("Error adding SMS subscriber:", smsSubError);
-        } else {
-          console.log("SMS subscriber added successfully");
-        }
+      if (result.success) {
+        console.log("SMS subscriber added successfully");
       } else {
-        console.warn("No default SMS list found for hub", hub_id);
+        console.error("Error adding SMS subscriber:", result.error);
       }
     } else if (sms_signup && !phone) {
       console.warn("SMS signup requested but no phone number provided");

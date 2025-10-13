@@ -6,7 +6,14 @@
 
 **SMS Hub Web** is a production-ready multi-tenant marketing website and sales dashboard for the SMS Hub B2B platform. It serves 4 business brands (Gnymble, PercyTech, PercyMD, PercyText) with isolated data, branded experiences, and comprehensive lead management capabilities.
 
-**Current Status**: ✅ **Production Ready** - Marketing platform fully operational with Sales Dashboard and multi-tenant support
+**Current Status**: ✅ **Production Ready** - Live on gnymble.com with SHAFT-compliant messaging
+
+**Production Notes (October 13, 2025)**:
+
+- Homepage emphasizes AFT (Alcohol, Firearms, Tobacco) compliance
+- Interactive phone demo scaled to 0.75 for optimal mobile/desktop balance
+- SignUp flow temporarily disabled in production (Contact-first conversion)
+- Feature flags active: `import.meta.env.DEV` for signup buttons
 
 ## 🏗️ Key Architecture Decisions
 
@@ -77,25 +84,36 @@ vercel --prod
 vercel ls
 ```
 
-## 🧭 Homepage Content Workflow (New)
+## 🧭 Homepage Content Workflow (Updated)
 
-- **Single Source of Truth**: Homepage hero copy lives in `packages/hub-logic/src/hubContent.ts` under the active hub (`hero.tagline.line1/line2`).
-- **Render Path**: `src/pages/Home.tsx` → `components/home/HubSelector` → `components/home/Gnymble` → `components/home/shared/HeroSection`.
-- **Best Practices**:
-  - Do not hardcode hero text inside components.
-  - Edit hub content, then hard refresh the browser.
-  - If dev still shows stale text, run `npm run clean && npm run dev` (clears Vite cache) and refresh.
-- **SHAFT Positioning**:
-  - The Platform Advantage section highlights SHAFT explicitly.
-  - Short SHAFT note appears under the section (brief regulatory context).
+### **Current Production Setup**
+
+- **Hero Tagline**: Hardcoded in `src/components/home/shared/HeroSection.tsx` for production control
+  - Line 1: "We do regulated texting really well."
+  - Line 2: "Others...don't do it at all."
+  - Style: Bold amber (`text-amber-400 font-bold`)
+- **Interactive Phone**: Scaled to 0.75 (`scale-75`) positioned between headline and tagline
+- **SHAFT Compliance**: Focused on AFT (Alcohol, Firearms, Tobacco) in `ProblemSolutionSection.tsx`
+- **Conversion Flow**: Contact-first (SignUp hidden via `import.meta.env.DEV`)
+
+### **Content Editing**
+
+1. **Hero Tagline**: Edit directly in `HeroSection.tsx` (lines 111-116)
+2. **SHAFT Messaging**: Edit `ProblemSolutionSection.tsx` (line 23-24 for note)
+3. **Clean & Test**: `npm run clean && npm run dev` + hard refresh
+4. **E2E Verify**: `cd config && npx playwright test test/e2e/web/home.spec.ts`
+5. **Deploy**: `vercel --prod --yes` (from project root)
 
 ### **QA Checklist (Homepage)**
 
-1. Confirm hero headline renders and both tagline lines are visible.
-2. Verify problem/solution headings: “BUILT FOR SHAFT-COMPLIANT MESSAGING” and “WHAT OTHERS WON’T DO”.
-3. Ensure SHAFT note card is visible beneath the grids (Gnymble hub).
-4. Confirm Stats and CTA sections use neutral styling and match hero rhythm.
-5. Switch hubs and verify hero pulls the correct hub content.
+1. ✅ Hero headline with typing animation renders correctly
+2. ✅ Interactive phone displays at 0.75 scale
+3. ✅ Both tagline lines visible in bold amber below phone
+4. ✅ SignUp button hidden in production, Contact button visible
+5. ✅ "BUILT FOR SHAFT COMPLIANCE" heading present
+6. ✅ AFT compliance note visible (not S/H categories)
+7. ✅ No section divider lines (clean black background flow)
+8. ✅ Mobile navigation shows logo left, Login right
 
 ## 📝 Coding Standards
 

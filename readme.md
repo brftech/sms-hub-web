@@ -6,7 +6,15 @@
 
 SMS Hub Web is a production-ready multi-tenant marketing website and sales dashboard for the SMS Hub B2B platform. It serves 4 business brands with isolated data, branded experiences, and comprehensive lead management capabilities.
 
-**Current Status**: ✅ **Production Ready** - Fully operational with Sales Dashboard, lead capture, and multi-tenant support
+**Current Status**: ✅ **Production Ready** - Live on gnymble.com with SHAFT-compliant messaging and contact-focused conversion
+
+**Recent Updates (October 13, 2025)**:
+
+- ✅ Updated homepage hero with 0.75 scale interactive phone
+- ✅ Refined tagline: "We do regulated texting really well. / Others...don't do it at all."
+- ✅ Enhanced SHAFT compliance messaging (AFT focus: Alcohol, Firearms, Tobacco)
+- ✅ SignUp buttons temporarily hidden in production (dev-only feature flag)
+- ✅ Streamlined conversion funnel to Contact-first approach
 
 ## 📁 Repository Structure
 
@@ -140,26 +148,37 @@ npm run dev
 
 ### **Authentication Flow**
 
-- **Payment-First**: Stripe → Email confirmation → Profile setup
-- **Magic Link**: Email-based authentication
-- **Cross-App**: Redirects to sms-hub-app2 for customer management
-- **Dev Mode**: Local development with simplified auth
+- **Current Production**: Contact-first approach (SignUp temporarily disabled)
+- **Development**: Payment-First flow via Stripe (visible in dev mode only)
+- **Future**: Stripe → Email confirmation → Profile setup in app2
+- **Cross-App**: Redirects to sms-hub-app2 for customer management (in development)
 
 ## 🧭 Homepage Content Architecture
 
 ### **Content Source of Truth**
 
-- **Location**: All homepage hero copy is defined in `packages/hub-logic/src/hubContent.ts` under the active hub (e.g., `gnymble` → `hero.tagline.line1/line2`).
-- **Render Path**: `src/pages/Home.tsx` → `components/home/HubSelector` → hub component (e.g., `Gnymble.tsx`) → `shared/HeroSection.tsx`.
-- **Best Practice**: Always edit hub content centrally, never override text in components.
-- **SHAFT Emphasis**: The Platform Advantage explicitly features SHAFT (Sex, Hate, Alcohol, Firearms, Tobacco) support. This is our primary value proposition for small businesses in regulated industries.
+- **Location**: All homepage hero copy is in `packages/hub-logic/src/hubContent.ts` under the active hub (hardcoded overrides in `HeroSection.tsx` for production launch)
+- **Render Path**: `src/pages/Home.tsx` → `components/home/HubSelector` → hub component (e.g., `Gnymble.tsx`) → `shared/HeroSection.tsx`
+- **Current Hero Design**:
+  - Headline with typing animation for business types
+  - Interactive phone demo at 0.75 scale
+  - Tagline: "We do regulated texting really well. / Others...don't do it at all." (bold amber)
+  - Contact CTA (SignUp hidden in production via `import.meta.env.DEV` flag)
+- **SHAFT Messaging**: AFT-focused (Alcohol, Firearms, Tobacco) - explicitly clarified in compliance section
 
 ### **Edit Workflow (Hero Copy)**
 
-1. Edit `packages/hub-logic/src/hubContent.ts` for the active hub.
-2. Save; if changes don't show, run `npm run clean && npm run dev` and hard refresh (Cmd+Shift+R).
-3. Verify both tagline lines render under the hero headline.
+1. Edit tagline in `src/components/home/shared/HeroSection.tsx` (currently hardcoded for production)
+2. Edit SHAFT compliance in `src/components/home/shared/ProblemSolutionSection.tsx`
+3. Save; if changes don't show, run `npm run clean && npm run dev` and hard refresh (Cmd+Shift+R)
 4. Run E2E tests to verify: `cd config && npx playwright test test/e2e/web/home.spec.ts`
+5. Deploy: `vercel --prod --yes`
+
+### **Feature Flags**
+
+- **SignUp Button**: Hidden in production (`import.meta.env.DEV` check in `HeroSection.tsx` and `Navigation.tsx`)
+- **Rationale**: App2 signup flow needs production updates before public launch
+- **Development**: All buttons visible in local dev environment
 
 ## 🗺️ Centralized Routing
 

@@ -1,41 +1,41 @@
 import { useState, useEffect, useRef } from "react";
 import { useHub, HubLogo } from "@sms-hub/ui/marketing";
-import { webEnvironment } from "../config/webEnvironment";
+import { webEnvironment } from "../config/environment";
 
 // Hub configurations
 const HUB_CONFIGS = {
   gnymble: {
     id: 1,
-    name: 'Gnymble',
+    name: "Gnymble",
     hubNumber: 1,
-    primaryColor: '#FF6B35',
-    secondaryColor: '#4ECDC4',
-    accentColor: '#FFA500'
+    primaryColor: "#FF6B35",
+    secondaryColor: "#4ECDC4",
+    accentColor: "#FFA500",
   },
   percytech: {
     id: 0,
-    name: 'PercyTech',
+    name: "PercyTech",
     hubNumber: 0,
-    primaryColor: '#007AFF',
-    secondaryColor: '#5AC8FA',
-    accentColor: '#FF3B30'
+    primaryColor: "#007AFF",
+    secondaryColor: "#5AC8FA",
+    accentColor: "#FF3B30",
   },
   percymd: {
     id: 2,
-    name: 'PercyMD',
+    name: "PercyMD",
     hubNumber: 2,
-    primaryColor: '#5856D6',
-    secondaryColor: '#AF52DE',
-    accentColor: '#32ADE6'
+    primaryColor: "#5856D6",
+    secondaryColor: "#AF52DE",
+    accentColor: "#32ADE6",
   },
   percytext: {
     id: 3,
-    name: 'PercyText',
+    name: "PercyText",
     hubNumber: 3,
-    primaryColor: '#FF9500',
-    secondaryColor: '#FFCC00',
-    accentColor: '#FF3B30'
-  }
+    primaryColor: "#FF9500",
+    secondaryColor: "#FFCC00",
+    accentColor: "#FF3B30",
+  },
 } as const;
 
 type HubType = keyof typeof HUB_CONFIGS;
@@ -54,7 +54,7 @@ const FloatingHubSwitcher = () => {
     hubNumber: config.hubNumber,
     primaryColor: config.primaryColor,
     secondaryColor: config.secondaryColor,
-    accentColor: config.accentColor
+    accentColor: config.accentColor,
   }));
 
   // Close when clicking outside
@@ -74,7 +74,7 @@ const FloatingHubSwitcher = () => {
   }, [isExpanded]);
 
   // Only show in development
-  if (import.meta.env.MODE !== 'development' && window.location.hostname !== 'localhost') {
+  if (import.meta.env.MODE !== "development" && window.location.hostname !== "localhost") {
     return null;
   }
 
@@ -89,19 +89,29 @@ const FloatingHubSwitcher = () => {
         {/* Floating Hub Switcher */}
         <div
           className={`absolute bottom-16 right-0 transition-all duration-300 ease-in-out ${
-            isExpanded 
-              ? "opacity-100 scale-100 translate-y-0 pointer-events-auto" 
+            isExpanded
+              ? "opacity-100 scale-100 translate-y-0 pointer-events-auto"
               : "opacity-0 scale-95 translate-y-2 pointer-events-none"
           }`}
         >
           <div className="bg-white rounded-xl shadow-2xl border border-gray-200 p-5 w-80">
             <div className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-              <svg className="w-5 h-5 mr-2 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              <svg
+                className="w-5 h-5 mr-2 text-orange-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                />
               </svg>
               Switch Hub
             </div>
-            
+
             {/* Custom Hub Selector */}
             <div className="relative">
               <button
@@ -122,7 +132,12 @@ const FloatingHubSwitcher = () => {
                   stroke="currentColor"
                   viewBox="0 0 24 24"
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
                 </svg>
               </button>
 
@@ -137,7 +152,9 @@ const FloatingHubSwitcher = () => {
                         setShowDropdown(false);
                       }}
                       className={`w-full flex items-center justify-between p-4 hover:bg-gradient-to-r hover:from-orange-50 hover:to-orange-100 transition-all duration-200 ${
-                        currentHub === hub.hubType ? "bg-gradient-to-r from-orange-100 to-orange-200" : ""
+                        currentHub === hub.hubType
+                          ? "bg-gradient-to-r from-orange-100 to-orange-200"
+                          : ""
                       }`}
                     >
                       <div className="flex items-center">
@@ -149,8 +166,16 @@ const FloatingHubSwitcher = () => {
                       {currentHub === hub.hubType && (
                         <div className="flex items-center">
                           <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
-                            <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            <svg
+                              className="w-4 h-4 text-white"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                clipRule="evenodd"
+                              />
                             </svg>
                           </div>
                         </div>

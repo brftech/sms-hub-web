@@ -10,7 +10,10 @@ import {
   SEO,
 } from "@sms-hub/ui/marketing";
 import { getHubColorClasses } from "@sms-hub/utils";
+import { getHubId, getHubDisplayName } from "@sms-hub/hub-logic";
 import { getSupabaseClient } from "../lib/supabaseSingleton";
+import { createSubscriberService } from "../services/subscriberService";
+import { getDisplayName } from "../utils/nameUtils";
 import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";
 import FloatingHubSwitcher from "../components/FloatingHubSwitcher";
@@ -103,6 +106,7 @@ export const AdminDashboard: React.FC = () => {
   // Use regular anon key client (RLS is disabled on marketing tables)
   // Security is handled at application layer via admin access code
   const supabase = React.useMemo(() => getSupabaseClient(), []);
+  const subscriberService = React.useMemo(() => createSubscriberService(supabase), [supabase]);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -242,16 +246,7 @@ export const AdminDashboard: React.FC = () => {
       });
 
       // Get current hub ID for filtering
-      const currentHubId =
-        currentHub === "percytech"
-          ? 0
-          : currentHub === "gnymble"
-            ? 1
-            : currentHub === "percymd"
-              ? 2
-              : currentHub === "percytext"
-                ? 3
-                : 1;
+      const currentHubId = getHubId(currentHub);
 
       // Get recent data AND total counts in parallel, filtered by current hub
       const [
@@ -555,47 +550,26 @@ export const AdminDashboard: React.FC = () => {
           continue;
         }
 
-        try {
-          // Get the default email marketing list for this hub
-          const { data: emailLists, error: listError } = await supabase
-            .from("email_lists")
-            .select("id")
-            .eq("hub_id", lead.hub_id)
-            .eq("list_type", "marketing")
-            .limit(1);
+        // Use subscriber service
+        const result = await subscriberService.addLeadToEmailList({
+          email: lead.email,
+          name: lead.name,
+          hubId: lead.hub_id,
+          phone: lead.phone || lead.lead_phone_number,
+          company: lead.company_name,
+        });
 
-          if (listError || !emailLists || emailLists.length === 0) {
-            errorCount++;
-            continue;
-          }
-
-          const emailListId = (emailLists[0] as { id: string }).id;
-
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const { error } = await (supabase as any).from("email_subscribers").insert({
-            email: lead.email,
-            email_list_id: emailListId,
-            first_name: lead.name?.split(" ")[0] || null,
-            last_name: lead.name?.split(" ").slice(1).join(" ") || null,
-            hub_id: lead.hub_id,
-            source: "website",
-            status: "active",
-          });
-
-          if (error) {
-            errorCount++;
-          } else {
-            successCount++;
-            // Update subscription status
-            setLeadSubscriptionStatus((prev) => ({
-              ...prev,
-              [lead.id]: {
-                ...prev[lead.id],
-                isEmailSubscriber: true,
-              },
-            }));
-          }
-        } catch {
+        if (result.success) {
+          successCount++;
+          // Update subscription status
+          setLeadSubscriptionStatus((prev) => ({
+            ...prev,
+            [lead.id]: {
+              ...prev[lead.id],
+              isEmailSubscriber: true,
+            },
+          }));
+        } else {
           errorCount++;
         }
       }
@@ -629,7 +603,7 @@ export const AdminDashboard: React.FC = () => {
       let errorCount = 0;
 
       for (const lead of selectedLeads) {
-        // Skip if already subscribed or no phone
+        // Skip if already subscribed
         if (leadSubscriptionStatus[lead.id]?.isSmsSubscriber) {
           skipCount++;
           continue;
@@ -641,48 +615,26 @@ export const AdminDashboard: React.FC = () => {
           continue;
         }
 
-        try {
-          // Get the default SMS marketing list for this hub
-          const { data: smsLists, error: listError } = await supabase
-            .from("sms_lists")
-            .select("id")
-            .eq("hub_id", lead.hub_id)
-            .eq("list_type", "marketing")
-            .limit(1);
+        // Use subscriber service
+        const result = await subscriberService.addLeadToSmsList({
+          phoneNumber,
+          name: lead.name,
+          hubId: lead.hub_id,
+          email: lead.email,
+          company: lead.company_name,
+        });
 
-          if (listError || !smsLists || smsLists.length === 0) {
-            errorCount++;
-            continue;
-          }
-
-          const smsListId = (smsLists[0] as { id: string }).id;
-
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const { error } = await (supabase as any).from("sms_subscribers").insert({
-            phone_number: phoneNumber,
-            sms_list_id: smsListId,
-            first_name: lead.name?.split(" ")[0] || null,
-            last_name: lead.name?.split(" ").slice(1).join(" ") || null,
-            hub_id: lead.hub_id,
-            email: lead.email,
-            source: "website",
-            status: "active",
-          });
-
-          if (error) {
-            errorCount++;
-          } else {
-            successCount++;
-            // Update subscription status
-            setLeadSubscriptionStatus((prev) => ({
-              ...prev,
-              [lead.id]: {
-                ...prev[lead.id],
-                isSmsSubscriber: true,
-              },
-            }));
-          }
-        } catch {
+        if (result.success) {
+          successCount++;
+          // Update subscription status
+          setLeadSubscriptionStatus((prev) => ({
+            ...prev,
+            [lead.id]: {
+              ...prev[lead.id],
+              isSmsSubscriber: true,
+            },
+          }));
+        } else {
           errorCount++;
         }
       }
@@ -742,51 +694,21 @@ export const AdminDashboard: React.FC = () => {
       // eslint-disable-next-line no-console
       console.log("📧 Adding lead to email list:", lead.email, "hub_id:", lead.hub_id);
 
-      // Get the default email marketing list for this hub
-      const { data: emailLists, error: listError } = await supabase
-        .from("email_lists")
-        .select("id")
-        .eq("hub_id", lead.hub_id)
-        .eq("list_type", "marketing")
-        .limit(1);
+      // Use subscriber service
+      const result = await subscriberService.addLeadToEmailList({
+        email: lead.email,
+        name: lead.name,
+        hubId: lead.hub_id,
+        phone: lead.phone || lead.lead_phone_number,
+        company: lead.company_name,
+      });
 
-      if (listError) {
-        console.error("❌ Error fetching email list:", listError);
-        throw listError;
+      if (!result.success) {
+        throw new Error(result.error || "Failed to add to email list");
       }
 
       // eslint-disable-next-line no-console
-      console.log("📋 Email lists found:", emailLists);
-
-      if (!emailLists || emailLists.length === 0) {
-        throw new Error(`No email list found for hub ${lead.hub_id}`);
-      }
-
-      const emailListId = (emailLists[0] as { id: string }).id;
-      // eslint-disable-next-line no-console
-      console.log("📋 Using email list ID:", emailListId);
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data: insertedData, error } = await (supabase as any)
-        .from("email_subscribers")
-        .insert({
-          email: lead.email,
-          email_list_id: emailListId,
-          first_name: lead.name?.split(" ")[0] || null,
-          last_name: lead.name?.split(" ").slice(1).join(" ") || null,
-          hub_id: lead.hub_id,
-          source: "website",
-          status: "active",
-        })
-        .select();
-
-      if (error) {
-        console.error("❌ Error inserting email subscriber:", error);
-        throw error;
-      }
-
-      // eslint-disable-next-line no-console
-      console.log("✅ Email subscriber added successfully:", insertedData);
+      console.log("✅ Email subscriber added successfully");
 
       // Update subscription status for this lead
       setLeadSubscriptionStatus((prev) => ({
@@ -811,65 +733,29 @@ export const AdminDashboard: React.FC = () => {
       setCrudLoading(true);
       setError(null);
 
-      // eslint-disable-next-line no-console
-      console.log(
-        "📱 Adding lead to SMS list:",
-        lead.phone || lead.lead_phone_number,
-        "hub_id:",
-        lead.hub_id
-      );
-
-      // Get the default SMS marketing list for this hub
-      const { data: smsLists, error: listError } = await supabase
-        .from("sms_lists")
-        .select("id")
-        .eq("hub_id", lead.hub_id)
-        .eq("list_type", "marketing")
-        .limit(1);
-
-      if (listError) {
-        console.error("❌ Error fetching SMS list:", listError);
-        throw listError;
+      const phoneNumber = lead.phone || lead.lead_phone_number;
+      if (!phoneNumber) {
+        throw new Error("No phone number available for this lead");
       }
 
       // eslint-disable-next-line no-console
-      console.log("📋 SMS lists found:", smsLists);
+      console.log("📱 Adding lead to SMS list:", phoneNumber, "hub_id:", lead.hub_id);
 
-      if (!smsLists || smsLists.length === 0) {
-        throw new Error(`No SMS list found for hub ${lead.hub_id}`);
-      }
+      // Use subscriber service
+      const result = await subscriberService.addLeadToSmsList({
+        phoneNumber,
+        name: lead.name,
+        hubId: lead.hub_id,
+        email: lead.email,
+        company: lead.company_name,
+      });
 
-      const smsListId = (smsLists[0] as { id: string }).id;
-      // eslint-disable-next-line no-console
-      console.log("📋 Using SMS list ID:", smsListId);
-
-      // Use phone field from lead, or fallback to a placeholder
-      const phoneNumber = lead.phone || lead.lead_phone_number || "000-000-0000";
-      // eslint-disable-next-line no-console
-      console.log("📞 Phone number:", phoneNumber);
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data: insertedData, error } = await (supabase as any)
-        .from("sms_subscribers")
-        .insert({
-          phone_number: phoneNumber,
-          sms_list_id: smsListId,
-          first_name: lead.name?.split(" ")[0] || null,
-          last_name: lead.name?.split(" ").slice(1).join(" ") || null,
-          hub_id: lead.hub_id,
-          email: lead.email,
-          source: "website",
-          status: "active",
-        })
-        .select();
-
-      if (error) {
-        console.error("❌ Error inserting SMS subscriber:", error);
-        throw error;
+      if (!result.success) {
+        throw new Error(result.error || "Failed to add to SMS list");
       }
 
       // eslint-disable-next-line no-console
-      console.log("✅ SMS subscriber added successfully:", insertedData);
+      console.log("✅ SMS subscriber added successfully");
 
       // Update subscription status for this lead
       setLeadSubscriptionStatus((prev) => ({
@@ -991,18 +877,7 @@ export const AdminDashboard: React.FC = () => {
                   <Database className={`w-8 h-8 mr-3 ${hubColors.text}`} />
                   Sales Dashboard
                 </h1>
-                <p className="text-gray-300 mt-2">
-                  {currentHub === "percytech"
-                    ? "PercyTech"
-                    : currentHub === "gnymble"
-                      ? "Gnymble"
-                      : currentHub === "percymd"
-                        ? "PercyMD"
-                        : currentHub === "percytext"
-                          ? "PercyText"
-                          : "Gnymble"}{" "}
-                  Hub Sales Data
-                </p>
+                <p className="text-gray-300 mt-2">{getHubDisplayName(currentHub)} Hub Sales Data</p>
               </div>
               <div className="flex items-center space-x-3">
                 <Button
@@ -1106,16 +981,7 @@ export const AdminDashboard: React.FC = () => {
                 <div className="flex items-center gap-4">
                   <CardTitle className="flex items-center text-white text-xl">
                     <MessageSquare className="w-6 h-6 mr-3" />
-                    {currentHub === "percytech"
-                      ? "PercyTech"
-                      : currentHub === "gnymble"
-                        ? "Gnymble"
-                        : currentHub === "percymd"
-                          ? "PercyMD"
-                          : currentHub === "percytext"
-                            ? "PercyText"
-                            : "Gnymble"}{" "}
-                    Leads
+                    {getHubDisplayName(currentHub)} Leads
                   </CardTitle>
                   <Button
                     onClick={() => setShowCreateLeadForm(true)}
@@ -1245,7 +1111,11 @@ export const AdminDashboard: React.FC = () => {
                               )}
                             </button>
                             <span className="text-sm font-medium text-white">
-                              {lead.name || lead.company_name || "Unknown"}
+                              {getDisplayName({
+                                fullName: lead.name,
+                                email: lead.email,
+                                fallback: lead.company_name || "Unknown",
+                              })}
                             </span>
                           </div>
                           <div className="flex items-center gap-2">
@@ -1554,16 +1424,7 @@ export const AdminDashboard: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <CardTitle className="flex items-center text-white">
                     <Users className="w-5 h-5 mr-2" />
-                    {currentHub === "percytech"
-                      ? "PercyTech"
-                      : currentHub === "gnymble"
-                        ? "Gnymble"
-                        : currentHub === "percymd"
-                          ? "PercyMD"
-                          : currentHub === "percytext"
-                            ? "PercyText"
-                            : "Gnymble"}{" "}
-                    Email Subscribers
+                    {getHubDisplayName(currentHub)} Email Subscribers
                   </CardTitle>
                   <select
                     value={emailFilter}
@@ -1630,16 +1491,7 @@ export const AdminDashboard: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <CardTitle className="flex items-center text-white">
                     <MessageSquare className="w-5 h-5 mr-2" />
-                    {currentHub === "percytech"
-                      ? "PercyTech"
-                      : currentHub === "gnymble"
-                        ? "Gnymble"
-                        : currentHub === "percymd"
-                          ? "PercyMD"
-                          : currentHub === "percytext"
-                            ? "PercyText"
-                            : "Gnymble"}{" "}
-                    SMS Subscribers
+                    {getHubDisplayName(currentHub)} SMS Subscribers
                   </CardTitle>
                   <select
                     value={smsFilter}

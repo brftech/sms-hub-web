@@ -11,7 +11,7 @@ import {
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Suspense, lazy, useEffect } from "react";
 import { useScrollToTop } from "@sms-hub/utils";
-import { webEnvironment } from "./config/webEnvironment";
+import { webEnvironment } from "./config/environment";
 import { EnvironmentDebug } from "./components/EnvironmentDebug";
 import AppFloatingComponents from "./components/AppFloatingComponents";
 import {

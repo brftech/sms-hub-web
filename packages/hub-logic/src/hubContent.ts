@@ -375,16 +375,3 @@ export const getHubTestimonialsContent = (hubType: HubType): TestimonialsContent
 export const getHubContent = (hubType: HubType): HubContentData => {
   return hubContentMap[hubType] || gnymbleContent;
 };
-
-// Export individual content objects for backward compatibility
-export const gnymbleHero = gnymbleContent.hero;
-export const gnymbleCTA = gnymbleContent.cta;
-export const gnymbleProblemSolution = gnymbleContent.problemSolution;
-export const gnymbleStats = gnymbleContent.stats;
-export const gnymbleTestimonials = gnymbleContent.testimonials;
-
-export const percymdHero = percymdContent.hero;
-export const percymdCTA = percymdContent.cta;
-export const percymdProblemSolution = percymdContent.problemSolution;
-export const percymdStats = percymdContent.stats;
-export const percymdTestimonials = percymdContent.testimonials;

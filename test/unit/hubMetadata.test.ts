@@ -12,7 +12,7 @@ import {
   getHubDomain,
   getHubIconPath,
   getHubDescription,
-  getHubByIdh,
+  getHubById,
   getAllHubTypes,
   isValidHubType,
 } from "../../packages/hub-logic/src/hubMetadata";
@@ -185,29 +185,29 @@ describe("getHubMetadata", () => {
   });
 });
 
-describe("getHubByIdh", () => {
+describe("getHubById", () => {
   it("should return percytech for ID 0", () => {
-    expect(getHubByIdh(0)).toBe("percytech");
+    expect(getHubById(0)).toBe("percytech");
   });
 
   it("should return gnymble for ID 1", () => {
-    expect(getHubByIdh(1)).toBe("gnymble");
+    expect(getHubById(1)).toBe("gnymble");
   });
 
   it("should return percymd for ID 2", () => {
-    expect(getHubByIdh(2)).toBe("percymd");
+    expect(getHubById(2)).toBe("percymd");
   });
 
   it("should return percytext for ID 3", () => {
-    expect(getHubByIdh(3)).toBe("percytext");
+    expect(getHubById(3)).toBe("percytext");
   });
 
   it("should return null for invalid ID", () => {
-    expect(getHubByIdh(999)).toBeNull();
+    expect(getHubById(999)).toBeNull();
   });
 
   it("should return null for negative ID", () => {
-    expect(getHubByIdh(-1)).toBeNull();
+    expect(getHubById(-1)).toBeNull();
   });
 });
 
@@ -252,7 +252,7 @@ describe("hubMetadata integration tests", () => {
   it("should be able to convert hub type to ID and back", () => {
     const hubType: HubType = "gnymble";
     const id = getHubId(hubType);
-    const retrievedHubType = getHubByIdh(id);
+    const retrievedHubType = getHubById(id);
     expect(retrievedHubType).toBe(hubType);
   });
 

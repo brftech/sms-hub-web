@@ -2,7 +2,6 @@ import { HeroSection } from "../shared/HeroSection";
 import { ProblemSolutionSection } from "../shared/ProblemSolutionSection";
 import { StatsSection } from "../shared/StatsSection";
 import { CTASection } from "../shared/CTA";
-import { percymdHero } from "@sms-hub/hub-logic";
 
 interface PercyMDProps {
   businessTypes: string[];
@@ -11,7 +10,7 @@ interface PercyMDProps {
 export const PercyMD: React.FC<PercyMDProps> = ({ businessTypes }) => {
   return (
     <>
-      <HeroSection businessTypes={businessTypes} content={percymdHero} />
+      <HeroSection businessTypes={businessTypes} />
       <ProblemSolutionSection />
       {/* <TestimonialsSection /> */}
       <div className="bg-black py-16 md:py-24 lg:py-32 relative">

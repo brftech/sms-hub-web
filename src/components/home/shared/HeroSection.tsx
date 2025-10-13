@@ -1,31 +1,22 @@
 import { useState, useEffect } from "react";
 import { LiveMessagingProvider, PhoneInteractive, HubLogo, useHub } from "@sms-hub/ui/marketing";
+import { getHubHeroContent } from "@sms-hub/hub-logic";
 import { useNavigate } from "react-router-dom";
 import { handleDirectCheckout } from "@/utils/checkout";
 import { CONTACT_PATH } from "@/utils/routes";
 
-interface HeroContent {
-  fixedText: string;
-  tagline: {
-    line1: string;
-    line2: string;
-  };
-  description: string;
-  ctaText: string;
-}
-
 interface HeroSectionProps {
   businessTypes: string[];
-  content: HeroContent;
 }
 
-export const HeroSection: React.FC<HeroSectionProps> = ({ businessTypes, content }) => {
+export const HeroSection: React.FC<HeroSectionProps> = ({ businessTypes }) => {
+  const { currentHub } = useHub();
+  const content = getHubHeroContent(currentHub);
   const [currentBusinessIndex, setCurrentBusinessIndex] = useState(0);
   const [isTyping, setIsTyping] = useState(true);
   const [displayedBusiness, setDisplayedBusiness] = useState("");
   const [charIndex, setCharIndex] = useState(0);
   const navigate = useNavigate();
-  const { currentHub } = useHub();
 
   useEffect(() => {
     // Scroll to top of page on load/refresh

@@ -112,7 +112,7 @@ export function getHubDescription(hubType: HubType): string {
  * @param id - Hub ID number
  * @returns Hub type or null if not found
  */
-export function getHubByIdh(id: number): HubType | null {
+export function getHubById(id: number): HubType | null {
   const entry = Object.entries(HUB_METADATA).find(([_, meta]) => meta.id === id);
   return entry ? (entry[0] as HubType) : null;
 }

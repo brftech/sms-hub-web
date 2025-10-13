@@ -1,9 +1,5 @@
-export const GNYMBLE_FEATURES = {
-  REGULATED_INDUSTRY: "regulated_industry",
-  CIGAR_COMPLIANCE: "cigar_compliance",
-  SPEAKEASY_SUPPORT: "speakeasy_support",
-  LUXURY_RETAIL: "luxury_retail",
-} as const;
+// Gnymble hub - marketing site constants
+// Note: Onboarding/compliance logic belongs in app2
 
 export const GNYMBLE_INDUSTRIES = [
   "Cigar Retailers",
@@ -15,56 +11,3 @@ export const GNYMBLE_INDUSTRIES = [
   "Gaming & Casinos",
   "Other Regulated",
 ] as const;
-
-export const getGnymbleOnboardingRequirements = () => {
-  return {
-    additionalVerification: true,
-    complianceDocuments: [
-      "Business License",
-      "Tobacco License (if applicable)",
-      "Age Verification Process",
-      "Compliance Attestation",
-    ],
-    requiredTerms: [
-      "Tobacco Marketing Compliance",
-      "Age Verification Requirements",
-      "State Regulation Adherence",
-      "Industry-Specific Terms",
-    ],
-  };
-};
-
-export const validateGnymbleCompliance = (data: {
-  industry: string;
-  hasBusinessLicense: boolean;
-  hasTobaccoLicense?: boolean;
-  hasAgeVerification: boolean;
-}) => {
-  const errors: string[] = [];
-
-  if (!GNYMBLE_INDUSTRIES.includes(data.industry as typeof GNYMBLE_INDUSTRIES[number])) {
-    errors.push("Invalid industry selection for Gnymble platform");
-  }
-
-  if (!data.hasBusinessLicense) {
-    errors.push("Business license verification is required");
-  }
-
-  if (
-    data.industry.toLowerCase().includes("cigar") ||
-    data.industry.toLowerCase().includes("tobacco")
-  ) {
-    if (!data.hasTobaccoLicense) {
-      errors.push("Tobacco license is required for tobacco-related businesses");
-    }
-  }
-
-  if (!data.hasAgeVerification) {
-    errors.push("Age verification process documentation is required");
-  }
-
-  return {
-    isValid: errors.length === 0,
-    errors,
-  };
-};

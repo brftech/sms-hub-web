@@ -1,46 +1,50 @@
-import { SupabaseClient } from '@supabase/supabase-js'
+import { SupabaseClient } from "@supabase/supabase-js";
 
 export interface ContactFormData {
-  firstName: string
-  lastName: string
-  email: string
-  phone: string
-  company: string
-  message: string
-  platform_interest?: string
-  hub_id?: number
-  email_signup?: boolean
-  sms_signup?: boolean
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  company: string;
+  message: string;
+  platform_interest?: string;
+  hub_id?: number;
+  email_signup?: boolean;
+  sms_signup?: boolean;
+  turnstile_token?: string | null;
+  client_ip?: string | null;
 }
 
 export class ContactService {
   constructor(private supabase: SupabaseClient) {}
 
   async submitContact(data: ContactFormData) {
-    const { data: result, error } = await this.supabase.functions.invoke('submit-contact', {
+    const { data: result, error } = await this.supabase.functions.invoke("submit-contact", {
       body: {
         name: `${data.firstName} ${data.lastName}`,
         email: data.email,
         phone: data.phone,
         company: data.company,
         message: data.message,
-        platform_interest: data.platform_interest || 'General inquiry',
+        platform_interest: data.platform_interest || "General inquiry",
         hub_id: data.hub_id || 2, // Default to Gnymble
         email_signup: data.email_signup || false,
-        sms_signup: data.sms_signup || false
-      }
-    })
+        sms_signup: data.sms_signup || false,
+        turnstile_token: data.turnstile_token || null,
+        client_ip: data.client_ip || null,
+      },
+    });
 
     if (error) {
       // Error handled by caller
-      throw new Error('Failed to submit contact form')
+      throw new Error("Failed to submit contact form");
     }
 
-    return result
+    return result;
   }
 }
 
 // Factory function for creating service instance
 export const createContactService = (supabase: SupabaseClient) => {
-  return new ContactService(supabase)
-}
+  return new ContactService(supabase);
+};

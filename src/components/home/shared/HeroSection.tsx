@@ -69,7 +69,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ businessTypes, content
   }, [displayedBusiness, isTyping, businessTypes.length]);
 
   return (
-    <div className="min-h-screen bg-black pt-16 pb-20 relative overflow-hidden">
+    <div className="min-h-screen bg-black pt-20 pb-20 relative overflow-hidden">
       {/* Subtle background elements */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-orange-500/5 rounded-full blur-3xl"></div>
@@ -78,12 +78,12 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ businessTypes, content
 
       <div className="max-w-4xl mx-auto px-6 relative">
         {/* Optional small wordmark (desktop-only) */}
-        <div className="hidden md:flex justify-center mb-4 opacity-80">
+        <div className="hidden md:flex justify-center mb-8 opacity-80">
           <HubLogo hubType={currentHub} variant="main" size="lg" />
         </div>
 
         {/* Header */}
-        <div className="text-center py-6 md:py-8 mb-2">
+        <div className="text-center py-6 md:py-8 mb-0">
           <h1
             className="text-3xl md:text-5xl font-bold text-white mb-6 leading-tight"
             style={{ fontFamily: "Inter, system-ui, sans-serif" }}

@@ -3,8 +3,7 @@ import { Resend } from "npm:resend@2.0.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
 Deno.serve(async (req) => {
@@ -17,18 +16,74 @@ Deno.serve(async (req) => {
 
   try {
     const resendApiKey = Deno.env.get("RESEND_API_KEY");
+    const turnstileSecretKey = Deno.env.get("TURNSTILE_SECRET_KEY");
 
     console.log("Environment check:", {
       hasResendKey: !!resendApiKey,
       resendKeyLength: resendApiKey?.length || 0,
+      hasTurnstileKey: !!turnstileSecretKey,
     });
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    const { name, email, phone, company, message, platform_interest, hub_id } =
-      await req.json();
+    const {
+      name,
+      email,
+      phone,
+      company,
+      message,
+      platform_interest,
+      hub_id,
+      turnstile_token,
+      client_ip,
+      email_signup,
+      sms_signup,
+    } = await req.json();
+
+    // Verify Cloudflare Turnstile token (spam protection)
+    if (turnstileSecretKey && turnstile_token) {
+      console.log("Verifying Turnstile token...");
+
+      const turnstileResponse = await fetch(
+        "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            secret: turnstileSecretKey,
+            response: turnstile_token,
+            remoteip: client_ip,
+          }),
+        }
+      );
+
+      const turnstileResult = await turnstileResponse.json();
+
+      if (!turnstileResult.success) {
+        console.error("Turnstile verification failed:", turnstileResult);
+        return new Response(
+          JSON.stringify({
+            error: "Spam protection verification failed",
+            details: "Please try again or contact support if the issue persists.",
+          }),
+          {
+            status: 403,
+            headers: {
+              ...corsHeaders,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+      }
+
+      console.log("Turnstile verification successful");
+    } else if (!turnstile_token) {
+      console.warn("No Turnstile token provided - submission may be spam");
+    }
 
     console.log("Processing contact form submission:", {
       name,
@@ -70,6 +125,8 @@ Deno.serve(async (req) => {
           company_name: company || null,
           message,
           source: "contact_form",
+          last_interaction_at: new Date().toISOString(),
+          interaction_count: 1,
         })
         .select()
         .single();
@@ -89,15 +146,10 @@ Deno.serve(async (req) => {
     } else if (searchError) {
       // Some other error occurred during search
       console.error("Error searching for existing lead:", searchError);
-      throw new Error(
-        `Failed to search for existing lead: ${searchError.message}`
-      );
+      throw new Error(`Failed to search for existing lead: ${searchError.message}`);
     } else {
       // Existing lead found, update it with new information
-      console.log(
-        "Existing lead found, updating with new information:",
-        existingLead.id
-      );
+      console.log("Existing lead found, updating with new information:", existingLead.id);
 
       const updateData: any = {
         updated_at: new Date().toISOString(),
@@ -120,16 +172,18 @@ Deno.serve(async (req) => {
 
       const { data: updatedLead, error: updateError } = await supabase
         .from("leads")
-        .update(updateData)
+        .update({
+          ...updateData,
+          last_interaction_at: new Date().toISOString(),
+          interaction_count: (existingLead.interaction_count || 0) + 1,
+        })
         .eq("id", existingLead.id)
         .select()
         .single();
 
       if (updateError) {
         console.error("Error updating existing lead:", updateError);
-        throw new Error(
-          `Failed to update existing lead: ${updateError.message}`
-        );
+        throw new Error(`Failed to update existing lead: ${updateError.message}`);
       }
 
       leadData = updatedLead;
@@ -142,9 +196,7 @@ Deno.serve(async (req) => {
     const activityDescription = isNewLead
       ? `New contact form submission from ${firstName} ${lastName} (${email}). Company: ${
           company || "Not specified"
-        }. Platform interest: ${
-          platform_interest || "General inquiry"
-        }. Message: ${message}`
+        }. Platform interest: ${platform_interest || "General inquiry"}. Message: ${message}`
       : `Contact form resubmission from ${firstName} ${lastName} (${email}). Company: ${
           company || "Not specified"
         }. Platform interest: ${
@@ -158,14 +210,12 @@ Deno.serve(async (req) => {
       hub_id || 1
     );
 
-    const { error: activityError } = await supabase
-      .from("lead_activities")
-      .insert({
-        hub_id: hub_id || 1, // Default to Gnymble (hub_id: 1) if not provided
-        lead_id: leadData.id,
-        activity_type: "note",
-        activity_data: { description: activityDescription },
-      });
+    const { error: activityError } = await supabase.from("lead_activities").insert({
+      hub_id: hub_id || 1, // Default to Gnymble (hub_id: 1) if not provided
+      lead_id: leadData.id,
+      activity_type: "note",
+      activity_data: { description: activityDescription },
+    });
 
     if (activityError) {
       console.error("Activity tracking error:", activityError);
@@ -193,9 +243,7 @@ Deno.serve(async (req) => {
             <head>
               <meta charset="utf-8">
               <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              <title>${
-                isNewLead ? "Welcome to Gnymble" : "Thank you - Gnymble"
-              }</title>
+              <title>${isNewLead ? "Welcome to Gnymble" : "Thank you - Gnymble"}</title>
             </head>
             <body style="margin: 0; padding: 0; background-color: #0a0a0a; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">
               <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #0a0a0a;">
@@ -227,11 +275,7 @@ Deno.serve(async (req) => {
                             }
                           </h1>
                           <p style="color: #CC5500; font-size: 16px; margin: 8px 0 0 0; opacity: 0.9;">
-                            ${
-                              isNewLead
-                                ? "of hospitality communication"
-                                : "in Gnymble"
-                            }
+                            ${isNewLead ? "of hospitality communication" : "in Gnymble"}
                           </p>
                         </td>
                       </tr>
@@ -316,18 +360,14 @@ Deno.serve(async (req) => {
           const notificationEmail = await resend.emails.send({
             from: "Gnymble <contact@gnymble.com>",
             to: ["bryan@percytech.com"],
-            subject: `${
-              isNewLead ? "New" : "Updated"
-            } Contact Form Submission - Gnymble`,
+            subject: `${isNewLead ? "New" : "Updated"} Contact Form Submission - Gnymble`,
             html: `
               <!DOCTYPE html>
               <html>
               <head>
                 <meta charset="utf-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>${
-                  isNewLead ? "New" : "Updated"
-                } Contact Form Submission</title>
+                <title>${isNewLead ? "New" : "Updated"} Contact Form Submission</title>
               </head>
               <body style="margin: 0; padding: 0; background-color: #f5f5f5; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">
                 <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f5f5f5;">
@@ -393,9 +433,7 @@ Deno.serve(async (req) => {
                                 <tr>
                                   <td style="color: #666; font-size: 14px; padding: 8px 0; vertical-align: top; font-weight: 600;">Lead Status:</td>
                                   <td style="color: #333; font-size: 14px; padding: 8px 0;">${
-                                    isNewLead
-                                      ? "New Lead"
-                                      : "Existing Lead - Updated"
+                                    isNewLead ? "New Lead" : "Existing Lead - Updated"
                                   }</td>
                                 </tr>
                               </table>
@@ -408,9 +446,7 @@ Deno.serve(async (req) => {
                                 <li>Review the contact details above</li>
                                 <li>Follow up within 24 hours as promised</li>
                                 <li>Add to CRM if applicable</li>
-                                <li>Track in lead_activities table (ID: ${
-                                  leadData.id
-                                })</li>
+                                <li>Track in lead_activities table (ID: ${leadData.id})</li>
                                 ${
                                   !isNewLead
                                     ? "<li>Note: This is an existing lead with updated information</li>"
@@ -420,10 +456,9 @@ Deno.serve(async (req) => {
                             </div>
                             
                             <p style="color: #666; font-size: 14px; line-height: 1.6; margin: 24px 0 0 0;">
-                              This contact was submitted at ${new Date().toLocaleString(
-                                "en-US",
-                                { timeZone: "America/New_York" }
-                              )}.
+                              This contact was submitted at ${new Date().toLocaleString("en-US", {
+                                timeZone: "America/New_York",
+                              })}.
                             </p>
                           </td>
                         </tr>
@@ -446,10 +481,7 @@ Deno.serve(async (req) => {
             `,
           });
 
-          console.log(
-            "Notification email sent successfully:",
-            notificationEmail
-          );
+          console.log("Notification email sent successfully:", notificationEmail);
         } catch (notificationError) {
           console.error("Error sending notification email:", notificationError);
           // Don't fail the function, but log the error
@@ -460,6 +492,82 @@ Deno.serve(async (req) => {
       }
     } else {
       console.warn("RESEND_API_KEY not configured - skipping email sending");
+    }
+
+    // Handle email/SMS signup preferences
+    // Reuse firstName and lastName already parsed at the top of the function
+
+    // Email signup
+    if (email_signup) {
+      console.log("Processing email signup preference...");
+
+      // Get default email marketing list for this hub
+      const { data: emailLists, error: emailListError } = await supabase
+        .from("email_lists")
+        .select("id")
+        .eq("hub_id", hub_id || 1)
+        .eq("list_type", "marketing")
+        .limit(1);
+
+      if (emailListError) {
+        console.error("Error fetching email list:", emailListError);
+      } else if (emailLists && emailLists.length > 0) {
+        const { error: emailSubError } = await supabase.from("email_subscribers").insert({
+          email: email,
+          email_list_id: emailLists[0].id,
+          first_name: firstName || null,
+          last_name: lastName,
+          hub_id: hub_id || 1,
+          source: "website",
+          status: "active",
+        });
+
+        if (emailSubError) {
+          console.error("Error adding email subscriber:", emailSubError);
+        } else {
+          console.log("Email subscriber added successfully");
+        }
+      } else {
+        console.warn("No default email list found for hub", hub_id);
+      }
+    }
+
+    // SMS signup
+    if (sms_signup && phone) {
+      console.log("Processing SMS signup preference...");
+
+      // Get default SMS marketing list for this hub
+      const { data: smsLists, error: smsListError } = await supabase
+        .from("sms_lists")
+        .select("id")
+        .eq("hub_id", hub_id || 1)
+        .eq("list_type", "marketing")
+        .limit(1);
+
+      if (smsListError) {
+        console.error("Error fetching SMS list:", smsListError);
+      } else if (smsLists && smsLists.length > 0) {
+        const { error: smsSubError } = await supabase.from("sms_subscribers").insert({
+          phone_number: phone,
+          sms_list_id: smsLists[0].id,
+          first_name: firstName || null,
+          last_name: lastName,
+          hub_id: hub_id || 1,
+          email: email,
+          source: "website",
+          status: "active",
+        });
+
+        if (smsSubError) {
+          console.error("Error adding SMS subscriber:", smsSubError);
+        } else {
+          console.log("SMS subscriber added successfully");
+        }
+      } else {
+        console.warn("No default SMS list found for hub", hub_id);
+      }
+    } else if (sms_signup && !phone) {
+      console.warn("SMS signup requested but no phone number provided");
     }
 
     return new Response(

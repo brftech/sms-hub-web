@@ -27,6 +27,17 @@ import {
   Trash2,
   Save,
   X,
+  ChevronDown,
+  ChevronUp,
+  Clock,
+  Phone,
+  Building,
+  Tag,
+  ExternalLink,
+  Activity,
+  CheckSquare,
+  Square,
+  Mail,
 } from "lucide-react";
 
 interface EmailSubscriber {
@@ -45,13 +56,38 @@ interface Lead {
   id: string;
   email: string;
   name: string | null;
+  phone: string | null;
+  lead_phone_number: string | null;
   company_name: string | null;
+  message: string | null;
   hub_id: number;
   source: string | null;
   status: string | null;
   lead_score: number | null;
+  campaign_source: string | null;
+  utm_source: string | null;
+  utm_medium: string | null;
+  utm_campaign: string | null;
+  utm_term: string | null;
+  utm_content: string | null;
+  platform_interest: string | null;
+  budget_range: string | null;
+  timeline: string | null;
+  interaction_count: number | null;
+  last_interaction_at: string | null;
+  notes: string | null;
+  tags: string[] | null;
   created_at: string | null;
   converted_at: string | null;
+  updated_at: string | null;
+}
+
+interface LeadActivity {
+  id: string;
+  lead_id: string;
+  activity_type: string;
+  activity_data: Record<string, unknown>;
+  created_at: string;
 }
 
 interface Hub {
@@ -64,8 +100,9 @@ export const AdminDashboard: React.FC = () => {
   const { currentHub } = useHub();
   const hubColors = getHubColorClasses(currentHub);
 
-  // Use singleton Supabase client to avoid multiple instances
-  const supabase = getSupabaseClient();
+  // Use regular anon key client (RLS is disabled on marketing tables)
+  // Security is handled at application layer via admin access code
+  const supabase = React.useMemo(() => getSupabaseClient(), []);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -74,14 +111,52 @@ export const AdminDashboard: React.FC = () => {
   const [hubs, setHubs] = useState<Hub[]>([]);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [smsSubscribers, setSmsSubscribers] = useState<any[]>([]);
-  const [showSensitiveData, setShowSensitiveData] = useState(false);
+  const [showSensitiveData, setShowSensitiveData] = useState(true);
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
   const [leadsFilter, setLeadsFilter] = useState<"recent" | "all">("recent");
   const [emailFilter, setEmailFilter] = useState<"recent" | "all">("recent");
   const [smsFilter, setSmsFilter] = useState<"recent" | "all">("recent");
+  const [expandedLeadId, setExpandedLeadId] = useState<string | null>(null);
+  const [leadActivities, setLeadActivities] = useState<Record<string, LeadActivity[]>>({});
+
+  // Track subscription status for each lead
+  const [leadSubscriptionStatus, setLeadSubscriptionStatus] = useState<
+    Record<string, { isEmailSubscriber: boolean; isSmsSubscriber: boolean }>
+  >({});
+
+  // Bulk selection state
+  const [selectedLeadIds, setSelectedLeadIds] = useState<Set<string>>(new Set());
+
+  // Total counts (not just recent)
+  const [totalLeadsCount, setTotalLeadsCount] = useState(0);
+  const [totalEmailSubscribersCount, setTotalEmailSubscribersCount] = useState(0);
+  const [totalSmsSubscribersCount, setTotalSmsSubscribersCount] = useState(0);
 
   // Admin authentication check
-  const [adminAuth, setAdminAuth] = useState(true); // Always allow in development
+  const [adminAuth, setAdminAuth] = useState(() => {
+    // Check if already authenticated (stored in localStorage with timestamp)
+    const token = localStorage.getItem("admin_auth_token");
+    const timestamp = localStorage.getItem("admin_auth_timestamp");
+
+    // In development, allow bypassing auth if no access code is set
+    if (import.meta.env.DEV && !import.meta.env.VITE_ADMIN_ACCESS_CODE) {
+      console.warn("⚠️ Admin dashboard accessible without authentication in DEV mode");
+      return true;
+    }
+
+    // Check if authenticated within last 24 hours
+    if (token === "authenticated" && timestamp) {
+      const authTime = new Date(timestamp).getTime();
+      const now = new Date().getTime();
+      const hoursSinceAuth = (now - authTime) / (1000 * 60 * 60);
+
+      if (hoursSinceAuth < 24) {
+        return true;
+      }
+    }
+
+    return false;
+  });
   const [authCode, setAuthCode] = useState("");
 
   // CRUD operations state
@@ -114,10 +189,57 @@ export const AdminDashboard: React.FC = () => {
     }
   };
 
+  // Check subscription status for all leads
+  const checkLeadSubscriptionStatus = useCallback(
+    async (leads: Lead[]) => {
+      const statusMap: Record<string, { isEmailSubscriber: boolean; isSmsSubscriber: boolean }> =
+        {};
+
+      for (const lead of leads) {
+        // Check email subscription
+        const { data: emailSub } = await supabase
+          .from("email_subscribers")
+          .select("id")
+          .eq("email", lead.email)
+          .eq("hub_id", lead.hub_id)
+          .limit(1);
+
+        // Check SMS subscription
+        const phoneNumber = lead.phone || lead.lead_phone_number;
+        let smsSub = null;
+        if (phoneNumber) {
+          const result = await supabase
+            .from("sms_subscribers")
+            .select("id")
+            .eq("phone_number", phoneNumber)
+            .eq("hub_id", lead.hub_id)
+            .limit(1);
+          smsSub = result.data;
+        }
+
+        statusMap[lead.id] = {
+          isEmailSubscriber: !!(emailSub && emailSub.length > 0),
+          isSmsSubscriber: !!(smsSub && smsSub.length > 0),
+        };
+      }
+
+      setLeadSubscriptionStatus(statusMap);
+    },
+    [supabase]
+  );
+
   const fetchDatabaseStats = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
+
+      // Debug: Log connection info
+      // eslint-disable-next-line no-console
+      console.log("🔌 Admin Dashboard - Connecting to Supabase:", {
+        url: import.meta.env.VITE_SUPABASE_URL,
+        hasAnonKey: !!import.meta.env.VITE_SUPABASE_ANON_KEY,
+        mode: import.meta.env.DEV ? "development" : "production",
+      });
 
       // Get current hub ID for filtering
       const currentHubId =
@@ -131,12 +253,15 @@ export const AdminDashboard: React.FC = () => {
                 ? 3
                 : 1;
 
-      // Get recent data in parallel, filtered by current hub
+      // Get recent data AND total counts in parallel, filtered by current hub
       const [
         emailSubscribersDataResult,
         leadsDataResult,
         smsSubscribersDataResult,
         hubsDataResult,
+        emailCountResult,
+        leadsCountResult,
+        smsCountResult,
       ] = await Promise.all([
         supabase
           .from("email_subscribers")
@@ -148,7 +273,7 @@ export const AdminDashboard: React.FC = () => {
           .from("leads")
           .select("*")
           .eq("hub_id", currentHubId)
-          .order("created_at", { ascending: false })
+          .order("last_interaction_at", { ascending: false, nullsFirst: false })
           .limit(10),
         supabase
           .from("sms_subscribers")
@@ -157,39 +282,86 @@ export const AdminDashboard: React.FC = () => {
           .order("created_at", { ascending: false })
           .limit(10),
         supabase.from("hubs").select("*").order("hub_number", { ascending: true }),
+        // Count queries
+        supabase
+          .from("email_subscribers")
+          .select("*", { count: "exact", head: true })
+          .eq("hub_id", currentHubId),
+        supabase
+          .from("leads")
+          .select("*", { count: "exact", head: true })
+          .eq("hub_id", currentHubId),
+        supabase
+          .from("sms_subscribers")
+          .select("*", { count: "exact", head: true })
+          .eq("hub_id", currentHubId),
       ]);
 
+      // Collect any errors
+      const errors = [];
       if (emailSubscribersDataResult.error) {
-        // Handle error silently
+        errors.push(`Email Subscribers: ${emailSubscribersDataResult.error.message}`);
+        console.error("Email subscribers error:", emailSubscribersDataResult.error);
       } else {
         setRecentEmailSubscribers(emailSubscribersDataResult.data || []);
       }
 
       if (leadsDataResult.error) {
-        // Handle error silently
+        errors.push(`Leads: ${leadsDataResult.error.message}`);
+        console.error("Leads error:", leadsDataResult.error);
       } else {
-        setRecentLeads(leadsDataResult.data || []);
+        const fetchedLeads = leadsDataResult.data || [];
+        setRecentLeads(fetchedLeads);
+        // Check subscription status for all leads
+        if (fetchedLeads.length > 0) {
+          checkLeadSubscriptionStatus(fetchedLeads);
+        }
       }
 
       if (smsSubscribersDataResult.error) {
-        // Handle error silently
+        errors.push(`SMS Subscribers: ${smsSubscribersDataResult.error.message}`);
+        console.error("SMS subscribers error:", smsSubscribersDataResult.error);
       } else {
         setSmsSubscribers(smsSubscribersDataResult.data || []);
       }
 
       if (hubsDataResult.error) {
-        // Handle error silently
+        errors.push(`Hubs: ${hubsDataResult.error.message}`);
+        console.error("Hubs error:", hubsDataResult.error);
       } else {
         setHubs(hubsDataResult.data || []);
       }
 
+      // Show errors if any
+      if (errors.length > 0) {
+        setError(`Database errors: ${errors.join("; ")}`);
+      }
+
+      // Set total counts
+      setTotalEmailSubscribersCount(emailCountResult.count || 0);
+      setTotalLeadsCount(leadsCountResult.count || 0);
+      setTotalSmsSubscribersCount(smsCountResult.count || 0);
+
+      // Debug logging
+      // eslint-disable-next-line no-console
+      console.log("✅ Admin Dashboard Data:", {
+        currentHub,
+        currentHubId,
+        leadsCount: leadsCountResult.count,
+        leadsData: leadsDataResult.data,
+        emailCount: emailCountResult.count,
+        smsCount: smsCountResult.count,
+        hubsCount: hubsDataResult.data?.length || 0,
+      });
+
       setLastRefresh(new Date());
     } catch (err) {
+      console.error("❌ Admin Dashboard Error:", err);
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
       setLoading(false);
     }
-  }, [supabase, currentHub]);
+  }, [supabase, currentHub, checkLeadSubscriptionStatus]);
 
   useEffect(() => {
     if (adminAuth) {
@@ -305,28 +477,329 @@ export const AdminDashboard: React.FC = () => {
     resetLeadForm();
   };
 
-  const addLeadToEmailList = async (lead: Lead) => {
+  const fetchLeadActivities = async (leadId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from("lead_activities")
+        .select("*")
+        .eq("lead_id", leadId)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      setLeadActivities((prev) => ({
+        ...prev,
+        [leadId]: data || [],
+      }));
+    } catch (err) {
+      console.error("Error fetching lead activities:", err);
+    }
+  };
+
+  const toggleLeadExpansion = async (leadId: string) => {
+    if (expandedLeadId === leadId) {
+      setExpandedLeadId(null);
+    } else {
+      setExpandedLeadId(leadId);
+      // Fetch activities if not already loaded
+      if (!leadActivities[leadId]) {
+        await fetchLeadActivities(leadId);
+      }
+    }
+  };
+
+  // Bulk selection handlers
+  const toggleLeadSelection = (leadId: string) => {
+    setSelectedLeadIds((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(leadId)) {
+        newSet.delete(leadId);
+      } else {
+        newSet.add(leadId);
+      }
+      return newSet;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedLeadIds.size === recentLeads.length) {
+      // Deselect all
+      setSelectedLeadIds(new Set());
+    } else {
+      // Select all
+      setSelectedLeadIds(new Set(recentLeads.map((lead) => lead.id)));
+    }
+  };
+
+  const clearSelection = () => {
+    setSelectedLeadIds(new Set());
+  };
+
+  // Bulk operations
+  const bulkAddToEmailList = async () => {
+    if (selectedLeadIds.size === 0) return;
+
     try {
       setCrudLoading(true);
       setError(null);
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { error } = await (supabase as any).from("email_subscribers").insert({
-        email: lead.email,
-        first_name: lead.name?.split(" ")[0] || null,
-        last_name: lead.name?.split(" ").slice(1).join(" ") || null,
-        hub_id: lead.hub_id,
-        source: lead.source || "lead_conversion",
-        status: "active",
-        created_at: new Date().toISOString(),
-      });
+      const selectedLeads = recentLeads.filter((lead) => selectedLeadIds.has(lead.id));
+      let successCount = 0;
+      let skipCount = 0;
+      let errorCount = 0;
+
+      for (const lead of selectedLeads) {
+        // Skip if already subscribed
+        if (leadSubscriptionStatus[lead.id]?.isEmailSubscriber) {
+          skipCount++;
+          continue;
+        }
+
+        try {
+          // Get the default email marketing list for this hub
+          const { data: emailLists, error: listError } = await supabase
+            .from("email_lists")
+            .select("id")
+            .eq("hub_id", lead.hub_id)
+            .eq("list_type", "marketing")
+            .limit(1);
+
+          if (listError || !emailLists || emailLists.length === 0) {
+            errorCount++;
+            continue;
+          }
+
+          const emailListId = (emailLists[0] as { id: string }).id;
+
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const { error } = await (supabase as any).from("email_subscribers").insert({
+            email: lead.email,
+            email_list_id: emailListId,
+            first_name: lead.name?.split(" ")[0] || null,
+            last_name: lead.name?.split(" ").slice(1).join(" ") || null,
+            hub_id: lead.hub_id,
+            source: "website",
+            status: "active",
+          });
+
+          if (error) {
+            errorCount++;
+          } else {
+            successCount++;
+            // Update subscription status
+            setLeadSubscriptionStatus((prev) => ({
+              ...prev,
+              [lead.id]: {
+                ...prev[lead.id],
+                isEmailSubscriber: true,
+              },
+            }));
+          }
+        } catch {
+          errorCount++;
+        }
+      }
+
+      // Show results
+      const messages = [];
+      if (successCount > 0) messages.push(`✅ Added ${successCount} to email list`);
+      if (skipCount > 0) messages.push(`⏭️ Skipped ${skipCount} (already subscribed)`);
+      if (errorCount > 0) messages.push(`❌ Failed ${errorCount}`);
+
+      setError(messages.join(" • "));
+      clearSelection();
+      await fetchDatabaseStats();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to add leads to email list");
+    } finally {
+      setCrudLoading(false);
+    }
+  };
+
+  const bulkAddToSmsList = async () => {
+    if (selectedLeadIds.size === 0) return;
+
+    try {
+      setCrudLoading(true);
+      setError(null);
+
+      const selectedLeads = recentLeads.filter((lead) => selectedLeadIds.has(lead.id));
+      let successCount = 0;
+      let skipCount = 0;
+      let errorCount = 0;
+
+      for (const lead of selectedLeads) {
+        // Skip if already subscribed or no phone
+        if (leadSubscriptionStatus[lead.id]?.isSmsSubscriber) {
+          skipCount++;
+          continue;
+        }
+
+        const phoneNumber = lead.phone || lead.lead_phone_number;
+        if (!phoneNumber) {
+          skipCount++;
+          continue;
+        }
+
+        try {
+          // Get the default SMS marketing list for this hub
+          const { data: smsLists, error: listError } = await supabase
+            .from("sms_lists")
+            .select("id")
+            .eq("hub_id", lead.hub_id)
+            .eq("list_type", "marketing")
+            .limit(1);
+
+          if (listError || !smsLists || smsLists.length === 0) {
+            errorCount++;
+            continue;
+          }
+
+          const smsListId = (smsLists[0] as { id: string }).id;
+
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const { error } = await (supabase as any).from("sms_subscribers").insert({
+            phone_number: phoneNumber,
+            sms_list_id: smsListId,
+            first_name: lead.name?.split(" ")[0] || null,
+            last_name: lead.name?.split(" ").slice(1).join(" ") || null,
+            hub_id: lead.hub_id,
+            email: lead.email,
+            source: "website",
+            status: "active",
+          });
+
+          if (error) {
+            errorCount++;
+          } else {
+            successCount++;
+            // Update subscription status
+            setLeadSubscriptionStatus((prev) => ({
+              ...prev,
+              [lead.id]: {
+                ...prev[lead.id],
+                isSmsSubscriber: true,
+              },
+            }));
+          }
+        } catch {
+          errorCount++;
+        }
+      }
+
+      // Show results
+      const messages = [];
+      if (successCount > 0) messages.push(`✅ Added ${successCount} to SMS list`);
+      if (skipCount > 0) messages.push(`⏭️ Skipped ${skipCount} (already subscribed or no phone)`);
+      if (errorCount > 0) messages.push(`❌ Failed ${errorCount}`);
+
+      setError(messages.join(" • "));
+      clearSelection();
+      await fetchDatabaseStats();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to add leads to SMS list");
+    } finally {
+      setCrudLoading(false);
+    }
+  };
+
+  const bulkDeleteLeads = async () => {
+    if (selectedLeadIds.size === 0) return;
+
+    if (
+      !confirm(
+        `Are you sure you want to delete ${selectedLeadIds.size} lead(s)? This action cannot be undone.`
+      )
+    ) {
+      return;
+    }
+
+    try {
+      setCrudLoading(true);
+      setError(null);
+
+      const { error } = await supabase.from("leads").delete().in("id", Array.from(selectedLeadIds));
 
       if (error) {
         throw error;
       }
 
+      setError(`✅ Deleted ${selectedLeadIds.size} lead(s)`);
+      clearSelection();
+      await fetchDatabaseStats();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to delete leads");
+    } finally {
+      setCrudLoading(false);
+    }
+  };
+
+  const addLeadToEmailList = async (lead: Lead) => {
+    try {
+      setCrudLoading(true);
+      setError(null);
+
+      // eslint-disable-next-line no-console
+      console.log("📧 Adding lead to email list:", lead.email, "hub_id:", lead.hub_id);
+
+      // Get the default email marketing list for this hub
+      const { data: emailLists, error: listError } = await supabase
+        .from("email_lists")
+        .select("id")
+        .eq("hub_id", lead.hub_id)
+        .eq("list_type", "marketing")
+        .limit(1);
+
+      if (listError) {
+        console.error("❌ Error fetching email list:", listError);
+        throw listError;
+      }
+
+      // eslint-disable-next-line no-console
+      console.log("📋 Email lists found:", emailLists);
+
+      if (!emailLists || emailLists.length === 0) {
+        throw new Error(`No email list found for hub ${lead.hub_id}`);
+      }
+
+      const emailListId = (emailLists[0] as { id: string }).id;
+      // eslint-disable-next-line no-console
+      console.log("📋 Using email list ID:", emailListId);
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: insertedData, error } = await (supabase as any)
+        .from("email_subscribers")
+        .insert({
+          email: lead.email,
+          email_list_id: emailListId,
+          first_name: lead.name?.split(" ")[0] || null,
+          last_name: lead.name?.split(" ").slice(1).join(" ") || null,
+          hub_id: lead.hub_id,
+          source: "website",
+          status: "active",
+        })
+        .select();
+
+      if (error) {
+        console.error("❌ Error inserting email subscriber:", error);
+        throw error;
+      }
+
+      // eslint-disable-next-line no-console
+      console.log("✅ Email subscriber added successfully:", insertedData);
+
+      // Update subscription status for this lead
+      setLeadSubscriptionStatus((prev) => ({
+        ...prev,
+        [lead.id]: {
+          ...prev[lead.id],
+          isEmailSubscriber: true,
+        },
+      }));
+
       await fetchDatabaseStats(); // Refresh data
     } catch (err) {
+      console.error("❌ Full error:", err);
       setError(err instanceof Error ? err.message : "Failed to add to email list");
     } finally {
       setCrudLoading(false);
@@ -338,23 +811,78 @@ export const AdminDashboard: React.FC = () => {
       setCrudLoading(true);
       setError(null);
 
+      // eslint-disable-next-line no-console
+      console.log(
+        "📱 Adding lead to SMS list:",
+        lead.phone || lead.lead_phone_number,
+        "hub_id:",
+        lead.hub_id
+      );
+
+      // Get the default SMS marketing list for this hub
+      const { data: smsLists, error: listError } = await supabase
+        .from("sms_lists")
+        .select("id")
+        .eq("hub_id", lead.hub_id)
+        .eq("list_type", "marketing")
+        .limit(1);
+
+      if (listError) {
+        console.error("❌ Error fetching SMS list:", listError);
+        throw listError;
+      }
+
+      // eslint-disable-next-line no-console
+      console.log("📋 SMS lists found:", smsLists);
+
+      if (!smsLists || smsLists.length === 0) {
+        throw new Error(`No SMS list found for hub ${lead.hub_id}`);
+      }
+
+      const smsListId = (smsLists[0] as { id: string }).id;
+      // eslint-disable-next-line no-console
+      console.log("📋 Using SMS list ID:", smsListId);
+
+      // Use phone field from lead, or fallback to a placeholder
+      const phoneNumber = lead.phone || lead.lead_phone_number || "000-000-0000";
+      // eslint-disable-next-line no-console
+      console.log("📞 Phone number:", phoneNumber);
+
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { error } = await (supabase as any).from("sms_subscribers").insert({
-        phone: lead.email, // Assuming email field contains phone for now
-        first_name: lead.name?.split(" ")[0] || null,
-        last_name: lead.name?.split(" ").slice(1).join(" ") || null,
-        hub_id: lead.hub_id,
-        source: lead.source || "lead_conversion",
-        status: "active",
-        created_at: new Date().toISOString(),
-      });
+      const { data: insertedData, error } = await (supabase as any)
+        .from("sms_subscribers")
+        .insert({
+          phone_number: phoneNumber,
+          sms_list_id: smsListId,
+          first_name: lead.name?.split(" ")[0] || null,
+          last_name: lead.name?.split(" ").slice(1).join(" ") || null,
+          hub_id: lead.hub_id,
+          email: lead.email,
+          source: "website",
+          status: "active",
+        })
+        .select();
 
       if (error) {
+        console.error("❌ Error inserting SMS subscriber:", error);
         throw error;
       }
 
+      // eslint-disable-next-line no-console
+      console.log("✅ SMS subscriber added successfully:", insertedData);
+
+      // Update subscription status for this lead
+      setLeadSubscriptionStatus((prev) => ({
+        ...prev,
+        [lead.id]: {
+          ...prev[lead.id],
+          isSmsSubscriber: true,
+        },
+      }));
+
       await fetchDatabaseStats(); // Refresh data
     } catch (err) {
+      console.error("❌ Full error:", err);
       setError(err instanceof Error ? err.message : "Failed to add to SMS list");
     } finally {
       setCrudLoading(false);
@@ -518,7 +1046,7 @@ export const AdminDashboard: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-gray-400">Total Leads</p>
-                    <p className="text-2xl font-bold text-white">{recentLeads.length}</p>
+                    <p className="text-2xl font-bold text-white">{totalLeadsCount}</p>
                   </div>
                   <MessageSquare className={`w-8 h-8 ${hubColors.text}`} />
                 </div>
@@ -530,7 +1058,7 @@ export const AdminDashboard: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-gray-400">Email Subscribers</p>
-                    <p className="text-2xl font-bold text-white">{recentEmailSubscribers.length}</p>
+                    <p className="text-2xl font-bold text-white">{totalEmailSubscribersCount}</p>
                   </div>
                   <Users className={`w-8 h-8 ${hubColors.text}`} />
                 </div>
@@ -542,7 +1070,7 @@ export const AdminDashboard: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-gray-400">SMS Subscribers</p>
-                    <p className="text-2xl font-bold text-white">{smsSubscribers.length}</p>
+                    <p className="text-2xl font-bold text-white">{totalSmsSubscribersCount}</p>
                   </div>
                   <MessageSquare className={`w-8 h-8 ${hubColors.text}`} />
                 </div>
@@ -555,10 +1083,10 @@ export const AdminDashboard: React.FC = () => {
                   <div>
                     <p className="text-sm font-medium text-gray-400">Conversion Rate</p>
                     <p className="text-2xl font-bold text-white">
-                      {recentLeads.length > 0
+                      {totalLeadsCount > 0
                         ? Math.round(
                             (recentLeads.filter((lead) => lead.status === "converted").length /
-                              recentLeads.length) *
+                              totalLeadsCount) *
                               100
                           )
                         : 0}
@@ -610,103 +1138,410 @@ export const AdminDashboard: React.FC = () => {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                {recentLeads.map((lead) => (
-                  <div
-                    key={lead.id}
-                    className="p-3 bg-gray-800/50 rounded-lg border border-gray-700/50 hover:border-gray-600/50 transition-colors"
+              {/* Bulk Actions Toolbar */}
+              {selectedLeadIds.size > 0 && (
+                <div className="mb-4 p-3 bg-blue-900/20 border border-blue-700/50 rounded-lg flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <span className="text-sm font-medium text-blue-300">
+                      {selectedLeadIds.size} lead{selectedLeadIds.size !== 1 ? "s" : ""} selected
+                    </span>
+                    <Button
+                      onClick={clearSelection}
+                      size="sm"
+                      variant="outline"
+                      className="h-8 bg-gray-800/50 border-gray-600 hover:bg-gray-700/50"
+                    >
+                      <X className="w-3 h-3 mr-1" />
+                      Clear
+                    </Button>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={bulkAddToEmailList}
+                      disabled={crudLoading}
+                      size="sm"
+                      className="h-8 bg-green-900/50 border-green-700 hover:bg-green-800/50 text-green-300"
+                    >
+                      <Mail className="w-3 h-3 mr-1" />
+                      Add to Email List
+                    </Button>
+                    <Button
+                      onClick={bulkAddToSmsList}
+                      disabled={crudLoading}
+                      size="sm"
+                      className="h-8 bg-blue-900/50 border-blue-700 hover:bg-blue-800/50 text-blue-300"
+                    >
+                      <MessageSquare className="w-3 h-3 mr-1" />
+                      Add to SMS List
+                    </Button>
+                    <Button
+                      onClick={bulkDeleteLeads}
+                      disabled={crudLoading}
+                      size="sm"
+                      variant="outline"
+                      className="h-8 bg-red-900/50 border-red-700 hover:bg-red-800/50 text-red-300"
+                    >
+                      <Trash2 className="w-3 h-3 mr-1" />
+                      Delete
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {/* Select All Checkbox */}
+              {recentLeads.length > 0 && (
+                <div className="mb-3 flex items-center gap-2 p-2 bg-gray-800/30 rounded border border-gray-700/50">
+                  <button
+                    onClick={toggleSelectAll}
+                    className="text-gray-400 hover:text-white transition-colors"
                   >
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-white">
-                        {lead.name || lead.company_name || "Unknown"}
-                      </span>
-                      <div className="flex items-center gap-2">
-                        <div className="flex gap-1">
-                          {lead.lead_score && (
-                            <span
-                              className={`px-2 py-1 text-xs rounded-full ${
-                                lead.lead_score >= 80
-                                  ? "bg-green-900/50 text-green-300"
-                                  : lead.lead_score >= 60
-                                    ? "bg-yellow-900/50 text-yellow-300"
-                                    : "bg-red-900/50 text-red-300"
-                              }`}
+                    {selectedLeadIds.size === recentLeads.length ? (
+                      <CheckSquare className="w-5 h-5 text-blue-400" />
+                    ) : (
+                      <Square className="w-5 h-5" />
+                    )}
+                  </button>
+                  <span className="text-sm text-gray-400">Select all ({recentLeads.length})</span>
+                </div>
+              )}
+
+              <div className="space-y-3">
+                {recentLeads.map((lead) => {
+                  const isExpanded = expandedLeadId === lead.id;
+                  const activities = leadActivities[lead.id] || [];
+                  const isSelected = selectedLeadIds.has(lead.id);
+
+                  return (
+                    <div
+                      key={lead.id}
+                      className={`bg-gray-800/50 rounded-lg border transition-colors ${
+                        isSelected
+                          ? "border-blue-500/70 bg-blue-900/10"
+                          : "border-gray-700/50 hover:border-gray-600/50"
+                      }`}
+                    >
+                      {/* Lead Header */}
+                      <div className="p-3">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => toggleLeadSelection(lead.id)}
+                              className="text-gray-400 hover:text-white transition-colors"
                             >
-                              Score: {lead.lead_score}
-                            </span>
-                          )}
-                          {lead.status && (
-                            <span
-                              className={`px-2 py-1 text-xs rounded-full ${
-                                lead.status === "converted"
-                                  ? "bg-green-900/50 text-green-300"
-                                  : lead.status === "qualified"
-                                    ? "bg-blue-900/50 text-blue-300"
-                                    : "bg-gray-800/50 text-gray-300"
-                              }`}
+                              {isSelected ? (
+                                <CheckSquare className="w-5 h-5 text-blue-400" />
+                              ) : (
+                                <Square className="w-5 h-5" />
+                              )}
+                            </button>
+                            <button
+                              onClick={() => toggleLeadExpansion(lead.id)}
+                              className="text-gray-400 hover:text-white transition-colors"
                             >
-                              {lead.status}
+                              {isExpanded ? (
+                                <ChevronUp className="w-4 h-4" />
+                              ) : (
+                                <ChevronDown className="w-4 h-4" />
+                              )}
+                            </button>
+                            <span className="text-sm font-medium text-white">
+                              {lead.name || lead.company_name || "Unknown"}
                             </span>
-                          )}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="flex gap-1">
+                              {lead.lead_score !== null && (
+                                <span
+                                  className={`px-2 py-1 text-xs rounded-full ${
+                                    lead.lead_score >= 80
+                                      ? "bg-green-900/50 text-green-300"
+                                      : lead.lead_score >= 60
+                                        ? "bg-yellow-900/50 text-yellow-300"
+                                        : "bg-red-900/50 text-red-300"
+                                  }`}
+                                >
+                                  Score: {lead.lead_score}
+                                </span>
+                              )}
+                              {lead.status && (
+                                <span
+                                  className={`px-2 py-1 text-xs rounded-full ${
+                                    lead.status === "converted"
+                                      ? "bg-green-900/50 text-green-300"
+                                      : lead.status === "qualified"
+                                        ? "bg-blue-900/50 text-blue-300"
+                                        : "bg-gray-800/50 text-gray-300"
+                                  }`}
+                                >
+                                  {lead.status}
+                                </span>
+                              )}
+                            </div>
+                            <div className="flex gap-1 ml-2">
+                              <Button
+                                onClick={() => addLeadToEmailList(lead)}
+                                size="sm"
+                                variant="outline"
+                                disabled={leadSubscriptionStatus[lead.id]?.isEmailSubscriber}
+                                className={`h-6 w-6 p-0 ${
+                                  leadSubscriptionStatus[lead.id]?.isEmailSubscriber
+                                    ? "bg-gray-800/50 border-gray-700 opacity-50 cursor-not-allowed"
+                                    : "bg-green-900/50 border-green-700 hover:bg-green-800/50"
+                                }`}
+                                title={
+                                  leadSubscriptionStatus[lead.id]?.isEmailSubscriber
+                                    ? "Already on Email List"
+                                    : "Add to Email List"
+                                }
+                              >
+                                <Users
+                                  className={`w-3 h-3 ${
+                                    leadSubscriptionStatus[lead.id]?.isEmailSubscriber
+                                      ? "text-gray-500"
+                                      : "text-green-300"
+                                  }`}
+                                />
+                              </Button>
+                              <Button
+                                onClick={() => addLeadToSmsList(lead)}
+                                size="sm"
+                                variant="outline"
+                                disabled={leadSubscriptionStatus[lead.id]?.isSmsSubscriber}
+                                className={`h-6 w-6 p-0 ${
+                                  leadSubscriptionStatus[lead.id]?.isSmsSubscriber
+                                    ? "bg-gray-800/50 border-gray-700 opacity-50 cursor-not-allowed"
+                                    : "bg-blue-900/50 border-blue-700 hover:bg-blue-800/50"
+                                }`}
+                                title={
+                                  leadSubscriptionStatus[lead.id]?.isSmsSubscriber
+                                    ? "Already on SMS List"
+                                    : "Add to SMS List"
+                                }
+                              >
+                                <MessageSquare
+                                  className={`w-3 h-3 ${
+                                    leadSubscriptionStatus[lead.id]?.isSmsSubscriber
+                                      ? "text-gray-500"
+                                      : "text-blue-300"
+                                  }`}
+                                />
+                              </Button>
+                              <Button
+                                onClick={() => startEditLead(lead)}
+                                size="sm"
+                                variant="outline"
+                                className="h-6 w-6 p-0 bg-gray-700/50 border-gray-600 hover:bg-gray-600/50"
+                                title="Edit Lead"
+                              >
+                                <Edit className="w-3 h-3 text-gray-300" />
+                              </Button>
+                              <Button
+                                onClick={() => handleDeleteLead(lead.id)}
+                                size="sm"
+                                variant="outline"
+                                className="h-6 w-6 p-0 bg-red-900/50 border-red-700 hover:bg-red-800/50"
+                                disabled={crudLoading && deletingLead === lead.id}
+                                title="Delete Lead"
+                              >
+                                <Trash2 className="w-3 h-3 text-red-300" />
+                              </Button>
+                            </div>
+                          </div>
                         </div>
-                        <div className="flex gap-1 ml-2">
-                          <Button
-                            onClick={() => addLeadToEmailList(lead)}
-                            size="sm"
-                            variant="outline"
-                            className="h-6 w-6 p-0 bg-green-900/50 border-green-700 hover:bg-green-800/50"
-                            title="Add to Email List"
-                          >
-                            <Users className="w-3 h-3 text-green-300" />
-                          </Button>
-                          <Button
-                            onClick={() => addLeadToSmsList(lead)}
-                            size="sm"
-                            variant="outline"
-                            className="h-6 w-6 p-0 bg-blue-900/50 border-blue-700 hover:bg-blue-800/50"
-                            title="Add to SMS List"
-                          >
-                            <MessageSquare className="w-3 h-3 text-blue-300" />
-                          </Button>
-                          <Button
-                            onClick={() => startEditLead(lead)}
-                            size="sm"
-                            variant="outline"
-                            className="h-6 w-6 p-0 bg-gray-700/50 border-gray-600 hover:bg-gray-600/50"
-                            title="Edit Lead"
-                          >
-                            <Edit className="w-3 h-3 text-gray-300" />
-                          </Button>
-                          <Button
-                            onClick={() => handleDeleteLead(lead.id)}
-                            size="sm"
-                            variant="outline"
-                            className="h-6 w-6 p-0 bg-red-900/50 border-red-700 hover:bg-red-800/50"
-                            disabled={crudLoading && deletingLead === lead.id}
-                            title="Delete Lead"
-                          >
-                            <Trash2 className="w-3 h-3 text-red-300" />
-                          </Button>
+
+                        {/* Basic Info - Always Visible */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
+                          <div className="flex items-center gap-2 text-sm text-gray-300">
+                            <Users className="w-3 h-3 text-gray-400" />
+                            {showSensitiveData ? lead.email : "***@***.***"}
+                          </div>
+                          {(lead.phone || lead.lead_phone_number) && (
+                            <div className="flex items-center gap-2 text-sm text-gray-300">
+                              <Phone className="w-3 h-3 text-gray-400" />
+                              {showSensitiveData
+                                ? lead.phone || lead.lead_phone_number
+                                : "***-***-****"}
+                            </div>
+                          )}
+                          {lead.company_name && (
+                            <div className="flex items-center gap-2 text-sm text-gray-300">
+                              <Building className="w-3 h-3 text-gray-400" />
+                              {lead.company_name}
+                            </div>
+                          )}
+                          <div className="flex items-center gap-2 text-xs text-gray-400">
+                            <Clock className="w-3 h-3" />
+                            Last Activity:{" "}
+                            {lead.last_interaction_at
+                              ? new Date(lead.last_interaction_at).toLocaleString()
+                              : lead.created_at
+                                ? new Date(lead.created_at).toLocaleString()
+                                : "N/A"}
+                          </div>
+                        </div>
+
+                        <div className="flex justify-between items-center text-xs text-gray-400">
+                          <span>Source: {lead.source || "Unknown"}</span>
+                          {lead.interaction_count && lead.interaction_count > 0 && (
+                            <span>{lead.interaction_count} interactions</span>
+                          )}
                         </div>
                       </div>
+
+                      {/* Expanded Details */}
+                      {isExpanded && (
+                        <div className="border-t border-gray-700/50 p-3 space-y-3 bg-gray-800/30">
+                          {/* Message */}
+                          {lead.message && (
+                            <div>
+                              <p className="text-xs font-medium text-gray-400 mb-1">Message:</p>
+                              <p className="text-sm text-gray-300 bg-gray-900/50 p-2 rounded">
+                                {lead.message}
+                              </p>
+                            </div>
+                          )}
+
+                          {/* Lead Details Grid */}
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            {lead.platform_interest && (
+                              <div>
+                                <p className="text-xs font-medium text-gray-400">
+                                  Platform Interest
+                                </p>
+                                <p className="text-sm text-gray-300">{lead.platform_interest}</p>
+                              </div>
+                            )}
+                            {lead.budget_range && (
+                              <div>
+                                <p className="text-xs font-medium text-gray-400">Budget Range</p>
+                                <p className="text-sm text-gray-300">{lead.budget_range}</p>
+                              </div>
+                            )}
+                            {lead.timeline && (
+                              <div>
+                                <p className="text-xs font-medium text-gray-400">Timeline</p>
+                                <p className="text-sm text-gray-300">{lead.timeline}</p>
+                              </div>
+                            )}
+                            {lead.last_interaction_at && (
+                              <div>
+                                <p className="text-xs font-medium text-gray-400">
+                                  Last Interaction
+                                </p>
+                                <p className="text-sm text-gray-300">
+                                  {new Date(lead.last_interaction_at).toLocaleString()}
+                                </p>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* UTM Parameters */}
+                          {(lead.utm_source || lead.utm_medium || lead.utm_campaign) && (
+                            <div>
+                              <p className="text-xs font-medium text-gray-400 mb-1 flex items-center gap-1">
+                                <ExternalLink className="w-3 h-3" />
+                                Campaign Tracking
+                              </p>
+                              <div className="grid grid-cols-2 gap-2 text-xs">
+                                {lead.utm_source && (
+                                  <span className="text-gray-300">Source: {lead.utm_source}</span>
+                                )}
+                                {lead.utm_medium && (
+                                  <span className="text-gray-300">Medium: {lead.utm_medium}</span>
+                                )}
+                                {lead.utm_campaign && (
+                                  <span className="text-gray-300">
+                                    Campaign: {lead.utm_campaign}
+                                  </span>
+                                )}
+                                {lead.utm_term && (
+                                  <span className="text-gray-300">Term: {lead.utm_term}</span>
+                                )}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Tags */}
+                          {lead.tags && lead.tags.length > 0 && (
+                            <div>
+                              <p className="text-xs font-medium text-gray-400 mb-1 flex items-center gap-1">
+                                <Tag className="w-3 h-3" />
+                                Tags
+                              </p>
+                              <div className="flex flex-wrap gap-1">
+                                {lead.tags.map((tag, idx) => (
+                                  <span
+                                    key={idx}
+                                    className="px-2 py-1 text-xs bg-gray-700/50 text-gray-300 rounded"
+                                  >
+                                    {tag}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Notes */}
+                          {lead.notes && (
+                            <div>
+                              <p className="text-xs font-medium text-gray-400 mb-1">Notes:</p>
+                              <p className="text-sm text-gray-300 bg-gray-900/50 p-2 rounded">
+                                {lead.notes}
+                              </p>
+                            </div>
+                          )}
+
+                          {/* Activities Timeline */}
+                          <div>
+                            <p className="text-xs font-medium text-gray-400 mb-2 flex items-center gap-1">
+                              <Activity className="w-3 h-3" />
+                              Activity Timeline ({activities.length})
+                            </p>
+                            {activities.length > 0 ? (
+                              <div className="space-y-2 max-h-60 overflow-y-auto">
+                                {activities.map((activity) => (
+                                  <div
+                                    key={activity.id}
+                                    className="flex items-start gap-2 p-2 bg-gray-900/50 rounded text-xs"
+                                  >
+                                    <div className="flex-shrink-0 w-2 h-2 mt-1 rounded-full bg-orange-500" />
+                                    <div className="flex-1">
+                                      <div className="flex items-center justify-between mb-1">
+                                        <span className="font-medium text-gray-300 capitalize">
+                                          {activity.activity_type.replace(/_/g, " ")}
+                                        </span>
+                                        <span className="text-gray-500">
+                                          {new Date(activity.created_at).toLocaleString()}
+                                        </span>
+                                      </div>
+                                      {Object.keys(activity.activity_data).length > 0 && (
+                                        <p className="text-gray-400">
+                                          {JSON.stringify(activity.activity_data)}
+                                        </p>
+                                      )}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            ) : (
+                              <p className="text-xs text-gray-500 italic">No activities recorded</p>
+                            )}
+                          </div>
+
+                          {/* Converted Info */}
+                          {lead.converted_at && (
+                            <div className="pt-2 border-t border-gray-700/50">
+                              <p className="text-xs text-green-400 flex items-center gap-1">
+                                <span className="w-2 h-2 rounded-full bg-green-500" />
+                                Converted: {new Date(lead.converted_at).toLocaleString()}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
-                    <p className="text-sm text-gray-300 mb-2">
-                      {showSensitiveData ? lead.email : "***@***.***"}
-                    </p>
-                    <div className="flex justify-between items-center">
-                      <p className="text-xs text-gray-400">Source: {lead.source || "Unknown"}</p>
-                      <p className="text-xs text-gray-400">
-                        Created:{" "}
-                        {lead.created_at ? new Date(lead.created_at).toLocaleDateString() : "N/A"}
-                      </p>
-                    </div>
-                    {lead.converted_at && (
-                      <p className="text-xs text-green-400 mt-1">
-                        Converted: {new Date(lead.converted_at).toLocaleDateString()}
-                      </p>
-                    )}
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </CardContent>
           </Card>

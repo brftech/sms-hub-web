@@ -1,0 +1,17 @@
+# Cursor Ignore File
+# Files and directories that Cursor Agent should NOT access
+
+# Large dependencies
+node_modules/
+.next/
+.vercel/
+dist/
+build/
+
+# You can add .env* here if you want to hide secrets from Cursor Agent
+# .env*
+# .env.local
+# .env.production
+
+# But we're allowing .env files so the agent can help with configuration
+

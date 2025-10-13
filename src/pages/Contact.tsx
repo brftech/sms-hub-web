@@ -12,6 +12,7 @@ import { getHubColorClasses } from "@sms-hub/utils";
 import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";
 import { contactService } from "../services/contactService";
+import { CloudflareTurnstile } from "../components/CloudflareTurnstile";
 
 import { CheckCircle, Loader2, Star, Shield, Zap } from "lucide-react";
 import { HOME_PATH } from "@/utils/routes";
@@ -42,6 +43,7 @@ const Contact = () => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [honeypot, setHoneypot] = useState(""); // Spam protection
   const [formStartTime] = useState(Date.now()); // Spam protection
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
   const firstNameRef = useRef<HTMLInputElement>(null);
@@ -98,15 +100,34 @@ const Contact = () => {
       return;
     }
 
+    // Turnstile verification (if enabled)
+    const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY;
+    if (turnstileSiteKey && !turnstileToken) {
+      toast({
+        title: "Please complete verification",
+        description: "Please complete the verification challenge before submitting.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
-      // Submit to Edge Function with signup preferences
+      // Get client IP (best effort)
+      const clientIP = await fetch("https://api.ipify.org?format=json")
+        .then((res) => res.json())
+        .then((data) => data.ip)
+        .catch(() => null);
+
+      // Submit to Edge Function with signup preferences and spam protection
       await contactService.submitContact({
         ...formData,
         hub_id: hubConfig.hubNumber,
         email_signup: formData.emailSignup,
         sms_signup: formData.smsSignup,
+        turnstile_token: turnstileToken,
+        client_ip: clientIP,
       });
 
       // Show success modal
@@ -123,6 +144,9 @@ const Contact = () => {
         emailSignup: false,
         smsSignup: false,
       });
+
+      // Reset turnstile token
+      setTurnstileToken(null);
 
       // Redirect to landing page after 3 seconds
       setTimeout(() => {
@@ -351,6 +375,32 @@ const Contact = () => {
                         autoComplete="off"
                       />
                     </div>
+
+                    {/* Cloudflare Turnstile - Spam Protection */}
+                    {import.meta.env.VITE_TURNSTILE_SITE_KEY && (
+                      <div className="mb-6">
+                        <CloudflareTurnstile
+                          siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY}
+                          onVerify={(token) => {
+                            // eslint-disable-next-line no-console
+                            console.log(
+                              "🎫 Turnstile token received:",
+                              `${token.substring(0, 20)}...`
+                            );
+                            setTurnstileToken(token);
+                          }}
+                          onError={() => {
+                            toast({
+                              title: "Verification failed",
+                              description: "Please refresh the page and try again.",
+                              variant: "destructive",
+                            });
+                          }}
+                          theme="dark"
+                          size="normal"
+                        />
+                      </div>
+                    )}
                   </FormContainerComponent>
                 </div>
               </div>

@@ -1,6 +1,6 @@
 # Deployment
 
-**Last Updated**: October 14, 2025 (Evening - Post Refactor)
+**Last Updated**: October 14, 2025 (Night - Favicon & Manifest Fixes)
 
 ## 🚀 Quick Deploy
 
@@ -16,14 +16,16 @@ npm run build
 vercel --prod
 ```
 
-### Environment Variables (Required)
+### Environment Variables
 
-Set these in Vercel dashboard for each domain:
+#### Production Environment
+
+Set these in Vercel dashboard → Environment Variables (select **Production** only):
 
 ```bash
-# Supabase (Marketing Database)
+# Supabase (Production Marketing Database)
 VITE_SUPABASE_URL=https://fwlivygerbqzowbzxesw.supabase.co
-VITE_SUPABASE_ANON_KEY=your_anon_key_here
+VITE_SUPABASE_ANON_KEY=your_prod_anon_key
 
 # Admin Dashboard
 VITE_ADMIN_ACCESS_CODE=your_secure_code
@@ -35,6 +37,21 @@ TURNSTILE_SECRET_KEY=your_secret_key  # Server-side only
 # Email (Resend API)
 RESEND_API_KEY=your_resend_key
 ```
+
+#### Preview Environment (Optional)
+
+Set these in Vercel dashboard → Environment Variables (select **Preview** only):
+
+```bash
+# Supabase (Dev Marketing Database)
+VITE_SUPABASE_URL=https://hmumtnpnyxuplvqcmnfk.supabase.co
+VITE_SUPABASE_ANON_KEY=your_dev_anon_key
+
+# Other vars can be same as production or preview-specific
+VITE_ADMIN_ACCESS_CODE=your_preview_code
+```
+
+**Important**: Preview deployments will use dev database if configured. This allows testing without affecting production data.
 
 ## 🌐 Multi-Domain Setup (Production)
 
@@ -116,14 +133,52 @@ The app automatically detects the hub from the hostname:
 
 ```typescript
 // detectHubFromHostname() in environment.ts
-percytech.com → Hub 0 (PercyTech)
-gnymble.com   → Hub 1 (Gnymble)
-percymd.com   → Hub 2 (PercyMD)
-percytext.com → Hub 3 (PercyText)
+percytech.com → Hub 0 (PercyTech, red theme)
+gnymble.com   → Hub 1 (Gnymble, orange theme)
+percymd.com   → Hub 2 (PercyMD, blue theme)
+percytext.com → Hub 3 (PercyText, violet theme)
 localhost     → Hub 1 (Gnymble, default)
+*.vercel.app  → Uses hub switcher (dev/preview)
 ```
 
+**What Updates Automatically Per Domain**:
+
+- ✅ Favicon (browser tab icon)
+- ✅ PWA Manifest (app name, theme color, icons)
+- ✅ All colors and branding
+- ✅ Hero content and CTAs
+- ✅ Page titles and metadata
+
 No manual configuration needed - just deploy once and add domains!
+
+## 🧪 Preview Deployments
+
+### How to Create Preview Deployment
+
+```bash
+# Deploy to preview (not production)
+vercel
+
+# This creates a URL like:
+# https://sms-hub-{hash}.vercel.app
+```
+
+### Preview Environment Behavior
+
+- **Hub Switcher**: Visible (test all hubs)
+- **Admin Button**: Visible (test admin dashboard)
+- **Database**: Uses dev database if configured
+- **Favicon/Manifest**: Dynamic (changes with hub switcher)
+- **localStorage**: Override allowed (for testing)
+
+### Production vs Preview
+
+| Feature       | Production            | Preview                 |
+| ------------- | --------------------- | ----------------------- |
+| Hub Detection | Domain-based (locked) | Hub switcher (flexible) |
+| Database      | Production            | Dev (if configured)     |
+| Floating UI   | Hidden                | Visible                 |
+| localStorage  | Ignored               | Respected               |
 
 ## 📦 Build Process
 

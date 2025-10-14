@@ -1,6 +1,6 @@
 # Deployment
 
-**Last Updated**: October 14, 2025 (Night - Hub-Aware Login Button)
+**Last Updated**: October 14, 2025 (Night - Post-Production Recommendations)
 
 ## 🚀 Quick Deploy
 
@@ -284,3 +284,43 @@ Project settings in `vercel.json`:
 - Check DNS propagation (can take 24-48 hours)
 - Verify domain added in Vercel project settings
 - Confirm Cloudflare proxy is enabled
+
+## 🔧 Post-Deployment Cleanup (Optional)
+
+### 1. Remove Unused Environment Variables
+
+The following environment variable can be safely **deleted** from Vercel:
+
+- **`VITE_WEB_APP_URL`** - No longer used; login buttons now use dynamic hub detection
+
+This variable was previously used for login redirects but has been replaced by `detectHubFromHostname()` and `getHubDomain()` logic in `checkout.ts`.
+
+**To remove**:
+
+1. Go to Vercel → Project Settings → Environment Variables
+2. Find `VITE_WEB_APP_URL`
+3. Click three-dot menu → Delete
+4. Redeploy to apply changes
+
+### 2. Add Analytics & Monitoring (When Ready)
+
+Consider adding these services when you're ready to monitor production:
+
+**Analytics**:
+
+- [PostHog](https://posthog.com) - Product analytics (open source)
+- [Plausible](https://plausible.io) - Privacy-focused analytics
+- [Google Analytics 4](https://analytics.google.com) - Traditional option
+
+**Error Tracking**:
+
+- [Sentry](https://sentry.io) - Error monitoring & performance tracking
+- [LogRocket](https://logrocket.com) - Session replay + error tracking
+
+**Implementation tip**: Use environment variables to enable/disable in production vs preview:
+
+```typescript
+if (import.meta.env.PROD && import.meta.env.VITE_SENTRY_DSN) {
+  Sentry.init({ dsn: import.meta.env.VITE_SENTRY_DSN });
+}
+```

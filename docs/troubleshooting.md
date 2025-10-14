@@ -1,8 +1,36 @@
 # Troubleshooting
 
-**Last Updated**: October 14, 2025 (Evening - Post Refactor)
+**Last Updated**: October 14, 2025 (Night - Post-Production Recommendations)
 
 ## 🔧 Common Issues
+
+### Git Hooks & Husky
+
+**Issue: Husky deprecation warnings during commit/push**
+
+```
+husky - DEPRECATED
+Please remove the following two lines from .husky/pre-commit:
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+```
+
+**Solution (optional, not urgent)**:
+
+This is a Husky v9 → v10 migration warning. To fix:
+
+```bash
+# Edit .husky/pre-commit
+# Remove these two lines:
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Keep the rest of the file as-is
+
+# Repeat for .husky/pre-push
+```
+
+Or simply wait - this warning won't break anything, it's just informational.
 
 ### Build & Development
 

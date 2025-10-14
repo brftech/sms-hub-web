@@ -1,6 +1,6 @@
 # Agent Lessons - Best Practices from Real Development
 
-**Last Updated**: October 14, 2025 (Night - Favicon & Manifest Fixes)
+**Last Updated**: October 14, 2025 (Night - Hub-Aware Login Button)
 
 This document contains hard-won lessons from real development work. These principles apply to this repo AND future projects.
 
@@ -375,6 +375,15 @@ This document contains hard-won lessons from real development work. These princi
 - Use hub-specific manifests: `manifest-percytech.json`, `manifest-gnymble.json`, etc.
 - Each manifest should include: name, short_name, theme_color, icons
 - Theme colors in manifests should match hub brand colors exactly
+
+### 51. **External links should be hub-aware**
+
+- Login/signup buttons should redirect to hub-specific external apps
+- Use `detectHubFromHostname()` to determine current hub
+- Use `getHubDomain()` from hub-logic for proper domain names
+- Handle special cases (e.g., PercyText uses `app2` subdomain instead of `app`)
+- Create helper functions like `getLoginUrl()` for reusability
+- Example: percytech.com → app.percytech.com, percytext.com → app2.percytext.com
 
 ---
 

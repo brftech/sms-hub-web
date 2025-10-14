@@ -1,6 +1,6 @@
 # Deployment
 
-**Last Updated**: October 14, 2025 (Night - Favicon & Manifest Fixes)
+**Last Updated**: October 14, 2025 (Night - Hub-Aware Login Button)
 
 ## 🚀 Quick Deploy
 
@@ -148,6 +148,7 @@ localhost     → Hub 1 (Gnymble, default)
 - ✅ All colors and branding
 - ✅ Hero content and CTAs
 - ✅ Page titles and metadata
+- ✅ Login button redirect (app.{hub}.com or app2.percytext.com)
 
 No manual configuration needed - just deploy once and add domains!
 

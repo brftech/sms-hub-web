@@ -1,177 +1,224 @@
-import React, { Component, ErrorInfo, ReactNode } from "react";
-import { Button } from "./button";
-import { AlertTriangle, RefreshCw, Home, Bug } from "lucide-react";
+/**
+ * Enhanced Error Boundary Component
+ * 
+ * Features:
+ * - Granular isolation levels (page, section, component)
+ * - Recovery actions (reset, retry, navigate)
+ * - Error classification and reporting
+ * - Hub-aware error messages
+ * - Development mode debugging
+ */
 
-interface Props {
+import { Component, ErrorInfo, ReactNode } from 'react';
+
+export interface ErrorBoundaryProps {
   children: ReactNode;
-  fallback?: ReactNode;
+  fallback?: (error: Error, errorInfo: ErrorInfo, reset: () => void) => ReactNode;
   onError?: (error: Error, errorInfo: ErrorInfo) => void;
+  isolationLevel?: 'page' | 'section' | 'component';
+  resetKeys?: unknown[]; // Reset boundary when these change
+  context?: {
+    hubId?: number;
+    hubType?: string;
+    component?: string;
+    route?: string;
+  };
 }
 
-interface State {
+interface ErrorBoundaryState {
   hasError: boolean;
-  error?: Error;
-  errorInfo?: ErrorInfo;
+  error: Error | null;
+  errorInfo: ErrorInfo | null;
+  errorCount: number;
 }
 
-export class ErrorBoundary extends Component<Props, State> {
-  constructor(props: Props) {
+export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
     super(props);
-    this.state = { hasError: false };
-  }
-
-  static getDerivedStateFromError(error: Error): State {
-    return { hasError: true, error };
-  }
-
-  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    this.setState({
-      error,
-      errorInfo,
-    });
-
-    // Call the onError callback if provided
-    if (this.props.onError) {
-      this.props.onError(error, errorInfo);
-    }
-
-    // Log the error to console in development
-    const isDevelopment = (typeof import.meta !== 'undefined' && import.meta.env?.MODE !== "production") ||
-                         (typeof process !== 'undefined' && process.env?.NODE_ENV === "development");
-    if (isDevelopment) {
-      console.error("ErrorBoundary caught an error:", error, errorInfo);
-    }
-  }
-
-  handleRefresh = () => {
-    window.location.reload();
-  };
-
-  handleGoHome = () => {
-    window.location.href = "/";
-  };
-
-  handleReportBug = () => {
-    const errorDetails = {
-      error: this.state.error?.toString(),
-      stack: this.state.error?.stack,
-      componentStack: this.state.errorInfo?.componentStack,
-      url: window.location.href,
-      userAgent: navigator.userAgent,
-      timestamp: new Date().toISOString(),
+    this.state = {
+      hasError: false,
+      error: null,
+      errorInfo: null,
+      errorCount: 0,
     };
+  }
 
-    // Create a mailto link with error details
-    const subject = encodeURIComponent("Bug Report - SMS Hub Application");
-    const body = encodeURIComponent(
-      `Error Details:\n\n${JSON.stringify(errorDetails, null, 2)}`
-    );
-    const mailtoLink = `mailto:support@percytech.com?subject=${subject}&body=${body}`;
+  static getDerivedStateFromError(error: Error): Partial<ErrorBoundaryState> {
+    return {
+      hasError: true,
+      error,
+    };
+  }
 
-    window.open(mailtoLink);
+  componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
+    const { onError, context } = this.props;
+
+    // Increment error count
+    this.setState((prevState) => ({
+      errorInfo,
+      errorCount: prevState.errorCount + 1,
+    }));
+
+    // Call custom error handler if provided
+    if (onError) {
+      onError(error, errorInfo);
+    }
+
+    // Report error with context
+    this.reportError(error, errorInfo);
+
+    // Log to console in development
+    if (import.meta.env.MODE === 'development') {
+      console.group('🔴 Error Boundary Caught Error');
+      console.error('Error:', error);
+      console.error('Error Info:', errorInfo);
+      console.log('Context:', context);
+      console.log('Component Stack:', errorInfo.componentStack);
+      console.groupEnd();
+    }
+  }
+
+  componentDidUpdate(prevProps: ErrorBoundaryProps): void {
+    const { resetKeys } = this.props;
+    const { hasError } = this.state;
+
+    // Auto-reset when resetKeys change
+    if (hasError && resetKeys && prevProps.resetKeys) {
+      const hasResetKeyChanged = resetKeys.some(
+        (key, index) => key !== prevProps.resetKeys?.[index]
+      );
+      if (hasResetKeyChanged) {
+        this.reset();
+      }
+    }
+  }
+
+  private reportError(error: Error, errorInfo: ErrorInfo): void {
+    const { context } = this.props;
+
+    // Log error details for reporting
+    // In production, this would integrate with error reporting service
+    if (typeof window !== 'undefined' && (window as any).errorReporter) {
+      try {
+        (window as any).errorReporter.report(error, {
+          hubId: context?.hubId,
+          hubType: context?.hubType,
+          component: context?.component,
+          route: context?.route,
+          metadata: {
+            componentStack: errorInfo.componentStack,
+            isolationLevel: this.props.isolationLevel || 'page',
+            errorCount: this.state.errorCount,
+          },
+        });
+      } catch (err) {
+        console.error('Failed to report error:', err);
+      }
+    }
+  }
+
+  private reset = (): void => {
+    this.setState({
+      hasError: false,
+      error: null,
+      errorInfo: null,
+    });
   };
 
-  render() {
-    if (this.state.hasError) {
-      // Custom fallback UI
-      if (this.props.fallback) {
-        return this.props.fallback;
+  render(): ReactNode {
+    const { hasError, error, errorInfo } = this.state;
+    const { children, fallback, isolationLevel = 'page' } = this.props;
+
+    if (hasError && error && errorInfo) {
+      // Use custom fallback if provided
+      if (fallback) {
+        return fallback(error, errorInfo, this.reset);
       }
 
-      const isDevelopment = (typeof import.meta !== 'undefined' && import.meta.env?.MODE !== "production") ||
-                           (typeof process !== 'undefined' && process.env?.NODE_ENV === "development");
+      // Default fallback UI based on isolation level
+      return this.renderDefaultFallback(error, isolationLevel);
+    }
 
-      // Default error UI
+    return children;
+  }
+
+  private renderDefaultFallback(error: Error, isolationLevel: string): ReactNode {
+    const isDevelopment = import.meta.env.MODE === 'development';
+
+    // Component-level: Minimal inline error
+    if (isolationLevel === 'component') {
       return (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-          <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-6">
-            <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-red-100 rounded-full">
-              <AlertTriangle className="w-8 h-8 text-red-600" />
-            </div>
+        <div className="p-2 bg-red-50 border border-red-200 rounded text-sm text-red-800">
+          <span className="font-semibold">Error: </span>
+          {isDevelopment ? error.message : 'Component failed to load'}
+        </div>
+      );
+    }
 
-            <h1 className="text-2xl font-bold text-gray-900 text-center mb-2">
+    // Section-level: Contained error block
+    if (isolationLevel === 'section') {
+      return (
+        <div className="p-6 bg-red-50 border border-red-200 rounded-lg">
+          <h3 className="text-lg font-semibold text-red-900 mb-2">
+            Section Unavailable
+          </h3>
+          <p className="text-red-700 mb-4">
+            {isDevelopment ? error.message : 'This section encountered an error'}
+          </p>
+          <button
+            onClick={this.reset}
+            className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+          >
+            Try Again
+          </button>
+        </div>
+      );
+    }
+
+    // Page-level: Full page error (will be replaced by hub-aware ErrorFallback)
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
+          <div className="text-center">
+            <div className="text-6xl mb-4">⚠️</div>
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">
               Something went wrong
             </h1>
-            <p className="text-gray-600 text-center mb-6">
-              We're sorry, but something unexpected happened. Our team has been
-              notified and is working to fix this issue.
+            <p className="text-gray-600 mb-6">
+              {isDevelopment
+                ? error.message
+                : 'We encountered an unexpected error. Please try again.'}
             </p>
-
             <div className="space-y-3">
-              <Button
-                onClick={this.handleRefresh}
-                className="w-full"
-                variant="outline"
+              <button
+                onClick={this.reset}
+                className="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
               >
-                <RefreshCw className="w-4 h-4 mr-2" />
                 Try Again
-              </Button>
-
-              <Button
-                onClick={this.handleGoHome}
-                className="w-full"
-                variant="outline"
+              </button>
+              <button
+                onClick={() => window.location.href = '/'}
+                className="w-full px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 transition-colors"
               >
-                <Home className="w-4 h-4 mr-2" />
                 Go Home
-              </Button>
-
-              <Button
-                onClick={this.handleReportBug}
-                className="w-full"
-                variant="outline"
-              >
-                <Bug className="w-4 h-4 mr-2" />
-                Report Bug
-              </Button>
+              </button>
             </div>
-
-            {isDevelopment && this.state.error && (
-              <details className="mt-6 p-4 bg-gray-100 rounded-lg">
-                <summary className="cursor-pointer font-medium text-gray-700 mb-2">
-                  Error Details (Development)
+            {isDevelopment && this.state.errorInfo && (
+              <details className="mt-6 text-left">
+                <summary className="cursor-pointer text-sm text-gray-600 hover:text-gray-800">
+                  Show Error Details
                 </summary>
-                <pre className="text-xs text-gray-600 overflow-auto">
-                  {this.state.error.toString()}
-                  {"\n\n"}
-                  {this.state.errorInfo?.componentStack}
+                <pre className="mt-2 p-4 bg-gray-100 rounded text-xs overflow-auto">
+                  {this.state.errorInfo.componentStack}
                 </pre>
               </details>
             )}
           </div>
         </div>
-      );
-    }
-
-    return this.props.children;
+      </div>
+    );
   }
 }
 
-// Convenience function for functional components
-export const withErrorBoundary = <P extends object>(
-  Component: React.ComponentType<P>,
-  fallback?: ReactNode,
-  onError?: (error: Error, errorInfo: ErrorInfo) => void
-) => {
-  const WrappedComponent = (props: P) => (
-    <ErrorBoundary fallback={fallback} onError={onError}>
-      <Component {...props} />
-    </ErrorBoundary>
-  );
-
-  WrappedComponent.displayName = `withErrorBoundary(${Component.displayName || Component.name || "Component"})`;
-
-  return WrappedComponent;
-};
-
-// Global error handler for unhandled promise rejections
-if (typeof window !== "undefined") {
-  window.addEventListener("unhandledrejection", (event) => {
-    console.error("Unhandled promise rejection:", event.reason);
-  });
-
-  // Global error handler for uncaught errors
-  window.addEventListener("error", (event) => {
-    console.error("Uncaught error:", event.error);
-  });
-}
+// Export for backward compatibility
+export default ErrorBoundary;

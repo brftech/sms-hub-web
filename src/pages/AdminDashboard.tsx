@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { Link } from "react-router-dom";
 import {
   Card,
   CardContent,
@@ -15,6 +16,7 @@ import { createSubscriberService } from "../services/subscriberService";
 import { getDisplayName } from "@sms-hub/utils";
 import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";
+import { ADMIN_PERFORMANCE_PATH } from "../utils/routes";
 import {
   Database,
   Users,
@@ -39,6 +41,7 @@ import {
   CheckSquare,
   Square,
   Mail,
+  BarChart3,
 } from "lucide-react";
 
 interface EmailSubscriber {
@@ -901,6 +904,18 @@ export const AdminDashboard: React.FC = () => {
                 <p className="text-gray-300 mt-2">{getHubDisplayName(currentHub)} Hub Sales Data</p>
               </div>
               <div className="flex items-center space-x-3">
+                {import.meta.env.DEV && (
+                  <Link to={ADMIN_PERFORMANCE_PATH}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex items-center bg-gray-800/50 text-white border-gray-700 hover:bg-gray-700/50"
+                    >
+                      <BarChart3 className="w-4 h-4 mr-2" />
+                      Performance
+                    </Button>
+                  </Link>
+                )}
                 <Button
                   onClick={() => setShowSensitiveData(!showSensitiveData)}
                   variant="outline"

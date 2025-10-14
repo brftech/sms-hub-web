@@ -10,3 +10,4 @@ export { CTASection } from "./CTA";
 export { StatsSection } from "./StatsSection";
 export { ProblemSolutionSection } from "./ProblemSolutionSection";
 export { TestimonialsSection } from "./TestimonialsSection";
+export { ErrorFallback } from "./ErrorFallback";

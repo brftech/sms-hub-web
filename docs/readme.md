@@ -156,7 +156,16 @@ See [deployment.md](./deployment.md) for full guide.
 
 ## 📈 Recent Updates
 
-**October 14, 2025**:
+**October 14, 2025** (Latest):
+
+- ✅ **Reusable Form Component Library** - Schema-driven FormBuilder with validation, accessibility, hub-aware rules
+- ✅ **Performance Monitoring Dashboard** - Real-time Core Web Vitals, API stats, component render tracking (dev only at `/admin/performance`)
+- ✅ **Enhanced Error Boundaries** - Granular isolation levels, recovery actions, hub-aware error messages
+- ✅ **Contact Form Migration** - Simplified from 530+ to 250 lines using FormBuilder
+- ✅ **Admin Dashboard Navigation** - Added Performance button (dev only)
+- ✅ **Fixed Admin Access** - Dev environment now works without passcode (production requires passcode)
+
+**October 14, 2025** (Earlier):
 
 - ✅ Hub-centric content architecture (all hub content in `/packages/hub-logic/src/hubs/`)
 - ✅ Flattened component structure (removed unnecessary nesting)

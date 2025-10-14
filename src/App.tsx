@@ -8,12 +8,13 @@ import {
   PageTransition,
   useHub,
 } from "@sms-hub/ui/marketing";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { Suspense, lazy, useEffect } from "react";
 import { useScrollToTop } from "@sms-hub/utils";
 import { webEnvironment, detectHubFromHostname } from "./config/environment";
 import { EnvironmentDebug } from "./components/EnvironmentDebug";
 import AppFloatingComponents from "./components/AppFloatingComponents";
+import { performanceMonitor } from "./services/performanceMonitoringService";
 import {
   HOME_PATH,
   HOME_ALIAS_PATH,
@@ -29,6 +30,7 @@ import {
   PRICING_PATH,
   DEMO_PATH,
   ADMIN_PATH,
+  ADMIN_PERFORMANCE_PATH,
   TEST_AUTH_PATH,
   DEBUG_AUTH_PATH,
   PAYMENT_SUCCESS_PATH,
@@ -64,6 +66,7 @@ const ClientTerms = lazy(() => import("./pages/clients/ClientTerms"));
 
 // Lazy load admin dashboard
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
+const AdminPerformanceDashboard = lazy(() => import("./pages/AdminPerformanceDashboard"));
 
 const queryClient = new QueryClient();
 
@@ -95,6 +98,21 @@ const HubThemeWrapper = ({ children }: { children: React.ReactNode }) => {
 const AppRoutes = () => {
   // Apply scroll-to-top on route changes
   useScrollToTop();
+  
+  // Track page load performance
+  const location = useLocation();
+  
+  useEffect(() => {
+    const startTime = performance.now();
+    
+    // Track page load after component is mounted
+    const timer = setTimeout(() => {
+      const duration = performance.now() - startTime;
+      performanceMonitor.trackPageLoad(location.pathname, duration);
+    }, 100);
+    
+    return () => clearTimeout(timer);
+  }, [location.pathname]);
 
   // Show Home page as default
   const DefaultComponent = Home;
@@ -256,6 +274,20 @@ const AppRoutes = () => {
           </PageTransition>
         }
       />
+
+      {/* Admin Performance Dashboard - Dev only */}
+      {import.meta.env.MODE === "development" && (
+        <Route
+          path={ADMIN_PERFORMANCE_PATH}
+          element={
+            <PageTransition>
+              <Suspense fallback={<PageLoader />}>
+                <AdminPerformanceDashboard />
+              </Suspense>
+            </PageTransition>
+          }
+        />
+      )}
 
       {/* Auth routes - Dev only */}
       {import.meta.env.MODE === "development" && (

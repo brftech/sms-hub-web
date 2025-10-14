@@ -6,6 +6,7 @@ export const ABOUT_PATH = "/about";
 export const FAQ_PATH = "/faq";
 export const DEMO_PATH = "/demo";
 export const ADMIN_PATH = "/admin";
+export const ADMIN_PERFORMANCE_PATH = "/admin/performance";
 export const PRIVACY_PATH = "/privacy";
 export const TERMS_PATH = "/terms";
 export const LOGIN_PATH = "/login";

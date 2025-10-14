@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getSupabaseClient } from "../lib/supabaseSingleton";
+import { getSupabaseClient } from "../services/supabaseSingleton";
 
 export function TestAuth() {
   const [status, setStatus] = useState<Record<string, unknown>>({});
@@ -11,31 +11,23 @@ export function TestAuth() {
 
         // Check environment
         const envStatus = {
-          supabaseUrl: import.meta.env.VITE_SUPABASE_URL
-            ? "✓ Configured"
-            : "✗ Missing",
-          supabaseKey: import.meta.env.VITE_SUPABASE_ANON_KEY
-            ? "✓ Configured"
-            : "✗ Missing",
-          devAuthToken: import.meta.env.VITE_DEV_AUTH_TOKEN
-            ? "✓ Configured"
-            : "✗ Missing",
+          supabaseUrl: import.meta.env.VITE_SUPABASE_URL ? "✓ Configured" : "✗ Missing",
+          supabaseKey: import.meta.env.VITE_SUPABASE_ANON_KEY ? "✓ Configured" : "✗ Missing",
+          devAuthToken: import.meta.env.VITE_DEV_AUTH_TOKEN ? "✓ Configured" : "✗ Missing",
           environment: import.meta.env.MODE,
         };
 
         // Test connection
-        const { data: session, error: sessionError } =
-          await supabase.auth.getSession();
+        const { data: session, error: sessionError } = await supabase.auth.getSession();
 
         // Test auth
         const testEmail = "superadmin@gnymble.com";
         const testPassword = "SuperAdmin123!";
 
-        const { data: authData, error: authError } =
-          await supabase.auth.signInWithPassword({
-            email: testEmail,
-            password: testPassword,
-          });
+        const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+          email: testEmail,
+          password: testPassword,
+        });
 
         setStatus({
           environment: envStatus,
@@ -70,11 +62,7 @@ export function TestAuth() {
         <ul>
           <li>
             Dev Auth:{" "}
-            <a
-              href={`/admin?superadmin=${import.meta.env.VITE_DEV_AUTH_TOKEN}`}
-            >
-              Test Dev Auth
-            </a>
+            <a href={`/admin?superadmin=${import.meta.env.VITE_DEV_AUTH_TOKEN}`}>Test Dev Auth</a>
           </li>
         </ul>
       </div>

@@ -15,7 +15,7 @@ import {
   getHubById,
   getAllHubTypes,
   isValidHubType,
-} from "../../packages/hub-logic/src/hubMetadata";
+} from "@sms-hub/hub-logic";
 import type { HubType } from "../../packages/hub-logic/src/types";
 
 describe("HUB_METADATA constant", () => {

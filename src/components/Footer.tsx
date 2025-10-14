@@ -1,9 +1,11 @@
 import { Link } from "react-router-dom";
 import { useHub, HubLogo } from "@sms-hub/ui/marketing";
+import { getHubSEO } from "@sms-hub/hub-logic";
 import { PRICING_PATH, ABOUT_PATH, CONTACT_PATH, PRIVACY_PATH, TERMS_PATH } from "@/utils/routes";
 
 const Footer = () => {
   const { currentHub } = useHub();
+  const seo = getHubSEO(currentHub);
 
   const getLogo = () => {
     return <HubLogo hubType={currentHub} variant="main" size="lg" />;
@@ -16,11 +18,7 @@ const Footer = () => {
           {/* Logo and Description */}
           <div className="col-span-1 md:col-span-2">
             <div className="mb-3 flex justify-start">{getLogo()}</div>
-            <p className="text-gray-400 mb-4 max-w-md text-sm">
-              {currentHub === "percytech"
-                ? "Enterprise technology solutions and platforms for modern businesses."
-                : "Compliant SMS marketing platform designed for premium retailers and sophisticated customer engagement."}
-            </p>
+            <p className="text-gray-400 mb-4 max-w-md text-sm">{seo.footerDescription}</p>
           </div>
 
           {/* Quick Links */}
@@ -28,17 +26,26 @@ const Footer = () => {
             <h3 className="text-base font-semibold mb-3">Quick Links</h3>
             <ul className="space-y-1">
               <li>
-                <Link to={PRICING_PATH} className="text-gray-400 hover:text-white transition-colors text-sm">
+                <Link
+                  to={PRICING_PATH}
+                  className="text-gray-400 hover:text-white transition-colors text-sm"
+                >
                   Pricing
                 </Link>
               </li>
               <li>
-                <Link to={ABOUT_PATH} className="text-gray-400 hover:text-white transition-colors text-sm">
+                <Link
+                  to={ABOUT_PATH}
+                  className="text-gray-400 hover:text-white transition-colors text-sm"
+                >
                   About
                 </Link>
               </li>
               <li>
-                <Link to={CONTACT_PATH} className="text-gray-400 hover:text-white transition-colors text-sm">
+                <Link
+                  to={CONTACT_PATH}
+                  className="text-gray-400 hover:text-white transition-colors text-sm"
+                >
                   Contact
                 </Link>
               </li>
@@ -50,12 +57,18 @@ const Footer = () => {
             <h3 className="text-base font-semibold mb-3">Legal</h3>
             <ul className="space-y-1">
               <li>
-                <Link to={PRIVACY_PATH} className="text-gray-400 hover:text-white transition-colors text-sm">
+                <Link
+                  to={PRIVACY_PATH}
+                  className="text-gray-400 hover:text-white transition-colors text-sm"
+                >
                   Privacy Policy
                 </Link>
               </li>
               <li>
-                <Link to={TERMS_PATH} className="text-gray-400 hover:text-white transition-colors text-sm">
+                <Link
+                  to={TERMS_PATH}
+                  className="text-gray-400 hover:text-white transition-colors text-sm"
+                >
                   Terms of Service
                 </Link>
               </li>

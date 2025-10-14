@@ -14,7 +14,7 @@ import {
   AlertDescription,
 } from "@sms-hub/ui/marketing";
 import { Shield, AlertCircle, CheckCircle, CheckCircle2, RefreshCw } from "lucide-react";
-import { getSupabaseClient } from "../lib/supabaseSingleton";
+import { getSupabaseClient } from "../services/supabaseSingleton";
 import styled from "styled-components";
 import { ADMIN_PATH, LOGIN_PATH, SIGNUP_PATH } from "@/utils/routes";
 

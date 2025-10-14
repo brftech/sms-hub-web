@@ -1,5 +1,6 @@
-import { PageLayout, SEO } from "@sms-hub/ui/marketing";
+import { PageLayout, SEO, useHub } from "@sms-hub/ui/marketing";
 import { handleDirectCheckout } from "../utils/checkout";
+import { getHubPricingContent, getHubMetadata } from "@sms-hub/hub-logic";
 
 import { useState } from "react";
 import {
@@ -14,11 +15,15 @@ import {
   Star,
   Users,
   Target,
+  Heart,
 } from "lucide-react";
 import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";
 
 const Pricing = () => {
+  const { currentHub } = useHub();
+  const pricingContent = getHubPricingContent(currentHub);
+  const hubMetadata = getHubMetadata(currentHub);
   const [isLoading, setIsLoading] = useState(false);
 
   // Wrapper for loading state
@@ -50,8 +55,7 @@ const Pricing = () => {
       name: "Starter",
       price: "$79",
       period: "per month",
-      description:
-        "Perfect for small shops starting with customer communications.",
+      description: "Perfect for small businesses starting with customer communications.",
       features: [
         "200 SMS per month",
         "Up to 50 contacts",
@@ -66,8 +70,7 @@ const Pricing = () => {
       name: "Core",
       price: "$179",
       period: "per month",
-      description:
-        "For established shops ready to grow their customer communications.",
+      description: "For established businesses ready to grow customer communications.",
       features: [
         "1,500 SMS per month",
         "Up to 500 contacts",
@@ -82,7 +85,7 @@ const Pricing = () => {
       name: "Elite",
       price: "$349",
       period: "per month",
-      description: "For retailers with a thriving customer base.",
+      description: "For businesses with a thriving customer base.",
       features: [
         "8,000 SMS per month",
         "Up to 3,000 contacts",
@@ -102,45 +105,8 @@ const Pricing = () => {
     { icon: Headphones, text: "Expert customer support" },
   ];
 
-  const whyChooseUs = [
-    {
-      icon: Target,
-      title: "We Get It",
-      description:
-        "While others reject your industry, we specialize in it. Cigar lounges, distilleries, premium venues - we understand your business.",
-    },
-    {
-      icon: Star,
-      title: "Premium Service",
-      description:
-        "White-glove support from day one. No chatbots, no runaround. Real experts who know your industry inside and out.",
-    },
-    {
-      icon: Users,
-      title: "Proven Results",
-      description:
-        "Our clients see real ROI. Better customer engagement, higher retention, and SMS that actually delivers results.",
-    },
-  ];
-
-  const faqs = [
-    {
-      q: "How long does setup take?",
-      a: "Setup takes 7-10 business days. We handle all compliance, carrier approvals, and platform configuration. No shortcuts, no surprises.",
-    },
-    {
-      q: "Can I change plans later?",
-      a: "Absolutely. After your first month, you can upgrade or downgrade based on your actual usage and needs. We're flexible because your business grows.",
-    },
-    {
-      q: "What makes you different from other SMS providers?",
-      a: "We specialize in regulated businesses. While others reject cigar retailers and premium venues, we provide compliant solutions designed for your industry. We get it.",
-    },
-    {
-      q: "Is there a contract?",
-      a: "No long-term contracts. Just the one-time onboarding fee to get started, then month-to-month service. We're confident you'll stay because we deliver.",
-    },
-  ];
+  // Map whyChooseUs to icons
+  const iconMap = [Target, Star, Users, Heart];
 
   return (
     <PageLayout
@@ -150,25 +116,31 @@ const Pricing = () => {
       footer={<Footer />}
     >
       <SEO
-        title="Pricing - Gnymble SMS Platform"
-        description="Transparent pricing for compliant SMS solutions. Start for $179. No contracts, no rejections, just results."
-        keywords="SMS pricing, business texting cost, compliant messaging, regulated industries"
+        title={`Pricing - ${hubMetadata.displayName}`}
+        description={`${pricingContent.description} ${pricingContent.highlightText}`}
+        keywords={`SMS pricing, ${hubMetadata.displayName}, business texting cost`}
       />
 
       <div className="min-h-screen bg-black pt-20 pb-12 relative">
         {/* Subtle background elements */}
         <div className="absolute inset-0">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-orange-500/5 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-orange-500/5 rounded-full blur-3xl"></div>
+          <div
+            className={`absolute top-0 left-1/4 w-96 h-96 bg-${hubMetadata.color}-500/5 rounded-full blur-3xl`}
+          ></div>
+          <div
+            className={`absolute bottom-0 right-1/4 w-96 h-96 bg-${hubMetadata.color}-500/5 rounded-full blur-3xl`}
+          ></div>
         </div>
 
         <div className="relative z-10 max-w-6xl mx-auto px-6">
-          {/* Hero Section - Matching Homepage Style */}
+          {/* Hero Section - Hub-aware */}
           <div className="text-center mb-20">
-            <div className="inline-flex items-center px-4 py-2 rounded-full bg-orange-500/20 border border-orange-500/30 mb-8">
-              <Zap className="w-4 h-4 text-orange-400 mr-2" />
-              <span className="text-sm font-medium text-orange-400">
-                SIMPLE PRICING
+            <div
+              className={`inline-flex items-center px-4 py-2 rounded-full bg-${hubMetadata.color}-500/20 border border-${hubMetadata.color}-500/30 mb-8`}
+            >
+              <Zap className={`w-4 h-4 text-${hubMetadata.color}-400 mr-2`} />
+              <span className={`text-sm font-medium text-${hubMetadata.color}-400`}>
+                {pricingContent.badge}
               </span>
             </div>
 
@@ -176,32 +148,32 @@ const Pricing = () => {
               className="text-4xl md:text-6xl font-bold text-white mb-8 leading-tight"
               style={{ fontFamily: "Inter, system-ui, sans-serif" }}
             >
-              SMS that actually
-              <span className="gradient-text block"> works</span>
+              {pricingContent.title}
+              <span className="gradient-text block">{pricingContent.subtitle}</span>
             </h1>
 
             <p
               className="text-xl text-gray-300 max-w-3xl mx-auto mb-12 leading-relaxed"
               style={{ fontFamily: "Inter, system-ui, sans-serif" }}
             >
-              One simple fee gets you set up, compliant, and ready to text.
-              <span className="text-orange-400">
+              {pricingContent.description}
+              <span className={`text-${hubMetadata.color}-400`}>
                 {" "}
-                No contracts. No hidden costs. No rejections.
+                {pricingContent.highlightText}
               </span>
             </p>
 
             <div className="flex items-center justify-center space-x-8 text-gray-400 text-sm">
               <div className="flex items-center">
-                <Check className="w-4 h-4 text-orange-500 mr-2" />
+                <Check className={`w-4 h-4 text-${hubMetadata.color}-500 mr-2`} />
                 <span>7-10 day setup</span>
               </div>
               <div className="flex items-center">
-                <Check className="w-4 h-4 text-orange-500 mr-2" />
+                <Check className={`w-4 h-4 text-${hubMetadata.color}-500 mr-2`} />
                 <span>Full compliance</span>
               </div>
               <div className="flex items-center">
-                <Check className="w-4 h-4 text-orange-500 mr-2" />
+                <Check className={`w-4 h-4 text-${hubMetadata.color}-500 mr-2`} />
                 <span>Month-to-month</span>
               </div>
             </div>
@@ -210,8 +182,10 @@ const Pricing = () => {
           {/* Main Pricing Card - Center Stage */}
           <div className="mb-20">
             <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-3xl border border-gray-700/50 p-12 max-w-3xl mx-auto text-center">
-              <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-orange-500/20 border border-orange-500/30 mb-8">
-                <Zap className="w-10 h-10 text-orange-400" />
+              <div
+                className={`inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-${hubMetadata.color}-500/20 border border-${hubMetadata.color}-500/30 mb-8`}
+              >
+                <Zap className={`w-10 h-10 text-${hubMetadata.color}-400`} />
               </div>
 
               <h2
@@ -228,9 +202,7 @@ const Pricing = () => {
                 >
                   {onboardingPlan.price}
                 </div>
-                <div className="text-gray-400 text-lg">
-                  {onboardingPlan.type}
-                </div>
+                <div className="text-gray-400 text-lg">{onboardingPlan.type}</div>
               </div>
 
               <p
@@ -243,7 +215,7 @@ const Pricing = () => {
               <ul className="text-left space-y-4 mb-10 max-w-lg mx-auto">
                 {onboardingPlan.features.map((feature, index) => (
                   <li key={index} className="flex items-center text-gray-300">
-                    <Check className="w-6 h-6 text-orange-500 mr-4 flex-shrink-0" />
+                    <Check className={`w-6 h-6 text-${hubMetadata.color}-500 mr-4 flex-shrink-0`} />
                     <span className="text-lg">{feature}</span>
                   </li>
                 ))}
@@ -252,12 +224,10 @@ const Pricing = () => {
               <button
                 onClick={() => handleCheckoutWithLoading()}
                 disabled={isLoading}
-                className="px-10 py-4 bg-orange-600 text-white font-bold rounded-full hover:bg-orange-700 disabled:bg-orange-400 disabled:cursor-not-allowed transition-all duration-300 text-lg tracking-wide uppercase flex items-center justify-center mx-auto group mb-6"
+                className={`px-10 py-4 bg-${hubMetadata.color}-600 text-white font-bold rounded-full hover:bg-${hubMetadata.color}-700 disabled:bg-${hubMetadata.color}-400 disabled:cursor-not-allowed transition-all duration-300 text-lg tracking-wide uppercase flex items-center justify-center mx-auto group mb-6`}
                 style={{ fontFamily: "Inter, system-ui, sans-serif" }}
               >
-                {isLoading
-                  ? "Starting Checkout..."
-                  : "Get Started Today - $179"}
+                {isLoading ? "Starting Checkout..." : "Get Started Today - $179"}
                 <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
               </button>
 
@@ -268,7 +238,7 @@ const Pricing = () => {
             </div>
           </div>
 
-          {/* Why Choose Us Section */}
+          {/* Why Choose Us Section - Hub-aware */}
           <div className="mb-20">
             <div className="text-center mb-12">
               <h2
@@ -277,34 +247,33 @@ const Pricing = () => {
               >
                 Why businesses choose us
               </h2>
-              <p
-                className="text-gray-300 max-w-3xl mx-auto text-lg leading-relaxed"
-                style={{ fontFamily: "Inter, system-ui, sans-serif" }}
-              >
-                We do it really well. Others...don't do it at all.
-              </p>
             </div>
 
             <div className="grid md:grid-cols-3 gap-8">
-              {whyChooseUs.map((item, index) => (
-                <div key={index} className="text-center">
-                  <div className="w-16 h-16 bg-orange-500/20 border border-orange-500/30 rounded-xl flex items-center justify-center mx-auto mb-6">
-                    <item.icon className="w-8 h-8 text-orange-400" />
+              {pricingContent.whyChooseUs.map((item, index) => {
+                const IconComponent = iconMap[index] || Target;
+                return (
+                  <div key={index} className="text-center">
+                    <div
+                      className={`w-16 h-16 bg-${hubMetadata.color}-500/20 border border-${hubMetadata.color}-500/30 rounded-xl flex items-center justify-center mx-auto mb-6`}
+                    >
+                      <IconComponent className={`w-8 h-8 text-${hubMetadata.color}-400`} />
+                    </div>
+                    <h3
+                      className="text-xl font-semibold text-white mb-4"
+                      style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+                    >
+                      {item.title}
+                    </h3>
+                    <p
+                      className="text-gray-400 leading-relaxed"
+                      style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+                    >
+                      {item.description}
+                    </p>
                   </div>
-                  <h3
-                    className="text-xl font-semibold text-white mb-4"
-                    style={{ fontFamily: "Inter, system-ui, sans-serif" }}
-                  >
-                    {item.title}
-                  </h3>
-                  <p
-                    className="text-gray-400 leading-relaxed"
-                    style={{ fontFamily: "Inter, system-ui, sans-serif" }}
-                  >
-                    {item.description}
-                  </p>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 
@@ -312,7 +281,7 @@ const Pricing = () => {
           <div className="mb-20">
             <div className="text-center mb-12">
               <h2
-                className="text-3xl md:text-4xl font-bold text-orange-500 mb-6"
+                className={`text-3xl md:text-4xl font-bold text-${hubMetadata.color}-500 mb-6`}
                 style={{ fontFamily: "Inter, system-ui, sans-serif" }}
               >
                 After setup, choose your monthly plan
@@ -321,8 +290,8 @@ const Pricing = () => {
                 className="text-gray-300 max-w-3xl mx-auto text-lg leading-relaxed"
                 style={{ fontFamily: "Inter, system-ui, sans-serif" }}
               >
-                Your first month is included in onboarding. After that, pick the
-                plan that fits your usage.
+                Your first month is included in onboarding. After that, pick the plan that fits your
+                usage.
               </p>
             </div>
 
@@ -330,7 +299,7 @@ const Pricing = () => {
               {monthlyPlans.map((plan, index) => (
                 <div
                   key={index}
-                  className="bg-gradient-to-br from-gray-800/30 to-gray-900/30 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-8 hover:border-orange-500/30 transition-all duration-300"
+                  className={`bg-gradient-to-br from-gray-800/30 to-gray-900/30 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-8 hover:border-${hubMetadata.color}-500/30 transition-all duration-300`}
                 >
                   <div className="text-center mb-8">
                     <h3
@@ -344,9 +313,7 @@ const Pricing = () => {
                       style={{ fontFamily: "Inter, system-ui, sans-serif" }}
                     >
                       {plan.price}
-                      <span className="text-lg text-gray-400 font-normal">
-                        /month
-                      </span>
+                      <span className="text-lg text-gray-400 font-normal">/month</span>
                     </div>
                     <p
                       className="text-gray-400 leading-relaxed"
@@ -358,14 +325,11 @@ const Pricing = () => {
 
                   <ul className="space-y-3">
                     {plan.features.map((feature, featureIndex) => (
-                      <li
-                        key={featureIndex}
-                        className="flex items-center text-gray-300"
-                      >
-                        <Check className="w-5 h-5 text-orange-500 mr-3 flex-shrink-0" />
-                        <span
-                          style={{ fontFamily: "Inter, system-ui, sans-serif" }}
-                        >
+                      <li key={featureIndex} className="flex items-center text-gray-300">
+                        <Check
+                          className={`w-5 h-5 text-${hubMetadata.color}-500 mr-3 flex-shrink-0`}
+                        />
+                        <span style={{ fontFamily: "Inter, system-ui, sans-serif" }}>
                           {feature}
                         </span>
                       </li>
@@ -389,8 +353,7 @@ const Pricing = () => {
                 className="text-gray-300 text-lg leading-relaxed"
                 style={{ fontFamily: "Inter, system-ui, sans-serif" }}
               >
-                Premium features that come standard because excellence shouldn't
-                be optional.
+                Premium features that come standard because excellence shouldn't be optional.
               </p>
             </div>
 
@@ -398,10 +361,12 @@ const Pricing = () => {
               {everyPlanIncludes.map((item, index) => (
                 <div
                   key={index}
-                  className="flex items-center p-6 bg-gradient-to-br from-gray-800/30 to-gray-900/30 backdrop-blur-sm rounded-2xl border border-gray-700/50 hover:border-orange-500/30 transition-all duration-300"
+                  className={`flex items-center p-6 bg-gradient-to-br from-gray-800/30 to-gray-900/30 backdrop-blur-sm rounded-2xl border border-gray-700/50 hover:border-${hubMetadata.color}-500/30 transition-all duration-300`}
                 >
-                  <div className="w-16 h-16 bg-orange-500/20 border border-orange-500/30 rounded-xl flex items-center justify-center mr-6 flex-shrink-0">
-                    <item.icon className="w-8 h-8 text-orange-400" />
+                  <div
+                    className={`w-16 h-16 bg-${hubMetadata.color}-500/20 border border-${hubMetadata.color}-500/30 rounded-xl flex items-center justify-center mr-6 flex-shrink-0`}
+                  >
+                    <item.icon className={`w-8 h-8 text-${hubMetadata.color}-400`} />
                   </div>
                   <span
                     className="text-white font-medium text-lg"
@@ -414,7 +379,7 @@ const Pricing = () => {
             </div>
           </div>
 
-          {/* FAQ Section */}
+          {/* FAQ Section - Hub-aware */}
           <div className="mb-20">
             <div className="text-center mb-12">
               <h2
@@ -426,10 +391,10 @@ const Pricing = () => {
             </div>
 
             <div className="space-y-6 max-w-4xl mx-auto">
-              {faqs.map((faq, index) => (
+              {pricingContent.faqs.map((faq, index) => (
                 <div
                   key={index}
-                  className="bg-gradient-to-br from-gray-800/30 to-gray-900/30 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-8 hover:border-orange-500/30 transition-all duration-300"
+                  className={`bg-gradient-to-br from-gray-800/30 to-gray-900/30 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-8 hover:border-${hubMetadata.color}-500/30 transition-all duration-300`}
                 >
                   <h3
                     className="text-xl font-semibold text-white mb-4"
@@ -448,31 +413,28 @@ const Pricing = () => {
             </div>
           </div>
 
-          {/* Final CTA */}
+          {/* Final CTA - Hub-aware */}
           <div className="text-center">
             <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-3xl border border-gray-700/50 p-12 max-w-4xl mx-auto">
               <h2
                 className="text-3xl md:text-4xl font-bold text-white mb-6"
                 style={{ fontFamily: "Inter, system-ui, sans-serif" }}
               >
-                Ready to start for $179?
+                {pricingContent.ctaTitle}
               </h2>
               <p
                 className="text-gray-300 mb-10 max-w-2xl mx-auto text-lg leading-relaxed"
                 style={{ fontFamily: "Inter, system-ui, sans-serif" }}
               >
-                No more SMS rejections. No compliance headaches. Just premium
-                texting that works.
+                {pricingContent.ctaDescription}
               </p>
               <button
                 onClick={() => handleCheckoutWithLoading()}
                 disabled={isLoading}
-                className="px-10 py-4 bg-orange-600 text-white font-bold rounded-full hover:bg-orange-700 disabled:bg-orange-400 disabled:cursor-not-allowed transition-all duration-300 text-lg tracking-wide uppercase flex items-center justify-center mx-auto group"
+                className={`px-10 py-4 bg-${hubMetadata.color}-600 text-white font-bold rounded-full hover:bg-${hubMetadata.color}-700 disabled:bg-${hubMetadata.color}-400 disabled:cursor-not-allowed transition-all duration-300 text-lg tracking-wide uppercase flex items-center justify-center mx-auto group`}
                 style={{ fontFamily: "Inter, system-ui, sans-serif" }}
               >
-                {isLoading
-                  ? "Starting Checkout..."
-                  : "Get Started Today - $179"}
+                {isLoading ? "Starting Checkout..." : "Get Started Today - $179"}
                 <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
               </button>
             </div>

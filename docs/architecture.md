@@ -1,349 +1,105 @@
-# SMS Hub Web Architecture Guide
+# Architecture
 
-**Last Updated**: October 13, 2025
+**Last Updated**: October 14, 2025
 
-## 🎯 Overview
+## 🏗️ System Overview
 
-SMS Hub Web is a production-ready multi-tenant marketing website and sales dashboard built with React 19, Vite, TypeScript, and Supabase. It serves 4 business brands with isolated data, branded experiences, and comprehensive lead management capabilities.
+SMS Hub Web is a multi-tenant marketing platform serving 4 business brands (PercyTech, Gnymble, PercyMD, PercyText) with isolated data, branded experiences, and comprehensive lead management.
 
-**Current Status**: ✅ **Production Ready** - Live at gnymble.com with SHAFT-compliant messaging
+**Stack**: React 19, TypeScript, Vite, Tailwind CSS, Supabase
 
-**Production Architecture (October 13, 2025)**:
+### Hub System
 
-- Contact-first conversion funnel (SignUp temporarily disabled)
-- Feature flags via `import.meta.env.DEV` for controlled rollout
-- AFT-focused compliance messaging (Alcohol, Firearms, Tobacco)
-- Streamlined hero design with 0.75 scale interactive phone demo
-
-## 🏗️ System Architecture
-
-### **High-Level Architecture**
-
-```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   sms-hub-web   │    │  sms-hub-app2   │    │     texting     │
-│   (Marketing)   │    │   (Customer)    │    │   (SMS Core)    │
-│   Port: 3000    │    │   Port: 3001    │    │   Package       │
-│   [hub].com     │    │ app2.[hub].com  │    │   Shared        │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-         │                       │                       │
-         └───────────────────────┼───────────────────────┘
-                                 │
-                    ┌─────────────────┐
-                    │    Supabase     │
-                    │   (Backend)     │
-                    │ 2 Databases     │
-                    └─────────────────┘
-```
-
-### **Key Design Principles**
-
-- **Separation of Concerns**: Marketing vs Customer applications
-- **Multi-Tenant**: Hub-based data isolation
-- **Performance**: Optimized bundles and code splitting
-- **Maintainability**: Type safety and comprehensive testing
-
-### **Multi-Tenant Hub System**
-
-- **Hub 0**: PercyTech (percytech.com) - Red theme, technology focus
-- **Hub 1**: Gnymble (gnymble.com) - Orange theme, primary brand (default)
-- **Hub 2**: PercyMD (percymd.com) - Red theme, medical focus
+- **Hub 0**: PercyTech (percytech.com) - Red theme, technology businesses
+- **Hub 1**: Gnymble (gnymble.com) - Orange theme, retail/general (default)
+- **Hub 2**: PercyMD (percymd.com) - Red theme, healthcare
 - **Hub 3**: PercyText (percytext.com) - Purple theme, messaging focus
 
-## 🗄️ Database Architecture
+All data is isolated by `hub_id`. Domain-based routing determines the active hub.
 
-### **Marketing Database Strategy**
+## 📁 Folder Structure
 
-The platform uses a separate Supabase database for marketing operations:
+```
+/
+├── src/                      # Main application
+│   ├── components/           # Shared React components (flat structure)
+│   ├── pages/                # Route components
+│   ├── services/             # API services (Supabase, contact forms)
+│   ├── config/               # Environment configuration
+│   └── types/                # TypeScript type definitions
+│
+├── packages/                 # Internal packages
+│   ├── hub-logic/            # Hub configs, metadata, content
+│   │   └── src/hubs/         # Hub-specific folders (gnymble, percymd, etc)
+│   ├── ui/                   # Shared UI components
+│   ├── supabase/             # Supabase client & queries
+│   └── utils/                # Shared utilities
+│
+├── supabase/                 # Supabase backend
+│   ├── migrations/           # Database schema
+│   └── functions/            # Edge Functions (submit-contact, stripe-webhook)
+│
+├── test/                     # All tests
+│   ├── unit/                 # Unit tests (Vitest)
+│   ├── integration/          # Integration tests
+│   └── e2e/                  # End-to-end tests (Playwright)
+│
+└── docs/                     # Documentation (5 files max)
+```
 
-#### **SMS-Hub-Web Database** (Marketing)
+### Key Architecture Decisions
 
-- **Purpose**: Lead capture, email marketing, contact forms
+**1. Hub Centralization**
+
+- ALL hub-specific content lives in `/packages/hub-logic/src/hubs/`
+- Each hub has its own folder with small files: `metadata.ts`, `colors.ts`, `hero.ts`, etc.
+- Components use `useHub()` hook + helper functions like `getHubColors()`
+
+**2. Flat Component Structure**
+
+- No deep nesting (no `/home/shared/` folders)
+- Components are either shared or deleted
+- One level of folders maximum
+
+**3. Package Architecture**
+
+- Local packages use `file:` dependencies
+- Vite configured with `preserveSymlinks: true`
+- Optimized bundle: `@sms-hub/ui/marketing` exports only marketing components
+
+## 🗄️ Database
+
+### Marketing Database (Separate from App2)
+
 - **Dev**: `hmumtnpnyxuplvqcmnfk.supabase.co`
 - **Prod**: `fwlivygerbqzowbzxesw.supabase.co`
-- **Key Tables**: `leads`, `email_lists`, `contact_form_submissions`, `verifications`
 
-### **Database Schema Design**
+### Key Tables
 
-- **Multi-tenant**: All tables include `hub_id` for tenant isolation
-- **Marketing Focus**: Optimized for lead capture and conversion
-- **Clean Slate**: Schemas designed for new databases (no existing data)
-- **Hub Isolation**: Proper data separation between brands
+- `leads` - Contact form submissions
+- `lead_activities` - Lead interaction history
+- `email_lists` / `sms_lists` - Marketing list definitions
+- `email_subscribers` / `sms_subscribers` - Subscription tracking
 
-## 🔐 Authentication Architecture
+All tables have `hub_id` for multi-tenant isolation.
 
-### **Payment-First Authentication Flow**
+## 🔐 Security
 
-1. **Payment**: User clicks "Get Started" → Stripe checkout
-2. **Webhook**: `stripe-webhook` creates Supabase Auth user + lead records
-3. **Email Confirmation**: User receives email confirmation link
-4. **Cross-App Redirect**: User redirected to sms-hub-app2 for profile setup
-5. **Customer Management**: Full functionality in customer app
+- Frontend uses **anon key only**
+- Admin operations via **Edge Functions** (service role key server-side)
+- RLS policies disabled in dev, enabled in production
+- No sensitive keys in client code
 
-### **Security Features**
+## 🎨 Styling System
 
-- **Frontend Security**: Uses only anon key, never exposes service role key
-- **Admin Operations**: Moved to Edge Functions for security
-- **Hub Isolation**: All data filtered by `hub_id`
-- **Cross-App Security**: Secure redirects between applications
+- **Tailwind CSS** for all styling
+- Hub-specific colors in `/packages/hub-logic/src/hubs/*/colors.ts`
+- Includes hex values + Tailwind class mappings
+- Dynamic theming via `getHubColors()` helper
 
-## 📦 Package Architecture
+## 🧪 Testing
 
-### **Core Packages**
-
-- **`@sms-hub/ui/marketing`** - Optimized UI components for marketing
-- **`@sms-hub/hub-logic`** - Hub configurations and branding
-- **`@sms-hub/supabase`** - Database client and queries
-- **`@sms-hub/utils`** - Shared utilities and validation
-
-### **Package Dependencies**
-
-```
-sms-hub-web
-├── @sms-hub/ui/marketing    # Optimized marketing bundle
-├── @sms-hub/hub-logic       # Hub configurations
-├── @sms-hub/supabase        # Database client
-└── @sms-hub/utils           # Shared utilities
-```
-
-## 🚀 Technology Stack
-
-### **Frontend Stack**
-
-| Technology       | Purpose          | Version |
-| ---------------- | ---------------- | ------- |
-| **React**        | UI Framework     | 19.1.1  |
-| **Vite**         | Build Tool       | 7.1.7   |
-| **TypeScript**   | Type Safety      | 5.9.2   |
-| **Tailwind CSS** | Styling          | 3.4.17  |
-| **React Query**  | State Management | 5.56.2  |
-| **Playwright**   | E2E Testing      | 1.55.1  |
-
-### **Backend Stack**
-
-| Service      | Purpose         | Database ID         |
-| ------------ | --------------- | ------------------- |
-| **Supabase** | Database + Auth | Marketing database  |
-| **Stripe**   | Payments        | Webhook integration |
-| **Vercel**   | Hosting         | Edge functions      |
-
-### **Deployment Stack**
-
-- **Hosting**: Vercel (marketing application)
-- **Database**: Supabase (managed PostgreSQL)
-- **CDN**: Vercel Edge Network
-- **Monitoring**: Vercel Analytics + Supabase Dashboard
-
-## 🔄 Data Flow
-
-### **Marketing Flow (sms-hub-web)**
-
-1. User visits marketing site
-2. Hub detection based on domain
-3. Lead capture via contact forms
-4. Data stored in marketing database with hub-specific filtering
-5. Sales Dashboard provides hub-filtered CRUD operations
-6. Lead conversion to customer (via sms-hub-app2)
-
-### **Cross-App Integration Flow**
-
-1. User completes Stripe payment on marketing site
-2. Webhook creates user + lead records in marketing database
-3. User redirected to sms-hub-app2 for profile setup
-4. Customer management and SMS functionality in app2
-5. Both apps maintain hub consistency
-
-## 🎯 Design Principles
-
-### **Separation of Concerns**
-
-- **Marketing vs Customer**: Separate applications and databases
-- **Package Isolation**: Core functionality in separate packages
-- **Multi-tenant**: Clean tenant isolation via hub_id
-
-### **Scalability**
-
-- **Horizontal Scaling**: Each app can scale independently
-- **Database Separation**: Marketing and customer data isolated
-- **Package Reusability**: Shared packages across applications
-
-### **Security**
-
-- **Least Privilege**: Frontend uses only anon key
-- **Edge Functions**: Admin operations in secure serverless functions
-- **Data Isolation**: Multi-tenant data separation
-
-### **Maintainability**
-
-- **Type Safety**: 100% TypeScript coverage
-- **Documentation**: Comprehensive documentation
-- **Testing**: Unit and E2E test coverage
-- **Code Organization**: Clear package and module structure
-
-## 🔧 Development Workflow
-
-### **Local Development**
-
-```bash
-# Start marketing application
-cd sms-hub-web && npm run dev    # Port 3000
-
-# Access applications
-# Marketing Site: http://localhost:3000
-# Sales Dashboard: http://localhost:3000/admin (dev mode)
-```
-
-### **Package Development**
-
-```bash
-# Build shared packages
-cd packages/ui && npm run build
-cd packages/hub-logic && npm run build
-```
-
-### **Database Management**
-
-```bash
-# Deploy schemas
-cd sms-hub-web && npx supabase db push --project-ref fwlivygerbqzowbzxesw
-
-# Deploy Edge Functions
-npx supabase functions deploy submit-contact --project-ref fwlivygerbqzowbzxesw
-npx supabase functions deploy stripe-webhook --project-ref fwlivygerbqzowbzxesw
-```
-
-## 📊 Performance Considerations
-
-### **Frontend Optimization**
-
-- **Code Splitting**: Lazy loading for better performance
-- **Bundle Optimization**: Terser minification and tree shaking
-- **CDN**: Vercel Edge Network for global distribution
-- **Caching**: Aggressive caching for static assets
-
-### **Backend Optimization**
-
-- **Edge Functions**: Serverless functions for better performance
-- **Database Indexing**: Proper indexes for query optimization
-- **Connection Pooling**: Supabase handles connection management
-- **Caching**: React Query for client-side caching
-
-### **Bundle Optimization**
-
-- **Target**: 91KB gzipped main bundle (achieved)
-- **Code Splitting**: Route-based lazy loading
-- **Tree Shaking**: Strategic imports to eliminate unused code
-- **Import Optimization**: Use `@sms-hub/ui/marketing` for better performance
-
-## 🚨 Important Notes
-
-- **Multi-tenant Architecture**: All operations must include `hub_id`
-- **Database Separation**: Web and App2 use different databases
-- **Package Dependencies**: Maintain proper package versioning
-- **Security**: Never expose service role keys in frontend
-- **Bundle Optimization**: Use optimized imports (`@sms-hub/ui/marketing`) for better performance
-- **Code Quality**: Zero TypeScript/ESLint errors across all applications
-
-## 🚀 Recent Updates (October 2025)
-
-### **SMS-Hub-Web Achievements**
-
-- **Sales Dashboard**: Rebranded with hub-specific filtering and branded UI
-- **Code Simplification**: Removed @sms-hub/logger package (~1,000 lines eliminated)
-- **Performance**: 91KB gzipped main bundle (down from 302KB)
-- **Testing**: Complete E2E test overhaul (48 tests, 6 browsers)
-- **Documentation**: Comprehensive updates with clear structure
-
-### **Production Launch Updates (October 13, 2025)**
-
-- **Homepage Redesign**: Interactive phone at 0.75 scale, tagline below
-- **SHAFT Messaging**: Clear AFT focus (Alcohol, Firearms, Tobacco only)
-- **Conversion Strategy**: Contact-first approach with SignUp in development
-- **Feature Flags**: Environment-based button visibility (`import.meta.env.DEV`)
-- **Visual Cleanup**: Removed all section divider lines for seamless flow
-- **Mobile Optimization**: Logo left + Login right in mobile navigation
-
-## 🗺️ Centralized Routing Architecture
-
-### **Route Management System**
-
-All application routes are centralized in `src/utils/routes.ts` to ensure consistency and type safety across the application.
-
-**File Location**: `src/utils/routes.ts`
-
-```typescript
-export const HOME_PATH = "/";
-export const CONTACT_PATH = "/contact";
-export const PRICING_PATH = "/pricing";
-export const ADMIN_PATH = "/admin";
-// ... all other routes
-```
-
-### **Benefits of Centralization**
-
-- **Type Safety**: Compile-time checking for all route references
-- **Refactor Safety**: Change paths in one place, affects entire codebase
-- **Consistency**: Same paths across navigation, links, buttons, and redirects
-- **Maintainability**: Easy to add, modify, or deprecate routes
-- **Documentation**: Single source of truth for all application paths
-
-### **Implementation Details**
-
-**Components Using Routes:**
-
-- `src/App.tsx` - Route definitions
-- `src/components/Navigation.tsx` - Navigation links
-- `src/components/Footer.tsx` - Footer links
-- All page components - Programmatic navigation
-
-**Usage Pattern:**
-
-```typescript
-import { CONTACT_PATH, PRICING_PATH } from "@/utils/routes";
-
-// In React Router
-<Route path={CONTACT_PATH} element={<Contact />} />
-
-// In navigation
-<Link to={PRICING_PATH}>Pricing</Link>
-
-// In programmatic navigation
-navigate(CONTACT_PATH);
-```
-
-## 🔧 Vite Configuration Enhancements
-
-### **Package Aliases**
-
-Vite is configured with direct source aliases to ensure fresh content during development:
-
-```typescript
-// vite.config.ts
-resolve: {
-  alias: {
-    '@sms-hub/hub-logic': path.resolve(__dirname, './packages/hub-logic/src'),
-    '@sms-hub/supabase': path.resolve(__dirname, './packages/supabase/src'),
-    // ... other aliases
-  }
-}
-```
-
-**Benefits:**
-
-- Bypasses package build cache
-- Ensures latest content from `hubContent.ts`
-- Eliminates HMR cache issues
-- Direct source resolution in development
-
-### **Cache Management**
-
-```bash
-# Clean Vite cache when content doesn't update
-npm run clean  # Removes .vite cache and dist
-npm run dev    # Fresh development build
-```
-
----
-
-**Last Updated**: October 13, 2025  
-**Status**: Production Ready - Marketing platform architecture implemented, optimized, and deployed
+- **Unit Tests**: Vitest (`npm test`)
+- **Type Checking**: TypeScript (`npm run type-check`)
+- **E2E Tests**: Playwright (`npm run test:e2e`)
+- Setup file: `/test/setup.ts`

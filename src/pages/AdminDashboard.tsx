@@ -11,7 +11,7 @@ import {
 } from "@sms-hub/ui/marketing";
 import { getHubColorClasses } from "@sms-hub/utils";
 import { getHubId, getHubDisplayName } from "@sms-hub/hub-logic";
-import { getSupabaseClient } from "../lib/supabaseSingleton";
+import { getSupabaseClient } from "../services/supabaseSingleton";
 import { createSubscriberService } from "../services/subscriberService";
 import { getDisplayName } from "../utils/nameUtils";
 import Navigation from "../components/Navigation";

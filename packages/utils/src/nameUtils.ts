@@ -1,5 +1,10 @@
 /**
  * Utility functions for parsing and formatting names
+ *
+ * Single source of truth for name handling across:
+ * - Frontend (AdminDashboard, services)
+ * - Edge Functions (submit-contact)
+ * - Tests (nameUtils.test.ts)
  */
 
 export interface ParsedName {

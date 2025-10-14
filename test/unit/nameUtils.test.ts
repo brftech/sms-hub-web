@@ -4,7 +4,7 @@
 /// <reference types="vitest/globals" />
 
 import { describe, it, expect } from "vitest";
-import { parseFullName, formatFullName, getDisplayName } from "../../src/utils/nameUtils";
+import { parseFullName, formatFullName, getDisplayName } from "@sms-hub/utils";
 
 describe("parseFullName", () => {
   it("should parse a two-word name correctly", () => {

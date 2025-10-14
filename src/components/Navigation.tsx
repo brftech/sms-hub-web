@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button, useHub, HubLogo } from "@sms-hub/ui/marketing";
 import { Menu, X, MessageSquare, Users, HelpCircle, CreditCard } from "lucide-react";
-import { getHubColorClasses } from "@sms-hub/utils";
+import { getHubColors } from "@sms-hub/hub-logic";
 import { handleDirectCheckout, handleDirectLogin } from "../utils/checkout";
 import {
   HOME_PATH,
@@ -19,7 +19,7 @@ const Navigation = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { currentHub } = useHub();
-  const hubColors = getHubColorClasses(currentHub);
+  const hubColors = getHubColors(currentHub).tailwind;
 
   const getLogo = () => {
     return <HubLogo hubType={currentHub} variant="icon" size="lg" />;

@@ -1,12 +1,14 @@
 export * from "./hub";
 export * from "./sms";
 export * from "./validation";
-export * from "./hub-colors";
+// hub-colors.ts is deprecated - use getHubColors() from @sms-hub/hub-logic instead
+// export * from "./hub-colors";
 export * from "./errors";
 export * from "./validation-advanced";
 // Logger removed - using console for debugging
 export * from "./tcr-validation";
 export * from "./crossAppRedirects";
+export * from "./nameUtils";
 
 // React hooks
 export * from "./useScrollToTop";

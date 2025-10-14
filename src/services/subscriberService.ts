@@ -4,7 +4,7 @@
  */
 
 import { SupabaseClient } from "@supabase/supabase-js";
-import { parseFullName } from "../utils/nameUtils";
+import { parseFullName } from "@sms-hub/utils";
 
 export interface AddEmailSubscriberParams {
   email: string;

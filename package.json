@@ -32,6 +32,7 @@
     "postinstall": "npm run clean"
   },
   "dependencies": {
+    "@sms-hub/clients": "file:./packages/clients",
     "@sms-hub/hub-logic": "file:./packages/hub-logic",
     "@sms-hub/supabase": "file:./packages/supabase",
     "@sms-hub/ui": "file:./packages/ui",

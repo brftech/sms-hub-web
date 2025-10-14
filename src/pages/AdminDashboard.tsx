@@ -9,11 +9,10 @@ import {
   useHub,
   SEO,
 } from "@sms-hub/ui/marketing";
-import { getHubColorClasses } from "@sms-hub/utils";
-import { getHubId, getHubDisplayName } from "@sms-hub/hub-logic";
+import { getHubId, getHubDisplayName, getHubColors } from "@sms-hub/hub-logic";
 import { getSupabaseClient } from "../services/supabaseSingleton";
 import { createSubscriberService } from "../services/subscriberService";
-import { getDisplayName } from "../utils/nameUtils";
+import { getDisplayName } from "@sms-hub/utils";
 import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";
 import FloatingHubSwitcher from "../components/FloatingHubSwitcher";
@@ -101,7 +100,7 @@ interface Hub {
 
 export const AdminDashboard: React.FC = () => {
   const { currentHub } = useHub();
-  const hubColors = getHubColorClasses(currentHub);
+  const hubColors = getHubColors(currentHub).tailwind;
 
   // Use regular anon key client (RLS is disabled on marketing tables)
   // Security is handled at application layer via admin access code

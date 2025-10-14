@@ -8,7 +8,7 @@ import {
   useHub,
   SEO,
 } from "@sms-hub/ui/marketing";
-import { getHubColorClasses } from "@sms-hub/utils";
+import { getHubColors } from "@sms-hub/hub-logic";
 import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";
 import { contactService } from "../services/contactService";
@@ -19,7 +19,7 @@ import { HOME_PATH } from "@/utils/routes";
 
 const Contact = () => {
   const { hubConfig, currentHub } = useHub();
-  const hubColors = getHubColorClasses(currentHub);
+  const hubColors = getHubColors(currentHub).tailwind;
   const [formData, setFormData] = useState<{
     firstName: string;
     lastName: string;

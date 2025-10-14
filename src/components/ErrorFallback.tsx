@@ -6,9 +6,8 @@
  */
 
 import React, { ErrorInfo } from 'react';
-import { useHub } from '@sms-hub/ui/marketing';
+import { useHub, HubLogo } from '@sms-hub/ui/marketing';
 import { getHubColors, getHubDisplayName } from '@sms-hub/hub-logic';
-import { HubLogo } from '@sms-hub/ui/marketing';
 
 export interface ErrorFallbackProps {
   error: Error;

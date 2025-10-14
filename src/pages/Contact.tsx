@@ -91,7 +91,7 @@ const Contact = () => {
       }, 3000);
 
       return { success: true };
-    } catch (error) {
+    } catch {
       // Track failed submission
       const duration = performance.now() - startTime;
       trackFormSubmission('contact', false, duration);

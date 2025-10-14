@@ -61,7 +61,7 @@ export function useAPITracking() {
       return result;
     } catch (error) {
       success = false;
-      status = (error as any)?.status || 500;
+      status = (error as { status?: number })?.status || 500;
       throw error;
     } finally {
       const duration = performance.now() - start;

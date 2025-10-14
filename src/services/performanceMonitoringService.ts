@@ -124,7 +124,7 @@ class PerformanceMonitoringService {
       metadata: {
         id: metric.id,
         delta: metric.delta,
-        navigationType: (metric as any).navigationType,
+        navigationType: (metric as { navigationType?: string }).navigationType,
       },
     };
 

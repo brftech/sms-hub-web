@@ -47,6 +47,21 @@ const FloatingHubSwitcher = () => {
   const { currentHub, switchHub } = useHub();
   const hubColors = getHubColors(currentHub);
 
+  // Close when clicking outside
+  useEffect(() => {
+    if (!isExpanded) return;
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setIsExpanded(false);
+        setShowDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isExpanded]);
+
   // Only show in development
   if (import.meta.env.MODE !== 'development') {
     return null;
@@ -61,22 +76,6 @@ const FloatingHubSwitcher = () => {
     secondaryColor: config.secondaryColor,
     accentColor: config.accentColor,
   }));
-
-  // Close when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        setIsExpanded(false);
-        setShowDropdown(false);
-      }
-    };
-
-    if (isExpanded) {
-      document.addEventListener("mousedown", handleClickOutside);
-      return () => document.removeEventListener("mousedown", handleClickOutside);
-    }
-    return undefined;
-  }, [isExpanded]);
 
   // Show in development and on preview/staging URLs (.vercel.app)
   // Hide in production (actual production domains)

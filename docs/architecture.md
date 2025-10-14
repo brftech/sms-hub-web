@@ -1,6 +1,6 @@
 # Architecture
 
-**Last Updated**: October 14, 2025
+**Last Updated**: October 14, 2025 (Evening - Post Refactor)
 
 ## 🏗️ System Overview
 
@@ -29,11 +29,12 @@ All data is isolated by `hub_id`. Domain-based routing determines the active hub
 │   └── types/                # TypeScript type definitions
 │
 ├── packages/                 # Internal packages
+│   ├── clients/              # Client data and marketing page assets
 │   ├── hub-logic/            # Hub configs, metadata, content
 │   │   └── src/hubs/         # Hub-specific folders (gnymble, percymd, etc)
 │   ├── ui/                   # Shared UI components
 │   ├── supabase/             # Supabase client & queries
-│   └── utils/                # Shared utilities
+│   └── utils/                # Shared utilities (nameUtils, validation, etc.)
 │
 ├── supabase/                 # Supabase backend
 │   ├── migrations/           # Database schema

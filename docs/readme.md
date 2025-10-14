@@ -1,6 +1,6 @@
 # SMS Hub Web - Marketing Platform
 
-**Last Updated**: October 14, 2025  
+**Last Updated**: October 14, 2025 (Evening - Post Refactor)  
 **Status**: ✅ Production Ready - Live at gnymble.com
 
 ## 🎯 What This Is
@@ -125,10 +125,11 @@ npm run type-check
 
 This repo uses local packages via `file:` dependencies:
 
+- `@sms-hub/clients` - Client data and marketing page assets
 - `@sms-hub/hub-logic` - Hub configurations and content
 - `@sms-hub/ui` - Shared UI components
 - `@sms-hub/supabase` - Database client and queries
-- `@sms-hub/utils` - Shared utilities
+- `@sms-hub/utils` - Shared utilities (nameUtils, validation, etc.)
 
 Changes to packages are immediately reflected (symlinked).
 

@@ -1,6 +1,6 @@
 # Agent Lessons - Best Practices from Real Development
 
-**Last Updated**: October 14, 2025
+**Last Updated**: October 14, 2025 (Evening update)
 
 This document contains hard-won lessons from real development work. These principles apply to this repo AND future projects.
 

@@ -1,6 +1,6 @@
 # Architecture
 
-**Last Updated**: October 14, 2025 (Night - CSS Consolidation)
+**Last Updated**: October 14, 2025 (Night - Favicon & Manifest Fixes)
 
 ## 🏗️ System Overview
 
@@ -97,6 +97,26 @@ All tables have `hub_id` for multi-tenant isolation.
 - Hub-specific colors in `/packages/hub-logic/src/hubs/*/colors.ts`
 - Includes hex values + Tailwind class mappings
 - Dynamic theming via `getHubColors()` helper
+- All hub-specific CSS consolidated in `shared-design-system.css` using `[data-hub="..."]` selectors
+
+## 🎨 Favicon & PWA Manifest System
+
+**Dynamic Favicon Switching**:
+- HubContext automatically updates favicons when hub changes
+- Production: Each domain shows its branded icon (percytech.com → red, gnymble.com → orange, etc.)
+- Preview/Dev: Favicon updates when using hub switcher
+- Icons: `/public/percytech-icon-logo.svg`, `/public/gnymble-icon-logo.svg`, etc.
+
+**Hub-Specific PWA Manifests**:
+- Each hub has its own manifest: `/public/manifest-{hubname}.json`
+- Dynamically loaded based on current hub
+- Includes hub-specific name, theme color, and icon references
+- Enables proper "Add to Home Screen" branding per domain
+
+**Implementation**:
+- `HubContext.tsx` manages both favicon and manifest via `DOMAdapter`
+- Uses `getHubIconPath()` from `@sms-hub/hub-logic`
+- All icons face the same direction (no CSS transforms)
 
 ## 🧪 Testing
 

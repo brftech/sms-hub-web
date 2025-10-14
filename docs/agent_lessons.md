@@ -1,6 +1,6 @@
 # Agent Lessons - Best Practices from Real Development
 
-**Last Updated**: October 14, 2025 (Night - CSS Consolidation)
+**Last Updated**: October 14, 2025 (Night - Favicon & Manifest Fixes)
 
 This document contains hard-won lessons from real development work. These principles apply to this repo AND future projects.
 
@@ -335,6 +335,46 @@ This document contains hard-won lessons from real development work. These princi
 - Render in `AppFloatingComponents` for global availability
 - Users should be able to switch hubs from any page
 - Maintain current page when switching hubs (don't redirect to home)
+
+### 46. **localStorage should not override domain-based hub detection in production**
+
+- In production, domain-based hub detection is the source of truth
+- localStorage override should only work in dev/preview (for hub switcher testing)
+- Check hostname to determine if on production domain vs preview
+- Before: percytech.com → checks localStorage → shows Gnymble ❌
+- After: percytech.com → ignores localStorage → shows PercyTech ✅
+
+### 47. **Dynamic favicon and PWA manifest switching**
+
+- Favicons and manifests should be hub-specific, not hardcoded
+- Use `DOMAdapter` pattern to abstract DOM operations for testability
+- Create hub-specific manifest files: `manifest-{hubname}.json`
+- HubContext should update both favicon and manifest on hub change
+- Each production domain gets proper branding in browser tabs and "Add to Home Screen"
+
+### 48. **SVG transforms can break icon consistency**
+
+- Inline CSS transforms like `style="transform: scaleX(-1);"` flip icons
+- All hub icons should face the same direction for visual consistency
+- Generate hub icons from a single template, changing colors only
+- Avoid CSS transforms in icon SVGs - use proper SVG transformations if needed
+- Check the actual SVG source code, not just visual appearance
+
+### 49. **Preview/staging URLs need explicit detection**
+
+- Vercel preview URLs use pattern: `{project}-{hash}.vercel.app`
+- `import.meta.env.MODE` is "production" in Vercel builds (even previews!)
+- Check hostname for `.vercel.app` to detect preview environments
+- Floating UI elements (hub switcher, admin button) should show on preview
+- Preview environment should use dev database, not production
+
+### 50. **PWA manifests are environment-specific**
+
+- Each hub needs its own manifest with hub-specific branding
+- Generic `manifest.json` causes confusion - delete it
+- Use hub-specific manifests: `manifest-percytech.json`, `manifest-gnymble.json`, etc.
+- Each manifest should include: name, short_name, theme_color, icons
+- Theme colors in manifests should match hub brand colors exactly
 
 ---
 

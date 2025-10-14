@@ -1,10 +1,6 @@
-/* Import shared design system */
+/* Import shared design system (includes all hub-specific styles) */
 @import "@sms-hub/ui/styles/shared-design-system.css";
 @import "@sms-hub/ui/styles/globals.css";
-@import "@sms-hub/ui/styles/gnymble.css";
-@import "@sms-hub/ui/styles/percytech.css";
-@import "@sms-hub/ui/styles/percymd.css";
-@import "@sms-hub/ui/styles/percytext.css";
 
 /* Web app specific overrides */
 

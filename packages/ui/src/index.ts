@@ -96,9 +96,6 @@ export * from "./theme/styled-provider";
 export * from "./theme/styled-components";
 
 // CSS files are available for import at:
-// import "@sms-hub/ui/styles/shared-design-system.css"; // Comprehensive dark/light theme system
+// import "@sms-hub/ui/styles/shared-design-system.css"; // Comprehensive dark/light theme with all hub-specific styles
 // import "@sms-hub/ui/styles/globals.css";
-// import "@sms-hub/ui/styles/gnymble.css";
-// import "@sms-hub/ui/styles/percytech.css";
-// import "@sms-hub/ui/styles/percymd.css";
-import "@sms-hub/ui/styles/percytext.css";
+// Note: Hub-specific styles (gnymble, percytech, percymd, percytext) are now consolidated in shared-design-system.css

@@ -1,6 +1,6 @@
 # Agent Lessons - Best Practices from Real Development
 
-**Last Updated**: October 14, 2025 (Evening - Multiple Updates)
+**Last Updated**: October 14, 2025 (Night - CSS Consolidation)
 
 This document contains hard-won lessons from real development work. These principles apply to this repo AND future projects.
 
@@ -300,6 +300,41 @@ This document contains hard-won lessons from real development work. These princi
 - Each hub in its own folder
 - Small files (colors, seo, metadata, content)
 - This pattern works, reuse it
+
+### 41. **Consolidate hub-specific CSS into one file**
+
+- ❌ Separate `gnymble.css`, `percytech.css`, `percymd.css`, `percytext.css` = duplication errors
+- ✅ All hub styles in `shared-design-system.css` with `[data-hub="..."]` selectors
+- Prevents color mismatches (like PercyMD showing red instead of blue)
+- Single source of truth prevents copy-paste errors
+
+### 42. **CSS variables should match hub colors.ts**
+
+- Duplicate color definitions lead to bugs
+- When `--primary` doesn't match `hubColors.primary`, things break
+- Always validate CSS against the source of truth in `/hubs/[hub]/colors.ts`
+- Use `getHubColors()` to ensure consistency
+
+### 43. **Vite cache issues require dev server restart**
+
+- Clearing `node_modules/.vite` fixes module resolution errors
+- But dev server must be restarted to pick up the cleared cache
+- Just `rm -rf node_modules/.vite` isn't enough - you need to restart
+- Watch for "does not provide an export named..." errors
+
+### 44. **Make floating UI elements context-aware**
+
+- Admin button should show Home icon when on admin page
+- Icons should reflect current state and destination
+- Use `useLocation()` to determine current page
+- Dynamic icons improve UX and reduce cognitive load
+
+### 45. **Hub switcher should be globally accessible**
+
+- Don't limit hub switcher to homepage only
+- Render in `AppFloatingComponents` for global availability
+- Users should be able to switch hubs from any page
+- Maintain current page when switching hubs (don't redirect to home)
 
 ---
 

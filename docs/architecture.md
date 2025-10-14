@@ -1,6 +1,6 @@
 # Architecture
 
-**Last Updated**: October 14, 2025 (Evening - Post Refactor)
+**Last Updated**: October 14, 2025 (Night - CSS Consolidation)
 
 ## 🏗️ System Overview
 
@@ -12,8 +12,8 @@ SMS Hub Web is a multi-tenant marketing platform serving 4 business brands (Perc
 
 - **Hub 0**: PercyTech (percytech.com) - Red theme, technology businesses
 - **Hub 1**: Gnymble (gnymble.com) - Orange theme, retail/general (default)
-- **Hub 2**: PercyMD (percymd.com) - Red theme, healthcare
-- **Hub 3**: PercyText (percytext.com) - Purple theme, messaging focus
+- **Hub 2**: PercyMD (percymd.com) - Blue theme, healthcare
+- **Hub 3**: PercyText (percytext.com) - Violet theme, messaging focus
 
 All data is isolated by `hub_id`. Domain-based routing determines the active hub.
 

@@ -2,7 +2,6 @@ import React from "react";
 import { PageLayout } from "@sms-hub/ui/marketing";
 import Navigation from "./Navigation";
 import Footer from "./Footer";
-import FloatingHubSwitcher from "./FloatingHubSwitcher";
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -10,10 +9,10 @@ interface AppLayoutProps {
   showFooter?: boolean;
 }
 
-const AppLayout: React.FC<AppLayoutProps> = ({ 
-  children, 
-  showNavigation = true, 
-  showFooter = true 
+const AppLayout: React.FC<AppLayoutProps> = ({
+  children,
+  showNavigation = true,
+  showFooter = true,
 }) => {
   return (
     <PageLayout
@@ -23,7 +22,6 @@ const AppLayout: React.FC<AppLayoutProps> = ({
       footer={showFooter ? <Footer /> : undefined}
     >
       {children}
-      <FloatingHubSwitcher />
     </PageLayout>
   );
 };

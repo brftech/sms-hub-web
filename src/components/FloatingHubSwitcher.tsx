@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useHub, HubLogo } from "@sms-hub/ui/marketing";
+import { getHubColors } from "@sms-hub/hub-logic";
 import { webEnvironment } from "../config/environment";
 
 // Hub configurations
@@ -45,6 +46,7 @@ const FloatingHubSwitcher = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const { currentHub, switchHub } = useHub();
+  const hubColors = getHubColors(currentHub);
 
   // Only show in development
   const hubs = Object.entries(HUB_CONFIGS).map(([hubType, config]) => ({
@@ -191,7 +193,10 @@ const FloatingHubSwitcher = () => {
         {/* Toggle Button */}
         <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className="w-14 h-14 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 flex items-center justify-center group transform hover:scale-105"
+          className="w-14 h-14 text-white rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 flex items-center justify-center group transform hover:scale-105"
+          style={{
+            background: `linear-gradient(135deg, ${hubColors.primary}, ${hubColors.secondary})`,
+          }}
           aria-label={isExpanded ? "Close hub switcher" : "Open hub switcher"}
         >
           {isExpanded ? (

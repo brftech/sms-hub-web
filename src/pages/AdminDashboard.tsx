@@ -15,7 +15,6 @@ import { createSubscriberService } from "../services/subscriberService";
 import { getDisplayName } from "@sms-hub/utils";
 import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";
-import FloatingHubSwitcher from "../components/FloatingHubSwitcher";
 import {
   Database,
   Users,
@@ -1733,9 +1732,6 @@ export const AdminDashboard: React.FC = () => {
           )}
         </div>
       </div>
-
-      {/* Floating Hub Switcher */}
-      <FloatingHubSwitcher />
     </PageLayout>
   );
 };

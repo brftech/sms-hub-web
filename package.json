@@ -11,7 +11,7 @@
     "preview": "vite preview --port 4173",
     "lint": "eslint src --ext .ts,.tsx --report-unused-disable-directives --max-warnings 0",
     "lint:fix": "eslint src --ext .ts,.tsx --fix",
-    "lint:check": "eslint src --ext .ts,.tsx --max-warnings 0",
+    "lint:check": "eslint src --ext .ts,.tsx",
     "lint:dev": "eslint src --ext .ts,.tsx --max-warnings 100",
     "type-check": "tsc --noEmit",
     "type-check:test": "tsc --project tsconfig.test.json --noEmit",

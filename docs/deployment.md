@@ -84,13 +84,14 @@ Name: @ (root)
 Target: cname.vercel-dns.com
 Proxy: ON (🟠 orange cloud)
 
-Type: CNAME  
+Type: CNAME
 Name: www
 Target: cname.vercel-dns.com
 Proxy: ON (🟠 orange cloud)
 ```
 
 **Alternative** (if CNAME at root isn't supported):
+
 ```
 Type: A
 Name: @
@@ -116,7 +117,7 @@ The app automatically detects the hub from the hostname:
 ```typescript
 // detectHubFromHostname() in environment.ts
 percytech.com → Hub 0 (PercyTech)
-gnymble.com   → Hub 1 (Gnymble) 
+gnymble.com   → Hub 1 (Gnymble)
 percymd.com   → Hub 2 (PercyMD)
 percytext.com → Hub 3 (PercyText)
 localhost     → Hub 1 (Gnymble, default)

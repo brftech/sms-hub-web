@@ -330,9 +330,7 @@ const App = () => {
   // Environment detection
   useEffect(() => {
     // Environment is detected and configured via webEnvironment
-    console.log(
-      `🚀 App initialized - Hub: ${defaultHub}, Environment: ${webEnvironment.getCurrent()}`
-    );
+    // Hub detection happens automatically via detectHubFromHostname()
   }, [defaultHub]);
 
   return (

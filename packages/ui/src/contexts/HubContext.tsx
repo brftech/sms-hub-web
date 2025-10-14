@@ -1,10 +1,4 @@
-import React, {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  ReactNode,
-} from "react";
+import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { HubType, getHubConfig } from "../types";
 
 // Abstract interface for environment-specific functionality
@@ -110,13 +104,23 @@ export const HubProvider: React.FC<HubProviderProps> = ({
   };
 
   useEffect(() => {
+    // Only use localStorage override in development/preview
+    // In production, respect the domain-based hub detection
+    const hostname = typeof window !== "undefined" ? window.location.hostname : "";
+    const isProductionDomain =
+      hostname.includes("percytech.com") ||
+      hostname.includes("gnymble.com") ||
+      hostname.includes("percymd.com") ||
+      hostname.includes("percytext.com");
+
+    // Skip localStorage override on production domains
+    if (isProductionDomain) {
+      return;
+    }
+
+    // In dev/preview, allow localStorage to override (for hub switcher)
     const savedHub = storage.getItem("preferredHub") as HubType;
-    const validHubs: HubType[] = [
-      "percytech",
-      "gnymble",
-      "percymd",
-      "percytext",
-    ];
+    const validHubs: HubType[] = ["percytech", "gnymble", "percymd", "percytext"];
     if (savedHub && validHubs.includes(savedHub)) {
       setCurrentHub(savedHub);
     }
@@ -130,7 +134,7 @@ export const HubProvider: React.FC<HubProviderProps> = ({
     dom.setDocumentElementAttribute("data-hub", currentHub);
 
     // Update document title with fallback
-    const title = hubConfig?.name || 'SMS Hub';
+    const title = hubConfig?.name || "SMS Hub";
     dom.setDocumentTitle(title);
 
     // Apply hub CSS variables

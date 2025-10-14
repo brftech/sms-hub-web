@@ -18,12 +18,14 @@ export const FloatingAdminButton: React.FC = () => {
   useEffect(() => {
     const checkAdminAccess = () => {
       const isDev = import.meta.env.MODE === "development";
-      const isLocalhost = window.location.hostname === "localhost";
+      const hostname = window.location.hostname;
+      const isLocalhost = hostname === "localhost" || hostname === "127.0.0.1";
+      const isPreview = hostname.includes(".vercel.app");
       const storedAuth = localStorage.getItem("admin_auth_token");
       const authTimestamp = localStorage.getItem("admin_auth_timestamp");
 
-      // Show in development always
-      if (isDev || isLocalhost) {
+      // Show in development, localhost, and preview/staging URLs
+      if (isDev || isLocalhost || isPreview) {
         setIsVisible(true);
         setIsAuthenticated(true);
         return;

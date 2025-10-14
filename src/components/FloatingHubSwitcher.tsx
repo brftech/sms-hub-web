@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useHub, HubLogo } from "@sms-hub/ui/marketing";
 import { getHubColors } from "@sms-hub/hub-logic";
-import { webEnvironment } from "../config/environment";
 
 // Hub configurations
 const HUB_CONFIGS = {
@@ -75,13 +74,17 @@ const FloatingHubSwitcher = () => {
     return undefined;
   }, [isExpanded]);
 
-  // Only show in development
-  if (import.meta.env.MODE !== "development" && window.location.hostname !== "localhost") {
-    return null;
-  }
+  // Show in development and on preview/staging URLs (.vercel.app)
+  // Hide in production (actual production domains)
+  const hostname = typeof window !== "undefined" ? window.location.hostname : "";
+  const isProductionDomain =
+    hostname.includes("percytech.com") ||
+    hostname.includes("gnymble.com") ||
+    hostname.includes("percymd.com") ||
+    hostname.includes("percytext.com");
 
-  // Only show if hub switcher is enabled
-  if (!webEnvironment.features.hubSwitcher()) {
+  // Only show if NOT on production domain
+  if (isProductionDomain) {
     return null;
   }
 

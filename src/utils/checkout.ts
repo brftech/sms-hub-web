@@ -1,4 +1,5 @@
-import { getEnvironmentConfig } from "../config/environment";
+import { getEnvironmentConfig, detectHubFromHostname } from "../config/environment";
+import { getHubDomain } from "@sms-hub/hub-logic";
 
 /**
  * Centralized checkout/signup redirect handler
@@ -23,16 +24,34 @@ export const handleDirectCheckout = () => {
 };
 
 /**
+ * Get the login URL for the current hub
+ * Production: app.{hub}.com (or app2.percytext.com for PercyText)
+ * Dev: localhost:3001/login
+ */
+const getLoginUrl = (): string => {
+  const envConfig = getEnvironmentConfig();
+
+  if (!envConfig.isProduction) {
+    return "http://localhost:3001/login";
+  }
+
+  // Detect current hub from hostname
+  const currentHub = detectHubFromHostname();
+  const hubDomain = getHubDomain(currentHub);
+
+  // PercyText uses app2 subdomain, all others use app subdomain
+  const appSubdomain = currentHub === "percytext" ? "app2" : "app";
+
+  return `https://${appSubdomain}.${hubDomain}`;
+};
+
+/**
  * Centralized login redirect handler
- * Opens the appropriate login URL in a new tab based on environment
+ * Opens the appropriate login URL in a new tab based on environment and current hub
  */
 export const handleDirectLogin = () => {
   try {
-    const envConfig = getEnvironmentConfig();
-    const loginUrl = envConfig.isProduction
-      ? "https://app.gnymble.com"
-      : "http://localhost:3001/login";
-
+    const loginUrl = getLoginUrl();
     window.open(loginUrl, "_blank");
   } catch (error) {
     console.error("Login redirect error:", error);

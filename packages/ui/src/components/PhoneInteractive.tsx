@@ -5,6 +5,8 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { useLiveMessaging } from "../contexts/LiveMessagingContext";
+import { useHub } from "../contexts/HubContext";
+import { getHubDemoMessages } from "@sms-hub/hub-logic";
 import SMSAuthModal from "./SMSAuthModal";
 // Removed logger import - using console for debugging
 import { ChatMessage } from "../types";
@@ -13,12 +15,6 @@ import "../styles/phone-components.css";
 // =============================================================================
 // TYPES & INTERFACES
 // =============================================================================
-
-interface DemoScenario {
-  id: number;
-  title: string;
-  messages: ChatMessage[];
-}
 
 interface PhoneState {
   isDemoActive: boolean;
@@ -31,10 +27,12 @@ interface PhoneState {
 }
 
 // =============================================================================
-// CONSTANTS
+// CONSTANTS - NOTE: These are now fetched from hub-logic per hub
 // =============================================================================
 
-const DEMO_SCENARIOS: DemoScenario[] = [
+// Legacy constant - removed, now using hub-specific messages from hub-logic
+/*
+const LEGACY_DEMO_SCENARIOS: DemoScenario[] = [
   {
     id: 1,
     title: "Gnymble Events",
@@ -165,6 +163,7 @@ const DEMO_SCENARIOS: DemoScenario[] = [
     ],
   },
 ];
+*/
 
 const PLACEHOLDER_TEXTS = [
   "Ask about our humidor...",
@@ -183,6 +182,16 @@ const DEMO_STARTER_MESSAGE =
 // =============================================================================
 
 export default function PhoneInteractive() {
+  // =============================================================================
+  // CONTEXT - Get hub-specific demo messages
+  // =============================================================================
+
+  const { currentHub } = useHub();
+  const { addMessage, state: messagingState } = useLiveMessaging();
+  
+  // Get hub-specific demo scenarios
+  const DEMO_SCENARIOS = getHubDemoMessages(currentHub);
+
   // =============================================================================
   // STATE MANAGEMENT
   // =============================================================================
@@ -206,12 +215,6 @@ export default function PhoneInteractive() {
   // =============================================================================
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  // =============================================================================
-  // CONTEXT
-  // =============================================================================
-
-  const { addMessage, state: messagingState } = useLiveMessaging();
 
   // =============================================================================
   // EFFECTS
@@ -468,7 +471,7 @@ export default function PhoneInteractive() {
                     {message.businessName && message.sender === "business" && (
                       <div className="phone-message-sender">{message.businessName}</div>
                     )}
-                    <div>{message.content ?? message.text}</div>
+                    <div>{message.content}</div>
                   </div>
                 </div>
               ))}

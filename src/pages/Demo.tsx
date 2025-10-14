@@ -9,6 +9,7 @@ import {
 } from "@sms-hub/ui/marketing";
 import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";
+import { PageBadge } from "../components";
 import {
   MessageSquare,
   ArrowRight,
@@ -59,12 +60,7 @@ export default function Demo() {
         <div className="relative z-10 max-w-7xl mx-auto px-6">
           {/* Hero Section - Matching Homepage Style */}
           <div className="text-center mb-20">
-            <div 
-              className={`inline-flex items-center px-4 py-2 rounded-full ${hubColors.tailwind.bgLight} border ${hubColors.tailwind.borderLight} mb-8`}
-            >
-              <Target className={`w-4 h-4 ${hubColors.tailwind.text} mr-2`} />
-              <span className={`text-sm font-medium ${hubColors.tailwind.text}`}>STATIC PREVIEW</span>
-            </div>
+            <PageBadge text="STATIC PREVIEW" icon={Target} className="mb-8" />
 
             <h1
               className="text-4xl md:text-6xl font-bold text-white mb-8 leading-tight"
@@ -130,18 +126,6 @@ export default function Demo() {
             </div>
           </div>
 
-          {/* Static Preview Notice */}
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center px-4 py-2 rounded-full border bg-blue-500/20 border-blue-500/30 text-blue-400">
-              <div className="w-2 h-2 rounded-full mr-2 bg-blue-400"></div>
-              <span
-                className="text-sm font-medium"
-                style={{ fontFamily: "Inter, system-ui, sans-serif" }}
-              >
-                Static Preview - Contact us for a live demo
-              </span>
-            </div>
-          </div>
 
           {/* Demo Content */}
           <div className="mb-20">
@@ -214,8 +198,8 @@ export default function Demo() {
               {/* Flow Diagram */}
               <div className="flex items-center justify-center space-x-8 mb-12">
                 <div className="text-center">
-                  <div className="w-20 h-20 bg-blue-500/20 border border-blue-500/30 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                    <Monitor className="w-10 h-10 text-blue-400" />
+                  <div className={`w-20 h-20 ${hubColors.tailwind.bgLight} border ${hubColors.tailwind.borderLight} rounded-2xl flex items-center justify-center mx-auto mb-4`}>
+                    <Monitor className={`w-10 h-10 ${hubColors.tailwind.text}`} />
                   </div>
                   <h3
                     className="text-lg font-semibold text-white mb-2"
@@ -272,8 +256,8 @@ export default function Demo() {
                   </p>
                 </div>
                 <div className="text-center">
-                  <div className="w-12 h-12 bg-blue-500/20 border border-blue-500/30 rounded-xl flex items-center justify-center mx-auto mb-4">
-                    <Eye className="w-6 h-6 text-blue-400" />
+                  <div className={`w-12 h-12 ${hubColors.tailwind.bgLight} border ${hubColors.tailwind.borderLight} rounded-xl flex items-center justify-center mx-auto mb-4`}>
+                    <Eye className={`w-6 h-6 ${hubColors.tailwind.text}`} />
                   </div>
                   <h3
                     className="text-lg font-semibold text-white mb-2"
@@ -331,7 +315,7 @@ export default function Demo() {
               </p>
               <button
                 onClick={() => navigate(CONTACT_PATH)}
-                className={`px-10 py-4 ${hubColors.tailwind.bg} text-white font-bold rounded-full ${hubColors.tailwind.bgHover} transition-all duration-300 text-lg tracking-wide uppercase flex items-center justify-center mx-auto group`}
+                className={`px-10 py-4 ${hubColors.tailwind.contactButton} font-bold rounded-full transition-all duration-300 text-lg tracking-wide uppercase flex items-center justify-center mx-auto group`}
                 style={{ fontFamily: "Inter, system-ui, sans-serif" }}
               >
                 Schedule Live Demo

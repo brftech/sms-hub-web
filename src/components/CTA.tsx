@@ -25,7 +25,7 @@ export const CTASection: React.FC = () => {
 
         <button
           onClick={() => navigate(CONTACT_PATH)}
-          className={`px-8 py-4 ${hubColors.tailwind.bg} ${hubColors.tailwind.bgHover} text-white font-semibold rounded-md transition-colors`}
+          className={`px-8 py-4 ${hubColors.tailwind.contactButton} font-semibold rounded-md transition-colors`}
         >
           Contact Us
         </button>

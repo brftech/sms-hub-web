@@ -87,7 +87,7 @@ const PaymentSuccess = () => {
               </p>
               <button
                 onClick={() => navigate(PRICING_PATH)}
-                className={`px-8 py-3 ${hubColors.tailwind.bg} text-white font-bold rounded-full ${hubColors.tailwind.bgHover} transition-all duration-300`}
+                className={`px-8 py-3 ${hubColors.tailwind.contactButton} font-bold rounded-full transition-all duration-300`}
               >
                 Back to Pricing
               </button>
@@ -132,7 +132,7 @@ const PaymentSuccess = () => {
 
             <button
               onClick={handleContinueToApp}
-              className={`w-full px-8 py-4 ${hubColors.tailwind.bg} text-white font-bold rounded-full ${hubColors.tailwind.bgHover} transition-all duration-300 text-lg flex items-center justify-center group`}
+              className={`w-full px-8 py-4 ${hubColors.tailwind.contactButton} font-bold rounded-full transition-all duration-300 text-lg flex items-center justify-center group`}
             >
               Complete Account Setup
               <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300" />

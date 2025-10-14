@@ -48,6 +48,10 @@ const FloatingHubSwitcher = () => {
   const hubColors = getHubColors(currentHub);
 
   // Only show in development
+  if (import.meta.env.MODE !== 'development') {
+    return null;
+  }
+
   const hubs = Object.entries(HUB_CONFIGS).map(([hubType, config]) => ({
     hubType: hubType as HubType,
     id: config.id,

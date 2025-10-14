@@ -129,7 +129,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ businessTypes }) => {
           <div className="flex flex-col sm:flex-row gap-3">
             <button
               onClick={() => navigate(CONTACT_PATH)}
-              className={`px-6 py-3 ${hubColors.tailwind.bg} ${hubColors.tailwind.bgHover} text-white font-semibold rounded-md transition-colors`}
+              className={`px-6 py-3 ${hubColors.tailwind.contactButton} font-semibold rounded-md transition-colors`}
               style={{ fontFamily: "Inter, system-ui, sans-serif" }}
             >
               Contact
@@ -137,7 +137,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ businessTypes }) => {
             {import.meta.env.DEV && (
               <button
                 onClick={() => handleDirectCheckout()}
-                className={`px-6 py-3 border ${hubColors.tailwind.border} ${hubColors.tailwind.text} hover:${hubColors.tailwind.bgLight} rounded-md font-semibold transition-colors`}
+                className={`px-6 py-3 ${hubColors.tailwind.contactButton} font-semibold rounded-md transition-colors`}
                 style={{ fontFamily: "Inter, system-ui, sans-serif" }}
               >
                 SignUp

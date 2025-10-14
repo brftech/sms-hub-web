@@ -53,6 +53,7 @@ This document contains hard-won lessons from real development work. These princi
 - ALL hub content goes in `/packages/hub-logic/src/hubs/`
 - Each hub gets its own folder with small, focused files
 - No hub-specific code in `/src/components/`
+- Includes: colors, content, demo messages, SEO, etc.
 
 ### 8. **One file per folder is a red flag**
 
@@ -384,6 +385,25 @@ This document contains hard-won lessons from real development work. These princi
 - Handle special cases (e.g., PercyText uses `app2` subdomain instead of `app`)
 - Create helper functions like `getLoginUrl()` for reusability
 - Example: percytech.com → app.percytech.com, percytext.com → app2.percytext.com
+
+### 52. **NEVER use dynamic Tailwind class construction**
+
+- ❌ `className={\`text-${hubMetadata.color}-500\`}` - Tailwind JIT CANNOT compile this
+- ❌ `className={\`bg-${hubColors.primary}\`}` - Will not work, even with safelist
+- ❌ Any template literal with Tailwind class names - Always fails
+- ✅ `className={hubColors.tailwind.text}` - Pre-defined classes from hub-logic
+- ✅ `style={{ color: hubColors.primary }}` - Inline styles for dynamic values
+- ✅ `style={{ backgroundColor: \`${hubColors.primary}0D\` }}` - Inline with opacity
+- All hub-specific colors are in `tailwind.config.ts` safelist, but only for static usage
+- If you need dynamic values, use inline styles, not dynamic class names
+
+### 53. **Hub-specific demo messages**
+
+- Interactive components should show hub-appropriate content
+- Don't hardcode Gnymble examples in shared components
+- Create `demoMessages.ts` for each hub in `hub-logic`
+- Use `getHubDemoMessages(currentHub)` to fetch hub-specific scenarios
+- Demo content should reflect each hub's vertical (healthcare, retail, fitness, etc.)
 
 ---
 

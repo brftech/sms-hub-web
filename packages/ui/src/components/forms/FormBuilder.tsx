@@ -24,7 +24,6 @@ import {
   validateMaxLength,
   validatePattern,
 } from './validators';
-import { Button } from '../button';
 
 export const FormBuilder: React.FC<FormBuilderProps> = ({
   fields,
@@ -375,13 +374,13 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
       {renderTurnstile()}
 
       {/* Submit Button */}
-      <Button
+      <button
         type="submit"
         disabled={isSubmitting || loading}
-        className={submitButtonClass || 'w-full bg-orange-500 hover:bg-orange-600 text-white'}
+        className={submitButtonClass || 'w-full rounded-md py-3 font-semibold border-2 border-orange-500 hover:border-orange-400 text-white bg-transparent hover:bg-orange-500/10 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed'}
       >
         {isSubmitting ? 'Submitting...' : submitButtonText}
-      </Button>
+      </button>
     </form>
   );
 };

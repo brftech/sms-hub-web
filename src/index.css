@@ -45,9 +45,9 @@
     @apply text-green-400;
   }
 
-  /* Interactive text states */
+  /* Interactive text states - Note: For hub-specific colors, use hubColors from hub-logic */
   .text-interactive {
-    @apply text-orange-400 hover:text-orange-300 transition-colors;
+    @apply text-gray-300 hover:text-white transition-colors;
   }
 
   /* Disabled text (only use for truly disabled states) */

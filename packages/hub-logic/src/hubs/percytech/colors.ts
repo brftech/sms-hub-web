@@ -19,6 +19,6 @@ export const percytechColors: HubColors = {
     gradient: "from-red-800 to-blue-600",
     shadow: "shadow-red-800/25",
     contactButton:
-      "bg-red-800 hover:bg-red-700 text-white border border-red-800 hover:border-red-700",
+      "border-2 border-red-800 hover:border-red-700 text-white bg-transparent hover:bg-red-800/10",
   },
 };

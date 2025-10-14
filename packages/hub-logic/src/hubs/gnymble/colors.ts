@@ -19,7 +19,7 @@ export const gnymbleColors: HubColors = {
     gradient: "from-orange-500 to-red-600",
     shadow: "shadow-orange-500/25",
     contactButton:
-      "bg-orange-400 hover:bg-orange-300 text-white border border-orange-400 hover:border-orange-300",
+      "border-2 border-orange-500 hover:border-orange-400 text-white bg-transparent hover:bg-orange-500/10",
   },
 };
 

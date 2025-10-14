@@ -1,9 +1,10 @@
 import { PageLayout, SEO, useHub } from "@sms-hub/ui/marketing";
 import { handleDirectCheckout } from "../utils/checkout";
-import { getHubAboutContent, getHubMetadata } from "@sms-hub/hub-logic";
+import { getHubAboutContent, getHubMetadata, getHubColors } from "@sms-hub/hub-logic";
 
 import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";
+import { PageBadge } from "../components";
 import { Shield, Users, CheckCircle, Star, ArrowRight, Target, Heart, Zap } from "lucide-react";
 // Import Bryan's profile image from UI assets
 import bryanProfileImage from "@sms-hub/ui/assets/bryan-profile.jpg";
@@ -12,6 +13,7 @@ const About = () => {
   const { currentHub } = useHub();
   const aboutContent = getHubAboutContent(currentHub);
   const hubMetadata = getHubMetadata(currentHub);
+  const hubColors = getHubColors(currentHub);
 
   // Map value descriptions to icons
   const valueIcons = [Shield, Users, Heart, Zap];
@@ -33,24 +35,19 @@ const About = () => {
         {/* Subtle background elements */}
         <div className="absolute inset-0">
           <div
-            className={`absolute top-0 left-1/4 w-96 h-96 bg-${hubMetadata.color}-500/5 rounded-full blur-3xl`}
+            className="absolute top-0 left-1/4 w-96 h-96 rounded-full blur-3xl"
+            style={{ backgroundColor: `${hubColors.primary}0D` }}
           ></div>
           <div
-            className={`absolute bottom-0 right-1/4 w-96 h-96 bg-${hubMetadata.color}-500/5 rounded-full blur-3xl`}
+            className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full blur-3xl"
+            style={{ backgroundColor: `${hubColors.primary}0D` }}
           ></div>
         </div>
 
         <div className="relative z-10 max-w-6xl mx-auto px-6">
           {/* Hero Section - Hub-aware */}
           <div className="text-center mb-20">
-            <div
-              className={`inline-flex items-center px-4 py-2 rounded-full bg-${hubMetadata.color}-500/20 border border-${hubMetadata.color}-500/30 mb-8`}
-            >
-              <Target className={`w-4 h-4 text-${hubMetadata.color}-400 mr-2`} />
-              <span className={`text-sm font-medium text-${hubMetadata.color}-400`}>
-                {aboutContent.badge}
-              </span>
-            </div>
+            <PageBadge text={aboutContent.badge} icon={Target} className="mb-8" />
 
             <h1
               className="text-4xl md:text-6xl font-bold text-white mb-8 leading-tight"
@@ -65,13 +62,13 @@ const About = () => {
               style={{ fontFamily: "Inter, system-ui, sans-serif" }}
             >
               {aboutContent.description}
-              <span className={`text-${hubMetadata.color}-400`}> {aboutContent.highlightText}</span>
+              <span className={hubColors.tailwind.text}> {aboutContent.highlightText}</span>
             </p>
 
             <div className="flex items-center justify-center space-x-8 text-gray-400 text-sm">
               {aboutContent.badges.map((badge, index) => (
                 <div key={index} className="flex items-center">
-                  <CheckCircle className={`w-4 h-4 text-${hubMetadata.color}-500 mr-2`} />
+                  <CheckCircle className={`w-4 h-4 ${hubColors.tailwind.text} mr-2`} />
                   <span>{badge}</span>
                 </div>
               ))}
@@ -124,9 +121,9 @@ const About = () => {
                     className="bg-gradient-to-br from-gray-800/30 to-gray-900/30 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-8 hover:border-gray-600/50 transition-all duration-300"
                   >
                     <div
-                      className={`w-16 h-16 bg-${hubMetadata.color}-500/20 border border-${hubMetadata.color}-500/30 rounded-xl flex items-center justify-center mb-6`}
+                      className={`w-16 h-16 ${hubColors.tailwind.bgLight} border ${hubColors.tailwind.borderLight} rounded-xl flex items-center justify-center mb-6`}
                     >
-                      <IconComponent className={`w-8 h-8 text-${hubMetadata.color}-400`} />
+                      <IconComponent className={`w-8 h-8 ${hubColors.tailwind.text}`} />
                     </div>
                     <h3
                       className="text-2xl font-semibold text-white mb-4"
@@ -154,10 +151,10 @@ const About = () => {
                   <img
                     src={bryanProfileImage}
                     alt={aboutContent.founderSection.name}
-                    className={`w-40 h-40 rounded-full object-cover border-4 border-${hubMetadata.color}-500/30 shadow-2xl`}
+                    className={`w-40 h-40 rounded-full object-cover border-4 ${hubColors.tailwind.borderLight} shadow-2xl`}
                   />
                   <div
-                    className={`absolute -bottom-2 -right-2 w-10 h-10 bg-${hubMetadata.color}-500 rounded-full flex items-center justify-center`}
+                    className={`absolute -bottom-2 -right-2 w-10 h-10 ${hubColors.tailwind.bg} rounded-full flex items-center justify-center`}
                   >
                     <Star className="w-6 h-6 text-white" />
                   </div>
@@ -177,7 +174,7 @@ const About = () => {
                     {aboutContent.founderSection.subtitle}
                   </p>
                   <blockquote
-                    className={`text-xl text-${hubMetadata.color}-400 italic mb-6 leading-relaxed`}
+                    className={`text-xl ${hubColors.tailwind.text} italic mb-6 leading-relaxed`}
                     style={{ fontFamily: "Inter, system-ui, sans-serif" }}
                   >
                     "{aboutContent.founderSection.quote}"
@@ -218,7 +215,7 @@ const About = () => {
               </p>
               <button
                 onClick={handleDirectCheckout}
-                className={`px-10 py-4 bg-${hubMetadata.color}-600 text-white font-bold rounded-full hover:bg-${hubMetadata.color}-700 transition-all duration-300 text-lg tracking-wide uppercase flex items-center justify-center mx-auto group`}
+                className={`px-10 py-4 ${hubColors.tailwind.bg} text-white font-bold rounded-full ${hubColors.tailwind.bgHover} transition-all duration-300 text-lg tracking-wide uppercase flex items-center justify-center mx-auto group`}
                 style={{ fontFamily: "Inter, system-ui, sans-serif" }}
               >
                 Get Started for $179

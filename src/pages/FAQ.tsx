@@ -1,9 +1,10 @@
 import { PageLayout, SEO, useHub } from "@sms-hub/ui/marketing";
 import { handleDirectCheckout } from "../utils/checkout";
-import { getHubFAQContent, getHubMetadata } from "@sms-hub/hub-logic";
+import { getHubFAQContent, getHubMetadata, getHubColors } from "@sms-hub/hub-logic";
 
 import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";
+import { PageBadge } from "../components";
 import {
   HelpCircle,
   Shield,
@@ -22,6 +23,7 @@ const FAQ = () => {
   const { currentHub } = useHub();
   const faqContent = getHubFAQContent(currentHub);
   const hubMetadata = getHubMetadata(currentHub);
+  const hubColors = getHubColors(currentHub);
   const [openItems, setOpenItems] = useState<Set<string>>(new Set());
 
   const toggleItem = (id: string) => {
@@ -66,24 +68,19 @@ const FAQ = () => {
         {/* Subtle background elements */}
         <div className="absolute inset-0">
           <div
-            className={`absolute top-0 left-1/4 w-96 h-96 bg-${hubMetadata.color}-500/5 rounded-full blur-3xl`}
+            className="absolute top-0 left-1/4 w-96 h-96 rounded-full blur-3xl"
+            style={{ backgroundColor: `${hubColors.primary}0D` }}
           ></div>
           <div
-            className={`absolute bottom-0 right-1/4 w-96 h-96 bg-${hubMetadata.color}-500/5 rounded-full blur-3xl`}
+            className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full blur-3xl"
+            style={{ backgroundColor: `${hubColors.primary}0D` }}
           ></div>
         </div>
 
         <div className="relative z-10 max-w-6xl mx-auto px-6">
           {/* Hero Section - Hub-aware */}
           <div className="text-center mb-20">
-            <div
-              className={`inline-flex items-center px-4 py-2 rounded-full bg-${hubMetadata.color}-500/20 border border-${hubMetadata.color}-500/30 mb-8`}
-            >
-              <Target className={`w-4 h-4 text-${hubMetadata.color}-400 mr-2`} />
-              <span className={`text-sm font-medium text-${hubMetadata.color}-400`}>
-                COMMON QUESTIONS
-              </span>
-            </div>
+            <PageBadge text="COMMON QUESTIONS" icon={Target} className="mb-8" />
 
             <h1
               className="text-4xl md:text-6xl font-bold text-white mb-8 leading-tight"
@@ -103,7 +100,7 @@ const FAQ = () => {
             <div className="flex items-center justify-center space-x-8 text-gray-400 text-sm">
               {faqContent.badges.map((badge, index) => (
                 <div key={index} className="flex items-center">
-                  <CheckCircle className={`w-4 h-4 text-${hubMetadata.color}-500 mr-2`} />
+                  <CheckCircle className={`w-4 h-4 ${hubColors.tailwind.text} mr-2`} />
                   <span>{badge}</span>
                 </div>
               ))}
@@ -119,9 +116,9 @@ const FAQ = () => {
                 <div key={categoryIndex} className="space-y-8">
                   <div className="text-center mb-12">
                     <div
-                      className={`inline-flex items-center justify-center w-16 h-16 bg-${hubMetadata.color}-500/20 border border-${hubMetadata.color}-500/30 rounded-xl mb-6`}
+                      className={`inline-flex items-center justify-center w-16 h-16 ${hubColors.tailwind.bgLight} border ${hubColors.tailwind.borderLight} rounded-xl mb-6`}
                     >
-                      <CategoryIcon className={`w-8 h-8 text-${hubMetadata.color}-400`} />
+                      <CategoryIcon className={`w-8 h-8 ${hubColors.tailwind.text}`} />
                     </div>
                     <h2
                       className="text-3xl md:text-4xl font-bold text-white"
@@ -135,7 +132,7 @@ const FAQ = () => {
                     {category.items.map((item) => (
                       <div
                         key={item.id}
-                        className={`bg-gradient-to-br from-gray-800/30 to-gray-900/30 backdrop-blur-sm rounded-2xl border border-gray-700/50 overflow-hidden transition-all duration-300 hover:border-${hubMetadata.color}-500/30`}
+                        className={`bg-gradient-to-br from-gray-800/30 to-gray-900/30 backdrop-blur-sm rounded-2xl border border-gray-700/50 overflow-hidden transition-all duration-300 hover:${hubColors.tailwind.borderLight}`}
                       >
                         <button
                           onClick={() => toggleItem(item.id)}
@@ -149,9 +146,9 @@ const FAQ = () => {
                           </h3>
                           <div className="flex-shrink-0">
                             {openItems.has(item.id) ? (
-                              <ChevronUp className={`w-6 h-6 text-${hubMetadata.color}-400`} />
+                              <ChevronUp className={`w-6 h-6 ${hubColors.tailwind.text}`} />
                             ) : (
-                              <ChevronDown className={`w-6 h-6 text-${hubMetadata.color}-400`} />
+                              <ChevronDown className={`w-6 h-6 ${hubColors.tailwind.text}`} />
                             )}
                           </div>
                         </button>
@@ -196,7 +193,7 @@ const FAQ = () => {
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <button
                   onClick={handleDirectCheckout}
-                  className={`px-10 py-4 bg-${hubMetadata.color}-600 text-white font-bold rounded-full hover:bg-${hubMetadata.color}-700 transition-all duration-300 text-lg tracking-wide uppercase flex items-center justify-center group`}
+                  className={`px-10 py-4 ${hubColors.tailwind.bg} text-white font-bold rounded-full ${hubColors.tailwind.bgHover} transition-all duration-300 text-lg tracking-wide uppercase flex items-center justify-center group`}
                   style={{ fontFamily: "Inter, system-ui, sans-serif" }}
                 >
                   Get Started Today
@@ -204,7 +201,7 @@ const FAQ = () => {
                 </button>
                 <a
                   href={PRICING_PATH}
-                  className={`px-10 py-4 border border-${hubMetadata.color}-500/50 text-${hubMetadata.color}-400 font-bold rounded-full hover:bg-${hubMetadata.color}-500/10 hover:border-${hubMetadata.color}-400 transition-all duration-300 text-lg tracking-wide uppercase flex items-center justify-center`}
+                  className={`px-10 py-4 ${hubColors.tailwind.contactButton} font-bold rounded-full transition-all duration-300 text-lg tracking-wide uppercase flex items-center justify-center`}
                   style={{ fontFamily: "Inter, system-ui, sans-serif" }}
                 >
                   View Pricing Details

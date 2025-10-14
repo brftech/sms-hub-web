@@ -94,6 +94,9 @@ export * from "./contexts/LiveMessagingContext";
 export * from "./theme/styled-provider";
 export * from "./theme/styled-components";
 
+// Export types
+export type { HubType, ChatMessage } from "./types";
+
 // CSS files are available for import at:
 // import "@sms-hub/ui/styles/shared-design-system.css"; // Comprehensive dark/light theme with all hub-specific styles
 // import "@sms-hub/ui/styles/globals.css";

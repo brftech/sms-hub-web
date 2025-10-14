@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Button, useHub, HubLogo } from "@sms-hub/ui/marketing";
+import { useHub, HubLogo } from "@sms-hub/ui/marketing";
 import { Menu, X, MessageSquare, Users, HelpCircle, CreditCard } from "lucide-react";
 import { getHubColors } from "@sms-hub/hub-logic";
 import { handleDirectCheckout, handleDirectLogin } from "../utils/checkout";
@@ -107,46 +107,38 @@ const Navigation = () => {
           <div className="flex items-center space-x-3">
             {/* Desktop CTAs */}
             <div className="hidden md:flex items-center space-x-3">
-              <Button
-                variant="outline"
-                size="sm"
+              <button
                 onClick={() => handleDesktopNavClick(CONTACT_PATH)}
-                className={`transition-all duration-300 backdrop-blur-sm px-6 py-2 text-sm bg-black/50 text-white border ${hubColors.borderLight} hover:${hubColors.bgLight} ${hubColors.textHover} min-w-[80px]`}
+                className={`transition-all duration-300 px-6 py-2 text-sm rounded-md font-medium ${hubColors.contactButton} min-w-[80px]`}
               >
                 Contact
-              </Button>
+              </button>
               {import.meta.env.DEV && (
-                <Button
-                  variant="outline"
-                  size="sm"
+                <button
                   onClick={() => handleDirectCheckout()}
-                  className={`transition-all duration-300 backdrop-blur-sm px-6 py-2 text-sm bg-black/50 text-white border ${hubColors.borderLight} hover:${hubColors.bgLight} ${hubColors.textHover} min-w-[80px]`}
+                  className={`transition-all duration-300 px-6 py-2 text-sm rounded-md font-medium ${hubColors.contactButton} min-w-[80px]`}
                 >
                   SignUp
-                </Button>
+                </button>
               )}
-              <Button
-                variant="outline"
-                size="sm"
+              <button
                 onClick={handleDirectLogin}
-                className={`transition-all duration-300 backdrop-blur-sm px-6 py-2 text-sm bg-black/50 text-white border ${hubColors.borderLight} hover:${hubColors.bgLight} ${hubColors.textHover} min-w-[80px]`}
+                className={`transition-all duration-300 px-6 py-2 text-sm rounded-md font-medium ${hubColors.contactButton} min-w-[80px]`}
               >
                 LogIn
-              </Button>
+              </button>
             </div>
 
             {/* Mobile menu button + Login on the right */}
             <div className="md:hidden flex items-center space-x-2">
-              <Button
-                variant="outline"
-                size="sm"
+              <button
                 onClick={() => {
                   window.location.href = ADMIN_PATH;
                 }}
-                className={`transition-all duration-300 backdrop-blur-sm px-3 py-1.5 text-xs bg-black/50 text-white border ${hubColors.borderLight} hover:${hubColors.bgLight} ${hubColors.textHover}`}
+                className={`transition-all duration-300 px-3 py-1.5 text-xs rounded-md font-medium ${hubColors.contactButton}`}
               >
                 Login
-              </Button>
+              </button>
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 className="text-white hover:text-gray-300 transition-colors p-2"
@@ -188,35 +180,35 @@ const Navigation = () => {
 
               {/* Mobile-specific CTAs */}
               <div className="pt-4 border-t border-white/10 space-y-3">
-                <Button
+                <button
                   onClick={() => {
                     setIsMobileMenuOpen(false);
                     handleNavClick(CONTACT_PATH);
                   }}
-                  className={`w-full bg:black/50 text-white border ${hubColors.borderLight} hover:${hubColors.bgLight} ${hubColors.textHover} font-medium py-3 text-sm h-12`}
+                  className={`w-full rounded-md ${hubColors.contactButton} font-medium py-3 text-sm h-12`}
                 >
                   Contact
-                </Button>
+                </button>
                 {import.meta.env.DEV && (
-                  <Button
+                  <button
                     onClick={() => {
                       setIsMobileMenuOpen(false);
                       handleDirectCheckout();
                     }}
-                    className={`w-full ${hubColors.bg} hover:${hubColors.bgHover} text-white font-semibold py-3 text-sm h-12`}
+                    className={`w-full rounded-md ${hubColors.contactButton} font-semibold py-3 text-sm h-12`}
                   >
                     SignUp
-                  </Button>
+                  </button>
                 )}
-                <Button
+                <button
                   onClick={() => {
                     setIsMobileMenuOpen(false);
                     handleDirectLogin();
                   }}
-                  className={`w-full bg:black/50 text-white border ${hubColors.borderLight} hover:${hubColors.bgLight} ${hubColors.textHover} font-medium py-3 text-sm h-12`}
+                  className={`w-full rounded-md ${hubColors.contactButton} font-medium py-3 text-sm h-12`}
                 >
                   LogIn
-                </Button>
+                </button>
               </div>
             </div>
           </div>

@@ -19,7 +19,7 @@ export const percymdColors: HubColors = {
     gradient: "from-blue-600 to-blue-700",
     shadow: "shadow-blue-600/25",
     contactButton:
-      "bg-blue-600 hover:bg-blue-500 text-white border border-blue-600 hover:border-blue-500",
+      "border-2 border-blue-600 hover:border-blue-500 text-white bg-transparent hover:bg-blue-600/10",
   },
 };
 

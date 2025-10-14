@@ -1,6 +1,6 @@
 import { PageLayout, SEO, useHub } from "@sms-hub/ui/marketing";
 import { handleDirectCheckout } from "../utils/checkout";
-import { getHubPricingContent, getHubMetadata } from "@sms-hub/hub-logic";
+import { getHubPricingContent, getHubMetadata, getHubColors } from "@sms-hub/hub-logic";
 
 import { useState } from "react";
 import {
@@ -19,11 +19,13 @@ import {
 } from "lucide-react";
 import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";
+import { PageBadge } from "../components";
 
 const Pricing = () => {
   const { currentHub } = useHub();
   const pricingContent = getHubPricingContent(currentHub);
   const hubMetadata = getHubMetadata(currentHub);
+  const hubColors = getHubColors(currentHub);
   const [isLoading, setIsLoading] = useState(false);
 
   // Wrapper for loading state
@@ -125,24 +127,19 @@ const Pricing = () => {
         {/* Subtle background elements */}
         <div className="absolute inset-0">
           <div
-            className={`absolute top-0 left-1/4 w-96 h-96 bg-${hubMetadata.color}-500/5 rounded-full blur-3xl`}
+            className="absolute top-0 left-1/4 w-96 h-96 rounded-full blur-3xl"
+            style={{ backgroundColor: `${hubColors.primary}0D` }}
           ></div>
           <div
-            className={`absolute bottom-0 right-1/4 w-96 h-96 bg-${hubMetadata.color}-500/5 rounded-full blur-3xl`}
+            className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full blur-3xl"
+            style={{ backgroundColor: `${hubColors.primary}0D` }}
           ></div>
         </div>
 
         <div className="relative z-10 max-w-6xl mx-auto px-6">
           {/* Hero Section - Hub-aware */}
           <div className="text-center mb-20">
-            <div
-              className={`inline-flex items-center px-4 py-2 rounded-full bg-${hubMetadata.color}-500/20 border border-${hubMetadata.color}-500/30 mb-8`}
-            >
-              <Zap className={`w-4 h-4 text-${hubMetadata.color}-400 mr-2`} />
-              <span className={`text-sm font-medium text-${hubMetadata.color}-400`}>
-                {pricingContent.badge}
-              </span>
-            </div>
+            <PageBadge text={pricingContent.badge} icon={Zap} className="mb-8" />
 
             <h1
               className="text-4xl md:text-6xl font-bold text-white mb-8 leading-tight"
@@ -157,7 +154,7 @@ const Pricing = () => {
               style={{ fontFamily: "Inter, system-ui, sans-serif" }}
             >
               {pricingContent.description}
-              <span className={`text-${hubMetadata.color}-400`}>
+              <span className={hubColors.tailwind.text}>
                 {" "}
                 {pricingContent.highlightText}
               </span>
@@ -165,15 +162,15 @@ const Pricing = () => {
 
             <div className="flex items-center justify-center space-x-8 text-gray-400 text-sm">
               <div className="flex items-center">
-                <Check className={`w-4 h-4 text-${hubMetadata.color}-500 mr-2`} />
+                <Check className={`w-4 h-4 ${hubColors.tailwind.text} mr-2`} />
                 <span>7-10 day setup</span>
               </div>
               <div className="flex items-center">
-                <Check className={`w-4 h-4 text-${hubMetadata.color}-500 mr-2`} />
+                <Check className={`w-4 h-4 ${hubColors.tailwind.text} mr-2`} />
                 <span>Full compliance</span>
               </div>
               <div className="flex items-center">
-                <Check className={`w-4 h-4 text-${hubMetadata.color}-500 mr-2`} />
+                <Check className={`w-4 h-4 ${hubColors.tailwind.text} mr-2`} />
                 <span>Month-to-month</span>
               </div>
             </div>
@@ -183,9 +180,9 @@ const Pricing = () => {
           <div className="mb-20">
             <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-3xl border border-gray-700/50 p-12 max-w-3xl mx-auto text-center">
               <div
-                className={`inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-${hubMetadata.color}-500/20 border border-${hubMetadata.color}-500/30 mb-8`}
+                className={`inline-flex items-center justify-center w-20 h-20 rounded-2xl ${hubColors.tailwind.bgLight} border ${hubColors.tailwind.borderLight} mb-8`}
               >
-                <Zap className={`w-10 h-10 text-${hubMetadata.color}-400`} />
+                <Zap className={`w-10 h-10 ${hubColors.tailwind.text}`} />
               </div>
 
               <h2
@@ -215,7 +212,7 @@ const Pricing = () => {
               <ul className="text-left space-y-4 mb-10 max-w-lg mx-auto">
                 {onboardingPlan.features.map((feature, index) => (
                   <li key={index} className="flex items-center text-gray-300">
-                    <Check className={`w-6 h-6 text-${hubMetadata.color}-500 mr-4 flex-shrink-0`} />
+                    <Check className={`w-6 h-6 ${hubColors.tailwind.text} mr-4 flex-shrink-0`} />
                     <span className="text-lg">{feature}</span>
                   </li>
                 ))}
@@ -224,7 +221,7 @@ const Pricing = () => {
               <button
                 onClick={() => handleCheckoutWithLoading()}
                 disabled={isLoading}
-                className={`px-10 py-4 bg-${hubMetadata.color}-600 text-white font-bold rounded-full hover:bg-${hubMetadata.color}-700 disabled:bg-${hubMetadata.color}-400 disabled:cursor-not-allowed transition-all duration-300 text-lg tracking-wide uppercase flex items-center justify-center mx-auto group mb-6`}
+                className={`px-10 py-4 ${hubColors.tailwind.bg} text-white font-bold rounded-full ${hubColors.tailwind.bgHover} disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 text-lg tracking-wide uppercase flex items-center justify-center mx-auto group mb-6`}
                 style={{ fontFamily: "Inter, system-ui, sans-serif" }}
               >
                 {isLoading ? "Starting Checkout..." : "Get Started Today - $179"}
@@ -255,9 +252,9 @@ const Pricing = () => {
                 return (
                   <div key={index} className="text-center">
                     <div
-                      className={`w-16 h-16 bg-${hubMetadata.color}-500/20 border border-${hubMetadata.color}-500/30 rounded-xl flex items-center justify-center mx-auto mb-6`}
+                      className={`w-16 h-16 ${hubColors.tailwind.bgLight} border ${hubColors.tailwind.borderLight} rounded-xl flex items-center justify-center mx-auto mb-6`}
                     >
-                      <IconComponent className={`w-8 h-8 text-${hubMetadata.color}-400`} />
+                      <IconComponent className={`w-8 h-8 ${hubColors.tailwind.text}`} />
                     </div>
                     <h3
                       className="text-xl font-semibold text-white mb-4"
@@ -281,7 +278,7 @@ const Pricing = () => {
           <div className="mb-20">
             <div className="text-center mb-12">
               <h2
-                className={`text-3xl md:text-4xl font-bold text-${hubMetadata.color}-500 mb-6`}
+                className={`text-3xl md:text-4xl font-bold ${hubColors.tailwind.text} mb-6`}
                 style={{ fontFamily: "Inter, system-ui, sans-serif" }}
               >
                 After setup, choose your monthly plan
@@ -299,7 +296,7 @@ const Pricing = () => {
               {monthlyPlans.map((plan, index) => (
                 <div
                   key={index}
-                  className={`bg-gradient-to-br from-gray-800/30 to-gray-900/30 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-8 hover:border-${hubMetadata.color}-500/30 transition-all duration-300`}
+                  className={`bg-gradient-to-br from-gray-800/30 to-gray-900/30 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-8 hover:${hubColors.tailwind.borderLight} transition-all duration-300`}
                 >
                   <div className="text-center mb-8">
                     <h3
@@ -327,7 +324,7 @@ const Pricing = () => {
                     {plan.features.map((feature, featureIndex) => (
                       <li key={featureIndex} className="flex items-center text-gray-300">
                         <Check
-                          className={`w-5 h-5 text-${hubMetadata.color}-500 mr-3 flex-shrink-0`}
+                          className={`w-5 h-5 ${hubColors.tailwind.text} mr-3 flex-shrink-0`}
                         />
                         <span style={{ fontFamily: "Inter, system-ui, sans-serif" }}>
                           {feature}
@@ -361,12 +358,12 @@ const Pricing = () => {
               {everyPlanIncludes.map((item, index) => (
                 <div
                   key={index}
-                  className={`flex items-center p-6 bg-gradient-to-br from-gray-800/30 to-gray-900/30 backdrop-blur-sm rounded-2xl border border-gray-700/50 hover:border-${hubMetadata.color}-500/30 transition-all duration-300`}
+                  className={`flex items-center p-6 bg-gradient-to-br from-gray-800/30 to-gray-900/30 backdrop-blur-sm rounded-2xl border border-gray-700/50 hover:${hubColors.tailwind.borderLight} transition-all duration-300`}
                 >
                   <div
-                    className={`w-16 h-16 bg-${hubMetadata.color}-500/20 border border-${hubMetadata.color}-500/30 rounded-xl flex items-center justify-center mr-6 flex-shrink-0`}
+                    className={`w-16 h-16 ${hubColors.tailwind.bgLight} border ${hubColors.tailwind.borderLight} rounded-xl flex items-center justify-center mr-6 flex-shrink-0`}
                   >
-                    <item.icon className={`w-8 h-8 text-${hubMetadata.color}-400`} />
+                    <item.icon className={`w-8 h-8 ${hubColors.tailwind.text}`} />
                   </div>
                   <span
                     className="text-white font-medium text-lg"
@@ -394,7 +391,7 @@ const Pricing = () => {
               {pricingContent.faqs.map((faq, index) => (
                 <div
                   key={index}
-                  className={`bg-gradient-to-br from-gray-800/30 to-gray-900/30 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-8 hover:border-${hubMetadata.color}-500/30 transition-all duration-300`}
+                  className={`bg-gradient-to-br from-gray-800/30 to-gray-900/30 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-8 hover:${hubColors.tailwind.borderLight} transition-all duration-300`}
                 >
                   <h3
                     className="text-xl font-semibold text-white mb-4"
@@ -431,7 +428,7 @@ const Pricing = () => {
               <button
                 onClick={() => handleCheckoutWithLoading()}
                 disabled={isLoading}
-                className={`px-10 py-4 bg-${hubMetadata.color}-600 text-white font-bold rounded-full hover:bg-${hubMetadata.color}-700 disabled:bg-${hubMetadata.color}-400 disabled:cursor-not-allowed transition-all duration-300 text-lg tracking-wide uppercase flex items-center justify-center mx-auto group`}
+                className={`px-10 py-4 ${hubColors.tailwind.bg} text-white font-bold rounded-full ${hubColors.tailwind.bgHover} disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 text-lg tracking-wide uppercase flex items-center justify-center mx-auto group`}
                 style={{ fontFamily: "Inter, system-ui, sans-serif" }}
               >
                 {isLoading ? "Starting Checkout..." : "Get Started Today - $179"}

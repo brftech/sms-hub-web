@@ -148,7 +148,7 @@ export default function ClientPageTemplate({
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
                   <button
                     onClick={handleDirectCheckout}
-                    className="bg-orange-500 hover:bg-orange-600 text-black font-bold py-3 px-8 rounded-lg transition-colors"
+                    className="border-2 border-orange-500 hover:border-orange-400 text-white bg-transparent hover:bg-orange-500/10 font-bold py-3 px-8 rounded-lg transition-all duration-300"
                   >
                     {ctaButtonText}
                   </button>

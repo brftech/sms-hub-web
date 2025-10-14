@@ -17,6 +17,7 @@ import { getHubColors } from "@sms-hub/hub-logic";
 import { getContactFormFields } from "../config/formSchemas";
 import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";
+import { PageBadge } from "../components";
 import { contactService } from "../services/contactService";
 import { CloudflareTurnstile } from "../components/CloudflareTurnstile";
 import { CheckCircle, Loader2, Star, Shield, Zap } from "lucide-react";
@@ -135,11 +136,7 @@ const Contact = () => {
         <div className="relative z-10 max-w-6xl mx-auto px-6">
           {/* Hero Section */}
           <div className="text-center mb-20">
-            <div
-              className={`inline-flex items-center px-4 py-2 rounded-full ${hubColors.bgLight} ${hubColors.borderLight} mb-8`}
-            >
-              <span className={`text-sm font-medium ${hubColors.text}`}>GET IN TOUCH</span>
-            </div>
+            <PageBadge text="GET IN TOUCH" className="mb-8" />
 
             <h1
               className="text-4xl md:text-6xl font-bold text-white mb-8 leading-tight"
@@ -174,7 +171,7 @@ const Contact = () => {
                     fields={formFields}
                     onSubmit={handleSubmit}
                     submitButtonText="Send Message"
-                    submitButtonClass={`w-full ${hubColors.bg} text-white hover:${hubColors.bgHover} transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105`}
+                    submitButtonClass={`w-full rounded-md py-3 ${hubColors.contactButton} font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105`}
                     layout="two-column"
                   />
 

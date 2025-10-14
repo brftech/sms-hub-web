@@ -11,3 +11,4 @@ export { StatsSection } from "./StatsSection";
 export { ProblemSolutionSection } from "./ProblemSolutionSection";
 export { TestimonialsSection } from "./TestimonialsSection";
 export { ErrorFallback } from "./ErrorFallback";
+export { PageBadge } from "./PageBadge";

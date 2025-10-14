@@ -193,6 +193,24 @@ export const getHubTestimonialsContent = (hubType: HubType) => {
 };
 
 /**
+ * DEMO MESSAGES
+ */
+export const getHubDemoMessages = (hubType: HubType) => {
+  switch (hubType) {
+    case "gnymble":
+      return gnymble.gnymbleDemoMessages;
+    case "percymd":
+      return percymd.percymdDemoMessages;
+    case "percytech":
+      return percytech.percytechDemoMessages;
+    case "percytext":
+      return percytext.percytextDemoMessages;
+    default:
+      return gnymble.gnymbleDemoMessages;
+  }
+};
+
+/**
  * FAQ PAGE CONTENT HELPER
  */
 export const getHubFAQContent = (hubType: HubType) => {

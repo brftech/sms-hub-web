@@ -19,6 +19,6 @@ export const percytextColors: HubColors = {
     gradient: "from-purple-600 to-purple-700",
     shadow: "shadow-purple-600/25",
     contactButton:
-      "bg-purple-600 hover:bg-purple-500 text-white border border-purple-600 hover:border-purple-500",
+      "border-2 border-purple-600 hover:border-purple-500 text-white bg-transparent hover:bg-purple-600/10",
   },
 };

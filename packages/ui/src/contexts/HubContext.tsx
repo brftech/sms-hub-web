@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { HubType, getHubConfig } from "../types";
+import { getHubIconPath } from "@sms-hub/hub-logic";
 
 // Abstract interface for environment-specific functionality
 export interface EnvironmentAdapter {
@@ -27,6 +28,8 @@ export interface DOMAdapter {
   setDocumentElementAttribute(name: string, value: string): void;
   setDocumentTitle(title: string): void;
   setCSSVariable(name: string, value: string): void;
+  setFavicon(iconPath: string): void;
+  setManifest(manifestPath: string): void;
 }
 
 export interface HubContextType {
@@ -86,6 +89,52 @@ const defaultDOMAdapter: DOMAdapter = {
       document.documentElement.style.setProperty(name, value);
     }
   },
+  setFavicon: (iconPath: string) => {
+    if (typeof document !== "undefined") {
+      // Update standard favicon
+      let faviconLink = document.querySelector("link[rel='icon']") as HTMLLinkElement;
+      if (!faviconLink) {
+        faviconLink = document.createElement("link");
+        faviconLink.rel = "icon";
+        faviconLink.type = "image/svg+xml";
+        document.head.appendChild(faviconLink);
+      }
+      faviconLink.href = iconPath;
+
+      // Update apple-touch-icon
+      let appleTouchIcon = document.querySelector(
+        "link[rel='apple-touch-icon']"
+      ) as HTMLLinkElement;
+      if (!appleTouchIcon) {
+        appleTouchIcon = document.createElement("link");
+        appleTouchIcon.rel = "apple-touch-icon";
+        appleTouchIcon.sizes = "180x180";
+        document.head.appendChild(appleTouchIcon);
+      }
+      appleTouchIcon.href = iconPath;
+
+      // Update mask-icon (Safari pinned tabs)
+      let maskIcon = document.querySelector("link[rel='mask-icon']") as HTMLLinkElement;
+      if (!maskIcon) {
+        maskIcon = document.createElement("link");
+        maskIcon.rel = "mask-icon";
+        document.head.appendChild(maskIcon);
+      }
+      maskIcon.href = iconPath;
+    }
+  },
+  setManifest: (manifestPath: string) => {
+    if (typeof document !== "undefined") {
+      // Update PWA manifest link
+      let manifestLink = document.querySelector("link[rel='manifest']") as HTMLLinkElement;
+      if (!manifestLink) {
+        manifestLink = document.createElement("link");
+        manifestLink.rel = "manifest";
+        document.head.appendChild(manifestLink);
+      }
+      manifestLink.href = manifestPath;
+    }
+  },
 };
 
 export const HubProvider: React.FC<HubProviderProps> = ({
@@ -141,6 +190,14 @@ export const HubProvider: React.FC<HubProviderProps> = ({
     dom.setCSSVariable("--hub-primary", hubConfig.primaryColor);
     dom.setCSSVariable("--hub-secondary", hubConfig.secondaryColor);
     dom.setCSSVariable("--hub-accent", hubConfig.accentColor);
+
+    // Update favicon dynamically based on current hub
+    const iconPath = getHubIconPath(currentHub);
+    dom.setFavicon(iconPath);
+
+    // Update PWA manifest dynamically based on current hub
+    const manifestPath = `/manifest-${currentHub}.json`;
+    dom.setManifest(manifestPath);
   }, [currentHub, hubConfig, storage, dom]);
 
   const value: HubContextType = {

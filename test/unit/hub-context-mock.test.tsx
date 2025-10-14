@@ -39,6 +39,8 @@ const createMockDOM = () => {
       style: { setProperty: vi.fn() },
     },
     title: "",
+    favicon: "",
+    manifest: "",
   };
 
   return {
@@ -56,6 +58,12 @@ const createMockDOM = () => {
     },
     setCSSVariable: (name: string, value: string) => {
       mockDocument.documentElement.style.setProperty(name, value);
+    },
+    setFavicon: (iconPath: string) => {
+      mockDocument.favicon = iconPath;
+    },
+    setManifest: (manifestPath: string) => {
+      mockDocument.manifest = manifestPath;
     },
     _mockDocument: mockDocument,
   };

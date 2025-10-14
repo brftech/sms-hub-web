@@ -205,3 +205,29 @@ export const isDevelopment = () => environmentConfig.isDevelopment;
 export const isStaging = () => environmentConfig.isStaging;
 export const isProduction = () => environmentConfig.isProduction;
 export const getEnvironment = () => environmentConfig.name;
+
+/**
+ * Detect hub from hostname for multi-domain deployment
+ * Used in production when each hub has its own domain
+ */
+export function detectHubFromHostname(): "percytech" | "gnymble" | "percymd" | "percytext" {
+  if (typeof window === "undefined") {
+    return "gnymble"; // Default for SSR
+  }
+
+  const hostname = window.location.hostname;
+
+  // Production domain mapping
+  if (hostname.includes("percytech.com")) return "percytech";
+  if (hostname.includes("percymd.com")) return "percymd";
+  if (hostname.includes("percytext.com")) return "percytext";
+  if (hostname.includes("gnymble.com")) return "gnymble";
+
+  // Staging/preview URL patterns (if you use them)
+  if (hostname.includes("percytech-")) return "percytech";
+  if (hostname.includes("percymd-")) return "percymd";
+  if (hostname.includes("percytext-")) return "percytext";
+
+  // Default to gnymble for development/unknown domains
+  return "gnymble";
+}

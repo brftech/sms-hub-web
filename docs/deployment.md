@@ -36,22 +36,93 @@ TURNSTILE_SECRET_KEY=your_secret_key  # Server-side only
 RESEND_API_KEY=your_resend_key
 ```
 
-## 🌐 Domain Setup
+## 🌐 Multi-Domain Setup (Production)
 
-Each hub has its own domain pointing to Vercel:
+### Overview
 
-- **percytech.com** → Vercel (Hub 0)
-- **gnymble.com** → Vercel (Hub 1)
-- **percymd.com** → Vercel (Hub 2)
-- **percytext.com** → Vercel (Hub 3)
+Deploy **once** to Vercel, then add all 4 domains to the same project:
 
-Domain detection is automatic in the app - no manual configuration needed.
+- **percytech.com** → Hub 0 (Red theme)
+- **gnymble.com** → Hub 1 (Orange theme)
+- **percymd.com** → Hub 2 (Blue theme)
+- **percytext.com** → Hub 3 (Violet theme)
 
-### Cloudflare Configuration
+The app automatically detects which hub to show based on the domain.
 
-1. DNS points to Vercel
-2. Turnstile enabled for spam protection
-3. Proxy status: Proxied (orange cloud)
+### Step 1: Deploy to Vercel
+
+```bash
+# Connect your repo (first time only)
+vercel
+
+# Deploy to production
+vercel --prod
+```
+
+### Step 2: Add All Domains in Vercel Dashboard
+
+1. Go to your project → **Settings** → **Domains**
+2. Add each domain:
+   ```
+   percytech.com
+   www.percytech.com (optional)
+   gnymble.com
+   www.gnymble.com (optional)
+   percymd.com
+   www.percymd.com (optional)
+   percytext.com
+   www.percytext.com (optional)
+   ```
+
+### Step 3: Configure DNS (at Cloudflare)
+
+For **each domain**, add these DNS records:
+
+```
+Type: CNAME
+Name: @ (root)
+Target: cname.vercel-dns.com
+Proxy: ON (🟠 orange cloud)
+
+Type: CNAME  
+Name: www
+Target: cname.vercel-dns.com
+Proxy: ON (🟠 orange cloud)
+```
+
+**Alternative** (if CNAME at root isn't supported):
+```
+Type: A
+Name: @
+Target: 76.76.21.21
+Proxy: ON
+
+Type: AAAA
+Name: @
+Target: 2606:4700:3033::6815:1515
+Proxy: ON
+```
+
+### Step 4: Enable Cloudflare Turnstile
+
+1. **Turnstile** → Create new site for each domain
+2. Add site key to Vercel env vars (VITE_TURNSTILE_SITE_KEY)
+3. Ensure **Proxy status** is ON in DNS settings
+
+### How Hub Detection Works
+
+The app automatically detects the hub from the hostname:
+
+```typescript
+// detectHubFromHostname() in environment.ts
+percytech.com → Hub 0 (PercyTech)
+gnymble.com   → Hub 1 (Gnymble) 
+percymd.com   → Hub 2 (PercyMD)
+percytext.com → Hub 3 (PercyText)
+localhost     → Hub 1 (Gnymble, default)
+```
+
+No manual configuration needed - just deploy once and add domains!
 
 ## 📦 Build Process
 

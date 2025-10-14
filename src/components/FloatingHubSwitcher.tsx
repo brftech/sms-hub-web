@@ -102,7 +102,8 @@ const FloatingHubSwitcher = () => {
           <div className="bg-white rounded-xl shadow-2xl border border-gray-200 p-5 w-80">
             <div className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
               <svg
-                className="w-5 h-5 mr-2 text-orange-500"
+                className="w-5 h-5 mr-2"
+                style={{ color: hubColors.primary }}
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -121,7 +122,19 @@ const FloatingHubSwitcher = () => {
             <div className="relative">
               <button
                 onClick={() => setShowDropdown(!showDropdown)}
-                className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-gray-100 border-2 border-orange-200 rounded-lg hover:border-orange-300 hover:from-orange-50 hover:to-orange-100 transition-all duration-200"
+                className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-gray-100 border-2 rounded-lg transition-all duration-200"
+                style={{ 
+                  borderColor: `${hubColors.primary}33`,
+                  '--hover-border-color': `${hubColors.primary}4D`,
+                  '--hover-from-color': `${hubColors.primary}0D`,
+                  '--hover-to-color': `${hubColors.primary}1A`,
+                } as React.CSSProperties}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = `${hubColors.primary}4D`;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = `${hubColors.primary}33`;
+                }}
               >
                 <div className="flex items-center">
                   <HubLogo hubType={currentHub} variant="icon" size="sm" />
@@ -130,9 +143,10 @@ const FloatingHubSwitcher = () => {
                   </span>
                 </div>
                 <svg
-                  className={`w-5 h-5 text-orange-500 transition-transform duration-200 ${
+                  className={`w-5 h-5 transition-transform duration-200 ${
                     showDropdown ? "rotate-180" : ""
                   }`}
+                  style={{ color: hubColors.primary }}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -148,19 +162,34 @@ const FloatingHubSwitcher = () => {
 
               {/* Dropdown */}
               {showDropdown && (
-                <div className="absolute bottom-full left-0 right-0 mb-2 bg-white border-2 border-orange-200 rounded-xl shadow-2xl z-20 overflow-hidden max-h-80 overflow-y-auto">
-                  {hubs.map((hub) => (
+                <div 
+                  className="absolute bottom-full left-0 right-0 mb-2 bg-white border-2 rounded-xl shadow-2xl z-20 overflow-hidden max-h-80 overflow-y-auto"
+                  style={{ borderColor: `${hubColors.primary}33` }}
+                >
+                  {hubs.map((hub) => {
+                    const hubItemColors = getHubColors(hub.hubType);
+                    const isSelected = currentHub === hub.hubType;
+                    return (
                     <button
                       key={hub.id}
                       onClick={() => {
                         switchHub(hub.hubType);
                         setShowDropdown(false);
                       }}
-                      className={`w-full flex items-center justify-between p-4 hover:bg-gradient-to-r hover:from-orange-50 hover:to-orange-100 transition-all duration-200 ${
-                        currentHub === hub.hubType
-                          ? "bg-gradient-to-r from-orange-100 to-orange-200"
-                          : ""
-                      }`}
+                      className="w-full flex items-center justify-between p-4 transition-all duration-200"
+                      style={isSelected ? {
+                        background: `linear-gradient(to right, ${hubItemColors.primary}1A, ${hubItemColors.primary}33)`
+                      } : {}}
+                      onMouseEnter={(e) => {
+                        if (!isSelected) {
+                          e.currentTarget.style.background = `linear-gradient(to right, ${hubItemColors.primary}0D, ${hubItemColors.primary}1A)`;
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isSelected) {
+                          e.currentTarget.style.background = '';
+                        }
+                      }}
                     >
                       <div className="flex items-center">
                         <HubLogo hubType={hub.hubType} variant="icon" size="sm" />
@@ -168,7 +197,7 @@ const FloatingHubSwitcher = () => {
                           {hub.name}
                         </span>
                       </div>
-                      {currentHub === hub.hubType && (
+                      {isSelected && (
                         <div className="flex items-center">
                           <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
                             <svg
@@ -186,7 +215,8 @@ const FloatingHubSwitcher = () => {
                         </div>
                       )}
                     </button>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { LiveMessagingProvider, PhoneInteractive, HubLogo, useHub } from "@sms-hub/ui/marketing";
-import { getHubHeroContent } from "@sms-hub/hub-logic";
+import { getHubHeroContent, getHubColors } from "@sms-hub/hub-logic";
 import { useNavigate } from "react-router-dom";
 import { handleDirectCheckout } from "@/utils/checkout";
 import { CONTACT_PATH } from "@/utils/routes";
@@ -12,6 +12,7 @@ interface HeroSectionProps {
 export const HeroSection: React.FC<HeroSectionProps> = ({ businessTypes }) => {
   const { currentHub } = useHub();
   const content = getHubHeroContent(currentHub);
+  const hubColors = getHubColors(currentHub);
   const [currentBusinessIndex, setCurrentBusinessIndex] = useState(0);
   const [isTyping, setIsTyping] = useState(true);
   const [displayedBusiness, setDisplayedBusiness] = useState("");
@@ -63,8 +64,14 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ businessTypes }) => {
     <div className="min-h-screen bg-black pt-20 pb-20 relative overflow-hidden">
       {/* Subtle background elements */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-orange-500/5 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-orange-500/5 rounded-full blur-3xl"></div>
+        <div 
+          className="absolute top-0 left-1/4 w-96 h-96 rounded-full blur-3xl"
+          style={{ backgroundColor: `${hubColors.primary}0D` }}
+        ></div>
+        <div 
+          className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full blur-3xl"
+          style={{ backgroundColor: `${hubColors.primary}0D` }}
+        ></div>
       </div>
 
       <div className="max-w-4xl mx-auto px-6 relative">
@@ -122,7 +129,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ businessTypes }) => {
           <div className="flex flex-col sm:flex-row gap-3">
             <button
               onClick={() => navigate(CONTACT_PATH)}
-              className="px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-md transition-colors"
+              className={`px-6 py-3 ${hubColors.tailwind.bg} ${hubColors.tailwind.bgHover} text-white font-semibold rounded-md transition-colors`}
               style={{ fontFamily: "Inter, system-ui, sans-serif" }}
             >
               Contact
@@ -130,7 +137,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ businessTypes }) => {
             {import.meta.env.DEV && (
               <button
                 onClick={() => handleDirectCheckout()}
-                className="px-6 py-3 border border-orange-600 text-orange-400 hover:bg-orange-600/10 rounded-md font-semibold transition-colors"
+                className={`px-6 py-3 border ${hubColors.tailwind.border} ${hubColors.tailwind.text} hover:${hubColors.tailwind.bgLight} rounded-md font-semibold transition-colors`}
                 style={{ fontFamily: "Inter, system-ui, sans-serif" }}
               >
                 SignUp

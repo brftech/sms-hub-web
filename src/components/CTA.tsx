@@ -1,12 +1,13 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useHub } from "@sms-hub/ui/marketing";
-import { getHubCTAContent } from "@sms-hub/hub-logic";
+import { getHubCTAContent, getHubColors } from "@sms-hub/hub-logic";
 import { CONTACT_PATH } from "@/utils/routes";
 
 export const CTASection: React.FC = () => {
   const { currentHub } = useHub();
   const navigate = useNavigate();
+  const hubColors = getHubColors(currentHub);
 
   const content = getHubCTAContent(currentHub);
   return (
@@ -24,7 +25,7 @@ export const CTASection: React.FC = () => {
 
         <button
           onClick={() => navigate(CONTACT_PATH)}
-          className="px-8 py-4 bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-md transition-colors"
+          className={`px-8 py-4 ${hubColors.tailwind.bg} ${hubColors.tailwind.bgHover} text-white font-semibold rounded-md transition-colors`}
         >
           Contact Us
         </button>

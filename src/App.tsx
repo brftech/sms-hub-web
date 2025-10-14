@@ -15,6 +15,7 @@ import { webEnvironment, detectHubFromHostname } from "./config/environment";
 import { EnvironmentDebug } from "./components/EnvironmentDebug";
 import AppFloatingComponents from "./components/AppFloatingComponents";
 import { performanceMonitor } from "./services/performanceMonitoringService";
+import { getHubColors } from "@sms-hub/hub-logic";
 import {
   HOME_PATH,
   HOME_ALIAS_PATH,
@@ -71,14 +72,22 @@ const AdminPerformanceDashboard = lazy(() => import("./pages/AdminPerformanceDas
 const queryClient = new QueryClient();
 
 // Enhanced loading component for better UX
-const PageLoader = () => (
-  <div className="min-h-screen bg-black flex items-center justify-center">
-    <div className="text-center">
-      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
-      <p className="text-white">Loading...</p>
+const PageLoader = () => {
+  const { currentHub } = useHub();
+  const colors = getHubColors(currentHub);
+  
+  return (
+    <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="text-center">
+        <div 
+          className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4"
+          style={{ borderBottomColor: colors.primary }}
+        ></div>
+        <p className="text-white">Loading...</p>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 // Component to set data-hub attribute on body
 const HubThemeWrapper = ({ children }: { children: React.ReactNode }) => {
@@ -172,13 +181,7 @@ const AppRoutes = () => {
         path={CLIENT_PAGE_STATIC_PATH}
         element={
           <PageTransition>
-            <Suspense
-              fallback={
-                <div className="min-h-screen bg-black flex items-center justify-center">
-                  <div className="text-orange-500 text-xl">Loading...</div>
-                </div>
-              }
-            >
+            <Suspense fallback={<PageLoader />}>
               <ClientPage />
             </Suspense>
           </PageTransition>
@@ -188,13 +191,7 @@ const AppRoutes = () => {
         path={CLIENTS_PATH}
         element={
           <PageTransition>
-            <Suspense
-              fallback={
-                <div className="min-h-screen bg-black flex items-center justify-center">
-                  <div className="text-orange-500 text-xl">Loading...</div>
-                </div>
-              }
-            >
+            <Suspense fallback={<PageLoader />}>
               <ClientPage />
             </Suspense>
           </PageTransition>
@@ -204,13 +201,7 @@ const AppRoutes = () => {
         path={CLIENTS_PRIVACY_PATH}
         element={
           <PageTransition>
-            <Suspense
-              fallback={
-                <div className="min-h-screen bg-black flex items-center justify-center">
-                  <div className="text-orange-500 text-xl">Loading...</div>
-                </div>
-              }
-            >
+            <Suspense fallback={<PageLoader />}>
               <ClientPrivacy />
             </Suspense>
           </PageTransition>
@@ -220,13 +211,7 @@ const AppRoutes = () => {
         path={CLIENTS_TERMS_PATH}
         element={
           <PageTransition>
-            <Suspense
-              fallback={
-                <div className="min-h-screen bg-black flex items-center justify-center">
-                  <div className="text-orange-500 text-xl">Loading...</div>
-                </div>
-              }
-            >
+            <Suspense fallback={<PageLoader />}>
               <ClientTerms />
             </Suspense>
           </PageTransition>

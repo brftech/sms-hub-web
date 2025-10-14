@@ -5,6 +5,7 @@ import {
   LiveMessagingProvider,
   PageLayout,
   SEO,
+  useHub,
 } from "@sms-hub/ui/marketing";
 import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";
@@ -21,10 +22,13 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { CONTACT_PATH } from "@/utils/routes";
+import { getHubColors } from "@sms-hub/hub-logic";
 
 export default function Demo() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<"phone" | "platform">("phone");
+  const { currentHub } = useHub();
+  const hubColors = getHubColors(currentHub);
 
   return (
     <PageLayout
@@ -42,16 +46,24 @@ export default function Demo() {
       <div className="min-h-screen bg-black pt-20 pb-12 relative">
         {/* Subtle background elements */}
         <div className="absolute inset-0">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-orange-500/5 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-orange-500/5 rounded-full blur-3xl"></div>
+          <div 
+            className="absolute top-0 left-1/4 w-96 h-96 rounded-full blur-3xl"
+            style={{ backgroundColor: `${hubColors.primary}0D` }}
+          ></div>
+          <div 
+            className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full blur-3xl"
+            style={{ backgroundColor: `${hubColors.primary}0D` }}
+          ></div>
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-6">
           {/* Hero Section - Matching Homepage Style */}
           <div className="text-center mb-20">
-            <div className="inline-flex items-center px-4 py-2 rounded-full bg-orange-500/20 border border-orange-500/30 mb-8">
-              <Target className="w-4 h-4 text-orange-400 mr-2" />
-              <span className="text-sm font-medium text-orange-400">STATIC PREVIEW</span>
+            <div 
+              className={`inline-flex items-center px-4 py-2 rounded-full ${hubColors.tailwind.bgLight} border ${hubColors.tailwind.borderLight} mb-8`}
+            >
+              <Target className={`w-4 h-4 ${hubColors.tailwind.text} mr-2`} />
+              <span className={`text-sm font-medium ${hubColors.tailwind.text}`}>STATIC PREVIEW</span>
             </div>
 
             <h1
@@ -72,15 +84,15 @@ export default function Demo() {
 
             <div className="flex items-center justify-center space-x-8 text-gray-400 text-sm">
               <div className="flex items-center">
-                <CheckCircle className="w-4 h-4 text-orange-500 mr-2" />
+                <CheckCircle className={`w-4 h-4 ${hubColors.tailwind.text} mr-2`} />
                 <span>Static preview</span>
               </div>
               <div className="flex items-center">
-                <CheckCircle className="w-4 h-4 text-orange-500 mr-2" />
+                <CheckCircle className={`w-4 h-4 ${hubColors.tailwind.text} mr-2`} />
                 <span>Both perspectives</span>
               </div>
               <div className="flex items-center">
-                <CheckCircle className="w-4 h-4 text-orange-500 mr-2" />
+                <CheckCircle className={`w-4 h-4 ${hubColors.tailwind.text} mr-2`} />
                 <span>Contact for live demo</span>
               </div>
             </div>
@@ -94,7 +106,7 @@ export default function Demo() {
                   onClick={() => setActiveTab("phone")}
                   className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center space-x-2 ${
                     activeTab === "phone"
-                      ? "bg-orange-600 text-white"
+                      ? `${hubColors.tailwind.bg} text-white`
                       : "text-gray-400 hover:text-white hover:bg-gray-700/50"
                   }`}
                   style={{ fontFamily: "Inter, system-ui, sans-serif" }}
@@ -106,7 +118,7 @@ export default function Demo() {
                   onClick={() => setActiveTab("platform")}
                   className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center space-x-2 ${
                     activeTab === "platform"
-                      ? "bg-orange-600 text-white"
+                      ? `${hubColors.tailwind.bg} text-white`
                       : "text-gray-400 hover:text-white hover:bg-gray-700/50"
                   }`}
                   style={{ fontFamily: "Inter, system-ui, sans-serif" }}
@@ -219,7 +231,7 @@ export default function Demo() {
                   </p>
                 </div>
 
-                <ArrowRightLeft className="w-8 h-8 text-orange-400 animate-pulse" />
+                <ArrowRightLeft className={`w-8 h-8 ${hubColors.tailwind.text} animate-pulse`} />
 
                 <div className="text-center">
                   <div className="w-20 h-20 bg-green-500/20 border border-green-500/30 rounded-2xl flex items-center justify-center mx-auto mb-4">
@@ -243,8 +255,8 @@ export default function Demo() {
               {/* Quick Tips */}
               <div className="grid md:grid-cols-3 gap-8">
                 <div className="text-center">
-                  <div className="w-12 h-12 bg-orange-500/20 border border-orange-500/30 rounded-xl flex items-center justify-center mx-auto mb-4">
-                    <MessageSquare className="w-6 h-6 text-orange-400" />
+                  <div className={`w-12 h-12 ${hubColors.tailwind.bgLight} border ${hubColors.tailwind.borderLight} rounded-xl flex items-center justify-center mx-auto mb-4`}>
+                    <MessageSquare className={`w-6 h-6 ${hubColors.tailwind.text}`} />
                   </div>
                   <h3
                     className="text-lg font-semibold text-white mb-2"
@@ -313,13 +325,13 @@ export default function Demo() {
                 This was just a static preview. No more SMS rejections. No compliance headaches.
                 Just professional texting that works for your regulated business.
                 <br />
-                <span className="text-orange-400 font-medium">
+                <span className={`${hubColors.tailwind.text} font-medium`}>
                   Submit our contact form to schedule a live demo with real SMS.
                 </span>
               </p>
               <button
                 onClick={() => navigate(CONTACT_PATH)}
-                className="px-10 py-4 bg-orange-600 text-white font-bold rounded-full hover:bg-orange-700 transition-all duration-300 text-lg tracking-wide uppercase flex items-center justify-center mx-auto group"
+                className={`px-10 py-4 ${hubColors.tailwind.bg} text-white font-bold rounded-full ${hubColors.tailwind.bgHover} transition-all duration-300 text-lg tracking-wide uppercase flex items-center justify-center mx-auto group`}
                 style={{ fontFamily: "Inter, system-ui, sans-serif" }}
               >
                 Schedule Live Demo

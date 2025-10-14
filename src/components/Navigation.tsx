@@ -111,7 +111,7 @@ const Navigation = () => {
                 variant="outline"
                 size="sm"
                 onClick={() => handleDesktopNavClick(CONTACT_PATH)}
-                className="transition-all duration-300 backdrop-blur-sm px-6 py-2 text-sm bg-black/50 text-white border border-orange-500/50 hover:bg-orange-500/10 hover:border-orange-400 min-w-[80px]"
+                className={`transition-all duration-300 backdrop-blur-sm px-6 py-2 text-sm bg-black/50 text-white border ${hubColors.borderLight} hover:${hubColors.bgLight} ${hubColors.textHover} min-w-[80px]`}
               >
                 Contact
               </Button>
@@ -120,7 +120,7 @@ const Navigation = () => {
                   variant="outline"
                   size="sm"
                   onClick={() => handleDirectCheckout()}
-                  className="transition-all duration-300 backdrop-blur-sm px-6 py-2 text-sm bg-black/50 text-white border border-orange-500/50 hover:bg-orange-500/10 hover:border-orange-400 min-w-[80px]"
+                  className={`transition-all duration-300 backdrop-blur-sm px-6 py-2 text-sm bg-black/50 text-white border ${hubColors.borderLight} hover:${hubColors.bgLight} ${hubColors.textHover} min-w-[80px]`}
                 >
                   SignUp
                 </Button>
@@ -129,7 +129,7 @@ const Navigation = () => {
                 variant="outline"
                 size="sm"
                 onClick={handleDirectLogin}
-                className="transition-all duration-300 backdrop-blur-sm px-6 py-2 text-sm bg-black/50 text-white border border-orange-500/50 hover:bg-orange-500/10 hover:border-orange-400 min-w-[80px]"
+                className={`transition-all duration-300 backdrop-blur-sm px-6 py-2 text-sm bg-black/50 text-white border ${hubColors.borderLight} hover:${hubColors.bgLight} ${hubColors.textHover} min-w-[80px]`}
               >
                 LogIn
               </Button>
@@ -143,7 +143,7 @@ const Navigation = () => {
                 onClick={() => {
                   window.location.href = ADMIN_PATH;
                 }}
-                className="transition-all duration-300 backdrop-blur-sm px-3 py-1.5 text-xs bg-black/50 text-white border border-orange-500/50 hover:bg-orange-500/10 hover:border-orange-400"
+                className={`transition-all duration-300 backdrop-blur-sm px-3 py-1.5 text-xs bg-black/50 text-white border ${hubColors.borderLight} hover:${hubColors.bgLight} ${hubColors.textHover}`}
               >
                 Login
               </Button>
@@ -162,9 +162,9 @@ const Navigation = () => {
         {isMobileMenuOpen && (
           <div className="md:hidden">
             <div
-              className="px-4 pt-4 pb-6 space-y-2 bg-black/95 backdrop-blur-md border-t border-orange-500/20"
+              className="px-4 pt-4 pb-6 space-y-2 bg-black/95 backdrop-blur-md border-t"
               style={{
-                borderTopColor: currentHub === "percytech" ? "#8B000020" : "#EA580C20",
+                borderTopColor: `${getHubColors(currentHub).primary}33`,
               }}
             >
               {mobileMenuItems.map((item) => {
@@ -193,7 +193,7 @@ const Navigation = () => {
                     setIsMobileMenuOpen(false);
                     handleNavClick(CONTACT_PATH);
                   }}
-                  className="w-full bg:black/50 text-white border border-orange-500/50 hover:bg-orange-500/10 hover:border-orange-400 font-medium py-3 text-sm h-12"
+                  className={`w-full bg:black/50 text-white border ${hubColors.borderLight} hover:${hubColors.bgLight} ${hubColors.textHover} font-medium py-3 text-sm h-12`}
                 >
                   Contact
                 </Button>
@@ -213,7 +213,7 @@ const Navigation = () => {
                     setIsMobileMenuOpen(false);
                     handleDirectLogin();
                   }}
-                  className="w-full bg:black/50 text-white border border-orange-500/50 hover:bg-orange-500/10 hover:border-orange-400 font-medium py-3 text-sm h-12"
+                  className={`w-full bg:black/50 text-white border ${hubColors.borderLight} hover:${hubColors.bgLight} ${hubColors.textHover} font-medium py-3 text-sm h-12`}
                 >
                   LogIn
                 </Button>

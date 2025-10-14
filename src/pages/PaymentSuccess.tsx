@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { PageLayout, SEO } from "@sms-hub/ui/marketing";
+import { PageLayout, SEO, useHub } from "@sms-hub/ui/marketing";
 import { CheckCircle, ArrowRight, Loader } from "lucide-react";
 import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";
 import { PRICING_PATH } from "@/utils/routes";
+import { getHubColors } from "@sms-hub/hub-logic";
 
 const PaymentSuccess = () => {
   const [searchParams] = useSearchParams();
@@ -12,6 +13,8 @@ const PaymentSuccess = () => {
   const [isVerifying, setIsVerifying] = useState(true);
   const [paymentStatus, setPaymentStatus] = useState<"success" | "error" | "pending">("pending");
   const [sessionId, setSessionId] = useState<string | null>(null);
+  const { currentHub } = useHub();
+  const hubColors = getHubColors(currentHub);
 
   useEffect(() => {
     const sessionIdParam = searchParams.get("session_id");
@@ -54,7 +57,7 @@ const PaymentSuccess = () => {
         <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center px-4 pt-24">
           <div className="max-w-md w-full text-center">
             <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-3xl border border-gray-700/50 p-8">
-              <Loader className="w-16 h-16 text-orange-500 animate-spin mx-auto mb-6" />
+              <Loader className={`w-16 h-16 ${hubColors.tailwind.text} animate-spin mx-auto mb-6`} />
               <h1 className="text-2xl font-bold text-white mb-4">Verifying Payment...</h1>
               <p className="text-gray-300">Please wait while we confirm your payment.</p>
             </div>
@@ -84,7 +87,7 @@ const PaymentSuccess = () => {
               </p>
               <button
                 onClick={() => navigate(PRICING_PATH)}
-                className="px-8 py-3 bg-orange-600 text-white font-bold rounded-full hover:bg-orange-700 transition-all duration-300"
+                className={`px-8 py-3 ${hubColors.tailwind.bg} text-white font-bold rounded-full ${hubColors.tailwind.bgHover} transition-all duration-300`}
               >
                 Back to Pricing
               </button>
@@ -129,7 +132,7 @@ const PaymentSuccess = () => {
 
             <button
               onClick={handleContinueToApp}
-              className="w-full px-8 py-4 bg-orange-600 text-white font-bold rounded-full hover:bg-orange-700 transition-all duration-300 text-lg flex items-center justify-center group"
+              className={`w-full px-8 py-4 ${hubColors.tailwind.bg} text-white font-bold rounded-full ${hubColors.tailwind.bgHover} transition-all duration-300 text-lg flex items-center justify-center group`}
             >
               Complete Account Setup
               <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300" />

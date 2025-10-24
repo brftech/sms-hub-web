@@ -2,26 +2,35 @@
  * Form Builder Type Definitions
  */
 
-import { CustomValidator } from './validators';
+import { CustomValidator } from "./validators";
 
-export type FieldType = 
-  | 'text' 
-  | 'email' 
-  | 'password' 
-  | 'tel' 
-  | 'url' 
-  | 'number' 
-  | 'date'
-  | 'time'
-  | 'datetime-local'
-  | 'textarea' 
-  | 'select' 
-  | 'checkbox' 
-  | 'radio'
-  | 'phone';
+export type FieldType =
+  | "text"
+  | "email"
+  | "password"
+  | "tel"
+  | "url"
+  | "number"
+  | "date"
+  | "time"
+  | "datetime-local"
+  | "textarea"
+  | "select"
+  | "checkbox"
+  | "radio"
+  | "phone";
 
 export interface ValidationRule {
-  type: 'required' | 'email' | 'phone' | 'url' | 'number' | 'minLength' | 'maxLength' | 'pattern' | 'custom';
+  type:
+    | "required"
+    | "email"
+    | "phone"
+    | "url"
+    | "number"
+    | "minLength"
+    | "maxLength"
+    | "pattern"
+    | "custom";
   message?: string;
   value?: string | number | RegExp;
   validator?: CustomValidator;
@@ -46,21 +55,24 @@ export interface FormField {
   autoComplete?: string;
   helpText?: string;
   className?: string;
-  
+
+  // Layout
+  fullWidth?: boolean; // Spans both columns in two-column layout
+
   // Select/Radio specific
   options?: SelectOption[];
-  
+
   // Textarea specific
   rows?: number;
-  
+
   // Number specific
   min?: number;
   max?: number;
   step?: number;
-  
+
   // Conditional rendering
   showIf?: (formData: Record<string, unknown>) => boolean;
-  
+
   // Hub-specific
   hubAware?: boolean;
 }
@@ -74,14 +86,17 @@ export interface FormBuilderProps {
   errorMessage?: string;
   includeTurnstile?: boolean;
   turnstileSiteKey?: string;
-  layout?: 'single-column' | 'two-column';
+  layout?: "single-column" | "two-column";
   hubId?: number;
   loading?: boolean;
-  
+
+  // Custom content before submit button
+  beforeSubmitButton?: React.ReactNode;
+
   // Multi-step forms
   steps?: FormField[][];
   showProgressBar?: boolean;
-  
+
   // Callbacks
   onChange?: (name: string, value: unknown) => void;
   onError?: (error: Error, formData: Record<string, unknown>) => void;
@@ -113,4 +128,3 @@ export interface FormState {
   isValid: boolean;
   touched: Record<string, boolean>;
 }
-

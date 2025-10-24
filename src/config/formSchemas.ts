@@ -1,164 +1,152 @@
 /**
  * Form Schemas - Centralized form definitions
- * 
+ *
  * All forms in the application are defined here as schemas.
  * This ensures consistency and makes forms easy to modify.
  */
 
-import { FormFieldType } from '@sms-hub/ui';
-import { HubType } from '@sms-hub/hub-logic';
+import { FormFieldType } from "@sms-hub/ui";
+import { HubType } from "@sms-hub/hub-logic";
 
 /**
  * Contact Form Schema
- * 
+ *
  * Dynamically adjusts based on hub type to show hub-specific fields
  */
 export function getContactFormFields(hubType: HubType): FormFieldType[] {
   const baseFields: FormFieldType[] = [
     {
-      name: 'firstName',
-      type: 'text',
-      label: 'First Name',
-      placeholder: 'John',
+      name: "firstName",
+      type: "text",
+      label: "First Name",
+      placeholder: "John",
       validation: [
-        { type: 'required', message: 'First name is required' },
-        { type: 'minLength', value: 2, message: 'Name must be at least 2 characters' }
+        { type: "required", message: "Required" },
+        { type: "minLength", value: 2, message: "Name must be at least 2 characters" },
       ],
-      autoComplete: 'given-name'
+      autoComplete: "given-name",
     },
     {
-      name: 'lastName',
-      type: 'text',
-      label: 'Last Name',
-      placeholder: 'Doe',
+      name: "lastName",
+      type: "text",
+      label: "Last Name",
+      placeholder: "Doe",
       validation: [
-        { type: 'required', message: 'Last name is required' },
-        { type: 'minLength', value: 2, message: 'Name must be at least 2 characters' }
+        { type: "required", message: "Required" },
+        { type: "minLength", value: 2, message: "Name must be at least 2 characters" },
       ],
-      autoComplete: 'family-name'
+      autoComplete: "family-name",
     },
     {
-      name: 'email',
-      type: 'email',
-      label: 'Email Address',
-      placeholder: 'john@company.com',
-      validation: [
-        { type: 'required', message: 'Email is required' },
-        { type: 'email', message: 'Please enter a valid email address' }
-      ],
-      autoComplete: 'email'
-    },
-    {
-      name: 'phone',
-      type: 'phone',
-      label: 'Phone Number',
-      placeholder: '(555) 123-4567',
-      validation: [
-        { type: 'phone', message: 'Please enter a valid phone number' }
-      ],
-      autoComplete: 'tel',
+      name: "phone",
+      type: "phone",
+      label: "Phone Number",
+      placeholder: "(555) 123-4567",
+      validation: [{ type: "phone", message: "Please enter a valid phone number" }],
+      autoComplete: "tel",
       optional: true,
-      helpText: 'Optional - We\'ll use this to schedule a call'
     },
     {
-      name: 'company',
-      type: 'text',
-      label: 'Company',
-      placeholder: 'Company Name',
-      optional: true,
-      autoComplete: 'organization',
-      helpText: 'Optional'
+      name: "email",
+      type: "email",
+      label: "Email Address",
+      placeholder: "john@company.com",
+      validation: [
+        { type: "required", message: "Required" },
+        { type: "email", message: "Invalid email" },
+      ],
+      autoComplete: "email",
     },
     {
-      name: 'message',
-      type: 'textarea',
-      label: 'Message',
-      placeholder: 'Tell us about your venue, your needs, and how we can help elevate your customer communication...',
-      rows: 5,
+      name: "company",
+      type: "text",
+      label: "Company",
+      placeholder: "Company Name",
       optional: true,
-      helpText: 'Optional'
-    }
+      autoComplete: "organization",
+    },
   ];
 
-  // Hub-specific fields
+  // Hub-specific fields (inserted after company field)
   switch (hubType) {
-    case 'gnymble':
+    case "gnymble":
       baseFields.push({
-        name: 'businessType',
-        type: 'select',
-        label: 'Business Type',
-        placeholder: 'Select your business type',
+        name: "businessType",
+        type: "select",
+        label: "Business Type",
+        placeholder: "Select your business type",
         options: [
-          { label: 'Tobacco/Cigar Retail', value: 'tobacco' },
-          { label: 'Alcohol/Spirits Retail', value: 'alcohol' },
-          { label: 'Cannabis Retail', value: 'cannabis' },
-          { label: 'Other Retail', value: 'other' }
+          { label: "Tobacco/Cigar Retail", value: "tobacco" },
+          { label: "Alcohol/Spirits Retail", value: "alcohol" },
+          { label: "Cannabis Retail", value: "cannabis" },
+          { label: "Other Retail", value: "other" },
         ],
-        validation: [
-          { type: 'required', message: 'Please select your business type' }
-        ],
-        helpText: 'Helps us understand your compliance needs'
+        validation: [{ type: "required", message: "Please select your business type" }],
       });
       break;
 
-    case 'percymd':
+    case "percymd":
       baseFields.push({
-        name: 'practiceType',
-        type: 'select',
-        label: 'Practice Type',
-        placeholder: 'Select your practice type',
+        name: "practiceType",
+        type: "select",
+        label: "Practice Type",
+        placeholder: "Select your practice type",
         options: [
-          { label: 'Primary Care', value: 'primary' },
-          { label: 'Specialty Practice', value: 'specialty' },
-          { label: 'Dental', value: 'dental' },
-          { label: 'Mental Health', value: 'mental' },
-          { label: 'Other Healthcare', value: 'other' }
+          { label: "Primary Care", value: "primary" },
+          { label: "Specialty Practice", value: "specialty" },
+          { label: "Dental", value: "dental" },
+          { label: "Mental Health", value: "mental" },
+          { label: "Other Healthcare", value: "other" },
         ],
-        validation: [
-          { type: 'required', message: 'Please select your practice type' }
-        ],
-        helpText: 'Helps us tailor HIPAA-compliant solutions for you'
+        validation: [{ type: "required", message: "Please select your practice type" }],
       });
       break;
 
-    case 'percytech':
+    case "percytech":
       baseFields.push({
-        name: 'industryFocus',
-        type: 'select',
-        label: 'Industry Focus',
-        placeholder: 'Select your industry',
+        name: "industryFocus",
+        type: "select",
+        label: "Industry Focus",
+        placeholder: "Select your industry",
         options: [
-          { label: 'SaaS/Software', value: 'saas' },
-          { label: 'E-commerce', value: 'ecommerce' },
-          { label: 'Professional Services', value: 'professional' },
-          { label: 'Education', value: 'education' },
-          { label: 'Other Technology', value: 'other' }
+          { label: "SaaS/Software", value: "saas" },
+          { label: "E-commerce", value: "ecommerce" },
+          { label: "Professional Services", value: "professional" },
+          { label: "Education", value: "education" },
+          { label: "Other Technology", value: "other" },
         ],
-        validation: [
-          { type: 'required', message: 'Please select your industry' }
-        ]
+        validation: [{ type: "required", message: "Please select your industry" }],
       });
       break;
 
-    case 'percytext':
+    case "percytext":
       baseFields.push({
-        name: 'monthlyVolume',
-        type: 'select',
-        label: 'Expected Monthly SMS Volume',
-        placeholder: 'Select expected volume',
+        name: "monthlyVolume",
+        type: "select",
+        label: "Expected Monthly SMS Volume",
+        placeholder: "Select expected volume",
         options: [
-          { label: 'Under 1,000 messages', value: 'under-1k' },
-          { label: '1,000 - 10,000 messages', value: '1k-10k' },
-          { label: '10,000 - 50,000 messages', value: '10k-50k' },
-          { label: '50,000+ messages', value: '50k-plus' }
+          { label: "Under 1,000 messages", value: "under-1k" },
+          { label: "1,000 - 10,000 messages", value: "1k-10k" },
+          { label: "10,000 - 50,000 messages", value: "10k-50k" },
+          { label: "50,000+ messages", value: "50k-plus" },
         ],
-        validation: [
-          { type: 'required', message: 'Please select your expected volume' }
-        ],
-        helpText: 'Helps us recommend the right plan'
+        validation: [{ type: "required", message: "Please select your expected volume" }],
       });
       break;
   }
+
+  // Add message field at the end (full-width)
+  baseFields.push({
+    name: "message",
+    type: "textarea",
+    label: "Message",
+    placeholder:
+      "Tell us about your venue, your needs, and how we can help elevate your customer communication...",
+    rows: 5,
+    optional: true,
+    fullWidth: true,
+  });
 
   return baseFields;
 }
@@ -168,27 +156,25 @@ export function getContactFormFields(hubType: HubType): FormFieldType[] {
  */
 export const newsletterFormFields: FormFieldType[] = [
   {
-    name: 'email',
-    type: 'email',
-    label: 'Email Address',
-    placeholder: 'you@example.com',
+    name: "email",
+    type: "email",
+    label: "Email Address",
+    placeholder: "you@example.com",
     validation: [
-      { type: 'required', message: 'Email is required' },
-      { type: 'email', message: 'Please enter a valid email address' }
+      { type: "required", message: "Email is required" },
+      { type: "email", message: "Please enter a valid email address" },
     ],
-    autoComplete: 'email'
+    autoComplete: "email",
   },
   {
-    name: 'firstName',
-    type: 'text',
-    label: 'First Name',
-    placeholder: 'John',
-    validation: [
-      { type: 'minLength', value: 2, message: 'Name must be at least 2 characters' }
-    ],
+    name: "firstName",
+    type: "text",
+    label: "First Name",
+    placeholder: "John",
+    validation: [{ type: "minLength", value: 2, message: "Name must be at least 2 characters" }],
     optional: true,
-    autoComplete: 'given-name'
-  }
+    autoComplete: "given-name",
+  },
 ];
 
 /**
@@ -196,60 +182,51 @@ export const newsletterFormFields: FormFieldType[] = [
  */
 export const adminLeadFormFields: FormFieldType[] = [
   {
-    name: 'fullName',
-    type: 'text',
-    label: 'Full Name',
-    validation: [
-      { type: 'required', message: 'Name is required' }
-    ]
+    name: "fullName",
+    type: "text",
+    label: "Full Name",
+    validation: [{ type: "required", message: "Name is required" }],
   },
   {
-    name: 'email',
-    type: 'email',
-    label: 'Email',
+    name: "email",
+    type: "email",
+    label: "Email",
     validation: [
-      { type: 'required', message: 'Email is required' },
-      { type: 'email', message: 'Invalid email' }
-    ]
-  },
-  {
-    name: 'phone',
-    type: 'phone',
-    label: 'Phone',
-    validation: [
-      { type: 'phone', message: 'Invalid phone number' }
+      { type: "required", message: "Email is required" },
+      { type: "email", message: "Invalid email" },
     ],
-    optional: true
   },
   {
-    name: 'company',
-    type: 'text',
-    label: 'Company',
-    validation: [
-      { type: 'required', message: 'Company is required' }
-    ]
+    name: "phone",
+    type: "phone",
+    label: "Phone",
+    validation: [{ type: "phone", message: "Invalid phone number" }],
+    optional: true,
   },
   {
-    name: 'status',
-    type: 'select',
-    label: 'Status',
+    name: "company",
+    type: "text",
+    label: "Company",
+    validation: [{ type: "required", message: "Company is required" }],
+  },
+  {
+    name: "status",
+    type: "select",
+    label: "Status",
     options: [
-      { label: 'New', value: 'new' },
-      { label: 'Contacted', value: 'contacted' },
-      { label: 'Qualified', value: 'qualified' },
-      { label: 'Converted', value: 'converted' },
-      { label: 'Lost', value: 'lost' }
+      { label: "New", value: "new" },
+      { label: "Contacted", value: "contacted" },
+      { label: "Qualified", value: "qualified" },
+      { label: "Converted", value: "converted" },
+      { label: "Lost", value: "lost" },
     ],
-    validation: [
-      { type: 'required', message: 'Status is required' }
-    ]
+    validation: [{ type: "required", message: "Status is required" }],
   },
   {
-    name: 'notes',
-    type: 'textarea',
-    label: 'Notes',
+    name: "notes",
+    type: "textarea",
+    label: "Notes",
     rows: 4,
-    optional: true
-  }
+    optional: true,
+  },
 ];
-

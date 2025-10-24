@@ -1,18 +1,12 @@
 /**
  * Contact Page - Using FormBuilder
- * 
+ *
  * Simplified from 530+ lines to ~250 lines while maintaining all functionality.
  */
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  useToast,
-  PageLayout,
-  useHub,
-  SEO,
-  FormBuilder,
-} from "@sms-hub/ui/marketing";
+import { useToast, PageLayout, useHub, SEO, FormBuilder } from "@sms-hub/ui/marketing";
 import { getHubColors } from "@sms-hub/hub-logic";
 import { getContactFormFields } from "../config/formSchemas";
 import Navigation from "../components/Navigation";
@@ -20,7 +14,7 @@ import Footer from "../components/Footer";
 import { PageBadge } from "../components";
 import { contactService } from "../services/contactService";
 import { CloudflareTurnstile } from "../components/CloudflareTurnstile";
-import { CheckCircle, Loader2, Star, Shield, Zap } from "lucide-react";
+import { CheckCircle, Loader2, Star, Shield, Zap, MessageSquare, Mail } from "lucide-react";
 import { HOME_PATH } from "@/utils/routes";
 import { trackFormSubmission } from "../usePerformanceTracking";
 
@@ -31,6 +25,8 @@ const Contact = () => {
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const [emailSignup, setEmailSignup] = useState(false);
   const [smsSignup, setSmsSignup] = useState(false);
+  const [communicationMethod, setCommunicationMethod] = useState<"email" | "sms">("email");
+  const [isPhoneValid, setIsPhoneValid] = useState<boolean>(false);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -38,6 +34,16 @@ const Contact = () => {
     const startTime = performance.now();
 
     try {
+      // Validate phone number if SMS communication chosen
+      if (communicationMethod === "sms" && !formData.phone) {
+        toast({
+          title: "Phone number required",
+          description: "Please provide a phone number to communicate via text.",
+          variant: "destructive",
+        });
+        return { success: false, error: "Phone required for SMS" };
+      }
+
       // Validate Turnstile if enabled
       const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY;
       if (turnstileSiteKey && !turnstileToken) {
@@ -55,6 +61,9 @@ const Contact = () => {
         .then((data) => data.ip)
         .catch(() => null);
 
+      // Add communication method preference to message
+      const messageWithPreference = `${formData.message as string}\n\n---\nPreferred Communication Method: ${communicationMethod === "sms" ? "SMS/Text Message" : "Email"}\n${communicationMethod === "sms" ? "⚠️ USER REQUESTED SMS CONNECTION - Please respond via text message." : ""}`;
+
       // Submit to contact service
       await contactService.submitContact({
         firstName: formData.firstName as string,
@@ -62,17 +71,17 @@ const Contact = () => {
         email: formData.email as string,
         phone: formData.phone as string,
         company: formData.company as string,
-        message: formData.message as string,
+        message: messageWithPreference,
         hub_id: hubConfig.hubNumber,
         email_signup: emailSignup,
-        sms_signup: smsSignup,
+        sms_signup: communicationMethod === "sms" ? true : smsSignup,
         turnstile_token: turnstileToken,
         client_ip: clientIP,
       });
 
       // Track successful submission
       const duration = performance.now() - startTime;
-      trackFormSubmission('contact', true, duration);
+      trackFormSubmission("contact", true, duration);
 
       // Show success modal
       setShowSuccess(true);
@@ -81,6 +90,8 @@ const Contact = () => {
       setTurnstileToken(null);
       setEmailSignup(false);
       setSmsSignup(false);
+      setCommunicationMethod("email");
+      setIsPhoneValid(false);
 
       // Redirect after 3 seconds
       setTimeout(() => {
@@ -94,7 +105,7 @@ const Contact = () => {
     } catch {
       // Track failed submission
       const duration = performance.now() - startTime;
-      trackFormSubmission('contact', false, duration);
+      trackFormSubmission("contact", false, duration);
 
       toast({
         title: "Something went sideways",
@@ -108,6 +119,24 @@ const Contact = () => {
 
   // Get form fields based on current hub
   const formFields = getContactFormFields(currentHub);
+
+  // Track phone number changes for validation and auto-switch communication method
+  const handleFormChange = (name: string, value: unknown) => {
+    if (name === "phone") {
+      const phone = value as string;
+      // Basic phone validation - at least 10 digits
+      const digitsOnly = phone?.replace(/\D/g, "") || "";
+      const isValid = digitsOnly.length >= 10;
+      setIsPhoneValid(isValid);
+
+      // Auto-switch to SMS when valid phone is entered, email when removed/invalid
+      if (isValid) {
+        setCommunicationMethod("sms");
+      } else {
+        setCommunicationMethod("email");
+      }
+    }
+  };
 
   return (
     <PageLayout
@@ -170,39 +199,146 @@ const Contact = () => {
                   <FormBuilder
                     fields={formFields}
                     onSubmit={handleSubmit}
-                    submitButtonText="Send Message"
-                    submitButtonClass={`w-full rounded-md py-3 ${hubColors.contactButton} font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105`}
+                    onChange={handleFormChange}
+                    submitButtonText="Send"
+                    submitButtonClass={`w-full rounded-lg py-4 ${hubColors.contactButton} font-bold text-lg transition-all duration-300 shadow-lg hover:shadow-2xl transform hover:scale-[1.02]`}
                     layout="two-column"
+                    beforeSubmitButton={
+                      <div className="p-6 bg-gradient-to-br from-gray-800/50 to-gray-800/30 rounded-lg border border-gray-700/50 shadow-xl">
+                        <h3 className="text-lg font-bold text-white mb-2 text-center">
+                          Choose Your Communication Method
+                        </h3>
+                        <p className="text-sm text-gray-400 text-center mb-6">
+                          Select how you&apos;d like us to respond
+                        </p>
+                        <div className="grid md:grid-cols-2 gap-4">
+                          {/* SMS Option - Emphasized */}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (isPhoneValid) {
+                                setCommunicationMethod("sms");
+                              }
+                            }}
+                            disabled={!isPhoneValid}
+                            className={`p-5 rounded-lg border-2 transition-all duration-200 relative ${
+                              !isPhoneValid
+                                ? "border-gray-700 bg-gray-800/30 opacity-50 cursor-not-allowed"
+                                : communicationMethod === "sms"
+                                  ? `${hubColors.border} bg-gradient-to-br ${hubColors.gradient} bg-opacity-20 shadow-lg`
+                                  : "border-gray-700 bg-gray-800/50 hover:border-gray-600 hover:bg-gray-800/70"
+                            }`}
+                          >
+                            {communicationMethod === "sms" && isPhoneValid && (
+                              <div className="absolute -top-2 -right-2">
+                                <div
+                                  className={`bg-gradient-to-br ${hubColors.gradient} rounded-full p-1`}
+                                >
+                                  <CheckCircle className="w-4 h-4 text-white" />
+                                </div>
+                              </div>
+                            )}
+                            <div className="flex items-center gap-3 mb-2">
+                              <MessageSquare
+                                className={`w-6 h-6 ${communicationMethod === "sms" && isPhoneValid ? hubColors.text : "text-gray-400"}`}
+                              />
+                              <span
+                                className={`font-bold text-lg ${communicationMethod === "sms" && isPhoneValid ? "text-white" : "text-gray-300"}`}
+                              >
+                                Text Message
+                              </span>
+                            </div>
+                            <p className="text-xs text-gray-400 text-left mb-2">
+                              Fast, direct SMS communication
+                            </p>
+                            {!isPhoneValid && (
+                              <p className="text-xs text-amber-400 text-left">
+                                ⚠️ Enter a valid phone number to enable
+                              </p>
+                            )}
+                          </button>
+
+                          {/* Email Option */}
+                          <button
+                            type="button"
+                            onClick={() => setCommunicationMethod("email")}
+                            className={`p-5 rounded-lg border-2 transition-all duration-200 relative ${
+                              communicationMethod === "email"
+                                ? `${hubColors.border} bg-gradient-to-br ${hubColors.gradient} bg-opacity-10`
+                                : "border-gray-700 bg-gray-800/50 hover:border-gray-600 hover:bg-gray-800/70"
+                            }`}
+                          >
+                            {communicationMethod === "email" && (
+                              <div className="absolute -top-2 -right-2">
+                                <div
+                                  className={`bg-gradient-to-br ${hubColors.gradient} rounded-full p-1`}
+                                >
+                                  <CheckCircle className="w-4 h-4 text-white" />
+                                </div>
+                              </div>
+                            )}
+                            <div className="flex items-center gap-3 mb-2">
+                              <Mail
+                                className={`w-6 h-6 ${communicationMethod === "email" ? hubColors.text : "text-gray-400"}`}
+                              />
+                              <span
+                                className={`font-bold text-lg ${communicationMethod === "email" ? "text-white" : "text-gray-300"}`}
+                              >
+                                Email
+                              </span>
+                            </div>
+                            <p className="text-xs text-gray-400 text-left">
+                              Traditional email communication
+                            </p>
+                          </button>
+                        </div>
+                        <p className="text-xs text-gray-400 text-center leading-relaxed mt-4">
+                          Future communication will be via your chosen method. You can always
+                          opt-out or switch later.
+                        </p>
+                      </div>
+                    }
                   />
 
                   {/* Signup Preferences */}
                   <div className="mt-6 p-4 bg-gray-800/30 rounded-lg border border-gray-700/50">
-                    <h3 className="text-sm font-medium text-white mb-3">
-                      Stay Updated (Optional)
-                    </h3>
+                    <h3 className="text-sm font-medium text-white mb-3">Stay Updated (Optional)</h3>
                     <div className="space-y-3">
-                      <label className="flex items-center space-x-3 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={emailSignup}
-                          onChange={(e) => setEmailSignup(e.target.checked)}
-                          className="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500 focus:ring-2"
-                        />
-                        <span className="text-sm text-gray-300">
-                          Email updates about SMS platform features and industry insights
-                        </span>
-                      </label>
-                      <label className="flex items-center space-x-3 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={smsSignup}
-                          onChange={(e) => setSmsSignup(e.target.checked)}
-                          className="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500 focus:ring-2"
-                        />
-                        <span className="text-sm text-gray-300">
-                          SMS notifications about important updates and new features
-                        </span>
-                      </label>
+                      {communicationMethod === "email" && (
+                        <>
+                          <label className="flex items-center space-x-3 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={emailSignup}
+                              onChange={(e) => setEmailSignup(e.target.checked)}
+                              className="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500 focus:ring-2"
+                            />
+                            <span className="text-sm text-gray-300">
+                              Email updates about SMS platform features and industry insights
+                            </span>
+                          </label>
+                          <label className="flex items-center space-x-3 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={smsSignup}
+                              onChange={(e) => setSmsSignup(e.target.checked)}
+                              className="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500 focus:ring-2"
+                            />
+                            <span className="text-sm text-gray-300">
+                              SMS notifications about important updates and new features
+                            </span>
+                          </label>
+                        </>
+                      )}
+                      {communicationMethod === "sms" && (
+                        <div className="text-sm text-gray-300 flex items-start gap-2">
+                          <CheckCircle className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
+                          <span>
+                            You&apos;ll automatically receive SMS updates when you choose text
+                            communication
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </div>
 

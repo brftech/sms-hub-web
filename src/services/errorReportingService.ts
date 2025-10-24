@@ -1,12 +1,12 @@
 /**
  * Centralized Error Reporting Service
- * 
+ *
  * Handles error classification, reporting, and telemetry.
  * Integrates with Sentry in production, logs to console in development.
  */
 
-export type ErrorSeverity = 'low' | 'medium' | 'high' | 'critical';
-export type ErrorCategory = 'network' | 'auth' | 'validation' | 'runtime' | 'database' | 'unknown';
+export type ErrorSeverity = "low" | "medium" | "high" | "critical";
+export type ErrorCategory = "network" | "auth" | "validation" | "runtime" | "database" | "unknown";
 
 export interface ErrorContext {
   hubId?: number;
@@ -35,76 +35,76 @@ class ErrorReportingService {
   private maxHistorySize = 50;
 
   constructor() {
-    this.isDevelopment = import.meta.env.MODE === 'development';
+    this.isDevelopment = import.meta.env.MODE === "development";
   }
 
   /**
    * Classify error based on type and message
    */
   classifyError(error: Error, context?: ErrorContext): ClassifiedError {
-    let category: ErrorCategory = 'unknown';
-    let severity: ErrorSeverity = 'medium';
+    let category: ErrorCategory = "unknown";
+    let severity: ErrorSeverity = "medium";
     let recoverable = false;
-    let userMessage = 'Something went wrong. Please try again.';
+    let userMessage = "Something went wrong. Please try again.";
 
     const errorMessage = error.message.toLowerCase();
 
     // Network errors
     if (
-      error.name === 'TypeError' && errorMessage.includes('fetch') ||
-      errorMessage.includes('network') ||
-      errorMessage.includes('connection') ||
-      errorMessage.includes('timeout')
+      (error.name === "TypeError" && errorMessage.includes("fetch")) ||
+      errorMessage.includes("network") ||
+      errorMessage.includes("connection") ||
+      errorMessage.includes("timeout")
     ) {
-      category = 'network';
-      severity = 'medium';
+      category = "network";
+      severity = "medium";
       recoverable = true;
-      userMessage = 'Unable to connect. Please check your internet connection and try again.';
+      userMessage = "Unable to connect. Please check your internet connection and try again.";
     }
     // Auth errors
     else if (
-      errorMessage.includes('auth') ||
-      errorMessage.includes('unauthorized') ||
-      errorMessage.includes('forbidden') ||
-      errorMessage.includes('token')
+      errorMessage.includes("auth") ||
+      errorMessage.includes("unauthorized") ||
+      errorMessage.includes("forbidden") ||
+      errorMessage.includes("token")
     ) {
-      category = 'auth';
-      severity = 'high';
+      category = "auth";
+      severity = "high";
       recoverable = true;
-      userMessage = 'Session expired. Please log in again.';
+      userMessage = "Session expired. Please log in again.";
     }
     // Validation errors
     else if (
-      errorMessage.includes('validation') ||
-      errorMessage.includes('invalid') ||
-      errorMessage.includes('required')
+      errorMessage.includes("validation") ||
+      errorMessage.includes("invalid") ||
+      errorMessage.includes("required")
     ) {
-      category = 'validation';
-      severity = 'low';
+      category = "validation";
+      severity = "low";
       recoverable = true;
-      userMessage = 'Please check your input and try again.';
+      userMessage = "Please check your input and try again.";
     }
     // Database errors
     else if (
-      errorMessage.includes('database') ||
-      errorMessage.includes('query') ||
-      errorMessage.includes('supabase')
+      errorMessage.includes("database") ||
+      errorMessage.includes("query") ||
+      errorMessage.includes("supabase")
     ) {
-      category = 'database';
-      severity = 'high';
+      category = "database";
+      severity = "high";
       recoverable = false;
-      userMessage = 'Unable to save changes. Please try again later.';
+      userMessage = "Unable to save changes. Please try again later.";
     }
     // Runtime errors
     else if (
-      error.name === 'TypeError' ||
-      error.name === 'ReferenceError' ||
-      error.name === 'RangeError'
+      error.name === "TypeError" ||
+      error.name === "ReferenceError" ||
+      error.name === "RangeError"
     ) {
-      category = 'runtime';
-      severity = 'critical';
+      category = "runtime";
+      severity = "critical";
       recoverable = false;
-      userMessage = 'An unexpected error occurred. Our team has been notified.';
+      userMessage = "An unexpected error occurred. Our team has been notified.";
     }
 
     return {
@@ -131,15 +131,22 @@ class ErrorReportingService {
 
     // Log to console in development
     if (this.isDevelopment) {
-      console.group(`🔴 Error [${classifiedError.severity.toUpperCase()}] - ${classifiedError.category}`);
-      console.error('Original Error:', classifiedError.originalError);
-      console.log('Classification:', {
+      // eslint-disable-next-line no-console
+      console.group(
+        `🔴 Error [${classifiedError.severity.toUpperCase()}] - ${classifiedError.category}`
+      );
+      console.error("Original Error:", classifiedError.originalError);
+      // eslint-disable-next-line no-console
+      console.log("Classification:", {
         category: classifiedError.category,
         severity: classifiedError.severity,
         recoverable: classifiedError.recoverable,
       });
-      console.log('Context:', classifiedError.context);
-      console.log('User Message:', classifiedError.userMessage);
+      // eslint-disable-next-line no-console
+      console.log("Context:", classifiedError.context);
+      // eslint-disable-next-line no-console
+      console.log("User Message:", classifiedError.userMessage);
+      // eslint-disable-next-line no-console
       console.groupEnd();
     }
 
@@ -157,7 +164,7 @@ class ErrorReportingService {
     }
 
     // Log critical errors to server
-    if (classifiedError.severity === 'critical') {
+    if (classifiedError.severity === "critical") {
       await this.logToServer(classifiedError);
     }
   }
@@ -184,7 +191,7 @@ class ErrorReportingService {
       }
     } catch (error) {
       // Silently fail - don't throw errors in error handler
-      console.error('Failed to log error to server:', error);
+      console.error("Failed to log error to server:", error);
     }
   }
 
@@ -207,9 +214,7 @@ class ErrorReportingService {
    */
   hasExcessiveErrors(timeWindowMs: number = 60000, threshold: number = 5): boolean {
     const cutoffTime = Date.now() - timeWindowMs;
-    const recentErrors = this.errorHistory.filter(
-      (err) => err.timestamp.getTime() > cutoffTime
-    );
+    const recentErrors = this.errorHistory.filter((err) => err.timestamp.getTime() > cutoffTime);
     return recentErrors.length >= threshold;
   }
 }
@@ -233,4 +238,3 @@ export function getUserErrorMessage(error: Error, context?: ErrorContext): strin
   const classified = errorReportingService.classifyError(error, context);
   return classified.userMessage;
 }
-

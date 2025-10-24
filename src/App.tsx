@@ -8,7 +8,7 @@ import {
   PageTransition,
   useHub,
 } from "@sms-hub/ui/marketing";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { Suspense, lazy, useEffect } from "react";
 import { useScrollToTop } from "@sms-hub/utils";
 import { webEnvironment, detectHubFromHostname } from "./config/environment";
@@ -75,11 +75,11 @@ const queryClient = new QueryClient();
 const PageLoader = () => {
   const { currentHub } = useHub();
   const colors = getHubColors(currentHub);
-  
+
   return (
     <div className="min-h-screen bg-black flex items-center justify-center">
       <div className="text-center">
-        <div 
+        <div
           className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4"
           style={{ borderBottomColor: colors.primary }}
         ></div>
@@ -107,19 +107,19 @@ const HubThemeWrapper = ({ children }: { children: React.ReactNode }) => {
 const AppRoutes = () => {
   // Apply scroll-to-top on route changes
   useScrollToTop();
-  
+
   // Track page load performance
   const location = useLocation();
-  
+
   useEffect(() => {
     const startTime = performance.now();
-    
+
     // Track page load after component is mounted
     const timer = setTimeout(() => {
       const duration = performance.now() - startTime;
       performanceMonitor.trackPageLoad(location.pathname, duration);
     }, 100);
-    
+
     return () => clearTimeout(timer);
   }, [location.pathname]);
 
@@ -176,17 +176,10 @@ const AppRoutes = () => {
           </PageTransition>
         }
       />
+      {/* Legacy Client Route Redirect - Temporary backward compatibility */}
+      <Route path={CLIENT_PAGE_STATIC_PATH} element={<Navigate to="/clients/donsbt" replace />} />
+
       {/* Dynamic Client Routes */}
-      <Route
-        path={CLIENT_PAGE_STATIC_PATH}
-        element={
-          <PageTransition>
-            <Suspense fallback={<PageLoader />}>
-              <ClientPage />
-            </Suspense>
-          </PageTransition>
-        }
-      />
       <Route
         path={CLIENTS_PATH}
         element={

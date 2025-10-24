@@ -1,12 +1,12 @@
 /**
  * React Hook for Performance Tracking
- * 
+ *
  * Provides easy-to-use hooks for tracking component performance,
  * API calls, and user interactions.
  */
 
-import { useEffect, useRef, useCallback } from 'react';
-import { performanceMonitor } from './services/performanceMonitoringService';
+import { useEffect, useRef, useCallback } from "react";
+import { performanceMonitor } from "./services/performanceMonitoringService";
 
 /**
  * Track component mount/unmount and render time
@@ -24,11 +24,11 @@ export function usePerformanceTracking(componentName: string, enabled = true) {
 
     // Track render duration
     const renderStart = performance.now();
-    
+
     return () => {
       const renderEnd = performance.now();
       const renderDuration = renderEnd - renderStart;
-      
+
       if (renderDuration > 0) {
         performanceMonitor.trackComponentRender(componentName, renderDuration);
       }
@@ -45,29 +45,28 @@ export function usePerformanceTracking(componentName: string, enabled = true) {
  * Track API calls with automatic timing
  */
 export function useAPITracking() {
-  const trackAPICall = useCallback(async <T,>(
-    endpoint: string,
-    method: string,
-    apiCall: () => Promise<T>
-  ): Promise<T> => {
-    const start = performance.now();
-    let success = false;
-    let status: number | undefined;
+  const trackAPICall = useCallback(
+    async <T>(endpoint: string, method: string, apiCall: () => Promise<T>): Promise<T> => {
+      const start = performance.now();
+      let success = false;
+      let status: number | undefined;
 
-    try {
-      const result = await apiCall();
-      success = true;
-      status = 200; // Assume success
-      return result;
-    } catch (error) {
-      success = false;
-      status = (error as { status?: number })?.status || 500;
-      throw error;
-    } finally {
-      const duration = performance.now() - start;
-      performanceMonitor.trackAPICall(endpoint, method, duration, success, status);
-    }
-  }, []);
+      try {
+        const result = await apiCall();
+        success = true;
+        status = 200; // Assume success
+        return result;
+      } catch (error) {
+        success = false;
+        status = (error as { status?: number })?.status || 500;
+        throw error;
+      } finally {
+        const duration = performance.now() - start;
+        performanceMonitor.trackAPICall(endpoint, method, duration, success, status);
+      }
+    },
+    []
+  );
 
   return { trackAPICall };
 }
@@ -80,7 +79,7 @@ export function usePageTracking(routeName: string) {
     const navigationStart = performance.now();
 
     // Track when page is fully loaded
-    if (document.readyState === 'complete') {
+    if (document.readyState === "complete") {
       const loadDuration = performance.now() - navigationStart;
       performanceMonitor.trackPageLoad(routeName, loadDuration);
       return undefined;
@@ -89,9 +88,9 @@ export function usePageTracking(routeName: string) {
         const loadDuration = performance.now() - navigationStart;
         performanceMonitor.trackPageLoad(routeName, loadDuration);
       };
-      
-      window.addEventListener('load', handleLoad);
-      return () => window.removeEventListener('load', handleLoad);
+
+      window.addEventListener("load", handleLoad);
+      return () => window.removeEventListener("load", handleLoad);
     }
   }, [routeName]);
 }
@@ -101,7 +100,7 @@ export function usePageTracking(routeName: string) {
  */
 export function useFormTracking(formName: string) {
   const trackSubmission = useCallback(
-    async <T,>(submitFn: () => Promise<T>): Promise<T> => {
+    async <T>(submitFn: () => Promise<T>): Promise<T> => {
       const start = performance.now();
       let success = false;
 
@@ -173,25 +172,26 @@ export function usePerformanceMetrics(refreshInterval = 5000) {
  * Measure a specific operation
  */
 export function useMeasure() {
-  const measure = useCallback(async <T,>(
-    operationName: string,
-    operation: () => Promise<T> | T
-  ): Promise<T> => {
-    const start = performance.now();
-    
-    try {
-      const result = await operation();
-      const duration = performance.now() - start;
-      
-      console.log(`⏱️ ${operationName}: ${duration.toFixed(2)}ms`);
-      
-      return result;
-    } catch (error) {
-      const duration = performance.now() - start;
-      console.error(`⏱️ ${operationName} failed after ${duration.toFixed(2)}ms`);
-      throw error;
-    }
-  }, []);
+  const measure = useCallback(
+    async <T>(operationName: string, operation: () => Promise<T> | T): Promise<T> => {
+      const start = performance.now();
+
+      try {
+        const result = await operation();
+        const duration = performance.now() - start;
+
+        // eslint-disable-next-line no-console
+        console.log(`⏱️ ${operationName}: ${duration.toFixed(2)}ms`);
+
+        return result;
+      } catch (error) {
+        const duration = performance.now() - start;
+        console.error(`⏱️ ${operationName} failed after ${duration.toFixed(2)}ms`);
+        throw error;
+      }
+    },
+    []
+  );
 
   return { measure };
 }

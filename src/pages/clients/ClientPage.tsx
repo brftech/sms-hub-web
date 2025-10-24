@@ -1,18 +1,11 @@
-import { useParams, useLocation } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { clientData } from "@sms-hub/clients";
 import ClientPageTemplate from "./ClientPageTemplate";
 
 export default function ClientPage() {
   const { clientId } = useParams<{ clientId: string }>();
-  const location = useLocation();
 
-  // Handle special case for /donsbt route
-  let actualClientId = clientId;
-  if (location.pathname === "/donsbt") {
-    actualClientId = "donsbt";
-  }
-
-  if (!actualClientId || !clientData[actualClientId]) {
+  if (!clientId || !clientData[clientId]) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-center">
@@ -23,10 +16,11 @@ export default function ClientPage() {
     );
   }
 
-  const client = clientData[actualClientId];
+  const client = clientData[clientId];
 
   return (
     <ClientPageTemplate
+      clientId={clientId}
       clientName={client.name}
       clientDescription={client.description}
       clientLogo={client.logo}
@@ -41,6 +35,7 @@ export default function ClientPage() {
       privacyLink={client.privacyLink}
       termsLink={client.termsLink}
       clientWebsite={client.clientWebsite}
+      colors={client.colors}
     />
   );
 }

@@ -1,26 +1,26 @@
 /**
  * Performance Monitoring Service
- * 
+ *
  * Tracks Core Web Vitals, custom metrics, and provides performance insights.
  * Integrates with Web Vitals API and provides real-time monitoring.
  */
 
-import { onCLS, onFID, onLCP, onFCP, onTTFB, Metric } from 'web-vitals';
+import { onCLS, onFID, onLCP, onFCP, onTTFB, Metric } from "web-vitals";
 
-export type MetricName = 'CLS' | 'FID' | 'LCP' | 'FCP' | 'TTFB';
-export type CustomMetricName = 
-  | 'page-load'
-  | 'api-call'
-  | 'component-render'
-  | 'hub-switch'
-  | 'form-submission'
-  | 'bundle-load'
-  | 'image-load';
+export type MetricName = "CLS" | "FID" | "LCP" | "FCP" | "TTFB";
+export type CustomMetricName =
+  | "page-load"
+  | "api-call"
+  | "component-render"
+  | "hub-switch"
+  | "form-submission"
+  | "bundle-load"
+  | "image-load";
 
 export interface PerformanceMetric {
   name: MetricName | CustomMetricName;
   value: number;
-  rating: 'good' | 'needs-improvement' | 'poor';
+  rating: "good" | "needs-improvement" | "poor";
   timestamp: number;
   metadata?: Record<string, unknown>;
 }
@@ -56,7 +56,7 @@ class PerformanceMonitoringService {
   private isInitialized = false;
 
   constructor() {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       this.initializeCoreWebVitals();
       this.initializeResourceTiming();
     }
@@ -77,7 +77,7 @@ class PerformanceMonitoringService {
 
       this.isInitialized = true;
     } catch (error) {
-      console.error('Failed to initialize Core Web Vitals:', error);
+      console.error("Failed to initialize Core Web Vitals:", error);
     }
   }
 
@@ -85,18 +85,18 @@ class PerformanceMonitoringService {
    * Initialize Resource Timing API tracking
    */
   private initializeResourceTiming(): void {
-    if (typeof window === 'undefined' || !window.performance) return;
+    if (typeof window === "undefined" || !window.performance) return;
 
     // Track bundle loads
     const observer = new PerformanceObserver((list) => {
       for (const entry of list.getEntries()) {
-        if (entry.entryType === 'resource') {
+        if (entry.entryType === "resource") {
           const resourceEntry = entry as PerformanceResourceTiming;
-          
+
           // Track JS bundles
-          if (resourceEntry.name.includes('.js')) {
+          if (resourceEntry.name.includes(".js")) {
             this.trackBundleLoad(
-              resourceEntry.name.split('/').pop() || 'unknown',
+              resourceEntry.name.split("/").pop() || "unknown",
               resourceEntry.transferSize || 0,
               resourceEntry.duration
             );
@@ -106,9 +106,9 @@ class PerformanceMonitoringService {
     });
 
     try {
-      observer.observe({ entryTypes: ['resource'] });
+      observer.observe({ entryTypes: ["resource"] });
     } catch (error) {
-      console.error('Failed to initialize Resource Timing:', error);
+      console.error("Failed to initialize Resource Timing:", error);
     }
   }
 
@@ -131,7 +131,8 @@ class PerformanceMonitoringService {
     this.addMetric(performanceMetric);
 
     // Log in development
-    if (import.meta.env.MODE === 'development') {
+    if (import.meta.env.MODE === "development") {
+      // eslint-disable-next-line no-console
       console.log(`📊 ${metric.name}:`, {
         value: metric.value.toFixed(2),
         rating: metric.rating,
@@ -144,9 +145,9 @@ class PerformanceMonitoringService {
    */
   trackPageLoad(route: string, duration: number): void {
     this.addMetric({
-      name: 'page-load',
+      name: "page-load",
       value: duration,
-      rating: this.getRating('page-load', duration),
+      rating: this.getRating("page-load", duration),
       timestamp: Date.now(),
       metadata: { route },
     });
@@ -177,9 +178,9 @@ class PerformanceMonitoringService {
     }
 
     this.addMetric({
-      name: 'api-call',
+      name: "api-call",
       value: duration,
-      rating: this.getRating('api-call', duration),
+      rating: this.getRating("api-call", duration),
       timestamp: Date.now(),
       metadata: { endpoint, method, success, status },
     });
@@ -201,9 +202,9 @@ class PerformanceMonitoringService {
     }
 
     this.addMetric({
-      name: 'component-render',
+      name: "component-render",
       value: duration,
-      rating: this.getRating('component-render', duration),
+      rating: this.getRating("component-render", duration),
       timestamp: Date.now(),
       metadata: { component },
     });
@@ -214,9 +215,9 @@ class PerformanceMonitoringService {
    */
   trackHubSwitch(fromHub: string, toHub: string, duration: number): void {
     this.addMetric({
-      name: 'hub-switch',
+      name: "hub-switch",
       value: duration,
-      rating: this.getRating('hub-switch', duration),
+      rating: this.getRating("hub-switch", duration),
       timestamp: Date.now(),
       metadata: { fromHub, toHub },
     });
@@ -227,9 +228,9 @@ class PerformanceMonitoringService {
    */
   trackFormSubmission(formType: string, success: boolean, duration: number): void {
     this.addMetric({
-      name: 'form-submission',
+      name: "form-submission",
       value: duration,
-      rating: this.getRating('form-submission', duration),
+      rating: this.getRating("form-submission", duration),
       timestamp: Date.now(),
       metadata: { formType, success },
     });
@@ -252,9 +253,9 @@ class PerformanceMonitoringService {
     }
 
     this.addMetric({
-      name: 'bundle-load',
+      name: "bundle-load",
       value: loadTime,
-      rating: this.getRating('bundle-load', loadTime),
+      rating: this.getRating("bundle-load", loadTime),
       timestamp: Date.now(),
       metadata: { name, size },
     });
@@ -265,9 +266,9 @@ class PerformanceMonitoringService {
    */
   trackImageLoad(url: string, size: number, duration: number): void {
     this.addMetric({
-      name: 'image-load',
+      name: "image-load",
       value: duration,
-      rating: this.getRating('image-load', duration),
+      rating: this.getRating("image-load", duration),
       timestamp: Date.now(),
       metadata: { url, size },
     });
@@ -286,23 +287,26 @@ class PerformanceMonitoringService {
   /**
    * Get rating for custom metrics
    */
-  private getRating(metricName: CustomMetricName, value: number): 'good' | 'needs-improvement' | 'poor' {
+  private getRating(
+    metricName: CustomMetricName,
+    value: number
+  ): "good" | "needs-improvement" | "poor" {
     const thresholds: Record<CustomMetricName, { good: number; poor: number }> = {
-      'page-load': { good: 2000, poor: 4000 },
-      'api-call': { good: 500, poor: 1000 },
-      'component-render': { good: 16, poor: 50 }, // 16ms = 60fps
-      'hub-switch': { good: 300, poor: 1000 },
-      'form-submission': { good: 1000, poor: 3000 },
-      'bundle-load': { good: 1000, poor: 3000 },
-      'image-load': { good: 500, poor: 1500 },
+      "page-load": { good: 2000, poor: 4000 },
+      "api-call": { good: 500, poor: 1000 },
+      "component-render": { good: 16, poor: 50 }, // 16ms = 60fps
+      "hub-switch": { good: 300, poor: 1000 },
+      "form-submission": { good: 1000, poor: 3000 },
+      "bundle-load": { good: 1000, poor: 3000 },
+      "image-load": { good: 500, poor: 1500 },
     };
 
     const threshold = thresholds[metricName];
-    if (!threshold) return 'good';
+    if (!threshold) return "good";
 
-    if (value <= threshold.good) return 'good';
-    if (value <= threshold.poor) return 'needs-improvement';
-    return 'poor';
+    if (value <= threshold.good) return "good";
+    if (value <= threshold.poor) return "needs-improvement";
+    return "poor";
   }
 
   /**
@@ -348,9 +352,7 @@ class PerformanceMonitoringService {
     const successful = this.apiCalls.filter((call) => call.success).length;
     const failed = total - successful;
     const averageDuration =
-      total > 0
-        ? this.apiCalls.reduce((sum, call) => sum + call.duration, 0) / total
-        : 0;
+      total > 0 ? this.apiCalls.reduce((sum, call) => sum + call.duration, 0) / total : 0;
 
     const byEndpoint: Record<string, { count: number; avgDuration: number }> = {};
     for (const call of this.apiCalls) {
@@ -373,7 +375,10 @@ class PerformanceMonitoringService {
   /**
    * Get component render statistics
    */
-  getComponentRenderStats(): Record<string, { count: number; avgDuration: number; maxDuration: number }> {
+  getComponentRenderStats(): Record<
+    string,
+    { count: number; avgDuration: number; maxDuration: number }
+  > {
     const stats: Record<string, { count: number; avgDuration: number; maxDuration: number }> = {};
 
     for (const render of this.componentRenders) {
@@ -429,13 +434,17 @@ class PerformanceMonitoringService {
    * Export metrics as JSON
    */
   exportMetrics(): string {
-    return JSON.stringify({
-      coreWebVitals: this.getCoreWebVitals(),
-      apiCalls: this.getAPICallStats(),
-      componentRenders: this.getComponentRenderStats(),
-      bundles: this.getBundleStats(),
-      allMetrics: this.metrics,
-    }, null, 2);
+    return JSON.stringify(
+      {
+        coreWebVitals: this.getCoreWebVitals(),
+        apiCalls: this.getAPICallStats(),
+        componentRenders: this.getComponentRenderStats(),
+        bundles: this.getBundleStats(),
+        allMetrics: this.metrics,
+      },
+      null,
+      2
+    );
   }
 }
 
@@ -462,4 +471,3 @@ export const trackHubSwitch = (fromHub: string, toHub: string, duration: number)
 
 export const trackFormSubmission = (formType: string, success: boolean, duration: number) =>
   performanceMonitor.trackFormSubmission(formType, success, duration);
-

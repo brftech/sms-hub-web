@@ -20,6 +20,7 @@ export default function ClientPrivacy() {
 
   return (
     <ClientPrivacyTemplate
+      clientId={clientId}
       clientName={client.name}
       clientDescription={client.description}
       clientLogo={client.logo}
@@ -30,6 +31,8 @@ export default function ClientPrivacy() {
       businessType={client.businessType}
       industryContext={client.industryContext}
       shortCode={client.shortCode}
+      clientWebsite={client.clientWebsite}
+      colors={client.colors}
     />
   );
 }

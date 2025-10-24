@@ -20,6 +20,7 @@ export default function ClientTerms() {
 
   return (
     <ClientTermsTemplate
+      clientId={clientId}
       clientName={client.name}
       clientDescription={client.description}
       clientLogo={client.logo}
@@ -30,6 +31,8 @@ export default function ClientTerms() {
       businessType={client.businessType}
       industryContext={client.industryContext}
       shortCode={client.shortCode}
+      clientWebsite={client.clientWebsite}
+      colors={client.colors}
     />
   );
 }

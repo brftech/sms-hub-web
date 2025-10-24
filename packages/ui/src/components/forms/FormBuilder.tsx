@@ -362,8 +362,8 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
                   field={pair[1]}
                   value={formData[pair[1].name]}
                   error={touched[pair[1].name] ? errors[pair[1].name] : undefined}
-                  onChange={(value) => handleFieldChange(pair[1].name, value)}
-                  onBlur={() => handleFieldBlur(pair[1].name)}
+                  onChange={(value) => pair[1] && handleFieldChange(pair[1].name, value)}
+                  onBlur={() => pair[1] && handleFieldBlur(pair[1].name)}
                   disabled={isSubmitting || loading}
                   className="!mb-0"
                 />

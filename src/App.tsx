@@ -53,12 +53,16 @@ const Pricing = lazy(() => import("./pages/Pricing"));
 const FAQ = lazy(() => import("./pages/FAQ"));
 const Demo = lazy(() => import("./pages/Demo"));
 
-// Import auth pages
-import { CheckEmail } from "./pages/CheckEmail";
-import { VerifyAuth } from "./pages/VerifyAuth";
-import { TestAuth } from "./pages/TestAuth";
-import { DebugAuth } from "./pages/DebugAuth";
-import PaymentSuccess from "./pages/PaymentSuccess";
+// Lazy load auth pages (not frequently accessed)
+const CheckEmail = lazy(() =>
+  import("./pages/CheckEmail").then((m) => ({ default: m.CheckEmail }))
+);
+const VerifyAuth = lazy(() =>
+  import("./pages/VerifyAuth").then((m) => ({ default: m.VerifyAuth }))
+);
+const TestAuth = lazy(() => import("./pages/TestAuth").then((m) => ({ default: m.TestAuth })));
+const DebugAuth = lazy(() => import("./pages/DebugAuth").then((m) => ({ default: m.DebugAuth })));
+const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"));
 
 // Lazy load client pages (less frequently accessed)
 const ClientPage = lazy(() => import("./pages/clients/ClientPage"));
@@ -273,7 +277,9 @@ const AppRoutes = () => {
           path={TEST_AUTH_PATH}
           element={
             <PageTransition>
-              <TestAuth />
+              <Suspense fallback={<PageLoader />}>
+                <TestAuth />
+              </Suspense>
             </PageTransition>
           }
         />
@@ -283,7 +289,9 @@ const AppRoutes = () => {
           path={DEBUG_AUTH_PATH}
           element={
             <PageTransition>
-              <DebugAuth />
+              <Suspense fallback={<PageLoader />}>
+                <DebugAuth />
+              </Suspense>
             </PageTransition>
           }
         />
@@ -292,7 +300,9 @@ const AppRoutes = () => {
         path={PAYMENT_SUCCESS_PATH}
         element={
           <PageTransition>
-            <PaymentSuccess />
+            <Suspense fallback={<PageLoader />}>
+              <PaymentSuccess />
+            </Suspense>
           </PageTransition>
         }
       />
@@ -300,7 +310,9 @@ const AppRoutes = () => {
         path={CHECK_EMAIL_PATH}
         element={
           <PageTransition>
-            <CheckEmail />
+            <Suspense fallback={<PageLoader />}>
+              <CheckEmail />
+            </Suspense>
           </PageTransition>
         }
       />
@@ -308,7 +320,9 @@ const AppRoutes = () => {
         path={VERIFY_OTP_PATH}
         element={
           <PageTransition>
-            <VerifyAuth />
+            <Suspense fallback={<PageLoader />}>
+              <VerifyAuth />
+            </Suspense>
           </PageTransition>
         }
       />
@@ -316,7 +330,9 @@ const AppRoutes = () => {
         path={VERIFY_PATH}
         element={
           <PageTransition>
-            <VerifyAuth />
+            <Suspense fallback={<PageLoader />}>
+              <VerifyAuth />
+            </Suspense>
           </PageTransition>
         }
       />

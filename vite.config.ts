@@ -22,6 +22,8 @@ export default defineConfig(({ mode }) => ({
       "@sms-hub/ui": path.resolve(__dirname, "./packages/ui/src"),
       "@sms-hub/hub-logic": path.resolve(__dirname, "./packages/hub-logic/src/index.ts"),
       "@sms-hub/supabase": path.resolve(__dirname, "./packages/supabase/src/index.ts"),
+      "@sms-hub/clients": path.resolve(__dirname, "./packages/clients/src/index.ts"),
+      "@sms-hub/utils": path.resolve(__dirname, "./packages/utils/src/index.ts"),
     },
     dedupe: ["react", "react-dom"],
     preserveSymlinks: true,
@@ -35,6 +37,21 @@ export default defineConfig(({ mode }) => ({
         chunkFileNames: "assets/[name]-[hash].js",
         entryFileNames: "assets/[name]-[hash].js",
         assetFileNames: "assets/[name]-[hash].[ext]",
+        // Manual chunk splitting to reduce main bundle size
+        manualChunks: {
+          // React ecosystem
+          "react-vendor": ["react", "react-dom", "react-router-dom"],
+          // Data fetching & state
+          "query-vendor": ["@tanstack/react-query"],
+          // Supabase
+          "supabase-vendor": ["@supabase/supabase-js"],
+          // Icons - large library
+          icons: ["lucide-react"],
+          // UI framework components
+          "ui-framework": ["@sms-hub/ui"],
+          // Hub logic
+          "hub-logic": ["@sms-hub/hub-logic", "@sms-hub/clients"],
+        },
       },
       // Use default treeshake settings for stability
     },
@@ -56,6 +73,7 @@ export default defineConfig(({ mode }) => ({
       "@sms-hub/ui",
       "@sms-hub/supabase",
       "@sms-hub/utils",
+      "@sms-hub/clients",
     ],
     dedupe: ["react", "react-dom"],
     // Exclude heavy dependencies from pre-bundling

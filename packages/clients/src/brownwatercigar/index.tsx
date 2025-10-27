@@ -12,9 +12,9 @@ export const brownwatercigarData: ClientData = {
   description: "Premium Handmade Cigars & Lounge",
   logo,
   icon: <Cigarette className="w-5 h-5 text-amber-900" />,
-  phoneNumber: "5555551234", // TODO: Replace with actual phone number
-  address: "Your Location Here", // TODO: Replace with actual address
-  hours: "Mon-Sat 11AM-10PM, Sun 12PM-8PM", // TODO: Replace with actual hours
+  phoneNumber: "9795519019",
+  address: "200 W. Alamo St., Brenham, TX 77833",
+  hours: "Closed Mon-Tue, Wed-Thu 11AM-9PM, Fri-Sat 11AM-10PM, Sun 12PM-6PM",
   features: [
     {
       icon: <Phone className="w-8 h-8 text-amber-900" />,
@@ -59,14 +59,14 @@ export const brownwatercigarData: ClientData = {
     },
   ],
   ctaText:
-    "Text 'JOIN' to join our exclusive community and experience the finest in premium cigars and lounge culture.",
-  ctaButtonText: "Text JOIN",
+    "Text 'JOIN' to (979) 216-3274 and join our exclusive community to experience the finest in premium cigars and lounge culture.",
+  ctaButtonText: "Text JOIN to (979) 216-3274",
   privacyLink: "/clients/brownwatercigar/privacy",
   termsLink: "/clients/brownwatercigar/terms",
   clientWebsite: "https://brownwatercigar.com",
   businessType: "Premium Cigar Lounge",
   industryContext: "premium cigar lounges and tobacco retail",
-  shortCode: "555-1234", // TODO: Replace with actual short code
+  shortCode: "9792163274",
   // Custom earthy, sophisticated color scheme inspired by Brown Water Cigar's branding
   colors: {
     primaryFrom: "#78350f", // amber-900

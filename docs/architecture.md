@@ -1,6 +1,6 @@
 # Architecture
 
-**Last Updated**: October 14, 2025 (Night - Favicon & Manifest Fixes)
+**Last Updated**: October 27, 2025 (Evening - Bundle Optimization & Client System)
 
 ## 🏗️ System Overview
 
@@ -30,6 +30,12 @@ All data is isolated by `hub_id`. Domain-based routing determines the active hub
 │
 ├── packages/                 # Internal packages
 │   ├── clients/              # Client data and marketing page assets
+│   │   └── src/              # Client-specific folders (brownwatercigar, donsbt)
+│   │       ├── {clientId}/   # Each client folder contains:
+│   │       │   ├── index.tsx # Client data (contact, hours, features, etc.)
+│   │       │   └── logo.png  # Client logo
+│   │       ├── index.ts      # Exports all client data
+│   │       └── types.ts      # TypeScript types
 │   ├── hub-logic/            # Hub configs, metadata, content
 │   │   └── src/hubs/         # Hub-specific folders (gnymble, percymd, etc)
 │   ├── ui/                   # Shared UI components
@@ -50,23 +56,37 @@ All data is isolated by `hub_id`. Domain-based routing determines the active hub
 
 ### Key Architecture Decisions
 
-**1. Hub Centralization**
+**1. Client Marketing Pages**
+
+- Client data centralized in `/packages/clients/src/`
+- Each client has own folder: `/clients/src/{clientId}/`
+- Contains: `index.tsx` (data), `logo.png` (branding)
+- Easily replicable pattern for onboarding new clients
+- Accessed via `/clients/{clientId}` route (e.g., `/clients/brownwatercigar`)
+- Client data includes: contact info, hours, features, benefits, SMS number, colors
+
+**2. Hub Centralization**
 
 - ALL hub-specific content lives in `/packages/hub-logic/src/hubs/`
 - Each hub has its own folder with small files: `metadata.ts`, `colors.ts`, `hero.ts`, etc.
 - Components use `useHub()` hook + helper functions like `getHubColors()`
 
-**2. Flat Component Structure**
+**3. Flat Component Structure**
 
 - No deep nesting (no `/home/shared/` folders)
 - Components are either shared or deleted
 - One level of folders maximum
 
-**3. Package Architecture**
+**4. Package Architecture & Bundle Optimization**
 
 - Local packages use `file:` dependencies
-- Vite configured with `preserveSymlinks: true`
-- Optimized bundle: `@sms-hub/ui/marketing` exports only marketing components
+- Vite configured with `preserveSymlinks: true` and proper aliases for all packages
+- **Bundle optimization** (66% reduction):
+  - Main bundle: 377KB (103KB gzipped) - down from 1.1MB
+  - Lazy loading for all auth pages and admin features
+  - Manual vendor chunk splitting (react, supabase, ui-framework, icons)
+  - Separate chunks cache independently for better performance
+- Optimized exports: `@sms-hub/ui/marketing` exports only marketing components
 
 ## 🗄️ Database
 
@@ -102,21 +122,40 @@ All tables have `hub_id` for multi-tenant isolation.
 ## 🎨 Favicon & PWA Manifest System
 
 **Dynamic Favicon Switching**:
+
 - HubContext automatically updates favicons when hub changes
 - Production: Each domain shows its branded icon (percytech.com → red, gnymble.com → orange, etc.)
 - Preview/Dev: Favicon updates when using hub switcher
 - Icons: `/public/percytech-icon-logo.svg`, `/public/gnymble-icon-logo.svg`, etc.
 
 **Hub-Specific PWA Manifests**:
+
 - Each hub has its own manifest: `/public/manifest-{hubname}.json`
 - Dynamically loaded based on current hub
 - Includes hub-specific name, theme color, and icon references
 - Enables proper "Add to Home Screen" branding per domain
 
 **Implementation**:
+
 - `HubContext.tsx` manages both favicon and manifest via `DOMAdapter`
 - Uses `getHubIconPath()` from `@sms-hub/hub-logic`
 - All icons face the same direction (no CSS transforms)
+
+## ⚡ Performance & Build
+
+**Bundle Optimization**:
+
+- Main bundle: 377KB (103KB gzipped)
+- Vendor chunks: react (55KB), supabase (128KB), ui-framework (477KB), icons (20KB)
+- Lazy loaded: All auth pages, client pages, admin features
+- Result: 66% faster initial page load
+
+**Vite Configuration** (`vite.config.ts`):
+
+- Manual chunk splitting for optimal caching
+- Proper aliases for all `@sms-hub/*` packages (critical for avoiding stale cache)
+- CSS code splitting enabled
+- Optimized dependencies pre-bundling
 
 ## 🧪 Testing
 

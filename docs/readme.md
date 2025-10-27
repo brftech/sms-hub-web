@@ -1,6 +1,6 @@
 # SMS Hub Web - Marketing Platform
 
-**Last Updated**: October 14, 2025 (Evening - Post Refactor)  
+**Last Updated**: October 27, 2025 (Evening - Bundle Optimization & Client System)  
 **Status**: ✅ Production Ready - Live at gnymble.com
 
 ## 🎯 What This Is
@@ -48,6 +48,7 @@ npm run build
   /services/              # API services
   /config/                # Environment configuration
 /packages/                # Internal packages
+  /clients/               # Client data & marketing assets
   /hub-logic/             # Hub configs & content
     /src/hubs/            # Hub-specific folders
   /ui/                    # Shared UI components
@@ -156,7 +157,16 @@ See [deployment.md](./deployment.md) for full guide.
 
 ## 📈 Recent Updates
 
-**October 14, 2025** (Latest):
+**October 27, 2025** (Latest):
+
+- ✅ **Bundle Size Optimization** - 66% reduction (1.1MB → 377KB main bundle, 304KB → 103KB gzipped)
+- ✅ **Lazy Loading** - All auth pages now load on-demand (CheckEmail, VerifyAuth, PaymentSuccess, etc.)
+- ✅ **Vendor Code Splitting** - Heavy libraries split into separate cached chunks (react, supabase, ui-framework, icons)
+- ✅ **Client Marketing System** - Centralized client data in `/packages/clients/` with easy-to-replicate pattern
+- ✅ **Vite Config Fixed** - Added missing aliases for `@sms-hub/clients` and `@sms-hub/utils` packages
+- ✅ **Brown Water Cigar** - Client site launched with contact info and SMS join number
+
+**October 14, 2025**:
 
 - ✅ **Reusable Form Component Library** - Schema-driven FormBuilder with validation, accessibility, hub-aware rules
 - ✅ **Performance Monitoring Dashboard** - Real-time Core Web Vitals, API stats, component render tracking (dev only at `/admin/performance`)

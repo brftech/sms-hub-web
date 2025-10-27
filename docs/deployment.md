@@ -1,6 +1,6 @@
 # Deployment
 
-**Last Updated**: October 14, 2025 (Night - Post-Production Recommendations)
+**Last Updated**: October 27, 2025 (Evening - Bundle Size Improvements)
 
 ## 🚀 Quick Deploy
 
@@ -198,6 +198,13 @@ npm run build
 ```
 
 Build output goes to `/dist/`.
+
+**Bundle Performance** (as of Oct 27, 2025):
+
+- Main bundle: 377KB (103KB gzipped)
+- 66% reduction from original 1.1MB through lazy loading and chunk splitting
+- Vendor chunks: react (55KB), supabase (128KB), ui-framework (477KB), icons (20KB)
+- All auth pages and admin features load on-demand
 
 ## 🔄 Supabase Setup
 

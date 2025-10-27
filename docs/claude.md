@@ -1,6 +1,6 @@
 # Claude Context - SMS Hub Web
 
-**Last Updated**: October 14, 2025 (Evening - Post Refactor)
+**Last Updated**: October 27, 2025 (Evening - Bundle Optimization & Client System)
 
 This file provides AI coding agents with essential context for working on SMS Hub Web. Read this first before making changes.
 
@@ -53,17 +53,32 @@ This file provides AI coding agents with essential context for working on SMS Hu
 - No `/home/shared/` or `/ui/` subfolders
 - Only create folders when 5+ related files exist
 
-### 3. Generic > Specific
+### 3. Client Marketing Pages
+
+- Client data centralized in `/packages/clients/src/`
+- Each client has own folder with `index.tsx` (data) and `logo.png`
+- Register in `/packages/clients/src/index.ts` to export
+- Accessed via `/clients/{clientId}` route
+- Easy to replicate for new clients
+
+### 4. Generic > Specific
 
 - Don't create `GnymbleLayout.tsx` and `PercyMDLayout.tsx`
 - Create `HomeLayout.tsx` with `variant` prop
 - Use `useHub()` hook + helper functions like `getHubColors()`
 
-### 4. Delete Dead Code
+### 5. Delete Dead Code
 
 - If not imported anywhere (`grep -r "ComponentName"`), delete it
 - Empty folders should be removed immediately
 - Archive folders = delete them, use git history
+
+### 6. Bundle Optimization Matters
+
+- Main bundle optimized to 377KB (103KB gzipped) - 66% reduction
+- Lazy load pages not needed on initial render
+- Manual vendor chunk splitting in `vite.config.ts`
+- All `@sms-hub/*` packages MUST have Vite aliases configured
 
 ## 🧭 Navigation Guide
 
@@ -71,6 +86,9 @@ This file provides AI coding agents with essential context for working on SMS Hu
 
 **Hub-specific content?**
 → `/packages/hub-logic/src/hubs/{hubType}/`
+
+**Client marketing pages?**
+→ `/packages/clients/src/{clientId}/`
 
 **UI components?**
 → `/src/components/` (flat structure)
@@ -97,6 +115,13 @@ This file provides AI coding agents with essential context for working on SMS Hu
 
 1. Edit `/packages/hub-logic/src/hubs/{hubType}/{section}.ts`
 2. No other files need updating (auto-imported)
+
+**Adding new client:**
+
+1. Create `/packages/clients/src/{clientId}/` folder
+2. Add `index.tsx` (client data) and `logo.png`
+3. Register in `/packages/clients/src/index.ts`
+4. Client accessible at `/clients/{clientId}`
 
 **Creating new page:**
 

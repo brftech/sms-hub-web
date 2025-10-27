@@ -1,6 +1,6 @@
 # Agent Lessons - Best Practices from Real Development
 
-**Last Updated**: October 14, 2025 (Night - Hub-Aware Login Button)
+**Last Updated**: October 27, 2025 (Evening - Bundle Optimization & Vite Config)
 
 This document contains hard-won lessons from real development work. These principles apply to this repo AND future projects.
 
@@ -404,6 +404,35 @@ This document contains hard-won lessons from real development work. These princi
 - Create `demoMessages.ts` for each hub in `hub-logic`
 - Use `getHubDemoMessages(currentHub)` to fetch hub-specific scenarios
 - Demo content should reflect each hub's vertical (healthcare, retail, fitness, etc.)
+
+### 54. **Vite config aliases are CRITICAL for local packages**
+
+- Missing `@sms-hub/clients` or `@sms-hub/utils` aliases in `vite.config.ts` causes stale cache issues
+- Symptoms: Changes to package files don't reflect in app, even after dev server restart
+- Without proper alias, Vite may cache old data from `node_modules` or other locations
+- **Always verify ALL local packages have aliases** in `vite.config.ts` `resolve.alias`
+- Also add to `optimizeDeps.include` array for proper pre-bundling
+- Example: Added missing aliases, cleared cache, restarted server → changes finally appeared
+
+### 55. **Bundle optimization through lazy loading and chunk splitting**
+
+- **Lazy loading**: Use `React.lazy()` for pages not needed on initial load (auth pages, admin, etc.)
+- **Manual chunk splitting**: Group vendor code in `vite.config.ts` `manualChunks`
+- Split by vendor: `react-vendor`, `supabase-vendor`, `ui-framework`, `icons`
+- Each vendor chunk caches independently - updates to app don't invalidate React cache
+- Wrap lazy components in `<Suspense>` with fallback loader
+- Result: 66% bundle size reduction (1.1MB → 377KB), 66% faster initial load
+- Don't over-split - too many chunks hurts HTTP/2 performance
+
+### 56. **Client marketing page pattern**
+
+- Client data centralized in `/packages/clients/src/{clientId}/`
+- Each client folder: `index.tsx` (data + config), `logo.png` (branding)
+- Register client in `/packages/clients/src/index.ts` (import, add to object, export)
+- URL automatically becomes `/clients/{clientId}`
+- Privacy/Terms pages automatically work via templates
+- Easy to replicate: copy folder, update data, register in index
+- All client data in one place - contact info, hours, features, benefits, SMS number, colors
 
 ---
 

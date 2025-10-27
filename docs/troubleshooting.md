@@ -1,6 +1,6 @@
 # Troubleshooting
 
-**Last Updated**: October 14, 2025 (Night - Post-Production Recommendations)
+**Last Updated**: October 27, 2025 (Evening - Added Vite Config Issues)
 
 ## 🔧 Common Issues
 
@@ -62,6 +62,40 @@ After refactoring, restart the dev server:
 # Stop server (Ctrl+C)
 npm run dev
 ```
+
+**Issue: Package changes not reflecting (stale cache)**
+
+If changes to `/packages/clients/` or `/packages/utils/` don't appear:
+
+1. **Check Vite aliases**: Verify `vite.config.ts` has aliases for ALL local packages:
+
+```typescript
+resolve: {
+  alias: {
+    '@sms-hub/clients': path.resolve(__dirname, './packages/clients/src/index.ts'),
+    '@sms-hub/utils': path.resolve(__dirname, './packages/utils/src/index.ts'),
+    // ... etc
+  }
+}
+```
+
+2. **Check optimizeDeps**: Ensure packages are in the include array:
+
+```typescript
+optimizeDeps: {
+  include: ["@sms-hub/clients", "@sms-hub/utils" /* ... */];
+}
+```
+
+3. **Clear cache and restart**:
+
+```bash
+rm -rf node_modules/.vite
+# Restart dev server
+npm run dev
+```
+
+Missing aliases cause Vite to load from stale cache instead of source files.
 
 ### Database & Supabase
 

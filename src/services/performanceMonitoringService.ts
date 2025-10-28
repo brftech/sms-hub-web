@@ -5,9 +5,9 @@
  * Integrates with Web Vitals API and provides real-time monitoring.
  */
 
-import { onCLS, onFID, onLCP, onFCP, onTTFB, Metric } from "web-vitals";
+import { onCLS, onINP, onLCP, onFCP, onTTFB, Metric } from "web-vitals";
 
-export type MetricName = "CLS" | "FID" | "LCP" | "FCP" | "TTFB";
+export type MetricName = "CLS" | "INP" | "LCP" | "FCP" | "TTFB";
 export type CustomMetricName =
   | "page-load"
   | "api-call"
@@ -70,7 +70,7 @@ class PerformanceMonitoringService {
 
     try {
       onCLS((metric) => this.recordCoreWebVital(metric));
-      onFID((metric) => this.recordCoreWebVital(metric));
+      onINP((metric) => this.recordCoreWebVital(metric));
       onLCP((metric) => this.recordCoreWebVital(metric));
       onFCP((metric) => this.recordCoreWebVital(metric));
       onTTFB((metric) => this.recordCoreWebVital(metric));
@@ -322,7 +322,7 @@ class PerformanceMonitoringService {
   getCoreWebVitals(): Record<MetricName, PerformanceMetric | null> {
     const vitals: Record<MetricName, PerformanceMetric | null> = {
       CLS: null,
-      FID: null,
+      INP: null,
       LCP: null,
       FCP: null,
       TTFB: null,

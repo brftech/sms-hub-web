@@ -20,15 +20,15 @@ export class PerformanceMonitor {
       // No start time found
       return 0;
     }
-    
+
     const duration = performance.now() - startTime;
     this.metrics.delete(label);
-    
+
     // Log slow operations
     if (duration > 100) {
       // Slow operation detected
     }
-    
+
     return duration;
   }
 
@@ -60,29 +60,29 @@ interface WebVitalsMetric {
 
 // Web Vitals monitoring
 export function initWebVitals(): void {
-  if (typeof window !== 'undefined') {
+  if (typeof window !== "undefined") {
     // Core Web Vitals
-    import('web-vitals').then(({ onCLS, onFID, onFCP, onLCP, onTTFB }) => {
+    import("web-vitals").then(({ onCLS, onINP, onFCP, onLCP, onTTFB }) => {
       onCLS((_metric: WebVitalsMetric) => {
         // CLS metric recorded
         // Send to analytics service
       });
-      
-      onFID((_metric: WebVitalsMetric) => {
-        // FID metric recorded
+
+      onINP((_metric: WebVitalsMetric) => {
+        // INP metric recorded
         // Send to analytics service
       });
-      
+
       onFCP((_metric: WebVitalsMetric) => {
         // FCP metric recorded
         // Send to analytics service
       });
-      
+
       onLCP((_metric: WebVitalsMetric) => {
         // LCP metric recorded
         // Send to analytics service
       });
-      
+
       onTTFB((_metric: WebVitalsMetric) => {
         // TTFB metric recorded
         // Send to analytics service
@@ -93,19 +93,19 @@ export function initWebVitals(): void {
 
 // Bundle size monitoring
 export function reportBundleSize(): void {
-  if (typeof window !== 'undefined' && import.meta.env.DEV) {
+  if (typeof window !== "undefined" && import.meta.env.DEV) {
     const observer = new PerformanceObserver((list) => {
       list.getEntries().forEach((entry) => {
-        if (entry.entryType === 'resource') {
+        if (entry.entryType === "resource") {
           const resource = entry as PerformanceResourceTiming;
-          if (resource.name.includes('.js') || resource.name.includes('.css')) {
+          if (resource.name.includes(".js") || resource.name.includes(".css")) {
             // Resource size logged
           }
         }
       });
     });
-    
-    observer.observe({ entryTypes: ['resource'] });
+
+    observer.observe({ entryTypes: ["resource"] });
   }
 }
 

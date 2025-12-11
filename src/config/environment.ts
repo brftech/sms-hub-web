@@ -94,7 +94,7 @@ function getWebAppUrl(env: Environment): string {
 
   return env === "production"
     ? "https://gnymble.com" // Default production URL
-    : "http://localhost:3000"; // Default dev URL
+    : "http://localhost:3005"; // Default dev URL
 }
 
 /**

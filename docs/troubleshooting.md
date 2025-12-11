@@ -1,6 +1,6 @@
 # Troubleshooting
 
-**Last Updated**: October 27, 2025 (Evening - Added Vite Config Issues)
+**Last Updated**: December 11, 2025 (Documentation Structure Update)
 
 ## 🔧 Common Issues
 
@@ -8,29 +8,9 @@
 
 **Issue: Husky deprecation warnings during commit/push**
 
-```
-husky - DEPRECATED
-Please remove the following two lines from .husky/pre-commit:
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
-```
+✅ **Fixed**: Removed deprecated `husky install` command from `package.json` prepare script.
 
-**Solution (optional, not urgent)**:
-
-This is a Husky v9 → v10 migration warning. To fix:
-
-```bash
-# Edit .husky/pre-commit
-# Remove these two lines:
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
-
-# Keep the rest of the file as-is
-
-# Repeat for .husky/pre-push
-```
-
-Or simply wait - this warning won't break anything, it's just informational.
+In Husky v9+, the `husky install` command is no longer needed in the prepare script. The hooks are already set up and will work automatically. The prepare script now only runs type-check and lint checks.
 
 ### Build & Development
 

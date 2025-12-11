@@ -39,7 +39,7 @@ describe("Environment Configuration", () => {
     global.window = {
       location: {
         hostname: "localhost",
-        origin: "http://localhost:3000",
+        origin: "http://localhost:3005",
       },
     } as any;
 
@@ -93,7 +93,7 @@ describe("Environment Configuration", () => {
 
     it("should use web app URL from window origin if available", () => {
       const config = getEnvironmentConfig();
-      expect(config.webAppUrl).toBe("http://localhost:3000");
+      expect(config.webAppUrl).toBe("http://localhost:3005");
     });
   });
 

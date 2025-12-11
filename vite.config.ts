@@ -7,7 +7,7 @@ export default defineConfig(({ mode }) => ({
   envDir: ".", // Load .env from current directory
   server: {
     host: true, // Allow external connections
-    port: 3000,
+    port: 3005,
     open: false, // Don't auto-open browser
     cors: true,
     hmr: {

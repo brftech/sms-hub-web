@@ -25,7 +25,7 @@ export default defineConfig({
   timeout: 30 * 1000, // 30 seconds per test
 
   use: {
-    baseURL: process.env.TEST_BASE_URL || "http://localhost:3000",
+    baseURL: process.env.TEST_BASE_URL || "http://localhost:3005",
     trace: "on-first-retry",
     screenshot: "only-on-failure",
     video: "retain-on-failure",
@@ -71,7 +71,7 @@ export default defineConfig({
 
   webServer: {
     command: "npm run dev",
-    url: "http://localhost:3000",
+    url: "http://localhost:3005",
     reuseExistingServer: true,
     timeout: 120 * 1000,
   },

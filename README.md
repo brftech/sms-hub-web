@@ -20,7 +20,7 @@ SMS Hub Web is a multi-tenant marketing website and sales dashboard for SMS Hub 
 # Install dependencies
 npm install
 
-# Start dev server (port 3000)
+# Start dev server (port 3005)
 npm run dev
 
 # Run tests
@@ -35,13 +35,13 @@ npm run build
 
 **Access Points**:
 
-- Marketing site: http://localhost:3000
-- Admin dashboard: http://localhost:3000/admin
+- Marketing site: http://localhost:3005
+- Admin dashboard: http://localhost:3005/admin
 
 ## 📁 Project Structure
 
 ```
-/docs/                    # Documentation (you are here)
+/docs/                    # Additional documentation
 /src/                     # Main React application
   /components/            # Shared components (flat structure)
   /pages/                 # Route components
@@ -80,11 +80,11 @@ npm run build
 
 ## 📚 Documentation
 
-- **[architecture.md](./architecture.md)** - System design, folder structure, database
-- **[deployment.md](./deployment.md)** - Production deployment guide
-- **[troubleshooting.md](./troubleshooting.md)** - Common issues & solutions
-- **[claude.md](./claude.md)** - AI agent context & coding guidelines
-- **[agent_lessons.md](./agent_lessons.md)** - Best practices from development
+- **[docs/architecture.md](./docs/architecture.md)** - System design, folder structure, database
+- **[docs/deployment.md](./docs/deployment.md)** - Production deployment guide
+- **[docs/troubleshooting.md](./docs/troubleshooting.md)** - Common issues & solutions
+- **[CLAUDE.md](./CLAUDE.md)** - AI agent context & coding guidelines
+- **[docs/agent_lessons.md](./docs/agent_lessons.md)** - Best practices from development
 
 ## 🌐 Environment Variables
 
@@ -153,7 +153,7 @@ git push origin main
 # Vercel auto-deploys to all 4 domains
 ```
 
-See [deployment.md](./deployment.md) for full guide.
+See [docs/deployment.md](./docs/deployment.md) for full guide.
 
 ## 📈 Recent Updates
 
@@ -193,8 +193,9 @@ See [deployment.md](./deployment.md) for full guide.
 
 ## 📞 Support
 
-- Check [troubleshooting.md](./troubleshooting.md) first
-- Review [agent_lessons.md](./agent_lessons.md) for patterns
+- Check [docs/troubleshooting.md](./docs/troubleshooting.md) first
+- Review [docs/agent_lessons.md](./docs/agent_lessons.md) for patterns
 - Check git history for similar issues
 - Review Supabase dashboard for database state
 - Check Vercel logs for production issues
+

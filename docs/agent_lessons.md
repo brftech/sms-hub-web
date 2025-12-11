@@ -1,6 +1,6 @@
 # Agent Lessons - Best Practices from Real Development
 
-**Last Updated**: October 27, 2025 (Evening - Bundle Optimization & Vite Config)
+**Last Updated**: December 11, 2025 (Documentation Structure Update)
 
 This document contains hard-won lessons from real development work. These principles apply to this repo AND future projects.
 
@@ -42,11 +42,11 @@ This document contains hard-won lessons from real development work. These princi
 
 ## 📁 File & Folder Organization
 
-### 6. **Use snake_case for .md files**
+### 6. **Use appropriate casing for .md files**
 
-- ✅ `readme.md`, `agent_lessons.md`, `troubleshooting.md`
-- ❌ `README.MD`, `Agent-Lessons.md`, `Troubleshooting.MD`
-- Consistent, lowercase, readable
+- Root documentation: `README.md`, `CLAUDE.md` (uppercase, standard convention)
+- Docs folder: `agent_lessons.md`, `troubleshooting.md` (lowercase, snake_case)
+- Consistent naming helps with discoverability
 
 ### 7. **Centralize hub-specific content**
 
@@ -251,11 +251,12 @@ This document contains hard-won lessons from real development work. These princi
 
 ## 📝 Documentation
 
-### 34. **5 docs maximum**
+### 34. **Root docs + focused /docs folder**
 
-- More docs = outdated docs
-- Better: comprehensive docs that stay updated
-- Delete/merge aggressively
+- Root: `README.md` (project overview), `CLAUDE.md` (AI agent context)
+- `/docs/`: Focused technical docs (architecture, deployment, troubleshooting, lessons)
+- Keep docs focused and actionable
+- Delete/merge aggressively to prevent outdated information
 
 ### 35. **Docs should be actionable**
 

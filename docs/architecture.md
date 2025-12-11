@@ -1,6 +1,6 @@
 # Architecture
 
-**Last Updated**: October 27, 2025 (Evening - Bundle Optimization & Client System)
+**Last Updated**: December 11, 2025 (Documentation Structure Update)
 
 ## 🏗️ System Overview
 
@@ -51,7 +51,7 @@ All data is isolated by `hub_id`. Domain-based routing determines the active hub
 │   ├── integration/          # Integration tests
 │   └── e2e/                  # End-to-end tests (Playwright)
 │
-└── docs/                     # Documentation (5 files max)
+└── docs/                     # Additional documentation (4 files)
 ```
 
 ### Key Architecture Decisions

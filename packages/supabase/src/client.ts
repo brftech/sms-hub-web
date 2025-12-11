@@ -8,9 +8,10 @@ export const createSupabaseClient = (url: string, anonKey: string) => {
     console.error("Missing Supabase environment variables");
   }
 
-  // Check if we're on the marketing site (port 3000) - don't persist sessions there
-  const isMarketingSite = typeof window !== "undefined" && 
-    (window.location.port === "3000" || window.location.hostname.includes("www."));
+  // Check if we're on the marketing site (port 3005) - don't persist sessions there
+  const isMarketingSite =
+    typeof window !== "undefined" &&
+    (window.location.port === "3005" || window.location.hostname.includes("www."));
 
   return createClient<Database>(url, anonKey, {
     auth: {
@@ -36,10 +37,7 @@ if (
   typeof global !== "undefined"
 ) {
   const url = process.env.SUPABASE_URL || "";
-  const key =
-    process.env.SUPABASE_SERVICE_ROLE_KEY ||
-    process.env.SUPABASE_ANON_KEY ||
-    "";
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || "";
 
   if (url && key) {
     supabase = createSupabaseClient(url, key);

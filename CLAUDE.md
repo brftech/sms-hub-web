@@ -341,10 +341,10 @@ const supabase = getSupabaseClient();
 
 ## 📚 Additional Resources
 
-- **[architecture.md](./architecture.md)** - Deep dive into system design
-- **[deployment.md](./deployment.md)** - Production deployment guide
-- **[troubleshooting.md](./troubleshooting.md)** - Common issues
-- **[agent_lessons.md](./agent_lessons.md)** - 40 lessons from real development
+- **[docs/architecture.md](./docs/architecture.md)** - Deep dive into system design
+- **[docs/deployment.md](./docs/deployment.md)** - Production deployment guide
+- **[docs/troubleshooting.md](./docs/troubleshooting.md)** - Common issues
+- **[docs/agent_lessons.md](./docs/agent_lessons.md)** - 40 lessons from real development
 
 ## ⚡ Pro Tips for AI Agents
 
@@ -362,3 +362,4 @@ const supabase = getSupabaseClient();
 ---
 
 **Remember**: This is a production app serving real customers. Write clean, tested, maintainable code. When in doubt, ask before making breaking changes.
+

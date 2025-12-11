@@ -16,7 +16,7 @@ export const detectHubFromPath = (pathname: string): HubType | null => {
 };
 
 // Port-based detection removed - now using domain-based detection only
-// All hubs are served from the same port (3000) with different domains
+// All hubs are served from the same port (3005) with different domains
 
 export const getHubUrl = (
   hubType: HubType,
@@ -24,7 +24,7 @@ export const getHubUrl = (
 ): string => {
   // Return appropriate URLs based on environment and hub
   const baseUrls = {
-    development: "http://localhost:3000",
+    development: "http://localhost:3005",
     staging: `https://staging.${hubType}.com`,
     production: `https://www.${hubType}.com`,
   };
@@ -52,11 +52,7 @@ export const hexToRgb = (hex: string): string => {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   if (!result) return "0, 0, 0";
 
-  return [
-    parseInt(result[1], 16),
-    parseInt(result[2], 16),
-    parseInt(result[3], 16),
-  ].join(", ");
+  return [parseInt(result[1], 16), parseInt(result[2], 16), parseInt(result[3], 16)].join(", ");
 };
 
 export const getHubFeatures = (hubType: HubType): string[] => {
@@ -64,11 +60,7 @@ export const getHubFeatures = (hubType: HubType): string[] => {
   const features = {
     gnymble: ["business-messaging", "lead-capture", "customer-support"],
     percytech: ["technical-support", "api-integration", "webhook-management"],
-    percymd: [
-      "medical-messaging",
-      "hipaa-compliance",
-      "appointment-scheduling",
-    ],
+    percymd: ["medical-messaging", "hipaa-compliance", "appointment-scheduling"],
     percytext: ["text-messaging", "sms-campaigns", "bulk-messaging"],
   };
   return features[hubType] || [];

@@ -155,17 +155,15 @@ describe("Hub-logic structure validation", () => {
 describe("Documentation structure validation", () => {
   const docsDir = path.resolve(__dirname, "../../docs");
 
-  it("should have exactly 6 .md files in /docs/", () => {
+  it("should have exactly 4 .md files in /docs/", () => {
     const entries = fs.readdirSync(docsDir);
     const mdFiles = entries.filter((file) => file.endsWith(".md"));
 
-    expect(mdFiles.length).toBe(6);
+    expect(mdFiles.length).toBe(4);
   });
 
-  it("should have all required documentation files", () => {
+  it("should have all required documentation files in /docs/", () => {
     const requiredDocs = [
-      "readme.md",
-      "claude.md",
       "architecture.md",
       "deployment.md",
       "troubleshooting.md",
@@ -196,10 +194,10 @@ describe("Documentation structure validation", () => {
     });
   });
 
-  it("should not have readme.md or claude.md in project root", () => {
+  it("should have README.md and CLAUDE.md in project root", () => {
     const rootDir = path.resolve(__dirname, "../..");
 
-    expect(fs.existsSync(path.join(rootDir, "readme.md"))).toBe(false);
-    expect(fs.existsSync(path.join(rootDir, "claude.md"))).toBe(false);
+    expect(fs.existsSync(path.join(rootDir, "README.md"))).toBe(true);
+    expect(fs.existsSync(path.join(rootDir, "CLAUDE.md"))).toBe(true);
   });
 });

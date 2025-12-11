@@ -37,20 +37,43 @@ export default defineConfig(({ mode }) => ({
         chunkFileNames: "assets/[name]-[hash].js",
         entryFileNames: "assets/[name]-[hash].js",
         assetFileNames: "assets/[name]-[hash].[ext]",
-        // Manual chunk splitting to reduce main bundle size
-        manualChunks: {
-          // React ecosystem
-          "react-vendor": ["react", "react-dom", "react-router-dom"],
+        // Ensure proper chunk loading order
+        manualChunks: (id) => {
+          // React ecosystem - must load first (includes JSX runtime)
+          // Match all React-related modules including JSX runtime
+          if (
+            id.includes("node_modules/react") ||
+            id.includes("/react/jsx-runtime") ||
+            id.includes("/react/jsx-dev-runtime") ||
+            id.includes("react/jsx-runtime") ||
+            id.includes("react/jsx-dev-runtime")
+          ) {
+            return "react-vendor";
+          }
           // Data fetching & state
-          "query-vendor": ["@tanstack/react-query"],
+          if (id.includes("node_modules/@tanstack/react-query")) {
+            return "query-vendor";
+          }
           // Supabase
-          "supabase-vendor": ["@supabase/supabase-js"],
+          if (id.includes("node_modules/@supabase/supabase-js")) {
+            return "supabase-vendor";
+          }
           // Icons - large library
-          icons: ["lucide-react"],
+          if (id.includes("node_modules/lucide-react")) {
+            return "icons";
+          }
           // UI framework components
-          "ui-framework": ["@sms-hub/ui"],
-          // Hub logic
-          "hub-logic": ["@sms-hub/hub-logic", "@sms-hub/clients"],
+          if (id.includes("packages/ui/src")) {
+            return "ui-framework";
+          }
+          // Hub logic and clients - these contain JSX so need React available
+          if (id.includes("packages/hub-logic/src") || id.includes("packages/clients/src")) {
+            return "hub-logic";
+          }
+          // Default: put other node_modules in vendor chunk
+          if (id.includes("node_modules")) {
+            return "vendor";
+          }
         },
       },
       // Use default treeshake settings for stability

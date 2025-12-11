@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import { clientData } from "@sms-hub/clients";
-import ClientPrivacyTemplate from "./ClientPrivacyTemplate";
+import ClientPrivacyTermsTemplate from "./ClientPrivacyTermsTemplate";
 
 export default function ClientPrivacy() {
   const { clientId } = useParams<{ clientId: string }>();
@@ -19,7 +19,7 @@ export default function ClientPrivacy() {
   const client = clientData[clientId];
 
   return (
-    <ClientPrivacyTemplate
+    <ClientPrivacyTermsTemplate
       clientId={clientId}
       clientName={client.name}
       clientDescription={client.description}

@@ -8,6 +8,7 @@
 // Import client data
 import { donsbtData } from "./donsbt";
 import { brownwatercigarData } from "./brownwatercigar";
+import { thelibrarycigarloungeData } from "./thelibrarycigarlounge";
 import type { ClientData } from "./types";
 
 // Export types
@@ -17,8 +18,10 @@ export type { ClientData, ClientColors } from "./types";
 export const clientData: Record<string, ClientData> = {
   donsbt: donsbtData,
   brownwatercigar: brownwatercigarData,
+  thelibrarycigarlounge: thelibrarycigarloungeData,
 };
 
 // Export individual clients for direct access
 export { donsbtData } from "./donsbt";
 export { brownwatercigarData } from "./brownwatercigar";
+export { thelibrarycigarloungeData } from "./thelibrarycigarlounge";

@@ -27,7 +27,7 @@ interface ClientPageTemplateProps {
   ctaButtonText: string;
   clientWebsite?: string;
   privacyLink?: string;
-  termsLink?: string;
+  termsLink?: string; // Kept for backwards compatibility, but both routes show combined page
   colors?: ClientColors; // Optional custom color scheme
 }
 
@@ -58,7 +58,7 @@ export default function ClientPageTemplate({
   ctaButtonText,
   clientWebsite,
   privacyLink,
-  termsLink,
+  termsLink: _termsLink, // Unused but kept for backwards compatibility
   colors,
 }: ClientPageTemplateProps) {
   // Use provided colors or fall back to defaults
@@ -124,13 +124,7 @@ export default function ClientPageTemplate({
                 to={privacyLink || "/privacy"}
                 className="text-gray-300 hover:text-white transition-colors text-sm"
               >
-                Privacy
-              </Link>
-              <Link
-                to={termsLink || "/terms"}
-                className="text-gray-300 hover:text-white transition-colors text-sm"
-              >
-                Terms
+                Privacy & Terms
               </Link>
             </nav>
           </div>
@@ -347,13 +341,7 @@ export default function ClientPageTemplate({
                 to={privacyLink || "/privacy"}
                 className="text-gray-400 hover:text-white transition-colors"
               >
-                Privacy Policy
-              </Link>
-              <Link
-                to={termsLink || "/terms"}
-                className="text-gray-400 hover:text-white transition-colors"
-              >
-                Terms & Conditions
+                Privacy & Terms
               </Link>
               {clientWebsite && (
                 <a

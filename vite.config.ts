@@ -70,10 +70,8 @@ export default defineConfig(({ mode }) => ({
           if (id.includes("packages/hub-logic/src") || id.includes("packages/clients/src")) {
             return "hub-logic";
           }
-          // Default: put other node_modules in vendor chunk
-          if (id.includes("node_modules")) {
-            return "vendor";
-          }
+          // Let Vite handle remaining node_modules automatically to avoid circular dependencies
+          // Don't force everything else into a single vendor chunk
         },
       },
       // Use default treeshake settings for stability
